@@ -387,10 +387,28 @@
       });
       nameInput.value = prefillName;
 
-      // Auto-join
-      setTimeout(() => {
-        joinBtn.click();
-      }, 500);
+      // Enable the join button
+      updateJoinEnabled();
+
+      // Check if we're on step 0 (code) or step 1 (name)
+      const stepCodeEl = document.getElementById('stepCode');
+      const stepNameEl = document.getElementById('stepName');
+
+      if (stepCodeEl && !stepCodeEl.classList.contains('hide')) {
+        // We're on step 0, need to go to step 1 first
+        setTimeout(() => {
+          nextBtn.click();
+          // Then click join after transition
+          setTimeout(() => {
+            joinBtn.click();
+          }, 500);
+        }, 100);
+      } else {
+        // Already on step 1, can join directly
+        setTimeout(() => {
+          joinBtn.click();
+        }, 500);
+      }
     }
 
     return false;
