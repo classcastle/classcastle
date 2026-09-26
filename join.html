@@ -321,6 +321,9 @@
   let currentStudentId = null;
   let messageInterval = null;
 
+  // LocalStorage keys
+  const STORAGE_KEY = 'classcastle_student_session';
+
   // Switch favicon based on theme
   function updateFavicon() {
     const favicon = document.getElementById('favicon');
@@ -331,6 +334,41 @@
   // Update favicon on load and when theme changes
   updateFavicon();
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
+
+  // Check for existing session on page load
+  function checkExistingSession() {
+    const savedSession = localStorage.getItem(STORAGE_KEY);
+    if (savedSession) {
+      try {
+        const session = JSON.parse(savedSession);
+        // Restore the session
+        currentRoomId = session.roomId;
+        currentStudentId = session.studentId;
+
+        // Pre-fill the form
+        const codeStr = session.code.toString();
+        digits.forEach((digit, i) => {
+          digit.value = codeStr[i] || '';
+        });
+        nameInput.value = session.name;
+
+        // Show joined state
+        joinedTitle.textContent = 'You\u2019re in the room';
+        joinedSub.textContent = session.name + ', you\u2019ve joined room ' + session.code + '. Sit tight \u2014 your teacher controls where this browser goes next.';
+        formState.classList.add('hide');
+        joinedState.classList.add('show');
+
+        // Start message polling
+        startMessagePolling();
+
+        return true;
+      } catch (error) {
+        console.error('Error restoring session:', error);
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    }
+    return false;
+  }
 
   const CODE_LEN = 6;
   const digits = Array.from(document.querySelectorAll('.code-digit'));
@@ -490,6 +528,14 @@
       currentRoomId = room.id;
       currentStudentId = studentData.id;
 
+      // Save session to localStorage
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        roomId: room.id,
+        studentId: studentData.id,
+        code: code,
+        name: name
+      }));
+
       // Start polling for messages
       startMessagePolling();
     } catch (error) {
@@ -511,6 +557,9 @@
     // Clear state
     currentRoomId = null;
     currentStudentId = null;
+
+    // Clear localStorage
+    localStorage.removeItem(STORAGE_KEY);
 
     // Try to delete student record
     try {
@@ -551,6 +600,27 @@
       if (!currentRoomId || !currentStudentId) return;
 
       try {
+        // Check if student still exists (not kicked)
+        const { data: student, error: studentError } = await SupabaseClient
+          .from('students')
+          .select('id')
+          .eq('id', currentStudentId)
+          .single();
+
+        if (studentError || !student) {
+          // Student was kicked, clear session and show join form
+          stopMessagePolling();
+          localStorage.removeItem(STORAGE_KEY);
+          currentRoomId = null;
+          currentStudentId = null;
+
+          alert('You have been removed from the room by your teacher.');
+          joinedState.classList.remove('show');
+          formState.classList.remove('hide');
+          goToStep(0);
+          return;
+        }
+
         const { data: messages, error } = await SupabaseClient
           .from('messages')
           .select('*')
@@ -592,6 +662,9 @@
       </div>
     `).join('');
   }
+
+  // Check for existing session on page load
+  checkExistingSession();
 
   updateNextEnabled();
 </script>
