@@ -21,10 +21,14 @@ chrome.storage.local.get(['roomId', 'studentId'], (result) => {
   }
 });
 
-// Listen for messages from popup
+// Listen for messages from popup and content scripts
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'joinRoom') {
     joinRoom(request.roomId, request.studentId);
+  } else if (request.action === 'studentJoined') {
+    // Student joined via join.html, update background script
+    joinRoom(request.roomId, request.studentId);
+    sendResponse({ success: true });
   } else if (request.action === 'leaveRoom') {
     leaveRoom();
   } else if (request.action === 'getStatus') {

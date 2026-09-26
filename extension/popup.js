@@ -8,13 +8,6 @@ const leaveBtn = document.getElementById('leaveBtn');
 const errorEl = document.getElementById('error');
 const loadingEl = document.getElementById('loading');
 
-// Load Supabase
-const SUPABASE_URL = 'https://hduyofdbpspjcuwvackd.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK';
-
-// Initialize extension
-const SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
 // Check current status
 checkStatus();
 
@@ -82,81 +75,18 @@ async function handleJoin() {
   hideError();
   showLoading();
 
-  try {
-    console.log('Looking for room with code:', roomId);
+  // Open join.html on classcastle.org with room code and student name
+  const joinUrl = `https://classcastle.org/join.html?code=${encodeURIComponent(roomId)}&name=${encodeURIComponent(studentName)}&from_extension=true`;
 
-    // First, check if room exists at all (without active filter)
-    const { data: allRooms, error: allRoomsError } = await SupabaseClient
-      .from('rooms')
-      .select('id, active, code')
-      .eq('code', roomId)
-      .limit(1);
-
-    console.log('All rooms with this code:', { allRooms, allRoomsError });
-
-    if (allRoomsError) {
-      console.error('Room query error:', allRoomsError);
-      throw new Error('Error looking up room: ' + allRoomsError.message);
+  // Get the active tab and navigate to join page
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs[0]) {
+      chrome.tabs.update(tabs[0].id, { url: joinUrl }, () => {
+        // Close the popup
+        window.close();
+      });
     }
-
-    if (!allRooms || allRooms.length === 0) {
-      console.log('No room found with code:', roomId);
-      throw new Error('Room not found. Please check the room code with your teacher.');
-    }
-
-    const roomData = allRooms[0];
-    console.log('Found room:', roomData);
-
-    // Check if room is active
-    if (!roomData.active) {
-      console.log('Room is closed (active: false)');
-      throw new Error('Room is closed. Please ask your teacher to reopen it.');
-    }
-
-    const roomIdValue = roomData.id;
-    console.log('Room is active, ID:', roomIdValue);
-
-    // Try to insert student
-    const { data: student, error: studentError } = await SupabaseClient
-      .from('students')
-      .insert({
-        room_id: roomIdValue,
-        name: studentName,
-        online: true,
-        current_url: null,
-        last_seen: new Date().toISOString()
-      })
-      .select()
-      .limit(1);
-
-    if (studentError) {
-      console.error('Student insert error:', studentError);
-      throw new Error('Error joining room: ' + studentError.message);
-    }
-
-    if (!student || student.length === 0) {
-      throw new Error('Error joining room');
-    }
-
-    const studentId = student[0].id;
-    console.log('Created student with ID:', studentId);
-
-    // Join room in background script
-    chrome.runtime.sendMessage({
-      action: 'joinRoom',
-      roomId: roomIdValue,
-      studentId: studentId
-    }, () => {
-      hideLoading();
-      showJoinedState();
-    });
-
-  } catch (error) {
-    console.error('Error joining room:', error);
-    hideLoading();
-    showJoinForm();
-    showError(error.message || 'Error joining room');
-  }
+  });
 }
 
 // Handle leave room

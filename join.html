@@ -339,6 +339,12 @@
   updateFavicon();
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
 
+  // Check if coming from extension
+  const urlParams = new URLSearchParams(window.location.search);
+  const fromExtension = urlParams.get('from_extension') === 'true';
+  const prefillCode = urlParams.get('code');
+  const prefillName = urlParams.get('name');
+
   // Check for existing session on page load
   function checkExistingSession() {
     const savedSession = localStorage.getItem(STORAGE_KEY);
@@ -371,6 +377,22 @@
         localStorage.removeItem(STORAGE_KEY);
       }
     }
+
+    // Check if coming from extension with pre-filled data
+    if (fromExtension && prefillCode && prefillName) {
+      // Pre-fill the form
+      const codeStr = prefillCode.toString();
+      digits.forEach((digit, i) => {
+        digit.value = codeStr[i] || '';
+      });
+      nameInput.value = prefillName;
+
+      // Auto-join
+      setTimeout(() => {
+        joinBtn.click();
+      }, 500);
+    }
+
     return false;
   }
 
@@ -542,6 +564,20 @@
 
       // Start polling for messages
       startMessagePolling();
+
+      // Notify extension that student joined (if running in extension context)
+      if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+        try {
+          chrome.runtime.sendMessage({
+            action: 'studentJoined',
+            roomId: room.id,
+            studentId: studentData.id
+          });
+        } catch (e) {
+          // Not running in extension context, ignore
+          console.log('Not in extension context, skipping extension notification');
+        }
+      }
     } catch (error) {
       console.error('Error joining room:', error);
       statusLine.textContent = 'Error joining room. Please try again.';
