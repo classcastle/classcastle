@@ -9,7 +9,8 @@
     "activeTab"
   ],
   "host_permissions": [
-    "https://hduyofdbpspjcuwvackd.supabase.co/*"
+    "https://hduyofdbpspjcuwvackd.supabase.co/*",
+    "https://cdn.jsdelivr.net/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -33,8 +34,5 @@
       "js": ["content.js"],
       "run_at": "document_idle"
     }
-  ],
-  "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'"
-  }
+  ]
 }
