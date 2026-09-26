@@ -35,24 +35,24 @@ ALTER TABLE rooms ENABLE ROW LEVEL SECURITY;
 ALTER TABLE students ENABLE ROW LEVEL SECURITY;
 
 -- RLS policies for rooms
-CREATE POLICY "Teachers can view their own rooms"
+CREATE OR REPLACE POLICY "Teachers can view their own rooms"
   ON rooms FOR SELECT
   USING (auth.uid() = teacher_id);
 
-CREATE POLICY "Teachers can create rooms"
+CREATE OR REPLACE POLICY "Teachers can create rooms"
   ON rooms FOR INSERT
   WITH CHECK (auth.uid() = teacher_id);
 
-CREATE POLICY "Teachers can update their own rooms"
+CREATE OR REPLACE POLICY "Teachers can update their own rooms"
   ON rooms FOR UPDATE
   USING (auth.uid() = teacher_id);
 
-CREATE POLICY "Teachers can delete their own rooms"
+CREATE OR REPLACE POLICY "Teachers can delete their own rooms"
   ON rooms FOR DELETE
   USING (auth.uid() = teacher_id);
 
 -- RLS policies for students
-CREATE POLICY "Teachers can view students in their rooms"
+CREATE OR REPLACE POLICY "Teachers can view students in their rooms"
   ON students FOR SELECT
   USING (
     EXISTS (
@@ -62,7 +62,7 @@ CREATE POLICY "Teachers can view students in their rooms"
     )
   );
 
-CREATE POLICY "Anyone can view students in active rooms"
+CREATE OR REPLACE POLICY "Anyone can view students in active rooms"
   ON students FOR SELECT
   USING (
     EXISTS (
@@ -72,32 +72,32 @@ CREATE POLICY "Anyone can view students in active rooms"
     )
   );
 
-CREATE POLICY "Teachers can insert students in their rooms"
+CREATE OR REPLACE POLICY "Teachers can insert students in their rooms"
   ON students FOR INSERT
   WITH CHECK (
     EXISTS (
-      SELECT 1 FROM rooms 
-      WHERE rooms.id = students.room_id 
+      SELECT 1 FROM rooms
+      WHERE rooms.id = students.room_id
       AND rooms.teacher_id = auth.uid()
     )
   );
 
-CREATE POLICY "Teachers can update students in their rooms"
+CREATE OR REPLACE POLICY "Teachers can update students in their rooms"
   ON students FOR UPDATE
   USING (
     EXISTS (
-      SELECT 1 FROM rooms 
-      WHERE rooms.id = students.room_id 
+      SELECT 1 FROM rooms
+      WHERE rooms.id = students.room_id
       AND rooms.teacher_id = auth.uid()
     )
   );
 
-CREATE POLICY "Teachers can delete students in their rooms"
+CREATE OR REPLACE POLICY "Teachers can delete students in their rooms"
   ON students FOR DELETE
   USING (
     EXISTS (
-      SELECT 1 FROM rooms 
-      WHERE rooms.id = students.room_id 
+      SELECT 1 FROM rooms
+      WHERE rooms.id = students.room_id
       AND rooms.teacher_id = auth.uid()
     )
   );
