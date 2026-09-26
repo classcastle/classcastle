@@ -9,8 +9,7 @@
     "activeTab"
   ],
   "host_permissions": [
-    "https://hduyofdbpspjcuwvackd.supabase.co/*",
-    "https://cdn.jsdelivr.net/*"
+    "https://hduyofdbpspjcuwvackd.supabase.co/*"
   ],
   "background": {
     "service_worker": "background.js"

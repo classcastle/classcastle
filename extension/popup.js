@@ -9,6 +9,13 @@ const errorEl = document.getElementById('error');
 const loadingEl = document.getElementById('loading');
 const cancelBtn = document.getElementById('cancelBtn');
 
+// Load Supabase
+const SUPABASE_URL = 'https://hduyofdbpspjcuwvackd.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK';
+
+// Initialize extension
+const SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 // Check current status
 checkStatus();
 

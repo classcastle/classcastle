@@ -2,8 +2,8 @@
 const SUPABASE_URL = 'https://hduyofdbpspjcuwvackd.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK';
 
-// Load Supabase from CDN
-importScripts('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js');
+// Load Supabase from local file
+importScripts('supabase.min.js');
 
 const SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
