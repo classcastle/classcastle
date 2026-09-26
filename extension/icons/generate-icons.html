@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generate Extension Icons from Logo</title>
+</head>
+<body>
+  <h1>Generate Extension Icons</h1>
+  <p>Click the buttons below to download the icons</p>
+
+  <button onclick="downloadIcon(16)">Download icon16.png</button>
+  <button onclick="downloadIcon(48)">Download icon48.png</button>
+  <button onclick="downloadIcon(128)">Download icon128.png</button>
+
+  <script>
+    async function createIcon(size) {
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+
+      // Load the SVG
+      const response = await fetch('logo.svg');
+      const svgText = await response.text();
+
+      // Create an image from the SVG
+      const img = new Image();
+      const svgBlob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+
+      await new Promise((resolve) => {
+        img.onload = () => {
+          ctx.drawImage(img, 0, 0, size, size);
+          URL.revokeObjectURL(url);
+          resolve();
+        };
+        img.src = url;
+      });
+
+      return canvas.toDataURL('image/png');
+    }
+
+    async function downloadIcon(size) {
+      const dataUrl = await createIcon(size);
+      const link = document.createElement('a');
+      link.download = `icon${size}.png`;
+      link.href = dataUrl;
+      link.click();
+    }
+  </script>
+</body>
+</html>
