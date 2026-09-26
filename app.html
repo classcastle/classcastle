@@ -564,8 +564,8 @@
     display: inline-block;
     width: 16px;
     height: 16px;
-    border: 2px solid var(--line);
-    border-top-color: var(--green);
+    border: 2px solid var(--paper);
+    border-top-color: transparent;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
@@ -826,14 +826,14 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
 
   async function loadRoomStudentCount(roomId) {
     try {
-      const { data, error } = await SupabaseClient
+      const { count, error } = await SupabaseClient
         .from('students')
-        .select('id', { count: 'exact', head: true })
+        .select('*', { count: 'exact', head: true })
         .eq('room_id', roomId)
         .eq('online', true);
 
       if (error) throw error;
-      return data.length || 0;
+      return count || 0;
     } catch (error) {
       console.error('Error loading student count:', error);
       return 0;
