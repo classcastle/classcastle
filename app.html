@@ -181,6 +181,12 @@
   }
   .page.active {
     display: block;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
   .page-header {
@@ -1149,11 +1155,11 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   // Check for existing session
   async function checkSession() {
     const { data: { session } } = await SupabaseClient.auth.getSession();
-    
+
     if (session) {
       currentUser = session.user;
       updateUserInfo();
-      showPage('dashboard');
+      // Don't call showPage since dashboard already has active class
       await loadRooms();
     } else {
       window.location.href = '/login.html';
