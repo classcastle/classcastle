@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
     --paper: #F7F6F1;
@@ -301,6 +302,12 @@
 </footer>
 
 <script>
+  // Supabase configuration
+  const SUPABASE_URL = 'https://hduyofdbpspjcuwvackd.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK';
+
+  const SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
   // Switch favicon based on theme
   function updateFavicon() {
     const favicon = document.getElementById('favicon');
@@ -415,7 +422,7 @@
     if (e.key === 'Enter' && !joinBtn.disabled) joinBtn.click();
   });
 
-  joinBtn.addEventListener('click', () => {
+  joinBtn.addEventListener('click', async () => {
     const code = currentCode();
     const name = nameInput.value.trim();
     if (code.length !== CODE_LEN || !name) return;
@@ -423,15 +430,78 @@
     joinBtn.disabled = true;
     joinBtn.textContent = 'Joining…';
 
-    setTimeout(() => {
+    try {
+      // Verify room exists
+      const { data: room, error: roomError } = await SupabaseClient
+        .from('rooms')
+        .select('id')
+        .eq('code', code)
+        .eq('active', true)
+        .single();
+
+      if (roomError || !room) {
+        statusLine.textContent = 'Room not found or closed. Check the code with your teacher.';
+        statusLine.className = 'status-line is-error';
+        joinBtn.disabled = false;
+        joinBtn.textContent = 'Join room';
+        return;
+      }
+
+      // Create student record
+      const { error: studentError } = await SupabaseClient
+        .from('students')
+        .insert({
+          room_id: room.id,
+          name: name,
+          online: true,
+          current_url: null
+        });
+
+      if (studentError) {
+        statusLine.textContent = 'Error joining room. Please try again.';
+        statusLine.className = 'status-line is-error';
+        joinBtn.disabled = false;
+        joinBtn.textContent = 'Join room';
+        return;
+      }
+
+      // Success
       joinedTitle.textContent = 'You\u2019re in the room';
       joinedSub.textContent = name + ', you\u2019ve joined room ' + code + '. Sit tight \u2014 your teacher controls where this browser goes next.';
       formState.classList.add('hide');
       joinedState.classList.add('show');
-    }, 700);
+    } catch (error) {
+      console.error('Error joining room:', error);
+      statusLine.textContent = 'Error joining room. Please try again.';
+      statusLine.className = 'status-line is-error';
+      joinBtn.disabled = false;
+      joinBtn.textContent = 'Join room';
+    }
   });
 
-  leaveBtn.addEventListener('click', () => {
+  leaveBtn.addEventListener('click', async () => {
+    const code = currentCode();
+    const name = nameInput.value.trim();
+
+    // Try to delete student record
+    try {
+      const { data: room } = await SupabaseClient
+        .from('rooms')
+        .select('id')
+        .eq('code', code)
+        .single();
+
+      if (room) {
+        await SupabaseClient
+          .from('students')
+          .delete()
+          .eq('room_id', room.id)
+          .eq('name', name);
+      }
+    } catch (error) {
+      console.error('Error leaving room:', error);
+    }
+
     digits.forEach(d => d.value = '');
     nameInput.value = '';
     joinBtn.disabled = true;
