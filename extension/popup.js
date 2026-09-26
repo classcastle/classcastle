@@ -85,28 +85,36 @@ async function handleJoin() {
   try {
     console.log('Looking for room with code:', roomId);
 
-    // Find room by code
-    const { data: room, error: roomError } = await SupabaseClient
+    // First, check if room exists at all (without active filter)
+    const { data: allRooms, error: allRoomsError } = await SupabaseClient
       .from('rooms')
-      .select('id')
+      .select('id, active, code')
       .eq('code', roomId)
-      .eq('active', true)
       .limit(1);
 
-    console.log('Room query result:', { room, roomError });
+    console.log('All rooms with this code:', { allRooms, allRoomsError });
 
-    if (roomError) {
-      console.error('Room query error:', roomError);
-      throw new Error('Room not found or closed: ' + roomError.message);
+    if (allRoomsError) {
+      console.error('Room query error:', allRoomsError);
+      throw new Error('Error looking up room: ' + allRoomsError.message);
     }
 
-    if (!room || room.length === 0) {
+    if (!allRooms || allRooms.length === 0) {
       console.log('No room found with code:', roomId);
-      throw new Error('Room not found or closed');
+      throw new Error('Room not found. Please check the room code with your teacher.');
     }
 
-    const roomIdValue = room[0].id;
-    console.log('Found room with ID:', roomIdValue);
+    const roomData = allRooms[0];
+    console.log('Found room:', roomData);
+
+    // Check if room is active
+    if (!roomData.active) {
+      console.log('Room is closed (active: false)');
+      throw new Error('Room is closed. Please ask your teacher to reopen it.');
+    }
+
+    const roomIdValue = roomData.id;
+    console.log('Room is active, ID:', roomIdValue);
 
     // Try to insert student
     const { data: student, error: studentError } = await SupabaseClient
@@ -131,6 +139,7 @@ async function handleJoin() {
     }
 
     const studentId = student[0].id;
+    console.log('Created student with ID:', studentId);
 
     // Join room in background script
     chrome.runtime.sendMessage({
