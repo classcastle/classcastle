@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Classcastle — Teacher App</title>
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --paper: #F7F6F1;
+    --ink: #1C1B17;
+    --ink-soft: #6B6A61;
+    --line: #E2E0D6;
+    --green: #2F5233;
+    --green-soft: #E7EDE4;
+    --amber: #D98E2B;
+    --red: #B23A2E;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #1C1B17;
+      --ink: #F7F6F1;
+      --ink-soft: #B8B7AE;
+      --line: #3A3930;
+      --green: #E7EDE4;
+      --green-soft: #2F5233;
+      --amber: #F0B84D;
+      --red: #E86A5E;
+    }
+  }
+  * { box-sizing: inherit; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; margin: 0; font-weight: 500; }
+  p { margin: 0; }
+  a { color: inherit; }
+
+  .app-layout {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  .sidebar {
+    width: 260px;
+    background: #fff;
+    border-right: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 100;
+  }
+
+  .sidebar-header {
+    padding: 24px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .wordmark { font-family: 'Fraunces', serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; display: flex; align-items: center; gap: 9px; }
+  .logo-mark { width: 24px; height: 24px; display: block; }
+  .wordmark .word-accent { color: var(--green); }
+
+  .sidebar-nav {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    margin-bottom: 4px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--ink-soft);
+    text-decoration: none;
+  }
+  .nav-item:hover {
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .nav-item.active {
+    background: var(--green-soft);
+    color: var(--green);
+  }
+  .nav-item svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .sidebar-footer {
+    padding: 16px;
+    border-top: 1px solid var(--line);
+  }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--paper);
+    border-radius: 8px;
+  }
+
+  .user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--green);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  .user-details {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .user-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .user-email {
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .btn-logout {
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    margin-top: 8px;
+  }
+  .btn-logout:hover {
+    color: var(--red);
+  }
+
+  .main-content {
+    flex: 1;
+    margin-left: 260px;
+    padding: 32px;
+  }
+
+  .page {
+    display: none;
+  }
+  .page.active {
+    display: block;
+  }
+
+  .page-header {
+    margin-bottom: 32px;
+  }
+
+  .page-title {
+    font-size: 2rem;
+    letter-spacing: -0.015em;
+    margin-bottom: 8px;
+  }
+
+  .page-subtitle {
+    color: var(--ink-soft);
+    font-size: 1rem;
+  }
+
+  .card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 24px;
+  }
+
+  .auth-form {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.98rem;
+    background: var(--paper);
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .form-input:focus {
+    border-color: var(--green);
+    background: #fff;
+  }
+
+  .btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.98rem;
+    cursor: pointer;
+    transition: opacity 0.15s ease, transform 0.1s ease;
+    border: none;
+  }
+  .btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  .btn:not(:disabled):active {
+    transform: scale(0.98);
+  }
+
+  .btn-primary {
+    background: var(--green);
+    color: #fff;
+  }
+
+  .btn-secondary {
+    background: var(--paper);
+    color: var(--ink);
+    border: 1.5px solid var(--line);
+  }
+
+  .btn-full {
+    width: 100%;
+  }
+
+  .room-section {
+    margin-bottom: 32px;
+  }
+
+  .room-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+  }
+
+  .room-title {
+    font-size: 1.3rem;
+    letter-spacing: -0.01em;
+  }
+
+  .room-code-display {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .code-big {
+    font-family: 'Fraunces', serif;
+    font-size: 2.2rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--green);
+  }
+
+  .control-bar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .url-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.98rem;
+    background: var(--paper);
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .url-input:focus {
+    border-color: var(--green);
+    background: #fff;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .section-title {
+    font-size: 1.15rem;
+    letter-spacing: -0.01em;
+  }
+
+  .student-count {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+
+  .student-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+
+  .student-card {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: border-color 0.15s ease;
+  }
+  .student-card.online {
+    border-color: var(--green);
+    background: var(--green-soft);
+  }
+
+  .student-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+  .student-card.online .student-avatar {
+    background: var(--green);
+    color: #fff;
+  }
+
+  .student-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .student-name {
+    font-size: 0.95rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .student-url {
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--line);
+  }
+  .student-card.online .status-dot {
+    background: var(--green);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--ink-soft);
+  }
+  .empty-state h3 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+  .empty-state p {
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+
+  .deployment-info {
+    display: grid;
+    gap: 24px;
+  }
+
+  .deployment-step {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 24px;
+  }
+
+  .deployment-step h3 {
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+  }
+
+  .deployment-step p {
+    color: var(--ink-soft);
+    line-height: 1.5;
+    font-size: 0.95rem;
+  }
+
+  .code-block {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 16px;
+    border-radius: 6px;
+    font-family: 'Monaco', 'Consolas', monospace;
+    font-size: 0.85rem;
+    margin: 12px 0;
+    overflow-x: auto;
+  }
+
+  .extension-id {
+    font-family: 'Monaco', 'Consolas', monospace;
+    background: var(--green-soft);
+    color: var(--green);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+
+  .notification {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 16px 20px;
+    border-radius: 8px;
+    font-size: 0.92rem;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+    z-index: 1000;
+  }
+  .notification.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .loading {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--line);
+    border-top-color: var(--green);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .hidden {
+    display: none !important;
+  }
+
+  @media (max-width: 780px) {
+    .sidebar {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+    .sidebar.open {
+      transform: translateX(0);
+    }
+    .main-content {
+      margin-left: 0;
+      padding: 24px;
+    }
+    .room-header {
+      flex-direction: column;
+      gap: 16px;
+    }
+    .control-bar {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .student-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="wordmark"><img src="/logo.svg" alt="" class="logo-mark"><span class="word-text">Class<span class="word-accent">castle</span></span></div>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item active" data-page="dashboard" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" data-page="deployment" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        IT Deployment
+      </a>
+      <a class="nav-item" data-page="settings" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info hidden" id="userInfo">
+        <div class="user-avatar" id="userAvatar">?</div>
+        <div class="user-details">
+          <div class="user-name" id="userName">Loading...</div>
+          <div class="user-email" id="userEmail">Loading...</div>
+        </div>
+      </div>
+      <button class="btn-logout hidden" id="logoutBtn">Sign out</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <!-- Login Page -->
+    <div class="page active" id="loginPage">
+      <div class="page-header">
+        <h1 class="page-title">Welcome to Classcastle</h1>
+        <p class="page-subtitle">Sign in to start managing your classroom</p>
+      </div>
+      <div class="card">
+        <div class="auth-form">
+          <div class="form-group">
+            <label class="form-label" for="loginEmail">Email</label>
+            <input type="email" class="form-input" id="loginEmail" placeholder="you@school.edu">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="loginPassword">Password</label>
+            <input type="password" class="form-input" id="loginPassword" placeholder="••••••••">
+          </div>
+          <button class="btn btn-primary btn-full" id="loginBtn">Sign in</button>
+          <p style="margin-top: 16px; text-align: center; color: var(--ink-soft); font-size: 0.9rem;">
+            Don't have an account? <a href="#" id="showSignup" style="color: var(--green);">Sign up</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Signup Page -->
+    <div class="page" id="signupPage">
+      <div class="page-header">
+        <h1 class="page-title">Create your account</h1>
+        <p class="page-subtitle">Start using Classcastle in your classroom</p>
+      </div>
+      <div class="card">
+        <div class="auth-form">
+          <div class="form-group">
+            <label class="form-label" for="signupName">Full name</label>
+            <input type="text" class="form-input" id="signupName" placeholder="Dr. Smith">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="signupEmail">Email</label>
+            <input type="email" class="form-input" id="signupEmail" placeholder="you@school.edu">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="signupPassword">Password</label>
+            <input type="password" class="form-input" id="signupPassword" placeholder="••••••••">
+          </div>
+          <button class="btn btn-primary btn-full" id="signupBtn">Create account</button>
+          <p style="margin-top: 16px; text-align: center; color: var(--ink-soft); font-size: 0.9rem;">
+            Already have an account? <a href="#" id="showLogin" style="color: var(--green);">Sign in</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div class="page" id="dashboardPage">
+      <div class="page-header">
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-subtitle">Manage your active room and students</p>
+      </div>
+
+      <div class="card room-section">
+        <div class="room-header">
+          <div>
+            <h2 class="room-title">Your room</h2>
+            <p style="margin-top: 8px; color: var(--ink-soft); font-size: 0.92rem;">Share this code with your students</p>
+          </div>
+          <div class="room-code-display">
+            <span class="code-big" id="roomCode">---</span>
+            <button class="btn btn-secondary" id="newRoomBtn">New room</button>
+          </div>
+        </div>
+        <div class="control-bar">
+          <input type="url" class="url-input" id="urlInput" placeholder="Enter URL to send students to (e.g., https://microbit.org)">
+          <button class="btn btn-primary" id="goBtn" disabled>Go</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-header">
+          <h2 class="section-title">Students in your room</h2>
+          <span class="student-count" id="studentCount">0 joined</span>
+        </div>
+        <div class="student-grid" id="studentGrid">
+          <div class="empty-state">
+            <h3>No students yet</h3>
+            <p>Students will appear here once they join with the room code and the Classcastle extension.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Deployment Page -->
+    <div class="page" id="deploymentPage">
+      <div class="page-header">
+        <h1 class="page-title">IT Deployment</h1>
+        <p class="page-subtitle">Information for your IT department to deploy Classcastle across your school</p>
+      </div>
+
+      <div class="card">
+        <div class="deployment-info">
+          <div class="deployment-step">
+            <h3>01. Extension ID</h3>
+            <p>Share this ID with your IT team. They'll need it to force-install the extension across your school's devices.</p>
+            <div class="code-block">Extension ID: <span class="extension-id">abcdefghijkabcdefghijk</span></div>
+            <p><strong>Note:</strong> This is a demo ID. In production, this will be your actual Chrome Web Store extension ID.</p>
+          </div>
+
+          <div class="deployment-step">
+            <h3>02. ChromeOS / Chrome Deployment</h3>
+            <p>Add the extension to your Google Admin console under Device Management > Chrome > Apps & Extensions.</p>
+            <div class="code-block">
+{
+  "ExtensionInstallForcelist": [
+    "abcdefghijkabcdefghijk"
+  ]
+}
+            </div>
+          </div>
+
+          <div class="deployment-step">
+            <h3>03. Edge Deployment (Intune/GPO)</h3>
+            <p>For Microsoft Edge, deploy via Intune or Group Policy using the extension ID.</p>
+            <div class="code-block">
+Registry key: HKLM\SOFTWARE\Policies\Microsoft\Edge\ExtensionInstallForcelist
+Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
+            </div>
+          </div>
+
+          <div class="deployment-step">
+            <h3>04. Network Configuration</h3>
+            <p>Safelist these domains in your web filter or firewall to ensure room connections work properly.</p>
+            <div class="code-block">
+*.supabase.co
+*.classcastle.com
+            </div>
+          </div>
+
+          <div class="deployment-step">
+            <h3>05. Testing</h3>
+            <p>Before full deployment, test on a single device to ensure the extension appears and can join a test room.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Page -->
+    <div class="page" id="settingsPage">
+      <div class="page-header">
+        <h1 class="page-title">Settings</h1>
+        <p class="page-subtitle">Manage your account and preferences</p>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title" style="margin-bottom: 16px;">Account Information</h2>
+        <div class="form-group">
+          <label class="form-label">Name</label>
+          <input type="text" class="form-input" id="settingsName" value="">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" id="settingsEmail" value="" disabled>
+        </div>
+        <button class="btn btn-primary" id="saveSettingsBtn">Save changes</button>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title" style="margin-bottom: 16px;">Danger Zone</h2>
+        <p style="color: var(--ink-soft); margin-bottom: 16px;">Once you delete your account, there is no going back. Please be certain.</p>
+        <button class="btn btn-secondary" style="color: var(--red); border-color: var(--red);" id="deleteAccountBtn">Delete account</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="notification" id="notification"></div>
+
+<script>
+  // Supabase configuration
+  const SUPABASE_URL = 'https://hduyofdbpspjcuwvackd.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK';
+  
+  const SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // App state
+  let currentUser = null;
+  let currentRoom = null;
+  let students = [];
+  let roomSubscription = null;
+
+  // DOM elements
+  const notification = document.getElementById('notification');
+  const sidebar = document.getElementById('sidebar');
+  const userInfo = document.getElementById('userInfo');
+  const userAvatar = document.getElementById('userAvatar');
+  const userName = document.getElementById('userName');
+  const userEmail = document.getElementById('userEmail');
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  // Pages
+  const loginPage = document.getElementById('loginPage');
+  const signupPage = document.getElementById('signupPage');
+  const dashboardPage = document.getElementById('dashboardPage');
+  const deploymentPage = document.getElementById('deploymentPage');
+  const settingsPage = document.getElementById('settingsPage');
+
+  // Dashboard elements
+  const roomCodeEl = document.getElementById('roomCode');
+  const newRoomBtn = document.getElementById('newRoomBtn');
+  const urlInput = document.getElementById('urlInput');
+  const goBtn = document.getElementById('goBtn');
+  const studentGrid = document.getElementById('studentGrid');
+  const studentCount = document.getElementById('studentCount');
+
+  // Auth elements
+  const loginEmail = document.getElementById('loginEmail');
+  const loginPassword = document.getElementById('loginPassword');
+  const loginBtn = document.getElementById('loginBtn');
+  const showSignup = document.getElementById('showSignup');
+  const signupName = document.getElementById('signupName');
+  const signupEmail = document.getElementById('signupEmail');
+  const signupPassword = document.getElementById('signupPassword');
+  const signupBtn = document.getElementById('signupBtn');
+  const showLogin = document.getElementById('showLogin');
+
+  // Settings elements
+  const settingsName = document.getElementById('settingsName');
+  const settingsEmail = document.getElementById('settingsEmail');
+  const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+  const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+
+  function showNotification(message, duration = 3000) {
+    notification.textContent = message;
+    notification.classList.add('show');
+    setTimeout(() => {
+      notification.classList.remove('show');
+    }, duration);
+  }
+
+  function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+    
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    const navItem = document.querySelector(`[data-page="${pageId.replace('Page', '')}"]`);
+    if (navItem) navItem.classList.add('active');
+  }
+
+  function generateRoomCode() {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  }
+
+  function renderStudents() {
+    if (students.length === 0) {
+      studentGrid.innerHTML = `
+        <div class="empty-state">
+          <h3>No students yet</h3>
+          <p>Students will appear here once they join with the room code and the Classcastle extension.</p>
+        </div>
+      `;
+      studentCount.textContent = '0 joined';
+      return;
+    }
+
+    studentGrid.innerHTML = students.map(student => `
+      <div class="student-card online">
+        <div class="student-avatar">${student.name.charAt(0)}</div>
+        <div class="student-info">
+          <div class="student-name">${student.name}</div>
+          <div class="student-url">${student.current_url || 'Waiting for navigation'}</div>
+        </div>
+        <div class="status-dot"></div>
+      </div>
+    `).join('');
+
+    studentCount.textContent = `${students.length} joined`;
+  }
+
+  function updateGoButton() {
+    goBtn.disabled = !urlInput.value.trim() || students.length === 0;
+  }
+
+  function updateUserInfo() {
+    if (currentUser) {
+      userInfo.classList.remove('hidden');
+      logoutBtn.classList.remove('hidden');
+      userAvatar.textContent = currentUser.user_metadata?.name?.charAt(0) || currentUser.email?.charAt(0) || '?';
+      userName.textContent = currentUser.user_metadata?.name || 'Teacher';
+      userEmail.textContent = currentUser.email;
+      
+      // Update settings
+      settingsName.value = currentUser.user_metadata?.name || '';
+      settingsEmail.value = currentUser.email || '';
+    } else {
+      userInfo.classList.add('hidden');
+      logoutBtn.classList.add('hidden');
+    }
+  }
+
+  // Navigation
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      const page = item.dataset.page;
+      showPage(page + 'Page');
+    });
+  });
+
+  // Auth functions
+  async function handleLogin() {
+    const email = loginEmail.value.trim();
+    const password = loginPassword.value;
+
+    if (!email || !password) {
+      showNotification('Please fill in all fields');
+      return;
+    }
+
+    try {
+      const { data, error } = await SupabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) throw error;
+
+      currentUser = data.user;
+      updateUserInfo();
+      showPage('dashboard');
+      showNotification('Welcome back!');
+      await loadOrCreateRoom();
+    } catch (error) {
+      showNotification(error.message);
+    }
+  }
+
+  async function handleSignup() {
+    const name = signupName.value.trim();
+    const email = signupEmail.value.trim();
+    const password = signupPassword.value;
+
+    if (!name || !email || !password) {
+      showNotification('Please fill in all fields');
+      return;
+    }
+
+    try {
+      const { data, error } = await SupabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name: name
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      currentUser = data.user;
+      updateUserInfo();
+      showPage('dashboard');
+      showNotification('Account created successfully!');
+      await loadOrCreateRoom();
+    } catch (error) {
+      showNotification(error.message);
+    }
+  }
+
+  async function handleLogout() {
+    await SupabaseClient.auth.signOut();
+    currentUser = null;
+    currentRoom = null;
+    students = [];
+    if (roomSubscription) {
+      roomSubscription.unsubscribe();
+      roomSubscription = null;
+    }
+    updateUserInfo();
+    showPage('login');
+    showNotification('Signed out');
+  }
+
+  // Room functions
+  async function loadOrCreateRoom() {
+    if (!currentUser) return;
+
+    try {
+      // Check for existing active room
+      const { data: existingRooms, error: fetchError } = await SupabaseClient
+        .from('rooms')
+        .select('*')
+        .eq('teacher_id', currentUser.id)
+        .eq('active', true)
+        .single();
+
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        // PGRST116 means no rows returned, which is fine
+        console.error('Error fetching room:', fetchError);
+      }
+
+      if (existingRooms) {
+        currentRoom = existingRooms;
+        roomCodeEl.textContent = existingRooms.code;
+      } else {
+        // Create new room
+        const roomCode = generateRoomCode();
+        const { data: newRoom, error: createError } = await SupabaseClient
+          .from('rooms')
+          .insert({
+            teacher_id: currentUser.id,
+            code: roomCode,
+            active: true,
+            target_url: null
+          })
+          .select()
+          .single();
+
+        if (createError) throw createError;
+
+        currentRoom = newRoom;
+        roomCodeEl.textContent = roomCode;
+      }
+
+      // Subscribe to room changes
+      subscribeToRoom();
+      await loadStudents();
+    } catch (error) {
+      console.error('Room error:', error);
+      showNotification('Error loading room');
+    }
+  }
+
+  async function loadStudents() {
+    if (!currentRoom) return;
+
+    try {
+      const { data, error } = await SupabaseClient
+        .from('students')
+        .select('*')
+        .eq('room_id', currentRoom.id)
+        .eq('online', true);
+
+      if (error) throw error;
+
+      students = data || [];
+      renderStudents();
+      updateGoButton();
+    } catch (error) {
+      console.error('Error loading students:', error);
+    }
+  }
+
+  function subscribeToRoom() {
+    if (roomSubscription) {
+      roomSubscription.unsubscribe();
+    }
+
+    roomSubscription = SupabaseClient
+      .channel(`room:${currentRoom.id}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'students',
+        filter: `room_id=eq.${currentRoom.id}`
+      }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          students.push(payload.new);
+          showNotification(`${payload.new.name} joined the room`);
+        } else if (payload.eventType === 'UPDATE') {
+          const index = students.findIndex(s => s.id === payload.new.id);
+          if (index !== -1) {
+            students[index] = payload.new;
+          }
+        } else if (payload.eventType === 'DELETE') {
+          students = students.filter(s => s.id !== payload.old.id);
+        }
+        renderStudents();
+        updateGoButton();
+      })
+      .subscribe();
+  }
+
+  async function createNewRoom() {
+    if (!currentUser) return;
+
+    try {
+      // Deactivate current room
+      if (currentRoom) {
+        await SupabaseClient
+          .from('rooms')
+          .update({ active: false })
+          .eq('id', currentRoom.id);
+      }
+
+      // Create new room
+      const roomCode = generateRoomCode();
+      const { data: newRoom, error } = await SupabaseClient
+        .from('rooms')
+        .insert({
+          teacher_id: currentUser.id,
+          code: roomCode,
+          active: true,
+          target_url: null
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      currentRoom = newRoom;
+      roomCodeEl.textContent = roomCode;
+      students = [];
+      renderStudents();
+      updateGoButton();
+      
+      // Re-subscribe to new room
+      subscribeToRoom();
+      
+      showNotification('New room created');
+    } catch (error) {
+      console.error('Error creating room:', error);
+      showNotification('Error creating room');
+    }
+  }
+
+  async function navigateStudents() {
+    const url = urlInput.value.trim();
+    if (!url || !currentRoom || students.length === 0) return;
+
+    try {
+      const { error } = await SupabaseClient
+        .from('rooms')
+        .update({ target_url: url })
+        .eq('id', currentRoom.id);
+
+      if (error) throw error;
+
+      // Update local state
+      currentRoom.target_url = url;
+      showNotification(`Sent ${students.length} students to ${url}`);
+    } catch (error) {
+      console.error('Error navigating students:', error);
+      showNotification('Error navigating students');
+    }
+  }
+
+  async function saveSettings() {
+    if (!currentUser) return;
+
+    const name = settingsName.value.trim();
+    if (!name) {
+      showNotification('Name is required');
+      return;
+    }
+
+    try {
+      const { error } = await SupabaseClient.auth.updateUser({
+        data: { name }
+      });
+
+      if (error) throw error;
+
+      currentUser.user_metadata.name = name;
+      updateUserInfo();
+      showNotification('Settings saved');
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      showNotification('Error saving settings');
+    }
+  }
+
+  async function deleteAccount() {
+    if (!currentUser) return;
+    if (!confirm('Are you sure you want to delete your account? This cannot be undone.')) return;
+
+    try {
+      const { error } = await SupabaseClient.auth.admin.deleteUser(currentUser.id);
+      
+      if (error) throw error;
+
+      showNotification('Account deleted');
+      handleLogout();
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      showNotification('Error deleting account');
+    }
+  }
+
+  // Event listeners
+  loginBtn.addEventListener('click', handleLogin);
+  signupBtn.addEventListener('click', handleSignup);
+  logoutBtn.addEventListener('click', handleLogout);
+  showSignup.addEventListener('click', (e) => { e.preventDefault(); showPage('signup'); });
+  showLogin.addEventListener('click', (e) => { e.preventDefault(); showPage('login'); });
+
+  newRoomBtn.addEventListener('click', createNewRoom);
+  urlInput.addEventListener('input', updateGoButton);
+  urlInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !goBtn.disabled) {
+      navigateStudents();
+    }
+  });
+  goBtn.addEventListener('click', navigateStudents);
+
+  saveSettingsBtn.addEventListener('click', saveSettings);
+  deleteAccountBtn.addEventListener('click', deleteAccount);
+
+  // Check for existing session
+  async function checkSession() {
+    const { data: { session } } = await SupabaseClient.auth.getSession();
+    
+    if (session) {
+      currentUser = session.user;
+      updateUserInfo();
+      showPage('dashboard');
+      await loadOrCreateRoom();
+    } else {
+      showPage('login');
+    }
+  }
+
+  // Initialize
+  checkSession();
+
+  // Listen for auth changes
+  SupabaseClient.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN') {
+      currentUser = session.user;
+      updateUserInfo();
+      showPage('dashboard');
+      loadOrCreateRoom();
+    } else if (event === 'SIGNED_OUT') {
+      currentUser = null;
+      currentRoom = null;
+      students = [];
+      updateUserInfo();
+      showPage('login');
+    }
+  });
+</script>
+
+</body>
+</html>
