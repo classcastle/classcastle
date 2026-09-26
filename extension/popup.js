@@ -83,6 +83,8 @@ async function handleJoin() {
   showLoading();
 
   try {
+    console.log('Looking for room with code:', roomId);
+
     // Find room by code
     const { data: room, error: roomError } = await SupabaseClient
       .from('rooms')
@@ -91,16 +93,20 @@ async function handleJoin() {
       .eq('active', true)
       .limit(1);
 
+    console.log('Room query result:', { room, roomError });
+
     if (roomError) {
       console.error('Room query error:', roomError);
       throw new Error('Room not found or closed: ' + roomError.message);
     }
 
     if (!room || room.length === 0) {
+      console.log('No room found with code:', roomId);
       throw new Error('Room not found or closed');
     }
 
     const roomIdValue = room[0].id;
+    console.log('Found room with ID:', roomIdValue);
 
     // Try to insert student
     const { data: student, error: studentError } = await SupabaseClient
