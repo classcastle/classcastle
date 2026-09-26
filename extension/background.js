@@ -85,12 +85,15 @@ function subscribeToRoom() {
       table: 'rooms',
       filter: `id=eq.${currentRoomId}`
     }, (payload) => {
+      console.log('Room update received:', payload);
       // Check if target_url changed
-      if (payload.new.target_url && payload.new.target_url !== payload.old.target_url) {
+      if (payload.new && payload.new.target_url && payload.new.target_url !== payload.old.target_url) {
         navigateToUrl(payload.new.target_url);
       }
     })
-    .subscribe();
+    .subscribe((status) => {
+      console.log('Subscription status:', status);
+    });
 }
 
 // Navigate to a URL

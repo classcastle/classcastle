@@ -89,17 +89,19 @@ async function handleJoin() {
       .select('id')
       .eq('code', roomId)
       .eq('active', true)
-      .single();
+      .limit(1);
 
-    if (roomError || !room) {
+    if (roomError || !room || room.length === 0) {
       throw new Error('Room not found or closed');
     }
+
+    const roomIdValue = room[0].id;
 
     // Create or find student
     const { data: student, error: studentError } = await SupabaseClient
       .from('students')
       .upsert({
-        room_id: room.id,
+        room_id: roomIdValue,
         name: studentName,
         online: true,
         current_url: null,
@@ -108,17 +110,19 @@ async function handleJoin() {
         onConflict: 'room_id,name'
       })
       .select()
-      .single();
+      .limit(1);
 
-    if (studentError) {
+    if (studentError || !student || student.length === 0) {
       throw new Error('Error joining room');
     }
+
+    const studentId = student[0].id;
 
     // Join room in background script
     chrome.runtime.sendMessage({
       action: 'joinRoom',
-      roomId: room.id,
-      studentId: student.id
+      roomId: roomIdValue,
+      studentId: studentId
     }, () => {
       hideLoading();
       showJoinedState();
