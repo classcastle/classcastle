@@ -566,63 +566,8 @@
   </aside>
 
   <main class="main-content">
-    <!-- Login Page -->
-    <div class="page active" id="loginPage">
-      <div class="page-header">
-        <h1 class="page-title">Welcome to Classcastle</h1>
-        <p class="page-subtitle">Teacher account required to manage classrooms</p>
-      </div>
-      <div class="card">
-        <div class="auth-form">
-          <div class="form-group">
-            <label class="form-label" for="loginEmail">Email</label>
-            <input type="email" class="form-input" id="loginEmail" placeholder="you@school.edu">
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="loginPassword">Password</label>
-            <input type="password" class="form-input" id="loginPassword" placeholder="••••••••">
-          </div>
-          <button class="btn btn-primary btn-full" id="loginBtn">Sign in</button>
-          <p style="margin-top: 16px; text-align: center; color: var(--ink-soft); font-size: 0.9rem;">
-            New teacher? <a href="#" id="showSignup" style="color: var(--green);">Create your account</a>
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Signup Page -->
-    <div class="page" id="signupPage">
-      <div class="page-header">
-        <h1 class="page-title">Create teacher account</h1>
-        <p class="page-subtitle">Teacher account required to manage classrooms and students</p>
-      </div>
-      <div class="card">
-        <div class="auth-form">
-          <div class="form-group">
-            <label class="form-label" for="signupName">Full name</label>
-            <input type="text" class="form-input" id="signupName" placeholder="Dr. Smith">
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="signupEmail">Email</label>
-            <input type="email" class="form-input" id="signupEmail" placeholder="you@school.edu">
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="signupPassword">Password</label>
-            <input type="password" class="form-input" id="signupPassword" placeholder="••••••••">
-          </div>
-          <button class="btn btn-primary btn-full" id="signupBtn">Create teacher account</button>
-          <p style="margin-top: 12px; text-align: center; color: var(--ink-soft); font-size: 0.85rem;">
-            By creating an account, you confirm you are a teacher or educator.
-          </p>
-          <p style="margin-top: 16px; text-align: center; color: var(--ink-soft); font-size: 0.9rem;">
-            Already have a teacher account? <a href="#" id="showLogin" style="color: var(--green);">Sign in</a>
-          </p>
-        </div>
-      </div>
-    </div>
-
     <!-- Dashboard Page -->
-    <div class="page" id="dashboardPage">
+    <div class="page active" id="dashboardPage">
       <div class="page-header">
         <h1 class="page-title">Teacher Dashboard</h1>
         <p class="page-subtitle">Manage your classroom and students</p>
@@ -792,17 +737,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   const studentGrid = document.getElementById('studentGrid');
   const studentCount = document.getElementById('studentCount');
 
-  // Auth elements
-  const loginEmail = document.getElementById('loginEmail');
-  const loginPassword = document.getElementById('loginPassword');
-  const loginBtn = document.getElementById('loginBtn');
-  const showSignup = document.getElementById('showSignup');
-  const signupName = document.getElementById('signupName');
-  const signupEmail = document.getElementById('signupEmail');
-  const signupPassword = document.getElementById('signupPassword');
-  const signupBtn = document.getElementById('signupBtn');
-  const showLogin = document.getElementById('showLogin');
-
   // Settings elements
   const settingsName = document.getElementById('settingsName');
   const settingsEmail = document.getElementById('settingsEmail');
@@ -818,12 +752,16 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   }
 
   function showPage(pageId) {
+    // Only handle internal pages (dashboard, deployment, settings)
     document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-    document.getElementById(pageId).classList.add('active');
-    
-    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    const navItem = document.querySelector(`[data-page="${pageId.replace('Page', '')}"]`);
-    if (navItem) navItem.classList.add('active');
+    const page = document.getElementById(pageId);
+    if (page) {
+      page.classList.add('active');
+      
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      const navItem = document.querySelector(`[data-page="${pageId.replace('Page', '')}"]`);
+      if (navItem) navItem.classList.add('active');
+    }
   }
 
   function generateRoomCode() {
@@ -887,66 +825,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   });
 
   // Auth functions
-  async function handleLogin() {
-    const email = loginEmail.value.trim();
-    const password = loginPassword.value;
-
-    if (!email || !password) {
-      showNotification('Please fill in all fields');
-      return;
-    }
-
-    try {
-      const { data, error } = await SupabaseClient.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (error) throw error;
-
-      currentUser = data.user;
-      updateUserInfo();
-      showPage('dashboard');
-      showNotification('Welcome back, teacher!');
-      await loadOrCreateRoom();
-    } catch (error) {
-      showNotification(error.message);
-    }
-  }
-
-  async function handleSignup() {
-    const name = signupName.value.trim();
-    const email = signupEmail.value.trim();
-    const password = signupPassword.value;
-
-    if (!name || !email || !password) {
-      showNotification('Please fill in all fields');
-      return;
-    }
-
-    try {
-      const { data, error } = await SupabaseClient.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            name: name
-          }
-        }
-      });
-
-      if (error) throw error;
-
-      currentUser = data.user;
-      updateUserInfo();
-      showPage('dashboard');
-      showNotification('Teacher account created successfully!');
-      await loadOrCreateRoom();
-    } catch (error) {
-      showNotification(error.message);
-    }
-  }
-
   async function handleLogout() {
     await SupabaseClient.auth.signOut();
     currentUser = null;
@@ -957,8 +835,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       roomSubscription = null;
     }
     updateUserInfo();
-    showPage('login');
-    showNotification('Signed out');
+    window.location.href = '/login.html';
   }
 
   // Room functions
@@ -1168,11 +1045,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   }
 
   // Event listeners
-  loginBtn.addEventListener('click', handleLogin);
-  signupBtn.addEventListener('click', handleSignup);
   logoutBtn.addEventListener('click', handleLogout);
-  showSignup.addEventListener('click', (e) => { e.preventDefault(); showPage('signup'); });
-  showLogin.addEventListener('click', (e) => { e.preventDefault(); showPage('login'); });
 
   newRoomBtn.addEventListener('click', createNewRoom);
   urlInput.addEventListener('input', updateGoButton);
@@ -1196,7 +1069,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       showPage('dashboard');
       await loadOrCreateRoom();
     } else {
-      showPage('login');
+      window.location.href = '/login.html';
     }
   }
 
@@ -1215,7 +1088,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       currentRoom = null;
       students = [];
       updateUserInfo();
-      showPage('login');
+      window.location.href = '/login.html';
     }
   });
 </script>
