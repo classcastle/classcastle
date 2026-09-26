@@ -35,24 +35,29 @@ ALTER TABLE rooms ENABLE ROW LEVEL SECURITY;
 ALTER TABLE students ENABLE ROW LEVEL SECURITY;
 
 -- RLS policies for rooms
-CREATE OR REPLACE POLICY "Teachers can view their own rooms"
+DROP POLICY IF EXISTS "Teachers can view their own rooms" ON rooms;
+CREATE POLICY "Teachers can view their own rooms"
   ON rooms FOR SELECT
   USING (auth.uid() = teacher_id);
 
-CREATE OR REPLACE POLICY "Teachers can create rooms"
+DROP POLICY IF EXISTS "Teachers can create rooms" ON rooms;
+CREATE POLICY "Teachers can create rooms"
   ON rooms FOR INSERT
   WITH CHECK (auth.uid() = teacher_id);
 
-CREATE OR REPLACE POLICY "Teachers can update their own rooms"
+DROP POLICY IF EXISTS "Teachers can update their own rooms" ON rooms;
+CREATE POLICY "Teachers can update their own rooms"
   ON rooms FOR UPDATE
   USING (auth.uid() = teacher_id);
 
-CREATE OR REPLACE POLICY "Teachers can delete their own rooms"
+DROP POLICY IF EXISTS "Teachers can delete their own rooms" ON rooms;
+CREATE POLICY "Teachers can delete their own rooms"
   ON rooms FOR DELETE
   USING (auth.uid() = teacher_id);
 
 -- RLS policies for students
-CREATE OR REPLACE POLICY "Teachers can view students in their rooms"
+DROP POLICY IF EXISTS "Teachers can view students in their rooms" ON students;
+CREATE POLICY "Teachers can view students in their rooms"
   ON students FOR SELECT
   USING (
     EXISTS (
@@ -62,7 +67,8 @@ CREATE OR REPLACE POLICY "Teachers can view students in their rooms"
     )
   );
 
-CREATE OR REPLACE POLICY "Anyone can view students in active rooms"
+DROP POLICY IF EXISTS "Anyone can view students in active rooms" ON students;
+CREATE POLICY "Anyone can view students in active rooms"
   ON students FOR SELECT
   USING (
     EXISTS (
@@ -72,7 +78,8 @@ CREATE OR REPLACE POLICY "Anyone can view students in active rooms"
     )
   );
 
-CREATE OR REPLACE POLICY "Teachers can insert students in their rooms"
+DROP POLICY IF EXISTS "Teachers can insert students in their rooms" ON students;
+CREATE POLICY "Teachers can insert students in their rooms"
   ON students FOR INSERT
   WITH CHECK (
     EXISTS (
@@ -82,7 +89,8 @@ CREATE OR REPLACE POLICY "Teachers can insert students in their rooms"
     )
   );
 
-CREATE OR REPLACE POLICY "Teachers can update students in their rooms"
+DROP POLICY IF EXISTS "Teachers can update students in their rooms" ON students;
+CREATE POLICY "Teachers can update students in their rooms"
   ON students FOR UPDATE
   USING (
     EXISTS (
@@ -92,7 +100,8 @@ CREATE OR REPLACE POLICY "Teachers can update students in their rooms"
     )
   );
 
-CREATE OR REPLACE POLICY "Teachers can delete students in their rooms"
+DROP POLICY IF EXISTS "Teachers can delete students in their rooms" ON students;
+CREATE POLICY "Teachers can delete students in their rooms"
   ON students FOR DELETE
   USING (
     EXISTS (
