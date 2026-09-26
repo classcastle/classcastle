@@ -91,28 +91,36 @@ async function handleJoin() {
       .eq('active', true)
       .limit(1);
 
-    if (roomError || !room || room.length === 0) {
+    if (roomError) {
+      console.error('Room query error:', roomError);
+      throw new Error('Room not found or closed: ' + roomError.message);
+    }
+
+    if (!room || room.length === 0) {
       throw new Error('Room not found or closed');
     }
 
     const roomIdValue = room[0].id;
 
-    // Create or find student
+    // Try to insert student
     const { data: student, error: studentError } = await SupabaseClient
       .from('students')
-      .upsert({
+      .insert({
         room_id: roomIdValue,
         name: studentName,
         online: true,
         current_url: null,
         last_seen: new Date().toISOString()
-      }, {
-        onConflict: 'room_id,name'
       })
       .select()
       .limit(1);
 
-    if (studentError || !student || student.length === 0) {
+    if (studentError) {
+      console.error('Student insert error:', studentError);
+      throw new Error('Error joining room: ' + studentError.message);
+    }
+
+    if (!student || student.length === 0) {
       throw new Error('Error joining room');
     }
 
