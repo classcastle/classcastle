@@ -916,7 +916,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
     // Add click handlers for room cards (navigation)
     document.querySelectorAll('.room-card').forEach(card => {
       card.addEventListener('click', (e) => {
-        if (!e.target.classList.contains('room-card-btn-delete')) {
+        if (!e.target.closest('.room-card-btn-delete')) {
           const roomId = card.dataset.roomId;
           const room = rooms.find(r => r.id === roomId);
           if (room) {
