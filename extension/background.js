@@ -2,13 +2,10 @@
 const SUPABASE_URL = 'https://hduyofdbpspjcuwvackd.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK';
 
-// Load Supabase client dynamically
-let SupabaseClient;
+// Import Supabase from local file
+importScripts('supabase.min.js');
 
-// Dynamically load Supabase
-importScripts('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js');
-
-SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Extension state
 let currentRoomId = null;

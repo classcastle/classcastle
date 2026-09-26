@@ -12,26 +12,15 @@ const loadingEl = document.getElementById('loading');
 const SUPABASE_URL = 'https://hduyofdbpspjcuwvackd.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK';
 
-// Load Supabase from CDN
-const script = document.createElement('script');
-script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-script.onload = () => {
-  initializeExtension();
-};
-document.head.appendChild(script);
+// Initialize extension
+const SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let SupabaseClient;
+// Check current status
+checkStatus();
 
-function initializeExtension() {
-  SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-  // Check current status
-  checkStatus();
-
-  // Event listeners
-  joinBtn.addEventListener('click', handleJoin);
-  leaveBtn.addEventListener('click', handleLeave);
-}
+// Event listeners
+joinBtn.addEventListener('click', handleJoin);
+leaveBtn.addEventListener('click', handleLeave);
 
 // Check current extension status
 function checkStatus() {
