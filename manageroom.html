@@ -519,11 +519,11 @@
       const { data, error } = await SupabaseClient
         .from('students')
         .select('*')
-        .eq('room_id', currentRoom.id)
-        .eq('online', true);
+        .eq('room_id', currentRoom.id);
 
       if (error) throw error;
 
+      console.log('Loaded students:', data);
       students = data || [];
       renderStudents();
       updateGoButton();
