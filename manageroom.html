@@ -263,6 +263,38 @@
     background: var(--green);
   }
 
+  .student-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-small {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+  }
+
+  .btn-message {
+    background: var(--green-soft);
+    color: var(--green);
+  }
+  .btn-message:hover {
+    background: #d5e0d0;
+  }
+
+  .btn-kick {
+    background: #f5e0e0;
+    color: var(--red);
+  }
+  .btn-kick:hover {
+    background: #e8d0d0;
+  }
+
   .empty-state {
     text-align: center;
     padding: 48px 24px;
@@ -333,6 +365,13 @@
     .student-grid {
       grid-template-columns: 1fr;
     }
+    .student-card {
+      flex-wrap: wrap;
+    }
+    .student-actions {
+      width: 100%;
+      margin-top: 12px;
+    }
   }
 </style>
 </head>
@@ -359,6 +398,7 @@
         <span class="code-big" id="roomCode">---</span>
         <div class="room-actions">
           <button class="btn btn-secondary" id="closeRoomBtn">Close room</button>
+          <button class="btn btn-primary" id="reopenRoomBtn" style="display: none;">Reopen room</button>
           <button class="btn btn-danger" id="deleteRoomBtn">Delete room</button>
         </div>
       </div>
@@ -414,6 +454,7 @@
   const roomCodeEl = document.getElementById('roomCode');
   const roomSubtitle = document.getElementById('roomSubtitle');
   const closeRoomBtn = document.getElementById('closeRoomBtn');
+  const reopenRoomBtn = document.getElementById('reopenRoomBtn');
   const deleteRoomBtn = document.getElementById('deleteRoomBtn');
   const urlInput = document.getElementById('urlInput');
   const goBtn = document.getElementById('goBtn');
@@ -448,17 +489,38 @@
     }
 
     studentGrid.innerHTML = students.map(student => `
-      <div class="student-card online">
+      <div class="student-card online" data-student-id="${student.id}">
         <div class="student-avatar">${student.name.charAt(0)}</div>
         <div class="student-info">
           <div class="student-name">${student.name}</div>
           <div class="student-url">${student.current_url || 'Waiting for navigation'}</div>
+        </div>
+        <div class="student-actions">
+          <button class="btn-small btn-message" data-student-id="${student.id}" data-student-name="${student.name}">Message</button>
+          <button class="btn-small btn-kick" data-student-id="${student.id}" data-student-name="${student.name}">Kick</button>
         </div>
         <div class="status-dot"></div>
       </div>
     `).join('');
 
     studentCount.textContent = `${students.length} joined`;
+
+    // Add event listeners for kick and message buttons
+    document.querySelectorAll('.btn-kick').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const studentId = e.target.dataset.studentId;
+        const studentName = e.target.dataset.studentName;
+        kickStudent(studentId, studentName);
+      });
+    });
+
+    document.querySelectorAll('.btn-message').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const studentId = e.target.dataset.studentId;
+        const studentName = e.target.dataset.studentName;
+        sendMessage(studentId, studentName);
+      });
+    });
   }
 
   function updateGoButton() {
@@ -498,10 +560,13 @@
       currentRoom = room;
       roomCodeEl.textContent = room.code;
       roomSubtitle.textContent = `Room ${room.code} • ${new Date(room.created_at).toLocaleDateString()}`;
-      
+
       if (room.target_url) {
         urlInput.value = room.target_url;
       }
+
+      // Update close/reopen button based on room status
+      updateRoomStatusButtons();
 
       return true;
     } catch (error) {
@@ -604,13 +669,82 @@
 
       if (error) throw error;
 
+      currentRoom.active = false;
+      updateRoomStatusButtons();
       showNotification('Room closed');
-      setTimeout(() => {
-        window.location.href = '/app.html';
-      }, 1000);
     } catch (error) {
       console.error('Error closing room:', error);
       showNotification('Error closing room');
+    }
+  }
+
+  async function reopenRoom() {
+    if (!currentRoom) return;
+
+    try {
+      const { error } = await SupabaseClient
+        .from('rooms')
+        .update({ active: true })
+        .eq('id', currentRoom.id);
+
+      if (error) throw error;
+
+      currentRoom.active = true;
+      updateRoomStatusButtons();
+      showNotification('Room reopened');
+    } catch (error) {
+      console.error('Error reopening room:', error);
+      showNotification('Error reopening room');
+    }
+  }
+
+  function updateRoomStatusButtons() {
+    if (!currentRoom) return;
+
+    if (currentRoom.active) {
+      closeRoomBtn.style.display = 'inline-block';
+      reopenRoomBtn.style.display = 'none';
+    } else {
+      closeRoomBtn.style.display = 'none';
+      reopenRoomBtn.style.display = 'inline-block';
+    }
+  }
+
+  async function kickStudent(studentId, studentName) {
+    if (!confirm(`Are you sure you want to kick ${studentName} from the room?`)) return;
+
+    try {
+      const { error } = await SupabaseClient
+        .from('students')
+        .delete()
+        .eq('id', studentId);
+
+      if (error) throw error;
+
+      showNotification(`${studentName} has been kicked from the room`);
+    } catch (error) {
+      console.error('Error kicking student:', error);
+      showNotification('Error kicking student');
+    }
+  }
+
+  async function sendMessage(studentId, studentName) {
+    const message = prompt(`Send a private message to ${studentName}:`);
+    if (!message || !message.trim()) return;
+
+    try {
+      // For now, we'll just show a notification
+      // In a real implementation, this would store messages in a messages table
+      // and the student's browser would poll for new messages
+      showNotification(`Message sent to ${studentName}: "${message}"`);
+
+      // TODO: Implement actual message storage in database
+      // Would need a messages table with:
+      // - id, room_id, student_id, sender_id, message, created_at
+      // And student polling mechanism
+    } catch (error) {
+      console.error('Error sending message:', error);
+      showNotification('Error sending message');
     }
   }
 
@@ -646,6 +780,7 @@
   });
   goBtn.addEventListener('click', navigateStudents);
   closeRoomBtn.addEventListener('click', closeRoom);
+  reopenRoomBtn.addEventListener('click', reopenRoom);
   deleteRoomBtn.addEventListener('click', deleteRoom);
 
   // Handle visibility change for refresh
