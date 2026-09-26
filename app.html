@@ -498,6 +498,32 @@
     color: var(--ink-soft);
   }
 
+  .room-card-actions {
+    margin-top: 16px;
+    display: flex;
+    gap: 8px;
+  }
+
+  .room-card-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: none;
+  }
+
+  .room-card-btn-delete {
+    background: var(--red);
+    color: #fff;
+  }
+  .room-card-btn-delete:hover {
+    background: #8B2E28;
+  }
+
   .deployment-info {
     display: grid;
     gap: 24px;
@@ -853,7 +879,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
     }
 
     roomsGrid.innerHTML = rooms.map(room => `
-      <div class="room-card" onclick="window.location.href='/manageroom.html?room=${room.code}'">
+      <div class="room-card" data-room-id="${room.id}">
         <div class="room-card-header">
           <span class="room-card-code">${room.code}</span>
           <span class="room-card-status">${room.active ? 'Active' : 'Closed'}</span>
@@ -862,6 +888,9 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
           Created ${new Date(room.created_at).toLocaleDateString()}
         </div>
         <div class="room-card-students" id="studentCount-${room.id}">Loading students...</div>
+        <div class="room-card-actions">
+          <button class="room-card-btn room-card-btn-delete" data-room-id="${room.id}">Delete room</button>
+        </div>
       </div>
     `).join('');
 
@@ -871,6 +900,28 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
         const countEl = document.getElementById(`studentCount-${room.id}`);
         if (countEl) {
           countEl.textContent = `${count} student${count !== 1 ? 's' : ''} online`;
+        }
+      });
+    });
+
+    // Add click handlers for delete buttons
+    document.querySelectorAll('.room-card-btn-delete').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const roomId = btn.dataset.roomId;
+        deleteRoom(roomId);
+      });
+    });
+
+    // Add click handlers for room cards (navigation)
+    document.querySelectorAll('.room-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (!e.target.classList.contains('room-card-btn-delete')) {
+          const roomId = card.dataset.roomId;
+          const room = rooms.find(r => r.id === roomId);
+          if (room) {
+            window.location.href = `/manageroom.html?room=${room.code}`;
+          }
         }
       });
     });
@@ -970,6 +1021,28 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       createRoomBtn.disabled = false;
       createRoomBtnText.style.display = 'inline';
       createRoomBtnLoading.style.display = 'none';
+    }
+  }
+
+  async function deleteRoom(roomId) {
+    if (!currentUser) return;
+    if (!confirm('Are you sure you want to delete this room? This will remove all student data and cannot be undone.')) return;
+
+    try {
+      const { error } = await SupabaseClient
+        .from('rooms')
+        .delete()
+        .eq('id', roomId)
+        .eq('teacher_id', currentUser.id);
+
+      if (error) throw error;
+
+      rooms = rooms.filter(r => r.id !== roomId);
+      renderRooms();
+      showNotification('Room deleted successfully');
+    } catch (error) {
+      console.error('Error deleting room:', error);
+      showNotification('Error deleting room');
     }
   }
 
