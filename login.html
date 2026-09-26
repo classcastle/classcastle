@@ -259,6 +259,18 @@
     }, duration);
   }
 
+  // Check if already logged in
+  async function checkSession() {
+    const { data: { session } } = await SupabaseClient.auth.getSession();
+    
+    if (session) {
+      showNotification('You are already logged in!');
+      setTimeout(() => {
+        window.location.href = '/app.html';
+      }, 500);
+    }
+  }
+
   async function handleLogin() {
     const email = loginEmail.value.trim();
     const password = loginPassword.value;
@@ -290,15 +302,7 @@
     if (e.key === 'Enter') handleLogin();
   });
 
-  // Check if already logged in
-  async function checkSession() {
-    const { data: { session } } = await SupabaseClient.auth.getSession();
-    
-    if (session) {
-      window.location.href = '/app.html';
-    }
-  }
-
+  // Check if already logged in on page load
   checkSession();
 </script>
 

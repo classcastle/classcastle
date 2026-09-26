@@ -299,12 +299,33 @@
 
       if (error) throw error;
 
-      showNotification('Teacher account created successfully!');
-      setTimeout(() => {
-        window.location.href = '/app.html';
-      }, 1000);
+      // If email confirmation is disabled, user is automatically logged in
+      if (data.session) {
+        showNotification('Teacher account created successfully!');
+        setTimeout(() => {
+          window.location.href = '/app.html';
+        }, 1000);
+      } else {
+        // If email confirmation is required, show different message
+        showNotification('Account created! Please check your email to confirm.');
+        setTimeout(() => {
+          window.location.href = '/login.html';
+        }, 2000);
+      }
     } catch (error) {
       showNotification(error.message);
+    }
+  }
+
+  // Check if already logged in
+  async function checkSession() {
+    const { data: { session } } = await SupabaseClient.auth.getSession();
+    
+    if (session) {
+      showNotification('You are already logged in!');
+      setTimeout(() => {
+        window.location.href = '/app.html';
+      }, 500);
     }
   }
 
@@ -313,15 +334,7 @@
     if (e.key === 'Enter') handleSignup();
   });
 
-  // Check if already logged in
-  async function checkSession() {
-    const { data: { session } } = await SupabaseClient.auth.getSession();
-    
-    if (session) {
-      window.location.href = '/app.html';
-    }
-  }
-
+  // Check if already logged in on page load
   checkSession();
 </script>
 
