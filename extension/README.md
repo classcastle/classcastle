@@ -30,10 +30,23 @@ The extension requires icon files in the `icons/` folder:
 - `icon48.png` - 48x48 pixels
 - `icon128.png` - 128x128 pixels
 
-To create icons from the logo:
+A simple castle SVG icon is provided in `icons/icon.svg`. To create PNG icons:
+
+### Recommended Method (Python):
+```bash
+cd icons
+pip install cairosvg
+python create-icons-from-svg.py
+```
+
+### Alternative Methods:
 1. Use the `logo.svg` from the parent directory
 2. Convert to PNG at the required sizes using any image editor
 3. Place in the `icons/` folder
+
+### Online Tools:
+- https://cloudconvert.com/svg-to-png
+- https://convertio.co/svg-png/
 
 ## Configuration
 
