@@ -187,6 +187,20 @@
     transform: translateY(0);
   }
 
+  .loading {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--paper);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
   @media (max-width: 780px) {
     nav { padding: 22px 24px; }
     main { padding: 24px; }
@@ -215,7 +229,10 @@
         <label class="form-label" for="loginPassword">Password</label>
         <input type="password" class="form-input" id="loginPassword" placeholder="••••••••">
       </div>
-      <button class="btn btn-primary btn-full" id="loginBtn">Sign in</button>
+      <button class="btn btn-primary btn-full" id="loginBtn">
+        <span class="btn-text">Sign in</span>
+        <span class="loading" style="display: none;"></span>
+      </button>
       <div class="auth-footer">
         New teacher? <a href="/signup.html">Create your account</a>
       </div>
@@ -250,6 +267,8 @@
   const loginEmail = document.getElementById('loginEmail');
   const loginPassword = document.getElementById('loginPassword');
   const loginBtn = document.getElementById('loginBtn');
+  const loginBtnText = loginBtn.querySelector('.btn-text');
+  const loginBtnLoading = loginBtn.querySelector('.loading');
 
   function showNotification(message, duration = 3000) {
     notification.textContent = message;
@@ -280,6 +299,11 @@
       return;
     }
 
+    // Show loading state
+    loginBtn.disabled = true;
+    loginBtnText.style.display = 'none';
+    loginBtnLoading.style.display = 'inline-block';
+
     try {
       const { data, error } = await SupabaseClient.auth.signInWithPassword({
         email,
@@ -294,6 +318,10 @@
       }, 1000);
     } catch (error) {
       showNotification(error.message);
+      // Reset button state
+      loginBtn.disabled = false;
+      loginBtnText.style.display = 'inline';
+      loginBtnLoading.style.display = 'none';
     }
   }
 

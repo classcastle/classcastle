@@ -199,6 +199,20 @@
     transform: translateY(0);
   }
 
+  .loading {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--paper);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
   @media (max-width: 780px) {
     nav { padding: 22px 24px; }
     main { padding: 24px; }
@@ -231,7 +245,10 @@
         <label class="form-label" for="signupPassword">Password</label>
         <input type="password" class="form-input" id="signupPassword" placeholder="••••••••">
       </div>
-      <button class="btn btn-primary btn-full" id="signupBtn">Create teacher account</button>
+      <button class="btn btn-primary btn-full" id="signupBtn">
+        <span class="btn-text">Create teacher account</span>
+        <span class="loading" style="display: none;"></span>
+      </button>
       <div class="auth-footer">
         Already have a teacher account? <a href="/login.html">Sign in</a>
       </div>
@@ -267,6 +284,8 @@
   const signupEmail = document.getElementById('signupEmail');
   const signupPassword = document.getElementById('signupPassword');
   const signupBtn = document.getElementById('signupBtn');
+  const signupBtnText = signupBtn.querySelector('.btn-text');
+  const signupBtnLoading = signupBtn.querySelector('.loading');
 
   function showNotification(message, duration = 3000) {
     notification.textContent = message;
@@ -285,6 +304,11 @@
       showNotification('Please fill in all fields');
       return;
     }
+
+    // Show loading state
+    signupBtn.disabled = true;
+    signupBtnText.style.display = 'none';
+    signupBtnLoading.style.display = 'inline-block';
 
     try {
       const { data, error } = await SupabaseClient.auth.signUp({
@@ -314,6 +338,10 @@
       }
     } catch (error) {
       showNotification(error.message);
+      // Reset button state
+      signupBtn.disabled = false;
+      signupBtnText.style.display = 'inline';
+      signupBtnLoading.style.display = 'none';
     }
   }
 
