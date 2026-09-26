@@ -95,6 +95,12 @@ async function handleJoin() {
     return;
   }
 
+  // Validate room code is exactly 6 digits
+  if (!/^\d{6}$/.test(roomId)) {
+    showError('Room code must be exactly 6 digits');
+    return;
+  }
+
   hideError();
   showLoading();
 

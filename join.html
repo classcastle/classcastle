@@ -162,6 +162,30 @@
   .status-line.is-error { color: var(--red); }
   .status-line.is-ok { color: var(--green); }
 
+  .no-access {
+    display: none;
+    text-align: center;
+    padding: 40px 20px;
+  }
+  .no-access.active {
+    display: block;
+  }
+  .no-access h1 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+  .no-access p {
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+  .no-access-detail {
+    font-size: 0.85rem;
+    color: var(--ink-softer);
+  }
+
   .name-field {
     margin-top: 22px;
     text-align: left;
@@ -263,6 +287,12 @@
 <main>
   <div class="card">
 
+    <div class="no-access" id="noAccess">
+      <h1>No Access</h1>
+      <p>Please use the Classcastle browser extension to join a room.</p>
+      <p class="no-access-detail">Direct access to this page is not allowed.</p>
+    </div>
+
     <div class="form-state" id="formState">
       <div class="card-eyebrow">Join a room</div>
       <h1 id="stepTitle">Enter your room code</h1>
@@ -349,6 +379,12 @@
   const prefillCode = urlParams.get('code');
   const prefillName = urlParams.get('name');
 
+  // Show no-access screen if not from extension
+  if (!fromExtension) {
+    document.getElementById('noAccess').classList.add('active');
+    document.getElementById('formState').classList.add('hide');
+  }
+
   // Check for existing session on page load
   function checkExistingSession() {
     const savedSession = localStorage.getItem(STORAGE_KEY);
@@ -394,30 +430,22 @@
       // Enable the join button
       updateJoinEnabled();
 
-      // Show confirmation dialog before auto-joining
+      // Auto-join after a delay (room code already validated by extension)
       setTimeout(() => {
-        const confirmed = confirm(`Are you sure you want to join room code ${prefillCode}?`);
-        if (confirmed) {
-          // Check if we're on step 0 (code) or step 1 (name)
-          const stepCodeEl = document.getElementById('stepCode');
-          const stepNameEl = document.getElementById('stepName');
+        // Check if we're on step 0 (code) or step 1 (name)
+        const stepCodeEl = document.getElementById('stepCode');
+        const stepNameEl = document.getElementById('stepName');
 
-          if (stepCodeEl && !stepCodeEl.classList.contains('hide')) {
-            // We're on step 0, need to go to step 1 first
-            nextBtn.click();
-            // Then click join after transition
-            setTimeout(() => {
-              joinBtn.click();
-            }, 500);
-          } else {
-            // Already on step 1, can join directly
+        if (stepCodeEl && !stepCodeEl.classList.contains('hide')) {
+          // We're on step 0, need to go to step 1 first
+          nextBtn.click();
+          // Then click join after transition
+          setTimeout(() => {
             joinBtn.click();
-          }
+          }, 500);
         } else {
-          // User cancelled, return to normal form
-          window.history.replaceState({}, document.title, window.location.pathname);
-          loadingExtensionState.classList.remove('show');
-          formState.classList.remove('hide');
+          // Already on step 1, can join directly
+          joinBtn.click();
         }
       }, 500);
     }
@@ -508,17 +536,54 @@
     });
   });
 
-  nextBtn.addEventListener('click', () => {
+  nextBtn.addEventListener('click', async () => {
     const code = currentCode();
     if (code.length !== CODE_LEN) return;
-    // Demo-only local check; a real deployment verifies the code with the teacher app's server.
+
+    // Validate code format
     if (!/^[0-9]{6}$/.test(code)) {
       codeRow.classList.add('error');
       statusLine.textContent = "That code doesn't look right. Check the board and try again.";
       statusLine.className = 'status-line is-error';
       return;
     }
-    goToStep(1);
+
+    // Validate room exists in Supabase
+    nextBtn.disabled = true;
+    nextBtn.textContent = 'Checking...';
+
+    try {
+      const { data: room, error } = await SupabaseClient
+        .from('rooms')
+        .select('id, active')
+        .eq('code', code)
+        .eq('active', true)
+        .limit(1);
+
+      if (error) {
+        throw error;
+      }
+
+      if (!room || room.length === 0) {
+        codeRow.classList.add('error');
+        statusLine.textContent = 'Invalid room code. Please check with your teacher.';
+        statusLine.className = 'status-line is-error';
+        nextBtn.disabled = false;
+        nextBtn.textContent = 'Next';
+        return;
+      }
+
+      // Room is valid, proceed to name step
+      goToStep(1);
+    } catch (error) {
+      console.error('Error validating room code:', error);
+      codeRow.classList.add('error');
+      statusLine.textContent = 'Error checking room code. Please try again.';
+      statusLine.className = 'status-line is-error';
+    } finally {
+      nextBtn.disabled = false;
+      nextBtn.textContent = 'Next';
+    }
   });
 
   backBtn.addEventListener('click', () => goToStep(0));
@@ -540,10 +605,6 @@
       codeRow.classList.add('error');
       return;
     }
-
-    // Show confirmation dialog
-    const confirmed = confirm(`Are you sure you want to join room code ${code}?`);
-    if (!confirmed) return;
 
     joinBtn.disabled = true;
     joinBtn.textContent = 'Joining…';
