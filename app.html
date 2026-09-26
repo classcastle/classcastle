@@ -443,6 +443,21 @@
     line-height: 1.5;
   }
 
+  .loading-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--ink-soft);
+  }
+  .loading-state .loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--line);
+    border-top-color: var(--green);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+  }
+
   .rooms-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -678,10 +693,9 @@
       </div>
 
       <div class="rooms-grid" id="roomsGrid">
-        <div class="empty-state">
-          <h3>No rooms yet</h3>
-          <p>Create your first classroom to start managing students.</p>
-          <button class="btn btn-primary" id="createFirstRoomBtn" style="margin-top: 16px;">Create room</button>
+        <div class="loading-state">
+          <div class="loading-spinner"></div>
+          <p>Loading your rooms...</p>
         </div>
       </div>
     </div>
@@ -904,15 +918,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       });
     });
 
-    // Add click handlers for delete buttons
-    document.querySelectorAll('.room-card-btn-delete').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const roomId = btn.dataset.roomId;
-        deleteRoom(roomId);
-      });
-    });
-
     // Add click handlers for room cards (navigation)
     document.querySelectorAll('.room-card').forEach(card => {
       card.addEventListener('click', (e) => {
@@ -925,6 +930,15 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
         }
       });
     });
+  }
+
+  function showLoadingState() {
+    roomsGrid.innerHTML = `
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Loading your rooms...</p>
+      </div>
+    `;
   }
 
   function updateUserInfo() {
@@ -970,6 +984,9 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   async function loadRooms() {
     if (!currentUser) return;
 
+    // Show loading state
+    showLoadingState();
+
     try {
       const { data, error } = await SupabaseClient
         .from('rooms')
@@ -984,6 +1001,12 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
     } catch (error) {
       console.error('Error loading rooms:', error);
       showNotification('Error loading rooms');
+      roomsGrid.innerHTML = `
+        <div class="empty-state">
+          <h3>Error loading rooms</h3>
+          <p>Please try refreshing the page.</p>
+        </div>
+      `;
     }
   }
 
@@ -1097,6 +1120,15 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   document.addEventListener('click', (e) => {
     if (e.target.id === 'createFirstRoomBtn') {
       createNewRoom();
+    }
+  });
+
+  // Handle delete room buttons (dynamically added)
+  document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('room-card-btn-delete')) {
+      e.stopPropagation();
+      const roomId = e.target.dataset.roomId;
+      deleteRoom(roomId);
     }
   });
 
