@@ -87,13 +87,9 @@ async function handleJoin() {
   // Open join.html on classcastle.org with room code and student name
   const joinUrl = `https://classcastle.org/join.html?code=${encodeURIComponent(roomId)}&name=${encodeURIComponent(studentName)}&from_extension=true`;
 
-  // Get the active tab and navigate to join page
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    if (tabs[0]) {
-      chrome.tabs.update(tabs[0].id, { url: joinUrl }, () => {
-        // Don't close popup, keep it open with loading state
-      });
-    }
+  // Create a new tab instead of updating the existing one
+  chrome.tabs.create({ url: joinUrl }, () => {
+    // Don't close popup, keep it open with loading state
   });
 }
 
