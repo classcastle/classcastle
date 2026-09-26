@@ -33,8 +33,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 // Event listeners
 joinBtn.addEventListener('click', handleJoin);
-leaveBtn.addEventListener('click', handleLeave);
 cancelBtn.addEventListener('click', handleCancel);
+leaveBtn.addEventListener('click', handleLeave);
 
 // Check current extension status
 function checkStatus() {
@@ -115,12 +115,6 @@ function handleCancel() {
 // Handle leave room
 function handleLeave() {
   // Leave room via background script
-  chrome.runtime.sendMessage({ action: 'leaveRoom' });
-  showJoinForm();
-}
-
-// Handle leave room
-function handleLeave() {
   chrome.runtime.sendMessage({ action: 'leaveRoom' }, () => {
     showJoinForm();
     roomIdInput.value = '';
