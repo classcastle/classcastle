@@ -7,6 +7,7 @@ const joinBtn = document.getElementById('joinBtn');
 const leaveBtn = document.getElementById('leaveBtn');
 const errorEl = document.getElementById('error');
 const loadingEl = document.getElementById('loading');
+const cancelBtn = document.getElementById('cancelBtn');
 
 // Check current status
 checkStatus();
@@ -14,6 +15,7 @@ checkStatus();
 // Event listeners
 joinBtn.addEventListener('click', handleJoin);
 leaveBtn.addEventListener('click', handleLeave);
+cancelBtn.addEventListener('click', handleCancel);
 
 // Check current extension status
 function checkStatus() {
@@ -82,11 +84,16 @@ async function handleJoin() {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (tabs[0]) {
       chrome.tabs.update(tabs[0].id, { url: joinUrl }, () => {
-        // Close the popup
-        window.close();
+        // Don't close popup, keep it open with loading state
       });
     }
   });
+}
+
+// Handle cancel
+function handleCancel() {
+  hideLoading();
+  showJoinForm();
 }
 
 // Handle leave room
