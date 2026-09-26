@@ -19,6 +19,18 @@ const SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // Check current status
 checkStatus();
 
+// Listen for status updates from background script
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'statusUpdate') {
+    if (request.joined) {
+      showJoinedState();
+    } else {
+      showJoinForm();
+    }
+  }
+  return true;
+});
+
 // Event listeners
 joinBtn.addEventListener('click', handleJoin);
 leaveBtn.addEventListener('click', handleLeave);
@@ -47,6 +59,7 @@ function showJoinForm() {
 function showJoinedState() {
   statusEl.classList.add('active');
   joinForm.classList.add('hidden');
+  leaveBtn.style.display = 'block';
 }
 
 // Show loading state
@@ -96,6 +109,13 @@ async function handleJoin() {
 // Handle cancel
 function handleCancel() {
   hideLoading();
+  showJoinForm();
+}
+
+// Handle leave room
+function handleLeave() {
+  // Leave room via background script
+  chrome.runtime.sendMessage({ action: 'leaveRoom' });
   showJoinForm();
 }
 

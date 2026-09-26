@@ -28,9 +28,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   } else if (request.action === 'studentJoined') {
     // Student joined via join.html, update background script
     joinRoom(request.roomId, request.studentId);
+    // Notify popup of status change
+    chrome.runtime.sendMessage({
+      action: 'statusUpdate',
+      joined: true
+    });
     sendResponse({ success: true });
   } else if (request.action === 'leaveRoom') {
     leaveRoom();
+    // Notify popup of status change
+    chrome.runtime.sendMessage({
+      action: 'statusUpdate',
+      joined: false
+    });
   } else if (request.action === 'getStatus') {
     sendResponse({
       joined: currentRoomId !== null,
