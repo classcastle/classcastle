@@ -80,6 +80,19 @@
   }
   .free-note { margin-top: 14px; font-size: 0.85rem; color: var(--ink-soft); }
 
+  .os-row { margin-top: 22px; display: flex; gap: 22px; flex-wrap: wrap; }
+  .os-item { display: flex; flex-direction: column; align-items: center; gap: 7px; }
+  .os-icon {
+    width: 30px; height: 24px; background: #fff; border: 1px solid var(--line);
+    border-radius: 5px; position: relative; display: block;
+  }
+  .os-icon::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 30%;
+    background: #F0EEE6; border-bottom: 1px solid var(--line); border-radius: 5px 5px 0 0;
+  }
+  .os-icon-bar { position: absolute; left: 15%; top: 8%; width: 3px; height: 3px; border-radius: 50%; background: #C9C6B8; }
+  .os-label { font-size: 0.75rem; color: var(--ink-soft); }
+
   /* VISUAL: grid of student windows */
   .rig { position: relative; }
   .grid-windows {
@@ -133,6 +146,7 @@
   .section-head p { margin-top: 12px; color: var(--ink-soft); font-size: 1.02rem; line-height: 1.55; }
 
   .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+  .it-steps { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px 48px; }
   .step .num {
     font-family: 'Fraunces', serif; font-size: 0.95rem; color: var(--green);
     margin-bottom: 14px; font-weight: 600;
@@ -169,7 +183,7 @@
 
   @media (max-width: 780px) {
     .hero { grid-template-columns: 1fr; }
-    .steps { grid-template-columns: 1fr; gap: 32px; }
+    .steps, .it-steps { grid-template-columns: 1fr; gap: 32px; }
     .features { grid-template-columns: 1fr; }
     nav { padding: 22px 24px; }
     .wrap, .hero, section { padding-left: 24px; padding-right: 24px; }
@@ -193,6 +207,24 @@
         <a class="btn-secondary" href="#how">Get the student extension</a>
       </div>
       <p class="free-note">Free for teachers. Works on Chromebooks. No student accounts needed.</p>
+      <div class="os-row">
+        <div class="os-item">
+          <span class="os-icon"><span class="os-icon-bar"></span></span>
+          <span class="os-label">Windows</span>
+        </div>
+        <div class="os-item">
+          <span class="os-icon"><span class="os-icon-bar"></span></span>
+          <span class="os-label">macOS</span>
+        </div>
+        <div class="os-item">
+          <span class="os-icon"><span class="os-icon-bar"></span></span>
+          <span class="os-label">ChromeOS</span>
+        </div>
+        <div class="os-item">
+          <span class="os-icon"><span class="os-icon-bar"></span></span>
+          <span class="os-label">Linux</span>
+        </div>
+      </div>
     </div>
     <div class="rig">
       <div class="grid-windows" id="winGrid"></div>
@@ -244,6 +276,37 @@
       <div class="feature">
         <h3>Works with what you already use</h3>
         <p>Send students to any URL — a site, a form, a game, a shared document. If it's a webpage, Classcastle can send them there.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <h2>For IT: rolling it out across a fleet</h2>
+      <p>You don't need every student clicking install one by one. Push the extension centrally and it's ready before the first lesson.</p>
+    </div>
+    <div class="it-steps">
+      <div class="step">
+        <div class="num">01</div>
+        <h3>Get the extension ID</h3>
+        <p>Find Classcastle's ID and store listing under Admin → Deployment in the teacher app. You'll use this ID in your policy.</p>
+      </div>
+      <div class="step">
+        <div class="num">02</div>
+        <h3>Force-install through policy</h3>
+        <p>Add it to ExtensionInstallForcelist in the Google Admin console for ChromeOS and Chrome, or push it via Intune or GPO for Edge. No end-user action required.</p>
+      </div>
+      <div class="step">
+        <div class="num">03</div>
+        <h3>Allow the connection</h3>
+        <p>Safelist Classcastle's domain in your web filter or firewall so room connections aren't blocked on the school network.</p>
+      </div>
+      <div class="step">
+        <div class="num">04</div>
+        <h3>Verify on a test device</h3>
+        <p>Confirm the icon appears pinned and can join a test room, then roll out to the rest of the fleet with the same policy.</p>
       </div>
     </div>
   </div>
