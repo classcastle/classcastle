@@ -121,6 +121,7 @@ END;
 $$ language 'plpgsql';
 
 -- Trigger for rooms table
+DROP TRIGGER IF EXISTS update_rooms_updated_at ON rooms;
 CREATE TRIGGER update_rooms_updated_at
   BEFORE UPDATE ON rooms
   FOR EACH ROW
@@ -136,6 +137,7 @@ END;
 $$ language 'plpgsql';
 
 -- Trigger for students table
+DROP TRIGGER IF EXISTS update_students_last_seen ON students;
 CREATE TRIGGER update_students_last_seen
   BEFORE UPDATE ON students
   FOR EACH ROW
