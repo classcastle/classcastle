@@ -1,0 +1,39 @@
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img">
+  <title>Classcastle icon (dark)</title>
+  <desc>A flat green castle icon with an amber flag on the center tower (dark theme version).</desc>
+
+  <g transform="translate(14,24)">
+    <!-- main wall -->
+    <rect x="0" y="34" width="92" height="52" rx="3" fill="#E7EDE4"/>
+    <!-- crenellations -->
+    <rect x="0" y="24" width="14" height="14" fill="#E7EDE4"/>
+    <rect x="24" y="24" width="14" height="14" fill="#E7EDE4"/>
+    <rect x="48" y="24" width="14" height="14" fill="#E7EDE4"/>
+    <rect x="72" y="24" width="14" height="14" fill="#E7EDE4"/>
+    <!-- left tower -->
+    <rect x="-8" y="18" width="24" height="68" rx="2" fill="#D4E0D8"/>
+    <rect x="-8" y="6" width="8" height="14" fill="#D4E0D8"/>
+    <rect x="0" y="6" width="8" height="14" fill="#D4E0D8"/>
+    <rect x="8" y="6" width="8" height="14" fill="#D4E0D8"/>
+    <!-- right tower -->
+    <rect x="76" y="18" width="24" height="68" rx="2" fill="#D4E0D8"/>
+    <rect x="76" y="6" width="8" height="14" fill="#D4E0D8"/>
+    <rect x="84" y="6" width="8" height="14" fill="#D4E0D8"/>
+    <rect x="92" y="6" width="8" height="14" fill="#D4E0D8"/>
+    <!-- center keep -->
+    <rect x="30" y="0" width="32" height="40" rx="2" fill="#E7EDE4"/>
+    <rect x="30" y="-10" width="8" height="12" fill="#E7EDE4"/>
+    <rect x="42" y="-10" width="8" height="12" fill="#E7EDE4"/>
+    <rect x="54" y="-10" width="8" height="12" fill="#E7EDE4"/>
+    <!-- flag -->
+    <line x1="46" y1="-10" x2="46" y2="-28" stroke="#E7EDE4" stroke-width="2"/>
+    <path d="M46 -28 L64 -22 L46 -16 Z" fill="#F0B84D"/>
+    <!-- door -->
+    <path d="M40 86 L40 66 Q40 58 46 58 Q52 58 52 66 L52 86 Z" fill="#1C1B17"/>
+    <!-- windows -->
+    <rect x="10" y="46" width="8" height="10" rx="1" fill="#1C1B17"/>
+    <rect x="66" y="46" width="8" height="10" rx="1" fill="#1C1B17"/>
+    <rect x="34" y="14" width="7" height="9" rx="1" fill="#1C1B17"/>
+    <rect x="51" y="14" width="7" height="9" rx="1" fill="#1C1B17"/>
+  </g>
+</svg>
