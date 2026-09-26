@@ -733,15 +733,18 @@
     if (!message || !message.trim()) return;
 
     try {
-      // For now, we'll just show a notification
-      // In a real implementation, this would store messages in a messages table
-      // and the student's browser would poll for new messages
-      showNotification(`Message sent to ${studentName}: "${message}"`);
+      const { error } = await SupabaseClient
+        .from('messages')
+        .insert({
+          room_id: currentRoom.id,
+          student_id: studentId,
+          sender_name: currentUser.user_metadata.name || 'Teacher',
+          message: message.trim()
+        });
 
-      // TODO: Implement actual message storage in database
-      // Would need a messages table with:
-      // - id, room_id, student_id, sender_id, message, created_at
-      // And student polling mechanism
+      if (error) throw error;
+
+      showNotification(`Message sent to ${studentName}`);
     } catch (error) {
       console.error('Error sending message:', error);
       showNotification('Error sending message');

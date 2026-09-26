@@ -187,6 +187,13 @@
   }
   .name-field input:focus { border-color: var(--green); background: #fff; }
 
+  #messageArea {
+    max-height: 200px;
+    overflow-y: auto;
+    text-align: left;
+    margin-top: 24px;
+  }
+
   .btn-join {
     margin-top: 26px;
     width: 100%;
@@ -289,6 +296,7 @@
       </div>
       <h1 id="joinedTitle">You're in the room</h1>
       <p class="sub" id="joinedSub">Sit tight — your teacher controls where this browser goes next.</p>
+      <div id="messageArea"></div>
       <button class="btn-join" id="leaveBtn" style="margin-top:26px; background: var(--paper); color: var(--ink); border: 1.5px solid var(--line);">Leave room</button>
     </div>
 
@@ -307,6 +315,11 @@
   const SUPABASE_KEY = 'sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK';
 
   const SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // Message polling state
+  let currentRoomId = null;
+  let currentStudentId = null;
+  let messageInterval = null;
 
   // Switch favicon based on theme
   function updateFavicon() {
@@ -448,14 +461,16 @@
       }
 
       // Create student record
-      const { error: studentError } = await SupabaseClient
+      const { data: studentData, error: studentError } = await SupabaseClient
         .from('students')
         .insert({
           room_id: room.id,
           name: name,
           online: true,
           current_url: null
-        });
+        })
+        .select()
+        .single();
 
       if (studentError) {
         statusLine.textContent = 'Error joining room. Please try again.';
@@ -470,6 +485,13 @@
       joinedSub.textContent = name + ', you\u2019ve joined room ' + code + '. Sit tight \u2014 your teacher controls where this browser goes next.';
       formState.classList.add('hide');
       joinedState.classList.add('show');
+
+      // Store room and student ID for message polling
+      currentRoomId = room.id;
+      currentStudentId = studentData.id;
+
+      // Start polling for messages
+      startMessagePolling();
     } catch (error) {
       console.error('Error joining room:', error);
       statusLine.textContent = 'Error joining room. Please try again.';
@@ -482,6 +504,13 @@
   leaveBtn.addEventListener('click', async () => {
     const code = currentCode();
     const name = nameInput.value.trim();
+
+    // Stop message polling
+    stopMessagePolling();
+
+    // Clear state
+    currentRoomId = null;
+    currentStudentId = null;
 
     // Try to delete student record
     try {
@@ -513,6 +542,56 @@
     formState.classList.remove('hide');
     goToStep(0);
   });
+
+  function startMessagePolling() {
+    if (messageInterval) clearInterval(messageInterval);
+
+    // Poll for messages every 3 seconds
+    messageInterval = setInterval(async () => {
+      if (!currentRoomId || !currentStudentId) return;
+
+      try {
+        const { data: messages, error } = await SupabaseClient
+          .from('messages')
+          .select('*')
+          .eq('room_id', currentRoomId)
+          .eq('student_id', currentStudentId)
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        if (error) throw error;
+
+        displayMessages(messages || []);
+      } catch (error) {
+        console.error('Error polling messages:', error);
+      }
+    }, 3000);
+  }
+
+  function stopMessagePolling() {
+    if (messageInterval) {
+      clearInterval(messageInterval);
+      messageInterval = null;
+    }
+  }
+
+  function displayMessages(messages) {
+    const messageArea = document.getElementById('messageArea');
+    if (!messageArea) return;
+
+    if (messages.length === 0) {
+      messageArea.innerHTML = '';
+      return;
+    }
+
+    messageArea.innerHTML = messages.map(msg => `
+      <div style="background: var(--green-soft); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 3px solid var(--green);">
+        <div style="font-weight: 500; font-size: 0.9rem; margin-bottom: 4px;">${msg.sender_name}</div>
+        <div style="font-size: 0.85rem; color: var(--ink);">${msg.message}</div>
+        <div style="font-size: 0.75rem; color: var(--ink-soft); margin-top: 4px;">${new Date(msg.created_at).toLocaleTimeString()}</div>
+      </div>
+    `).join('');
+  }
 
   updateNextEnabled();
 </script>
