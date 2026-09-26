@@ -185,6 +185,9 @@
 
   .page-header {
     margin-bottom: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
   }
 
   .page-title {
@@ -256,6 +259,20 @@
   }
   .btn:not(:disabled):active {
     transform: scale(0.98);
+  }
+
+  .loading {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--paper);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
   }
 
   .btn-primary {
@@ -426,6 +443,61 @@
     line-height: 1.5;
   }
 
+  .rooms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .room-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 24px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .room-card:hover {
+    border-color: var(--green);
+    transform: translateY(-2px);
+  }
+
+  .room-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
+  .room-card-code {
+    font-family: 'Fraunces', serif;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--green);
+    letter-spacing: 0.05em;
+  }
+
+  .room-card-status {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: var(--green-soft);
+    color: var(--green);
+    font-weight: 500;
+  }
+
+  .room-card-info {
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .room-card-students {
+    margin-top: 12px;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+
   .deployment-info {
     display: grid;
     gap: 24px;
@@ -569,37 +641,21 @@
     <!-- Dashboard Page -->
     <div class="page active" id="dashboardPage">
       <div class="page-header">
-        <h1 class="page-title">Teacher Dashboard</h1>
-        <p class="page-subtitle">Manage your classroom and students</p>
+        <div>
+          <h1 class="page-title">Your Rooms</h1>
+          <p class="page-subtitle">Manage your classrooms and students</p>
+        </div>
+        <button class="btn btn-primary" id="createRoomBtn">
+          <span class="btn-text">Create new room</span>
+          <span class="loading" style="display: none;"></span>
+        </button>
       </div>
 
-      <div class="card room-section">
-        <div class="room-header">
-          <div>
-            <h2 class="room-title">Your room</h2>
-            <p style="margin-top: 8px; color: var(--ink-soft); font-size: 0.92rem;">Share this code with your students</p>
-          </div>
-          <div class="room-code-display">
-            <span class="code-big" id="roomCode">---</span>
-            <button class="btn btn-secondary" id="newRoomBtn">New room</button>
-          </div>
-        </div>
-        <div class="control-bar">
-          <input type="url" class="url-input" id="urlInput" placeholder="Enter URL to send students to (e.g., https://microbit.org)">
-          <button class="btn btn-primary" id="goBtn" disabled>Go</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="section-header">
-          <h2 class="section-title">Students in your room</h2>
-          <span class="student-count" id="studentCount">0 joined</span>
-        </div>
-        <div class="student-grid" id="studentGrid">
-          <div class="empty-state">
-            <h3>No students yet</h3>
-            <p>As a teacher, share your room code with students. They'll appear here once they join with the Classcastle extension.</p>
-          </div>
+      <div class="rooms-grid" id="roomsGrid">
+        <div class="empty-state">
+          <h3>No rooms yet</h3>
+          <p>Create your first classroom to start managing students.</p>
+          <button class="btn btn-primary" id="createFirstRoomBtn" style="margin-top: 16px;">Create room</button>
         </div>
       </div>
     </div>
@@ -607,8 +663,10 @@
     <!-- Deployment Page -->
     <div class="page" id="deploymentPage">
       <div class="page-header">
-        <h1 class="page-title">IT Deployment Guide</h1>
-        <p class="page-subtitle">Share this information with your IT department to deploy Classcastle across your school</p>
+        <div>
+          <h1 class="page-title">IT Deployment Guide</h1>
+          <p class="page-subtitle">Share this information with your IT department to deploy Classcastle across your school</p>
+        </div>
       </div>
 
       <div class="card">
@@ -661,8 +719,10 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
     <!-- Settings Page -->
     <div class="page" id="settingsPage">
       <div class="page-header">
-        <h1 class="page-title">Teacher Settings</h1>
-        <p class="page-subtitle">Manage your teacher account and preferences</p>
+        <div>
+          <h1 class="page-title">Teacher Settings</h1>
+          <p class="page-subtitle">Manage your teacher account and preferences</p>
+        </div>
       </div>
 
       <div class="card">
@@ -709,8 +769,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
 
   // App state
   let currentUser = null;
-  let currentRoom = null;
-  let students = [];
+  let rooms = [];
   let roomSubscription = null;
 
   // DOM elements
@@ -723,19 +782,16 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   const logoutBtn = document.getElementById('logoutBtn');
 
   // Pages
-  const loginPage = document.getElementById('loginPage');
-  const signupPage = document.getElementById('signupPage');
   const dashboardPage = document.getElementById('dashboardPage');
   const deploymentPage = document.getElementById('deploymentPage');
   const settingsPage = document.getElementById('settingsPage');
 
   // Dashboard elements
-  const roomCodeEl = document.getElementById('roomCode');
-  const newRoomBtn = document.getElementById('newRoomBtn');
-  const urlInput = document.getElementById('urlInput');
-  const goBtn = document.getElementById('goBtn');
-  const studentGrid = document.getElementById('studentGrid');
-  const studentCount = document.getElementById('studentCount');
+  const roomsGrid = document.getElementById('roomsGrid');
+  const createRoomBtn = document.getElementById('createRoomBtn');
+  const createRoomBtnText = createRoomBtn.querySelector('.btn-text');
+  const createRoomBtnLoading = createRoomBtn.querySelector('.loading');
+  const createFirstRoomBtn = document.getElementById('createFirstRoomBtn');
 
   // Settings elements
   const settingsName = document.getElementById('settingsName');
@@ -768,34 +824,56 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
     return Math.floor(100000 + Math.random() * 900000).toString();
   }
 
-  function renderStudents() {
-    if (students.length === 0) {
-      studentGrid.innerHTML = `
+  async function loadRoomStudentCount(roomId) {
+    try {
+      const { data, error } = await SupabaseClient
+        .from('students')
+        .select('id', { count: 'exact', head: true })
+        .eq('room_id', roomId)
+        .eq('online', true);
+
+      if (error) throw error;
+      return data.length || 0;
+    } catch (error) {
+      console.error('Error loading student count:', error);
+      return 0;
+    }
+  }
+
+  function renderRooms() {
+    if (rooms.length === 0) {
+      roomsGrid.innerHTML = `
         <div class="empty-state">
-          <h3>No students yet</h3>
-          <p>As a teacher, share your room code with students. They'll appear here once they join with the Classcastle extension.</p>
+          <h3>No rooms yet</h3>
+          <p>Create your first classroom to start managing students.</p>
+          <button class="btn btn-primary" id="createFirstRoomBtn" style="margin-top: 16px;">Create room</button>
         </div>
       `;
-      studentCount.textContent = '0 joined';
       return;
     }
 
-    studentGrid.innerHTML = students.map(student => `
-      <div class="student-card online">
-        <div class="student-avatar">${student.name.charAt(0)}</div>
-        <div class="student-info">
-          <div class="student-name">${student.name}</div>
-          <div class="student-url">${student.current_url || 'Waiting for navigation'}</div>
+    roomsGrid.innerHTML = rooms.map(room => `
+      <div class="room-card" onclick="window.location.href='/manageroom.html?room=${room.code}'">
+        <div class="room-card-header">
+          <span class="room-card-code">${room.code}</span>
+          <span class="room-card-status">${room.active ? 'Active' : 'Closed'}</span>
         </div>
-        <div class="status-dot"></div>
+        <div class="room-card-info">
+          Created ${new Date(room.created_at).toLocaleDateString()}
+        </div>
+        <div class="room-card-students" id="studentCount-${room.id}">Loading students...</div>
       </div>
     `).join('');
 
-    studentCount.textContent = `${students.length} joined`;
-  }
-
-  function updateGoButton() {
-    goBtn.disabled = !urlInput.value.trim() || students.length === 0;
+    // Load student counts for each room
+    rooms.forEach(room => {
+      loadRoomStudentCount(room.id).then(count => {
+        const countEl = document.getElementById(`studentCount-${room.id}`);
+        if (countEl) {
+          countEl.textContent = `${count} student${count !== 1 ? 's' : ''} online`;
+        }
+      });
+    });
   }
 
   function updateUserInfo() {
@@ -828,8 +906,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   async function handleLogout() {
     await SupabaseClient.auth.signOut();
     currentUser = null;
-    currentRoom = null;
-    students = [];
+    rooms = [];
     if (roomSubscription) {
       roomSubscription.unsubscribe();
       roomSubscription = null;
@@ -839,118 +916,35 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   }
 
   // Room functions
-  async function loadOrCreateRoom() {
+  async function loadRooms() {
     if (!currentUser) return;
 
     try {
-      // Check for existing active room
-      const { data: existingRooms, error: fetchError } = await SupabaseClient
+      const { data, error } = await SupabaseClient
         .from('rooms')
         .select('*')
         .eq('teacher_id', currentUser.id)
-        .eq('active', true)
-        .single();
-
-      if (fetchError && fetchError.code !== 'PGRST116') {
-        // PGRST116 means no rows returned, which is fine
-        console.error('Error fetching room:', fetchError);
-      }
-
-      if (existingRooms) {
-        currentRoom = existingRooms;
-        roomCodeEl.textContent = existingRooms.code;
-      } else {
-        // Create new room
-        const roomCode = generateRoomCode();
-        const { data: newRoom, error: createError } = await SupabaseClient
-          .from('rooms')
-          .insert({
-            teacher_id: currentUser.id,
-            code: roomCode,
-            active: true,
-            target_url: null
-          })
-          .select()
-          .single();
-
-        if (createError) throw createError;
-
-        currentRoom = newRoom;
-        roomCodeEl.textContent = roomCode;
-      }
-
-      // Subscribe to room changes
-      subscribeToRoom();
-      await loadStudents();
-    } catch (error) {
-      console.error('Room error:', error);
-      showNotification('Error loading room');
-    }
-  }
-
-  async function loadStudents() {
-    if (!currentRoom) return;
-
-    try {
-      const { data, error } = await SupabaseClient
-        .from('students')
-        .select('*')
-        .eq('room_id', currentRoom.id)
-        .eq('online', true);
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      students = data || [];
-      renderStudents();
-      updateGoButton();
+      rooms = data || [];
+      renderRooms();
     } catch (error) {
-      console.error('Error loading students:', error);
+      console.error('Error loading rooms:', error);
+      showNotification('Error loading rooms');
     }
-  }
-
-  function subscribeToRoom() {
-    if (roomSubscription) {
-      roomSubscription.unsubscribe();
-    }
-
-    roomSubscription = SupabaseClient
-      .channel(`room:${currentRoom.id}`)
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'students',
-        filter: `room_id=eq.${currentRoom.id}`
-      }, (payload) => {
-        if (payload.eventType === 'INSERT') {
-          students.push(payload.new);
-          showNotification(`${payload.new.name} joined the room`);
-        } else if (payload.eventType === 'UPDATE') {
-          const index = students.findIndex(s => s.id === payload.new.id);
-          if (index !== -1) {
-            students[index] = payload.new;
-          }
-        } else if (payload.eventType === 'DELETE') {
-          students = students.filter(s => s.id !== payload.old.id);
-        }
-        renderStudents();
-        updateGoButton();
-      })
-      .subscribe();
   }
 
   async function createNewRoom() {
     if (!currentUser) return;
 
-    try {
-      // Deactivate current room
-      if (currentRoom) {
-        await SupabaseClient
-          .from('rooms')
-          .update({ active: false })
-          .eq('id', currentRoom.id);
-      }
+    // Show loading state
+    createRoomBtn.disabled = true;
+    createRoomBtnText.style.display = 'none';
+    createRoomBtnLoading.style.display = 'inline-block';
 
-      // Create new room
+    try {
       const roomCode = generateRoomCode();
       const { data: newRoom, error } = await SupabaseClient
         .from('rooms')
@@ -965,40 +959,17 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
 
       if (error) throw error;
 
-      currentRoom = newRoom;
-      roomCodeEl.textContent = roomCode;
-      students = [];
-      renderStudents();
-      updateGoButton();
-      
-      // Re-subscribe to new room
-      subscribeToRoom();
-      
-      showNotification('New room created');
+      rooms.unshift(newRoom);
+      renderRooms();
+      showNotification('Room created successfully');
     } catch (error) {
       console.error('Error creating room:', error);
       showNotification('Error creating room');
-    }
-  }
-
-  async function navigateStudents() {
-    const url = urlInput.value.trim();
-    if (!url || !currentRoom || students.length === 0) return;
-
-    try {
-      const { error } = await SupabaseClient
-        .from('rooms')
-        .update({ target_url: url })
-        .eq('id', currentRoom.id);
-
-      if (error) throw error;
-
-      // Update local state
-      currentRoom.target_url = url;
-      showNotification(`Sent ${students.length} students to ${url}`);
-    } catch (error) {
-      console.error('Error navigating students:', error);
-      showNotification('Error navigating students');
+    } finally {
+      // Reset button state
+      createRoomBtn.disabled = false;
+      createRoomBtnText.style.display = 'inline';
+      createRoomBtnLoading.style.display = 'none';
     }
   }
 
@@ -1047,17 +1018,24 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   // Event listeners
   logoutBtn.addEventListener('click', handleLogout);
 
-  newRoomBtn.addEventListener('click', createNewRoom);
-  urlInput.addEventListener('input', updateGoButton);
-  urlInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !goBtn.disabled) {
-      navigateStudents();
+  createRoomBtn.addEventListener('click', createNewRoom);
+
+  // Handle create first room button
+  document.addEventListener('click', (e) => {
+    if (e.target.id === 'createFirstRoomBtn') {
+      createNewRoom();
     }
   });
-  goBtn.addEventListener('click', navigateStudents);
 
   saveSettingsBtn.addEventListener('click', saveSettings);
   deleteAccountBtn.addEventListener('click', deleteAccount);
+
+  // Handle visibility change for refresh
+  document.addEventListener('visibilitychange', async () => {
+    if (!document.hidden && currentUser) {
+      await loadRooms();
+    }
+  });
 
   // Check for existing session
   async function checkSession() {
@@ -1067,7 +1045,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       currentUser = session.user;
       updateUserInfo();
       showPage('dashboard');
-      await loadOrCreateRoom();
+      await loadRooms();
     } else {
       window.location.href = '/login.html';
     }
@@ -1082,11 +1060,10 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       currentUser = session.user;
       updateUserInfo();
       showPage('dashboard');
-      loadOrCreateRoom();
+      loadRooms();
     } else if (event === 'SIGNED_OUT') {
       currentUser = null;
-      currentRoom = null;
-      students = [];
+      rooms = [];
       updateUserInfo();
       window.location.href = '/login.html';
     }
