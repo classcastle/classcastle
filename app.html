@@ -924,7 +924,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       loadRoomStudentCount(room.id).then(count => {
         const countEl = document.getElementById(`studentCount-${room.id}`);
         if (countEl) {
-          countEl.textContent = `${count} student${count !== 1 ? 's' : ''} online`;
+          countEl.textContent = `${count} student${count !== 1 ? 's' : ''}`;
         }
       });
     });
@@ -1082,7 +1082,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
             loadRoomStudentCount(room.id).then(count => {
               const countEl = document.getElementById(`studentCount-${room.id}`);
               if (countEl) {
-                countEl.textContent = `${count} student${count !== 1 ? 's' : ''} online`;
+                countEl.textContent = `${count} student${count !== 1 ? 's' : ''}`;
               }
             });
           });
