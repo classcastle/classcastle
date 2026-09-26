@@ -78,6 +78,17 @@ CREATE POLICY "Anyone can view students in active rooms"
     )
   );
 
+DROP POLICY IF EXISTS "Anyone can insert students in active rooms" ON students;
+CREATE POLICY "Anyone can insert students in active rooms"
+  ON students FOR INSERT
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM rooms
+      WHERE rooms.id = students.room_id
+      AND rooms.active = true
+    )
+  );
+
 DROP POLICY IF EXISTS "Teachers can insert students in their rooms" ON students;
 CREATE POLICY "Teachers can insert students in their rooms"
   ON students FOR INSERT
