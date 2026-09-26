@@ -394,22 +394,30 @@
       // Enable the join button
       updateJoinEnabled();
 
-      // Auto-join after a delay
+      // Show confirmation dialog before auto-joining
       setTimeout(() => {
-        // Check if we're on step 0 (code) or step 1 (name)
-        const stepCodeEl = document.getElementById('stepCode');
-        const stepNameEl = document.getElementById('stepName');
+        const confirmed = confirm(`Are you sure you want to join room code ${prefillCode}?`);
+        if (confirmed) {
+          // Check if we're on step 0 (code) or step 1 (name)
+          const stepCodeEl = document.getElementById('stepCode');
+          const stepNameEl = document.getElementById('stepName');
 
-        if (stepCodeEl && !stepCodeEl.classList.contains('hide')) {
-          // We're on step 0, need to go to step 1 first
-          nextBtn.click();
-          // Then click join after transition
-          setTimeout(() => {
+          if (stepCodeEl && !stepCodeEl.classList.contains('hide')) {
+            // We're on step 0, need to go to step 1 first
+            nextBtn.click();
+            // Then click join after transition
+            setTimeout(() => {
+              joinBtn.click();
+            }, 500);
+          } else {
+            // Already on step 1, can join directly
             joinBtn.click();
-          }, 500);
+          }
         } else {
-          // Already on step 1, can join directly
-          joinBtn.click();
+          // User cancelled, return to normal form
+          window.history.replaceState({}, document.title, window.location.pathname);
+          loadingExtensionState.classList.remove('show');
+          formState.classList.remove('hide');
         }
       }, 500);
     }
@@ -524,6 +532,18 @@
     const code = currentCode();
     const name = nameInput.value.trim();
     if (code.length !== CODE_LEN || !name) return;
+
+    // Only allow joining if coming from extension
+    if (!fromExtension) {
+      statusLine.textContent = 'Please use the Classcastle extension to join a room.';
+      statusLine.className = 'status-line is-error';
+      codeRow.classList.add('error');
+      return;
+    }
+
+    // Show confirmation dialog
+    const confirmed = confirm(`Are you sure you want to join room code ${code}?`);
+    if (!confirmed) return;
 
     joinBtn.disabled = true;
     joinBtn.textContent = 'Joining…';
