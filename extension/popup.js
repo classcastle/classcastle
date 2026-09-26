@@ -34,7 +34,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 // Event listeners
 joinBtn.addEventListener('click', handleJoin);
 cancelBtn.addEventListener('click', handleCancel);
-leaveBtn.addEventListener('click', handleLeave);
 
 // Check current extension status
 function checkStatus() {
@@ -60,6 +59,8 @@ function showJoinedState() {
   statusEl.classList.add('active');
   joinForm.classList.add('hidden');
   leaveBtn.style.display = 'block';
+  // Re-attach event listener to ensure it works
+  leaveBtn.onclick = handleLeave;
 }
 
 // Show loading state
