@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bad-words@1.6.6/lib/bad-words.min.js"></script>
 <style>
   :root {
     --paper: #F7F6F1;
@@ -185,6 +186,7 @@
     transition: border-color 0.15s ease, background 0.15s ease;
   }
   .name-field input:focus { border-color: var(--green); background: #fff; }
+  .name-field input.error { border-color: var(--red); }
 
   .btn-join {
     margin-top: 26px;
@@ -312,6 +314,9 @@
   updateFavicon();
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
 
+  // Initialize bad words filter
+  const filter = new Filter();
+
   const CODE_LEN = 6;
   const digits = Array.from(document.querySelectorAll('.code-digit'));
   const codeRow = document.getElementById('codeRow');
@@ -340,7 +345,25 @@
   }
 
   function updateJoinEnabled() {
-    joinBtn.disabled = nameInput.value.trim().length === 0;
+    const name = nameInput.value.trim();
+    const isEmpty = name.length === 0;
+    const hasBadWords = filter.isProfane(name);
+    joinBtn.disabled = isEmpty || hasBadWords;
+    
+    // Show error if name contains inappropriate words
+    if (hasBadWords && name.length > 0) {
+      nameInput.classList.add('error');
+      statusLine.textContent = 'Please use an appropriate name for classroom use.';
+      statusLine.className = 'status-line is-error';
+    } else if (!isEmpty) {
+      nameInput.classList.remove('error');
+      statusLine.textContent = '\u00A0';
+      statusLine.className = 'status-line';
+    } else {
+      nameInput.classList.remove('error');
+      statusLine.textContent = '\u00A0';
+      statusLine.className = 'status-line';
+    }
   }
 
   function goToStep(step) {
@@ -360,6 +383,9 @@
       stepDots[1].classList.add('active');
       stepTitle.textContent = 'What\u2019s your name?';
       stepSub.textContent = 'So your teacher can see who\u2019s joined room ' + currentCode() + '.';
+      nameInput.classList.remove('error');
+      statusLine.textContent = '\u00A0';
+      statusLine.className = 'status-line';
       nameInput.focus();
     }
   }
@@ -418,7 +444,7 @@
   joinBtn.addEventListener('click', () => {
     const code = currentCode();
     const name = nameInput.value.trim();
-    if (code.length !== CODE_LEN || !name) return;
+    if (code.length !== CODE_LEN || !name || filter.isProfane(name)) return;
 
     joinBtn.disabled = true;
     joinBtn.textContent = 'Joining…';
@@ -434,6 +460,7 @@
   leaveBtn.addEventListener('click', () => {
     digits.forEach(d => d.value = '');
     nameInput.value = '';
+    nameInput.classList.remove('error');
     joinBtn.disabled = true;
     joinBtn.textContent = 'Join room';
     statusLine.textContent = '\u00A0';
