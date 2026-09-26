@@ -463,6 +463,10 @@
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
   }
+  .rooms-grid .empty-state,
+  .rooms-grid .loading-state {
+    grid-column: 1 / -1;
+  }
 
   .room-card {
     background: #fff;
