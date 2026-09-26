@@ -682,17 +682,30 @@
           return;
         }
 
-        const { data: messages, error } = await SupabaseClient
-          .from('messages')
-          .select('*')
-          .eq('room_id', currentRoomId)
-          .eq('student_id', currentStudentId)
-          .order('created_at', { ascending: false })
-          .limit(10);
+        // Skip message polling if messages table doesn't exist
+        // This prevents errors when schema hasn't been updated
+        try {
+          const { data: messages, error } = await SupabaseClient
+            .from('messages')
+            .select('*')
+            .eq('room_id', currentRoomId)
+            .eq('student_id', currentStudentId)
+            .order('created_at', { ascending: false })
+            .limit(10);
 
-        if (error) throw error;
+          if (error) {
+            // Table doesn't exist or other error, just skip polling
+            console.log('Message polling skipped:', error.message);
+            return;
+          }
 
-        displayMessages(messages || []);
+          if (messages && messages.length > 0) {
+            displayMessages(messages);
+          }
+        } catch (err) {
+          // Ignore message polling errors
+          console.log('Message polling error:', err.message);
+        }
       } catch (error) {
         console.error('Error polling messages:', error);
       }
