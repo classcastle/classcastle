@@ -1,210 +1,292 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classcastle — Instant Browser Control for Teachers</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        sage: {
-                            light: '#c0cfd0',
-                            DEFAULT: '#a0bfb9',
-                            dark: '#80b48c',
-                        },
-                        neutralBg: '#f5f5f5',
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- Inter Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #ffffff;
-            color: #1e293b;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Classcastle — one click, every browser</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F7F6F1;
+    --ink: #1C1B17;
+    --ink-soft: #6B6A61;
+    --line: #E2E0D6;
+    --green: #2F5233;
+    --green-soft: #E7EDE4;
+    --amber: #D98E2B;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: inherit; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; margin: 0; font-weight: 500; }
+  p { margin: 0; }
+  a { color: inherit; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 32px; }
+
+  /* NAV */
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 28px 32px;
+    max-width: 1080px; margin: 0 auto;
+  }
+  .wordmark { font-family: 'Fraunces', serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; }
+  .wordmark span { color: var(--green); }
+  .nav-cta {
+    font-size: 0.9rem; font-weight: 500;
+    background: var(--ink); color: var(--paper);
+    padding: 10px 18px; border-radius: 8px; text-decoration: none;
+  }
+
+  /* HERO */
+  .hero {
+    display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px;
+    align-items: center;
+    padding: 40px 0 80px;
+  }
+  .hero h1 {
+    font-size: clamp(2.4rem, 4.2vw, 3.4rem);
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+    max-width: 11.5ch;
+  }
+  .hero p.lede {
+    margin-top: 22px;
+    font-size: 1.08rem;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    max-width: 42ch;
+  }
+  .hero-ctas { margin-top: 32px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--green); color: #fff;
+    padding: 13px 22px; border-radius: 8px;
+    font-weight: 500; font-size: 0.98rem; text-decoration: none;
+    display: inline-block;
+  }
+  .btn-secondary {
+    color: var(--ink); text-decoration: none; font-weight: 500; font-size: 0.98rem;
+    border-bottom: 1px solid var(--line); padding-bottom: 2px;
+  }
+  .free-note { margin-top: 14px; font-size: 0.85rem; color: var(--ink-soft); }
+
+  /* VISUAL: grid of student windows */
+  .rig { position: relative; }
+  .grid-windows {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
+  }
+  .win {
+    aspect-ratio: 4/3; background: #fff; border: 1px solid var(--line);
+    border-radius: 6px; position: relative; overflow: hidden;
+  }
+  .win::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 18%;
+    background: #F0EEE6; border-bottom: 1px solid var(--line);
+  }
+  .win::after {
+    content: ''; position: absolute; left: 8%; top: 5%; width: 5px; height: 5px;
+    border-radius: 50%; background: #C9C6B8;
+    box-shadow: 10px 0 0 #C9C6B8, 20px 0 0 #C9C6B8;
+  }
+  .win .body {
+    position: absolute; inset: 22% 10% 10% 10%;
+    border-radius: 3px; background: var(--line);
+    opacity: 0.6;
+    transition: background 0.6s ease, opacity 0.6s ease;
+  }
+  .win.synced .body {
+    background: var(--green-soft);
+    opacity: 1;
+  }
+  .win.synced .body::after {
+    content: '⌂ microbit.org';
+    position: absolute; top: 6px; left: 6px;
+    font-size: 6px; color: var(--green); font-family: 'Inter', sans-serif; font-weight: 600;
+  }
+  .rig-caption {
+    margin-top: 16px; font-size: 0.85rem; color: var(--ink-soft);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .dot-live {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--green);
+    display: inline-block;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .win.synced .body { animation: none; }
+  }
+
+  /* SECTION: how it works */
+  section { padding: 72px 0; border-top: 1px solid var(--line); }
+  .section-head { max-width: 46ch; margin-bottom: 48px; }
+  .section-head h2 { font-size: clamp(1.6rem, 2.6vw, 2.1rem); letter-spacing: -0.01em; }
+  .section-head p { margin-top: 12px; color: var(--ink-soft); font-size: 1.02rem; line-height: 1.55; }
+
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+  .step .num {
+    font-family: 'Fraunces', serif; font-size: 0.95rem; color: var(--green);
+    margin-bottom: 14px; font-weight: 600;
+  }
+  .step h3 { font-size: 1.15rem; margin-bottom: 10px; font-weight: 500; }
+  .step p { color: var(--ink-soft); line-height: 1.55; font-size: 0.97rem; }
+
+  /* FEATURES */
+  .features {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+    background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+  }
+  .feature { background: var(--paper); padding: 28px 26px; }
+  .feature h3 { font-size: 1.02rem; font-weight: 500; margin-bottom: 8px; }
+  .feature p { color: var(--ink-soft); font-size: 0.93rem; line-height: 1.5; }
+
+  /* CTA band */
+  .cta-band {
+    text-align: left;
+    padding: 64px 0 80px;
+  }
+  .cta-band h2 {
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+    max-width: 16ch; letter-spacing: -0.01em;
+  }
+  .cta-band .hero-ctas { margin-top: 28px; }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 28px 0 40px;
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--ink-soft); font-size: 0.85rem;
+  }
+
+  @media (max-width: 780px) {
+    .hero { grid-template-columns: 1fr; }
+    .steps { grid-template-columns: 1fr; gap: 32px; }
+    .features { grid-template-columns: 1fr; }
+    nav { padding: 22px 24px; }
+    .wrap, .hero, section { padding-left: 24px; padding-right: 24px; }
+  }
+</style>
 </head>
-<body class="antialiased selection:bg-[#a0bfb9]/30 selection:text-[#111827]">
+<body>
 
-    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-[#f5f5f5]">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-[#80b48c] flex items-center justify-center text-white font-bold text-xl shadow-md shadow-[#80b48c]/20">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                </div>
-                <span class="text-xl font-bold tracking-tight text-slate-900">Classcastle</span>
-            </div>
-            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-600">
-                <a href="#features" class="hover:text-[#80b48c] transition-colors">Courses & Actions</a>
-                <a href="#how-it-works" class="hover:text-[#80b48c] transition-colors">How It Works</a>
-                <a href="#pricing" class="hover:text-[#80b48c] transition-colors">Pricing</a>
-            </nav>
-            <div class="flex items-center space-x-2 sm:space-x-4">
-                <a href="#waitlist" class="text-sm font-medium text-slate-700 hover:text-[#80b48c] px-3 py-2 hidden sm:inline-block">Log in</a>
-                <a href="#waitlist" class="bg-[#80b48c] hover:bg-[#6fa07b] text-white text-sm font-semibold px-4 sm:px-5 py-2.5 rounded-xl transition-all shadow-sm shadow-[#80b48c]/20">Sign up</a>
-            </div>
-        </div>
-    </header>
+<nav>
+  <div class="wordmark">Class<span>castle</span></div>
+  <a class="nav-cta" href="#access">Open teacher app</a>
+</nav>
 
-    <main>
-        <section class="pt-12 md:pt-16 pb-20 md:pb-24 px-4 sm:px-6 relative overflow-hidden bg-gradient-to-b from-[#f5f5f5]/60 to-white">
-            <div class="max-w-6xl mx-auto grid md:grid-cols-12 gap-8 md:gap-12 items-center">
-                
-                <!-- Left Hand Graphic / Unsplash Photo Mockup -->
-                <div class="md:col-span-7 relative order-2 md:order-1">
-                    <div class="relative w-full aspect-[4/3] bg-[#c0cfd0]/20 rounded-3xl border border-[#c0cfd0]/40 overflow-hidden shadow-sm">
-                        <!-- Unsplash Photo with elegant overlay -->
-                        <img src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1200&q=80" alt="Students in a modern classroom environment learning with technology" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/10 to-transparent"></div>
-                        
-                        <div class="absolute bottom-6 left-6 right-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-white">
-                            <div class="bg-white/90 backdrop-blur px-4 py-2 rounded-xl shadow-sm border border-slate-100 text-xs font-semibold text-slate-800">
-                                🚀 Pushing URL: <span class="text-[#80b48c]">microbit.org/editor</span>
-                            </div>
-                            <div class="bg-emerald-500/90 backdrop-blur px-3 py-1.5 rounded-full text-xs font-bold text-white shadow-sm">
-                                28 Student Tabs Synced
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<div class="wrap">
+  <div class="hero">
+    <div>
+      <h1>One click, and thirty screens land in the same place.</h1>
+      <p class="lede">Classcastle is a teacher web app paired with a lightweight browser extension for students. You run the room from any browser; they join with a code. When it's time for the task, you press one button, and every student's browser opens the same page — no reading URLs off the whiteboard, no lost kids.</p>
+      <div class="hero-ctas">
+        <a class="btn-primary" href="#access" id="access">Open the teacher app</a>
+        <a class="btn-secondary" href="#how">Get the student extension</a>
+      </div>
+      <p class="free-note">Free for teachers. Works on Chromebooks. No student accounts needed.</p>
+    </div>
+    <div class="rig">
+      <div class="grid-windows" id="winGrid"></div>
+      <p class="rig-caption"><span class="dot-live"></span> 30 students, one command: go to microbit.org</p>
+    </div>
+  </div>
+</div>
 
-                <!-- Right Hand Copy matching Khan Academy layout structure -->
-                <div class="md:col-span-5 space-y-6 text-left order-1 md:order-2">
-                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 leading-[1.12]">
-                        For every student, every classroom. <span class="text-[#80b48c]">Instant control.</span>
-                    </h1>
-                    <p class="text-base sm:text-lg text-slate-600 leading-relaxed">
-                        Stop wasting 10 minutes typing URLs or reading links aloud. With Classcastle, teachers enter a room code, click a button, and instantly load webpages on every student's computer.
-                    </p>
-                    
-                    <!-- Action Pill Buttons matching reference style -->
-                    <div class="pt-2 flex flex-wrap gap-3">
-                        <a href="#waitlist" class="flex-1 sm:flex-none bg-[#80b48c] hover:bg-[#6fa07b] text-white font-semibold px-6 py-3.5 rounded-xl transition-all shadow-md shadow-[#80b48c]/20 text-center text-sm sm:text-base">Learners</a>
-                        <a href="#waitlist" class="flex-1 sm:flex-none bg-[#a0bfb9] hover:bg-[#8eb0a9] text-white font-semibold px-6 py-3.5 rounded-xl transition-all shadow-sm text-center text-sm sm:text-base">Teachers</a>
-                        <a href="#waitlist" class="flex-1 sm:flex-none bg-[#c0cfd0] hover:bg-[#b0c0c1] text-slate-800 font-semibold px-6 py-3.5 rounded-xl transition-all shadow-sm text-center text-sm sm:text-base">Parents</a>
-                    </div>
-                </div>
+<section id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>How a lesson runs</h2>
+      <p>Set up once, then it disappears into the background of your teaching.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="num">01</div>
+        <h3>You open a room in the teacher app</h3>
+        <p>No install for you — it runs in any browser. Start a room and you get a short code to put on the board.</p>
+      </div>
+      <div class="step">
+        <div class="num">02</div>
+        <h3>Students join with the extension</h3>
+        <p>A small add-on for Chrome or Edge, installed once. Students type in your room code and light up green in your teacher view.</p>
+      </div>
+      <div class="step">
+        <div class="num">03</div>
+        <h3>You press go, everyone arrives</h3>
+        <p>Type the page once — microbit.org, a quiz, a shared doc — and every joined browser navigates there together, instantly.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-            </div>
-        </section>
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Built for the realities of a classroom</h2>
+    </div>
+    <div class="features">
+      <div class="feature">
+        <h3>Lightweight by design</h3>
+        <p>No heavy install, no login walls. It runs quietly and doesn't slow down ageing school machines.</p>
+      </div>
+      <div class="feature">
+        <h3>One room, full visibility</h3>
+        <p>See who's joined and where their browser currently is, at a glance, from your own screen.</p>
+      </div>
+      <div class="feature">
+        <h3>Works with what you already use</h3>
+        <p>Send students to any URL — a site, a form, a game, a shared document. If it's a webpage, Classcastle can send them there.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-        <section id="features" class="py-20 md:py-24 px-4 sm:px-6 border-t border-[#f5f5f5] bg-white">
-            <div class="max-w-6xl mx-auto">
-                <div class="text-center max-w-2xl mx-auto mb-16">
-                    <h2 class="text-xs font-semibold text-[#80b48c] tracking-wider uppercase mb-3">Designed for Modern Classrooms</h2>
-                    <p class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Built to save your sanity and instructional time.</p>
-                </div>
-                <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
-                    <div class="bg-[#f5f5f5]/50 border border-[#c0cfd0]/30 rounded-2xl p-6 sm:p-8 hover:border-[#80b48c] transition-all">
-                        <div class="w-12 h-12 rounded-xl bg-[#80b48c]/15 text-[#80b48c] flex items-center justify-center font-bold mb-6">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                        </div>
-                        <h3 class="text-lg font-bold text-slate-900 mb-2">Instant Action Trigger</h3>
-                        <p class="text-sm text-slate-600 leading-relaxed">Click a button on your dashboard and watch the target URL or action fire simultaneously on all student screens.</p>
-                    </div>
-                    <div class="bg-[#f5f5f5]/50 border border-[#c0cfd0]/30 rounded-2xl p-6 sm:p-8 hover:border-[#80b48c] transition-all">
-                        <div class="w-12 h-12 rounded-xl bg-[#80b48c]/15 text-[#80b48c] flex items-center justify-center font-bold mb-6">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                        </div>
-                        <h3 class="text-lg font-bold text-slate-900 mb-2">Secure & Lightweight Extension</h3>
-                        <p class="text-sm text-slate-600 leading-relaxed">Powered by a secure companion browser extension installed on student devices, making tab synchronization instantaneous and reliable.</p>
-                    </div>
-                    <div class="bg-[#f5f5f5]/50 border border-[#c0cfd0]/30 rounded-2xl p-6 sm:p-8 hover:border-[#80b48c] transition-all sm:col-span-2 md:col-span-1">
-                        <div class="w-12 h-12 rounded-xl bg-[#80b48c]/15 text-[#80b48c] flex items-center justify-center font-bold mb-6">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                        </div>
-                        <h3 class="text-lg font-bold text-slate-900 mb-2">Zero Typo Mistakes</h3>
-                        <p class="text-sm text-slate-600 leading-relaxed">Eliminate misspelled URLs, wrong bookmarks, and students staring blankly at the wrong tab during critical lesson minutes.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+<div class="wrap">
+  <div class="cta-band">
+    <h2>Stop saying "did everyone find the page?"</h2>
+    <div class="hero-ctas">
+      <a class="btn-primary" href="#access">Open the teacher app</a>
+      <a class="btn-secondary" href="#how">Get the student extension</a>
+    </div>
+  </div>
+  <footer>
+    <span>Classcastle</span>
+    <span>Made for classrooms</span>
+  </footer>
+</div>
 
-        <section id="how-it-works" class="py-20 md:py-24 px-4 sm:px-6 bg-[#f5f5f5]/50 border-t border-[#c0cfd0]/30">
-            <div class="max-w-5xl mx-auto">
-                <div class="text-center max-w-2xl mx-auto mb-16">
-                    <h2 class="text-xs font-semibold text-[#80b48c] tracking-wider uppercase mb-3">Simple Workflow</h2>
-                    <p class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Up and running in three easy steps.</p>
-                </div>
-                <div class="grid md:grid-cols-3 gap-6 sm:gap-8">
-                    <div class="bg-white p-6 sm:p-8 rounded-2xl border border-[#c0cfd0]/40 shadow-sm relative">
-                        <div class="text-[#80b48c] font-extrabold text-2xl mb-4">01</div>
-                        <h3 class="text-lg font-bold text-slate-900 mb-2">Teacher Starts Room</h3>
-                        <p class="text-sm text-slate-600">Open Classcastle on your teacher laptop and generate a secure 4-digit room code instantly.</p>
-                    </div>
-                    <div class="bg-white p-6 sm:p-8 rounded-2xl border border-[#c0cfd0]/40 shadow-sm relative">
-                        <div class="text-[#80b48c] font-extrabold text-2xl mb-4">02</div>
-                        <h3 class="text-lg font-bold text-slate-900 mb-2">Students Join Code</h3>
-                        <p class="text-sm text-slate-600">Students enter the code via the lightweight companion browser extension to securely connect.</p>
-                    </div>
-                    <div class="bg-white p-6 sm:p-8 rounded-2xl border border-[#c0cfd0]/40 shadow-sm relative">
-                        <div class="text-[#80b48c] font-extrabold text-2xl mb-4">03</div>
-                        <h3 class="text-lg font-bold text-slate-900 mb-2">Push & Teach</h3>
-                        <p class="text-sm text-slate-600">Click any preset action or custom URL to instantly deploy it across all student monitors.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+<script>
+  // Build the 5x6 grid of student windows, decorative only.
+  const grid = document.getElementById('winGrid');
+  const total = 30;
+  for (let i = 0; i < total; i++) {
+    const w = document.createElement('div');
+    w.className = 'win';
+    w.innerHTML = '<div class="body"></div>';
+    grid.appendChild(w);
+  }
 
-        <!-- Waitlist Section -->
-        <section id="waitlist" class="py-20 md:py-24 px-4 sm:px-6 bg-white border-t border-[#f5f5f5]">
-            <div class="max-w-2xl mx-auto text-center">
-                <div class="inline-flex items-center space-x-2 bg-[#80b48c]/15 text-[#80b48c] px-3.5 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider mb-6">
-                    <span>Early Access Beta</span>
-                </div>
-                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">Be the first to try Classcastle</h2>
-                <p class="text-slate-600 mb-8">Join individual teachers using browser push controls to reclaim their instructional time.</p>
-                
-                <form onsubmit="event.preventDefault(); showSuccess();" class="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
-                    <input type="email" id="waitlist-email" placeholder="Enter your school email" required class="w-full px-4 py-3.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#80b48c] focus:border-transparent text-slate-800 placeholder-slate-400 bg-[#f5f5f5]/50 shadow-sm">
-                    <button type="submit" class="w-full sm:w-auto bg-[#80b48c] hover:bg-[#6fa07b] text-white font-semibold px-6 py-3.5 rounded-xl transition-all shadow-md shadow-[#80b48c]/20 whitespace-nowrap">Join Waitlist</button>
-                </form>
-                <div id="success-msg" class="hidden mt-4 text-sm font-medium text-[#80b48c]">
-                    🎉 You're on the list! We'll notify you when beta launches.
-                </div>
-            </div>
-        </section>
+  // One orchestrated reveal: windows sync a beat after load, respecting reduced motion.
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const windows = grid.querySelectorAll('.win');
+  if (prefersReduced) {
+    windows.forEach(w => w.classList.add('synced'));
+  } else {
+    setTimeout(() => {
+      windows.forEach((w, i) => {
+        setTimeout(() => w.classList.add('synced'), i * 22);
+      });
+    }, 500);
+  }
+</script>
 
-        <footer class="py-12 px-4 sm:px-6 border-t border-[#f5f5f5] bg-[#f5f5f5]/30 text-center text-sm text-slate-500">
-            <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-                <div class="flex items-center space-x-2 font-bold text-slate-900">
-                    <div class="w-6 h-6 rounded-md bg-[#80b48c] flex items-center justify-center text-white text-xs">C</div>
-                    <span>Classcastle</span>
-                </div>
-                <p class="text-xs sm:text-sm text-slate-500 max-w-md text-center">
-                    *Requires lightweight student companion browser extension for secure real-time tab synchronization and action execution.
-                </p>
-                <div class="flex space-x-6 text-slate-600">
-                    <a href="#" class="hover:text-[#80b48c]">Privacy</a>
-                    <a href="#" class="hover:text-[#80b48c]">Terms</a>
-                    <a href="#" class="hover:text-[#80b48c]">Contact</a>
-                </div>
-            </div>
-        </footer>
-    </main>
-
-    <!-- Interactive Script -->
-    <script>
-        function showSuccess() {
-            const input = document.getElementById('waitlist-email');
-            const msg = document.getElementById('success-msg');
-            if (input.value) {
-                input.value = '';
-                input.classList.add('opacity-50');
-                input.disabled = true;
-                msg.classList.remove('hidden');
-            }
-        }
-    </script>
 </body>
 </html>
