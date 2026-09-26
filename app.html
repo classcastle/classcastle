@@ -880,8 +880,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       const { count, error } = await SupabaseClient
         .from('students')
         .select('*', { count: 'exact', head: true })
-        .eq('room_id', roomId)
-        .eq('online', true);
+        .eq('room_id', roomId);
 
       if (error) throw error;
       console.log(`Room ${roomId} student count:`, count);
