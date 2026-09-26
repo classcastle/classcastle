@@ -821,6 +821,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   let currentUser = null;
   let rooms = [];
   let roomSubscription = null;
+  let studentSubscription = null;
 
   // DOM elements
   const notification = document.getElementById('notification');
@@ -986,6 +987,10 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       roomSubscription.unsubscribe();
       roomSubscription = null;
     }
+    if (studentSubscription) {
+      studentSubscription.unsubscribe();
+      studentSubscription = null;
+    }
     updateUserInfo();
     window.location.href = '/login.html';
   }
@@ -1018,6 +1023,72 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
         </div>
       `;
     }
+  }
+
+  function subscribeToRooms() {
+    if (roomSubscription) {
+      roomSubscription.unsubscribe();
+    }
+
+    // Subscribe to room changes (insert, update, delete)
+    roomSubscription = SupabaseClient
+      .channel('rooms-changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'rooms',
+        filter: `teacher_id=eq.${currentUser.id}`
+      }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          rooms.unshift(payload.new);
+          renderRooms();
+          showNotification('New room created');
+        } else if (payload.eventType === 'UPDATE') {
+          const index = rooms.findIndex(r => r.id === payload.new.id);
+          if (index !== -1) {
+            rooms[index] = payload.new;
+            renderRooms();
+          }
+        } else if (payload.eventType === 'DELETE') {
+          rooms = rooms.filter(r => r.id !== payload.old.id);
+          renderRooms();
+          showNotification('Room deleted');
+        }
+      })
+      .subscribe();
+  }
+
+  function subscribeToStudents() {
+    if (studentSubscription) {
+      studentSubscription.unsubscribe();
+    }
+
+    // Get current room IDs to filter subscriptions
+    const roomIds = rooms.map(r => r.id);
+
+    // Subscribe to student changes to update counts
+    studentSubscription = SupabaseClient
+      .channel('students-changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'students'
+      }, (payload) => {
+        // Only update if the student belongs to one of our rooms
+        const roomIds = rooms.map(r => r.id);
+        if (roomIds.includes(payload.new?.room_id) || roomIds.includes(payload.old?.room_id)) {
+          // Refresh all student counts when students change
+          rooms.forEach(room => {
+            loadRoomStudentCount(room.id).then(count => {
+              const countEl = document.getElementById(`studentCount-${room.id}`);
+              if (countEl) {
+                countEl.textContent = `${count} student${count !== 1 ? 's' : ''} online`;
+              }
+            });
+          });
+        }
+      })
+      .subscribe();
   }
 
   async function createNewRoom() {
@@ -1161,6 +1232,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       updateUserInfo();
       // Don't call showPage since dashboard already has active class
       await loadRooms();
+      subscribeToRooms();
+      subscribeToStudents();
     } else {
       window.location.href = '/login.html';
     }
