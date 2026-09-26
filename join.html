@@ -241,6 +241,32 @@
   }
   .ext-note a { color: var(--green); font-weight: 500; text-decoration: none; border-bottom: 1px solid var(--green-soft); }
 
+  .loading-extension-state {
+    display: none;
+    text-align: center;
+    padding: 60px 24px;
+  }
+  .loading-extension-state.show {
+    display: block;
+  }
+  .loading-extension-state .loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--line);
+    border-top-color: var(--green);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 24px;
+  }
+  .loading-extension-state h2 {
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+  }
+  .loading-extension-state p {
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+  }
+
   footer {
     text-align: center;
     padding-bottom: 24px;
@@ -292,6 +318,13 @@
       </div>
 
       <p class="ext-note">Don't see a code box light up green in class? <a href="#">Get the Classcastle extension</a> first — it only takes a second.</p>
+    </div>
+
+    <div class="loading-extension-state" id="loadingExtensionState">
+      <div class="loading-spinner"></div>
+      <h2>Please wait a moment...</h2>
+      <p>Continue in the opened window.</p>
+      <button class="btn-join" id="cancelExtensionBtn" style="margin-top: 24px; background: var(--paper); color: var(--ink); border: 1.5px solid var(--line);">Cancel</button>
     </div>
 
     <div class="joined-state" id="joinedState">
@@ -380,7 +413,11 @@
 
     // Check if coming from extension with pre-filled data
     if (fromExtension && prefillCode && prefillName) {
-      // Pre-fill the form
+      // Show loading state instead of form
+      formState.classList.add('hide');
+      document.getElementById('loadingExtensionState').classList.add('show');
+
+      // Pre-fill the form in background
       const codeStr = prefillCode.toString();
       digits.forEach((digit, i) => {
         digit.value = codeStr[i] || '';
@@ -390,25 +427,24 @@
       // Enable the join button
       updateJoinEnabled();
 
-      // Check if we're on step 0 (code) or step 1 (name)
-      const stepCodeEl = document.getElementById('stepCode');
-      const stepNameEl = document.getElementById('stepName');
+      // Auto-join after a delay
+      setTimeout(() => {
+        // Check if we're on step 0 (code) or step 1 (name)
+        const stepCodeEl = document.getElementById('stepCode');
+        const stepNameEl = document.getElementById('stepName');
 
-      if (stepCodeEl && !stepCodeEl.classList.contains('hide')) {
-        // We're on step 0, need to go to step 1 first
-        setTimeout(() => {
+        if (stepCodeEl && !stepCodeEl.classList.contains('hide')) {
+          // We're on step 0, need to go to step 1 first
           nextBtn.click();
           // Then click join after transition
           setTimeout(() => {
             joinBtn.click();
           }, 500);
-        }, 100);
-      } else {
-        // Already on step 1, can join directly
-        setTimeout(() => {
+        } else {
+          // Already on step 1, can join directly
           joinBtn.click();
-        }, 500);
-      }
+        }
+      }, 500);
     }
 
     return false;
@@ -427,6 +463,8 @@
   const joinedTitle = document.getElementById('joinedTitle');
   const joinedSub = document.getElementById('joinedSub');
   const leaveBtn = document.getElementById('leaveBtn');
+  const loadingExtensionState = document.getElementById('loadingExtensionState');
+  const cancelExtensionBtn = document.getElementById('cancelExtensionBtn');
   const stepCode = document.getElementById('stepCode');
   const stepName = document.getElementById('stepName');
   const stepDots = Array.from(document.querySelectorAll('.step-dot'));
@@ -511,6 +549,14 @@
   });
 
   backBtn.addEventListener('click', () => goToStep(0));
+
+  cancelExtensionBtn.addEventListener('click', () => {
+    // Cancel extension flow, return to normal form
+    loadingExtensionState.classList.remove('show');
+    formState.classList.remove('hide');
+    // Clear URL parameters
+    window.history.replaceState({}, document.title, window.location.pathname);
+  });
 
   nameInput.addEventListener('input', updateJoinEnabled);
   nameInput.addEventListener('keydown', (e) => {
