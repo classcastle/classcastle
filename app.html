@@ -884,6 +884,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
         .eq('online', true);
 
       if (error) throw error;
+      console.log(`Room ${roomId} student count:`, count);
       return count || 0;
     } catch (error) {
       console.error('Error loading student count:', error);
