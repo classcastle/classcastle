@@ -164,9 +164,16 @@
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
     background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
   }
+  .features.six-items { grid-template-columns: repeat(3, 1fr); }
   .feature { background: var(--paper); padding: 28px 26px; }
   .feature h3 { font-size: 1.02rem; font-weight: 500; margin-bottom: 8px; }
   .feature p { color: var(--ink-soft); font-size: 0.93rem; line-height: 1.5; }
+
+  /* FAQ */
+  .faq-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; }
+  .faq-item { padding: 24px; background: var(--paper); border: 1px solid var(--line); border-radius: 10px; }
+  .faq-item h3 { font-size: 1.02rem; font-weight: 500; margin-bottom: 8px; }
+  .faq-item p { color: var(--ink-soft); font-size: 0.93rem; line-height: 1.5; }
 
   /* CTA band */
   .cta-band {
@@ -190,6 +197,7 @@
     .hero { grid-template-columns: 1fr; }
     .steps, .it-steps { grid-template-columns: 1fr; gap: 32px; }
     .features { grid-template-columns: 1fr; }
+    .faq-list { grid-template-columns: 1fr; }
     nav { padding: 22px 24px; }
     .wrap, .hero, section { padding-left: 24px; padding-right: 24px; }
   }
@@ -209,7 +217,7 @@
       <p class="lede">Classcastle is a teacher web app paired with a lightweight browser extension for students. You run the room from any browser; they join with a code. When it's time for the task, you press one button, and every student's browser opens the same page — no reading URLs off the whiteboard, no lost kids.</p>
       <div class="hero-ctas">
         <a class="btn-primary" href="/login.html" id="access">Open the teacher app</a>
-        <a class="btn-secondary" href="/join.html">Get the student extension</a>
+        <a class="btn-secondary" href="https://chrome.google.com/webstore" target="_blank">Get the student extension</a>
       </div>
       <p class="free-note">Free for teachers. Works on Chromebooks. No student accounts needed.</p>
       <div class="os-row">
@@ -317,12 +325,116 @@
   </div>
 </section>
 
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Why teachers love it</h2>
+      <p>Built by educators who understand the chaos of a computer lab.</p>
+    </div>
+    <div class="features six-items">
+      <div class="feature">
+        <h3>Save instructional time</h3>
+        <p>No more walking around helping students type URLs. One click and everyone is where they need to be.</p>
+      </div>
+      <div class="feature">
+        <h3>Instant control</h3>
+        <p>Navigate 30 students to a new page in under 2 seconds. Close the tab when you're done.</p>
+      </div>
+      <div class="feature">
+        <h3>Student focus</h3>
+        <p>Reduce off-task behavior by keeping everyone on the same resource throughout the lesson.</p>
+      </div>
+      <div class="feature">
+        <h3>Room management</h3>
+        <p>Kick students, close rooms, and regenerate codes with simple controls. Full visibility of who's online.</p>
+      </div>
+      <div class="feature">
+        <h3>Works offline-capable</h3>
+        <p>Once joined, the extension keeps going even if the service worker suspends. Reliable performance every time.</p>
+      </div>
+      <div class="feature">
+        <h3>Privacy-first</h3>
+        <p>No tracking, no history collection beyond what you need for the lesson. Students leave no trace when they disconnect.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Security & Privacy</h2>
+      <p>Built with student privacy and school security in mind.</p>
+    </div>
+    <div class="features six-items">
+      <div class="feature">
+        <h3>No student accounts</h3>
+        <p>Students join with a room code only. No email, no signup, no personal data required.</p>
+      </div>
+      <div class="feature">
+        <h3>Teacher controls</h3>
+        <p>Only teachers can navigate browsers. Students cannot push URLs to others or control the room.</p>
+      </div>
+      <div class="feature">
+        <h3>Leave anytime</h3>
+        <p>Students can leave the room at any time. Teachers can kick students when needed.</p>
+      </div>
+      <div class="feature">
+        <h3>Secure by default</h3>
+        <p>All data encrypted in transit. Supabase backend with Row Level Security ensures teachers only see their own rooms.</p>
+      </div>
+      <div class="feature">
+        <h3>Minimal permissions</h3>
+        <p>Extension only requests what it needs: storage for session, tabs for navigation, alarms for reliability.</p>
+      </div>
+      <div class="feature">
+        <h3>No remote code</h3>
+        <p>All extension code is bundled locally. No remote code execution, no unexpected updates.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Frequently Asked Questions</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3>Is Classcastle free?</h3>
+        <p>Yes, Classcastle is free for teachers. Create unlimited rooms, invite unlimited students.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What browsers does it work with?</h3>
+        <p>Chrome, Edge, and any Chromium-based browser. Works on Windows, macOS, ChromeOS, and Linux.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Do students need accounts?</h3>
+        <p>No. Students only need the extension and the room code. No signup, no login, no email required.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Can students navigate on their own?</h3>
+        <p>Yes. Classcastle doesn't lock their browser — it just pushes URLs. Students can still navigate independently if needed.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What if a student's extension isn't working?</h3>
+        <p>Students without the extension simply won't receive navigation commands. They'll still appear in your room list but won't sync.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Is student data collected?</h3>
+        <p>We only collect what's needed: student name (for identification), online status, and the current URL for the teacher dashboard. No browsing history or tracking.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <div class="wrap">
   <div class="cta-band">
     <h2>Stop saying "did everyone find the page?"</h2>
     <div class="hero-ctas">
       <a class="btn-primary" href="/login.html">Open the teacher app</a>
-      <a class="btn-secondary" href="/join.html">Get the student extension</a>
+      <a class="btn-secondary" href="https://chrome.google.com/webstore" target="_blank">Get the student extension</a>
     </div>
   </div>
   <footer>

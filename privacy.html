@@ -141,7 +141,7 @@
 <div class="wrap">
   <div class="page-header">
     <h1 class="page-title">Privacy Policy</h1>
-    <p class="page-subtitle">Effective date: September 26, 2026</p>
+    <p class="page-subtitle">Effective date: September 27, 2026</p>
   </div>
 
   <div class="content">
@@ -151,16 +151,24 @@
       <h3>Teacher Account Information</h3>
       <ul>
         <li>Name and email address</li>
-        <li>Authentication credentials</li>
+        <li>Authentication credentials (stored securely via Supabase Auth)</li>
         <li>Room creation and management data</li>
-        <li>Usage patterns and preferences</li>
+        <li>Room names and settings</li>
       </ul>
       <h3>Student Information</h3>
       <ul>
-        <li>Student names (provided by teachers)</li>
-        <li>Current browser URL (for classroom management)</li>
-        <li>Room participation status</li>
-        <li>Join and activity timestamps</li>
+        <li>Student names (provided by students when joining)</li>
+        <li>Current browser URL (for teacher dashboard visibility)</li>
+        <li>Room participation status (online/offline)</li>
+        <li>Join timestamps and last seen status</li>
+        <li>URL history of pages pushed during the session</li>
+      </ul>
+      <h3>Extension Data (Local Storage Only)</h3>
+      <ul>
+        <li>Room ID and student ID for session persistence</li>
+        <li>Join timestamp for kick detection grace period</li>
+        <li>Kicked status flag for notification display</li>
+        <li>All extension data is stored locally on the student's device</li>
       </ul>
     </div>
 
@@ -264,7 +272,7 @@
     </div>
 
     <div class="last-updated">
-      Last updated: September 26, 2026
+      Last updated: September 27, 2026
     </div>
   </div>
 </div>
