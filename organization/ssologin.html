@@ -3,12 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Classcastle — Teacher Login</title>
+<title>Classcastle — SSO Login</title>
 <link rel="icon" type="image/svg+xml" href="/logo.svg" id="favicon">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
     --paper: #F7F6F1;
@@ -138,6 +137,8 @@
     cursor: pointer;
     transition: opacity 0.15s ease, transform 0.1s ease;
     border: none;
+    text-decoration: none;
+    display: inline-block;
   }
   .btn:disabled {
     opacity: 0.55;
@@ -150,15 +151,6 @@
   .btn-primary {
     background: var(--green);
     color: #fff;
-  }
-
-  .btn-secondary {
-    background: var(--paper);
-    color: var(--ink);
-    border: 1.5px solid var(--line);
-  }
-  .btn-secondary:hover {
-    border-color: var(--green);
   }
 
   .btn-full {
@@ -220,35 +212,26 @@
 
 <nav>
   <div class="wordmark"><img src="/logo.svg" alt="" class="logo-mark"><span class="word-text">Class<span class="word-accent">castle</span></span></div>
-  <a class="nav-link" href="/">Back to home</a>
+  <a class="nav-link" href="/login.html">Back to login</a>
 </nav>
 
 <main>
   <div class="auth-container">
     <div class="card">
       <div class="page-header">
-        <h1 class="page-title">Welcome to Classcastle</h1>
-        <p class="page-subtitle">Teacher account required to manage classrooms</p>
+        <h1 class="page-title">SSO Login</h1>
+        <p class="page-subtitle">Enter your school domain to sign in with GitHub</p>
       </div>
       <div class="form-group">
-        <label class="form-label" for="loginEmail">Email</label>
-        <input type="email" class="form-input" id="loginEmail" placeholder="you@school.edu">
+        <label class="form-label" for="schoolDomain">School Domain</label>
+        <input type="text" class="form-input" id="schoolDomain" placeholder="your-school.edu">
       </div>
-      <div class="form-group">
-        <label class="form-label" for="loginPassword">Password</label>
-        <input type="password" class="form-input" id="loginPassword" placeholder="••••••••">
-      </div>
-      <button class="btn btn-primary btn-full" id="loginBtn">
-        <span class="btn-text">Sign in</span>
+      <button class="btn btn-primary btn-full" id="ssoLoginBtn">
+        <span class="btn-text">Continue with GitHub</span>
         <span class="loading" style="display: none;"></span>
       </button>
-      <div style="margin: 16px 0; text-align: center; color: var(--ink-soft); font-size: 0.9rem;">or</div>
-      <a href="/organization/ssologin.html" class="btn btn-secondary btn-full" style="display: block; text-align: center; text-decoration: none;">Login with SSO</a>
       <div class="auth-footer">
-        New teacher? <a href="/signup.html">Create your account</a>
-      </div>
-      <div class="auth-footer" style="margin-top: 12px; font-size: 0.85rem;">
-        By signing in, you agree to our <a href="/terms.html">Terms of Service</a> and <a href="/privacy.html">Privacy Policy</a>
+        <a href="/login.html">Back to regular login</a>
       </div>
     </div>
   </div>
@@ -257,29 +240,11 @@
 <div class="notification" id="notification"></div>
 
 <script>
-  // Supabase configuration
-  const SUPABASE_URL = 'https://hduyofdbpspjcuwvackd.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK';
-  
-  const SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-  // Switch favicon based on theme
-  function updateFavicon() {
-    const favicon = document.getElementById('favicon');
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    favicon.href = isDark ? '/logo-dark.svg' : '/logo.svg';
-  }
-
-  // Update favicon on load and when theme changes
-  updateFavicon();
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
-
   const notification = document.getElementById('notification');
-  const loginEmail = document.getElementById('loginEmail');
-  const loginPassword = document.getElementById('loginPassword');
-  const loginBtn = document.getElementById('loginBtn');
-  const loginBtnText = loginBtn.querySelector('.btn-text');
-  const loginBtnLoading = loginBtn.querySelector('.loading');
+  const schoolDomain = document.getElementById('schoolDomain');
+  const ssoLoginBtn = document.getElementById('ssoLoginBtn');
+  const ssoLoginBtnText = ssoLoginBtn.querySelector('.btn-text');
+  const ssoLoginBtnLoading = ssoLoginBtn.querySelector('.loading');
 
   function showNotification(message, duration = 3000) {
     notification.textContent = message;
@@ -289,60 +254,33 @@
     }, duration);
   }
 
-  // Check if already logged in
-  async function checkSession() {
-    const { data: { session } } = await SupabaseClient.auth.getSession();
-    
-    if (session) {
-      showNotification('You are already logged in!');
-      setTimeout(() => {
-        window.location.href = '/app.html';
-      }, 500);
-    }
-  }
+  function handleSSOLogin() {
+    const domain = schoolDomain.value.trim();
 
-  async function handleLogin() {
-    const email = loginEmail.value.trim();
-    const password = loginPassword.value;
-
-    if (!email || !password) {
-      showNotification('Please fill in all fields');
+    if (!domain) {
+      showNotification('Please enter your school domain');
       return;
     }
 
     // Show loading state
-    loginBtn.disabled = true;
-    loginBtnText.style.display = 'none';
-    loginBtnLoading.style.display = 'inline-block';
+    ssoLoginBtn.disabled = true;
+    ssoLoginBtnText.style.display = 'none';
+    ssoLoginBtnLoading.style.display = 'inline-block';
 
-    try {
-      const { data, error } = await SupabaseClient.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (error) throw error;
-
-      showNotification('Welcome back, teacher!');
-      setTimeout(() => {
-        window.location.href = '/app.html';
-      }, 1000);
-    } catch (error) {
-      showNotification(error.message);
-      // Reset button state
-      loginBtn.disabled = false;
-      loginBtnText.style.display = 'inline';
-      loginBtnLoading.style.display = 'none';
-    }
+    // TODO: Implement actual GitHub SSO flow
+    // For now, just show a message
+    setTimeout(() => {
+      showNotification('SSO login coming soon! Contact us to set up GitHub SSO for your school.');
+      ssoLoginBtn.disabled = false;
+      ssoLoginBtnText.style.display = 'inline';
+      ssoLoginBtnLoading.style.display = 'none';
+    }, 1000);
   }
 
-  loginBtn.addEventListener('click', handleLogin);
-  loginPassword.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') handleLogin();
+  ssoLoginBtn.addEventListener('click', handleSSOLogin);
+  schoolDomain.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') handleSSOLogin();
   });
-
-  // Check if already logged in on page load
-  checkSession();
 </script>
 
 </body>
