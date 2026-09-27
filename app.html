@@ -1471,11 +1471,10 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   createRoomBtn.addEventListener('click', createNewRoom);
 
   // Handle create first room button
-  document.addEventListener('click', (e) => {
-    if (e.target.id === 'createFirstRoomBtn') {
-      createNewRoom();
-    }
-  });
+  const firstRoomBtn = document.getElementById('createFirstRoomBtn');
+  if (firstRoomBtn) {
+    firstRoomBtn.addEventListener('click', createNewRoom);
+  }
 
   // Handle delete room buttons (dynamically added)
   document.addEventListener('click', (e) => {
