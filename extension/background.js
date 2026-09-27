@@ -85,9 +85,12 @@ async function leaveRoom() {
 function subscribeToRoom() {
   if (!currentRoomId || !currentStudentId) return;
 
+  console.log('Subscribing to room:', currentRoomId, 'student:', currentStudentId);
+
   // Unsubscribe from existing subscription
   if (subscription) {
     subscription.unsubscribe();
+    subscription = null;
   }
 
   // Subscribe to room updates
@@ -101,12 +104,21 @@ function subscribeToRoom() {
     }, (payload) => {
       console.log('Room update received:', payload);
       // Check if target_url changed
-      if (payload.new && payload.new.target_url && payload.new.target_url !== payload.old.target_url) {
-        navigateToUrl(payload.new.target_url);
+      if (payload.new && payload.new.target_url) {
+        if (!payload.old || payload.new.target_url !== payload.old.target_url) {
+          console.log('Target URL changed to:', payload.new.target_url);
+          navigateToUrl(payload.new.target_url);
+        }
       }
     })
     .subscribe((status) => {
       console.log('Subscription status:', status);
+      if (status === 'SUBSCRIBED') {
+        console.log('Successfully subscribed to room updates');
+      } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+        console.error('Subscription failed, retrying in 5 seconds...');
+        setTimeout(subscribeToRoom, 5000);
+      }
     });
 }
 
@@ -114,11 +126,14 @@ function subscribeToRoom() {
 async function navigateToUrl(url) {
   if (!url) return;
 
+  console.log('Navigating to URL:', url);
+
   try {
     // Get the active tab
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
     if (tab) {
+      console.log('Navigating tab:', tab.id, 'to:', url);
       // Navigate the tab to the new URL
       await chrome.tabs.update(tab.id, { url: url });
 
@@ -130,6 +145,8 @@ async function navigateToUrl(url) {
           last_seen: new Date().toISOString()
         })
         .eq('id', currentStudentId);
+    } else {
+      console.error('No active tab found');
     }
   } catch (error) {
     console.error('Error navigating to URL:', error);

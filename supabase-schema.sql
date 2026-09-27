@@ -40,6 +40,11 @@ CREATE POLICY "Teachers can view their own rooms"
   ON rooms FOR SELECT
   USING (auth.uid() = teacher_id);
 
+DROP POLICY IF EXISTS "Anyone can view active rooms" ON rooms;
+CREATE POLICY "Anyone can view active rooms"
+  ON rooms FOR SELECT
+  USING (active = true);
+
 DROP POLICY IF EXISTS "Teachers can create rooms" ON rooms;
 CREATE POLICY "Teachers can create rooms"
   ON rooms FOR INSERT
@@ -54,6 +59,9 @@ DROP POLICY IF EXISTS "Teachers can delete their own rooms" ON rooms;
 CREATE POLICY "Teachers can delete their own rooms"
   ON rooms FOR DELETE
   USING (auth.uid() = teacher_id);
+
+-- Realtime publication for rooms
+ALTER PUBLICATION supabase_realtime ADD TABLE rooms;
 
 -- RLS policies for students
 DROP POLICY IF EXISTS "Teachers can view students in their rooms" ON students;
