@@ -897,6 +897,73 @@
     letter-spacing: 0.5px;
   }
 
+  /* Nav submenu */
+  .nav-item-parent {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+  }
+
+  .nav-item-parent span {
+    flex: 1;
+  }
+
+  .nav-chevron {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s ease;
+  }
+
+  .nav-section-admin.open .nav-chevron {
+    transform: rotate(180deg);
+  }
+
+  .nav-submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .nav-section-admin.open .nav-submenu {
+    max-height: 200px;
+  }
+
+  .nav-item-sub {
+    padding-left: 48px;
+    font-size: 0.9rem;
+  }
+
+  /* Back button in page header */
+  .back-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: none;
+    background: none;
+    color: var(--ink-soft);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.15s ease;
+  }
+
+  .back-button:hover {
+    color: var(--ink);
+  }
+
+  .back-button svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .page-header-with-back {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
   .modal-btn-cancel {
     border: 1.5px solid var(--line);
     background: var(--paper);
@@ -991,15 +1058,23 @@
         Activity Log
       </a>
       <div class="nav-divider"></div>
-      <div class="nav-section-label">Admin</div>
-      <a class="nav-item" data-page="deployment" href="#">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-        IT Deployment
-      </a>
-      <a class="nav-item" data-page="pricing" href="#">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-        Pricing
-      </a>
+      <div class="nav-section nav-section-admin">
+        <a class="nav-item nav-item-parent" data-parent="admin" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          <span>Admin</span>
+          <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </a>
+        <div class="nav-submenu" id="adminSubmenu">
+          <a class="nav-item nav-item-sub" data-page="deployment" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            IT Deployment
+          </a>
+          <a class="nav-item nav-item-sub" data-page="pricing" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Pricing
+          </a>
+        </div>
+      </div>
       <div class="nav-divider"></div>
       <a class="nav-item" data-page="settings" href="#">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -1078,7 +1153,11 @@
 
     <!-- Deployment Page -->
     <div class="page" id="deploymentPage">
-      <div class="page-header">
+      <div class="page-header page-header-with-back">
+        <button class="back-button" id="backToDashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          Back
+        </button>
         <div>
           <h1 class="page-title">IT Deployment Guide</h1>
           <p class="page-subtitle">Share this information with your IT department to deploy Classcastle across your school</p>
@@ -1232,7 +1311,11 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
 
     <!-- Pricing Page -->
     <div class="page" id="pricingPage">
-      <div class="page-header">
+      <div class="page-header page-header-with-back">
+        <button class="back-button" id="backToDashboardFromPricing">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          Back
+        </button>
         <div>
           <h1 class="page-title">Pricing</h1>
           <p class="page-subtitle">Choose the plan that works for your school</p>
@@ -1473,6 +1556,14 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
       const navItem = document.querySelector(`[data-page="${pageId.replace('Page', '')}"]`);
       if (navItem) navItem.classList.add('active');
+
+      // Handle admin submenu
+      const adminSection = document.querySelector('.nav-section-admin');
+      if (pageId === 'deploymentPage' || pageId === 'pricingPage') {
+        adminSection.classList.add('open');
+      } else if (pageId === 'dashboardPage') {
+        adminSection.classList.remove('open');
+      }
     }
   }
 
@@ -2414,11 +2505,39 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   // Activity log
   clearActivityBtn.addEventListener('click', clearActivityLog);
 
+  // Admin submenu toggle
+  const adminParent = document.querySelector('.nav-item-parent[data-parent="admin"]');
+  const adminSection = document.querySelector('.nav-section-admin');
+  if (adminParent) {
+    adminParent.addEventListener('click', (e) => {
+      e.preventDefault();
+      adminSection.classList.toggle('open');
+    });
+  }
+
+  // Back buttons
+  const backToDashboard = document.getElementById('backToDashboard');
+  if (backToDashboard) {
+    backToDashboard.addEventListener('click', () => {
+      showPage('dashboardPage');
+      adminSection.classList.remove('open');
+    });
+  }
+
+  const backToDashboardFromPricing = document.getElementById('backToDashboardFromPricing');
+  if (backToDashboardFromPricing) {
+    backToDashboardFromPricing.addEventListener('click', () => {
+      showPage('dashboardPage');
+      adminSection.classList.remove('open');
+    });
+  }
+
   // Navigation
   document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', (e) => {
       e.preventDefault();
       const page = item.dataset.page;
+      if (!page) return; // Skip parent items
       showPage(page + 'Page');
 
       // Load data for specific pages
