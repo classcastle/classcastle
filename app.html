@@ -65,11 +65,80 @@
     top: 0;
     bottom: 0;
     z-index: 100;
+    transition: transform 0.3s ease;
   }
 
   .sidebar-header {
     padding: 24px;
     border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .close-sidebar {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--ink-soft);
+    padding: 4px;
+  }
+
+  .mobile-menu-btn {
+    display: none;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 50;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .mobile-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 90;
+  }
+
+  @media (max-width: 780px) {
+    .sidebar {
+      transform: translateX(-100%);
+    }
+
+    .sidebar.open {
+      transform: translateX(0);
+    }
+
+    .mobile-menu-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close-sidebar {
+      display: block;
+    }
+
+    .mobile-overlay.show {
+      display: block;
+    }
+
+    .main-content {
+      margin-left: 0;
+      padding: 32px 16px;
+      padding-top: 80px;
+    }
   }
 
   .wordmark { font-family: 'Fraunces', serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; display: flex; align-items: center; gap: 9px; }
@@ -662,6 +731,7 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="wordmark"><img src="/logo.svg" alt="" class="logo-mark"><span class="word-text">Class<span class="word-accent">castle</span></span></div>
+      <button class="close-sidebar" id="closeSidebar">×</button>
     </div>
     <nav class="sidebar-nav">
       <a class="nav-item active" data-page="dashboard" href="#">
@@ -688,6 +758,16 @@
       <button class="btn-logout hidden" id="logoutBtn">Sign out</button>
     </div>
   </aside>
+
+  <button class="mobile-menu-btn" id="mobileMenuBtn">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </button>
+
+  <div class="mobile-overlay" id="mobileOverlay"></div>
 
   <main class="main-content">
     <!-- Dashboard Page -->
@@ -826,7 +906,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
 
   // DOM elements
   const notification = document.getElementById('notification');
-  const sidebar = document.getElementById('sidebar');
   const userInfo = document.getElementById('userInfo');
   const userAvatar = document.getElementById('userAvatar');
   const userName = document.getElementById('userName');
@@ -976,6 +1055,14 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       e.preventDefault();
       const page = item.dataset.page;
       showPage(page + 'Page');
+
+      // Close sidebar on mobile
+      if (window.innerWidth <= 780) {
+        const sidebar = document.getElementById('sidebar');
+        const mobileOverlay = document.getElementById('mobileOverlay');
+        sidebar.classList.remove('open');
+        mobileOverlay.classList.remove('show');
+      }
     });
   });
 
@@ -1208,6 +1295,29 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   // Event listeners
   logoutBtn.addEventListener('click', handleLogout);
 
+  // Mobile sidebar
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  const closeSidebar = document.getElementById('closeSidebar');
+  const mobileOverlay = document.getElementById('mobileOverlay');
+
+  mobileMenuBtn.addEventListener('click', () => {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.add('open');
+    mobileOverlay.classList.add('show');
+  });
+
+  closeSidebar.addEventListener('click', () => {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.remove('open');
+    mobileOverlay.classList.remove('show');
+  });
+
+  mobileOverlay.addEventListener('click', () => {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.remove('open');
+    mobileOverlay.classList.remove('show');
+  });
+
   createRoomBtn.addEventListener('click', createNewRoom);
 
   // Handle create first room button
@@ -1243,7 +1353,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
     if (session) {
       currentUser = session.user;
       updateUserInfo();
-      // Don't call showPage since dashboard already has active class
+      // Call showPage to ensure dashboard content renders properly
+      showPage('dashboard');
       await loadRooms();
       subscribeToRooms();
       subscribeToStudents();
