@@ -933,6 +933,15 @@
               </div>
             </div>
           </div>
+
+          <div class="control-group">
+            <label class="control-label">Quick Shortcuts</label>
+            <div class="url-history" id="shortcutsList">
+              <div class="empty-state" style="padding: 16px;">
+                <p style="font-size: 0.85rem;">Loading shortcuts...</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1105,6 +1114,7 @@
 
       await loadStudents();
       await loadUrlHistory();
+      await loadShortcuts();
     } catch (error) {
       console.error('Error loading room:', error);
       window.location.href = '/app.html';
@@ -1346,6 +1356,61 @@
     } catch (error) {
       console.error('Error loading URL history:', error);
     }
+  }
+
+  // Load shortcuts
+  async function loadShortcuts() {
+    const shortcutsList = document.getElementById('shortcutsList');
+    if (!shortcutsList) return;
+
+    try {
+      const { data: { user } } = await SupabaseClient.auth.getUser();
+      if (!user) {
+        shortcutsList.innerHTML = `
+          <div class="empty-state" style="padding: 16px;">
+            <p style="font-size: 0.85rem;">Please log in to see shortcuts</p>
+          </div>
+        `;
+        return;
+      }
+
+      const { data: shortcuts, error } = await SupabaseClient
+        .from('url_shortcuts')
+        .select('*')
+        .eq('teacher_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      if (shortcuts && shortcuts.length > 0) {
+        shortcutsList.innerHTML = shortcuts.map(shortcut => `
+          <div class="url-history-item" style="cursor: pointer;" onclick="navigateToShortcut('${shortcut.url}')">
+            <span class="url-history-url">${shortcut.name}</span>
+            <span class="url-history-time" style="font-size: 0.75rem;">${shortcut.url}</span>
+          </div>
+        `).join('');
+      } else {
+        shortcutsList.innerHTML = `
+          <div class="empty-state" style="padding: 16px;">
+            <p style="font-size: 0.85rem;">No shortcuts yet. Create them in the dashboard.</p>
+          </div>
+        `;
+      }
+    } catch (error) {
+      console.error('Error loading shortcuts:', error);
+      shortcutsList.innerHTML = `
+        <div class="empty-state" style="padding: 16px;">
+          <p style="font-size: 0.85rem;">Error loading shortcuts</p>
+        </div>
+      `;
+    }
+  }
+
+  // Navigate to shortcut URL
+  function navigateToShortcut(url) {
+    urlInput.value = url;
+    goBtn.disabled = false;
+    navigateStudents();
   }
 
   // Format time for display

@@ -1094,6 +1094,26 @@
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
             Donate
           </a>
+          <a class="nav-item nav-item-sub" data-page="analytics" href="#">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+            Analytics
+          </a>
+          <a class="nav-item nav-item-sub" data-page="activity" href="#">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Activity Log
+          </a>
+          <a class="nav-item nav-item-sub" href="/terms.html" target="_blank">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            Terms
+          </a>
+          <a class="nav-item nav-item-sub" href="/privacy.html" target="_blank">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Privacy
+          </a>
+          <a class="nav-item nav-item-sub" href="mailto:support@classcastle.org">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Support
+          </a>
         </div>
       </div>
       <div class="nav-divider"></div>
@@ -1437,6 +1457,9 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   let roomSubscription = null;
   let studentSubscription = null;
 
+  // Modal state
+  let modalResolve = null;
+
   // DOM elements
   const notification = document.getElementById('notification');
   const userInfo = document.getElementById('userInfo');
@@ -1444,6 +1467,12 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   const userName = document.getElementById('userName');
   const userEmail = document.getElementById('userEmail');
   const logoutBtn = document.getElementById('logoutBtn');
+  const modalOverlay = document.getElementById('modalOverlay');
+  const modal = document.getElementById('modal');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalMessage = document.getElementById('modalMessage');
+  const modalCancel = document.getElementById('modalCancel');
+  const modalConfirm = document.getElementById('modalConfirm');
 
   // Pages
   const dashboardPage = document.getElementById('dashboardPage');
@@ -1501,12 +1530,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   // Simple confirm modal
   function showConfirm({ title, message, confirmText = 'Yes', cancelText = 'Cancel' }) {
     return new Promise((resolve) => {
-      const modalOverlay = document.getElementById('modalOverlay');
-      const modalTitle = document.getElementById('modalTitle');
-      const modalMessage = document.getElementById('modalMessage');
-      const modalConfirm = document.getElementById('modalConfirm');
-      const modalCancel = document.getElementById('modalCancel');
-
       modalTitle.textContent = title;
       modalMessage.textContent = message;
       modalConfirm.textContent = confirmText;
@@ -1530,6 +1553,74 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
 
       modalConfirm.addEventListener('click', handleConfirm);
       modalCancel.addEventListener('click', handleCancel);
+
+      // Close on overlay click
+      modalOverlay.addEventListener('click', (e) => {
+        if (e.target === modalOverlay) {
+          handleCancel();
+        }
+      });
+
+      // Close on Escape key
+      const escapeHandler = (e) => {
+        if (e.key === 'Escape') {
+          handleCancel();
+          document.removeEventListener('keydown', escapeHandler);
+        }
+      };
+      document.addEventListener('keydown', escapeHandler);
+    });
+  }
+
+  // Simple input prompt modal
+  function showPrompt({ title, message, defaultValue = '', placeholder = '' }) {
+    return new Promise((resolve) => {
+      // Create input element
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = defaultValue;
+      input.placeholder = placeholder;
+      input.style.cssText = 'width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 1rem; margin-top: 16px;';
+
+      // Replace message with message + input
+      const originalMessage = modalMessage.textContent;
+      modalMessage.innerHTML = message;
+      modalMessage.appendChild(input);
+
+      modalTitle.textContent = title;
+      modalConfirm.textContent = 'OK';
+      modalCancel.textContent = 'Cancel';
+
+      modalOverlay.classList.add('show');
+
+      const handleConfirm = () => {
+        modalOverlay.classList.remove('show');
+        modalConfirm.removeEventListener('click', handleConfirm);
+        modalCancel.removeEventListener('click', handleCancel);
+        modalMessage.innerHTML = originalMessage;
+        resolve(input.value);
+      };
+
+      const handleCancel = () => {
+        modalOverlay.classList.remove('show');
+        modalConfirm.removeEventListener('click', handleConfirm);
+        modalCancel.removeEventListener('click', handleCancel);
+        modalMessage.innerHTML = originalMessage;
+        resolve(null);
+      };
+
+      modalConfirm.addEventListener('click', handleConfirm);
+      modalCancel.addEventListener('click', handleCancel);
+
+      // Handle Enter key
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          handleConfirm();
+        }
+      });
+
+      // Focus input
+      setTimeout(() => input.focus(), 100);
 
       // Close on overlay click
       modalOverlay.addEventListener('click', (e) => {
@@ -2072,12 +2163,24 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   }
 
   async function createTemplate() {
-    const name = prompt('Template name:');
+    const name = await showPrompt({
+      title: 'Create Template',
+      message: 'Enter a name for this template:',
+      placeholder: 'e.g., Science Lesson'
+    });
     if (!name) return;
 
-    const description = prompt('Description (optional):') || '';
-    const tagsInput = prompt('Tags (comma-separated, optional):') || '';
-    const tags = tagsInput.split(',').map(t => t.trim()).filter(t => t);
+    const description = await showPrompt({
+      title: 'Create Template',
+      message: 'Enter a description (optional):',
+      placeholder: 'e.g., Weekly science lesson template'
+    });
+    const tagsInput = await showPrompt({
+      title: 'Create Template',
+      message: 'Enter tags (comma-separated, optional):',
+      placeholder: 'e.g., science, weekly'
+    });
+    const tags = tagsInput ? tagsInput.split(',').map(t => t.trim()).filter(t => t) : [];
 
     try {
       const { error } = await SupabaseClient.from('room_templates').insert({
@@ -2195,14 +2298,26 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   }
 
   async function createShortcut() {
-    const name = prompt('Shortcut name:');
+    const name = await showPrompt({
+      title: 'Create Shortcut',
+      message: 'Enter a name for this shortcut:',
+      placeholder: 'e.g., BBC Bitesize'
+    });
     if (!name) return;
 
-    const url = prompt('URL:');
+    const url = await showPrompt({
+      title: 'Create Shortcut',
+      message: 'Enter the URL:',
+      placeholder: 'e.g., https://www.bbc.co.uk/bitesize'
+    });
     if (!url) return;
 
-    const tagsInput = prompt('Tags (comma-separated, optional):') || '';
-    const tags = tagsInput.split(',').map(t => t.trim()).filter(t => t);
+    const tagsInput = await showPrompt({
+      title: 'Create Shortcut',
+      message: 'Enter tags (comma-separated, optional):',
+      placeholder: 'e.g., science, maths'
+    });
+    const tags = tagsInput ? tagsInput.split(',').map(t => t.trim()).filter(t => t) : [];
 
     try {
       const { error } = await SupabaseClient.from('url_shortcuts').insert({
