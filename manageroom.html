@@ -520,6 +520,16 @@
     animation: spin 0.8s linear infinite;
   }
 
+  .loading-large {
+    display: inline-block;
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
   @keyframes spin {
     to { transform: rotate(360deg); }
   }
@@ -570,7 +580,9 @@
       </div>
       <div class="banner-center">
         <p class="banner-text">Go to classcastle.org and enter Room Code:</p>
-        <div class="room-code-huge" id="roomCode">---</div>
+        <div class="room-code-huge" id="roomCode">
+          <div class="loading-large"></div>
+        </div>
         <button class="btn btn-primary" id="startBtn">
           <span class="btn-text">Start</span>
         </button>
