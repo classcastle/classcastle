@@ -1550,22 +1550,22 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   }
 
   function showPage(pageId) {
+    const page = document.getElementById(pageId);
+    if (!page) return; // Don't touch existing pages if target doesn't exist
+
     // Handle all pages
     document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-    const page = document.getElementById(pageId);
-    if (page) {
-      page.classList.add('active');
+    page.classList.add('active');
 
-      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-      const navItem = document.querySelector(`[data-page="${pageId.replace('Page', '')}"]`);
-      if (navItem) navItem.classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    const navItem = document.querySelector(`[data-page="${pageId.replace('Page', '')}"]`);
+    if (navItem) navItem.classList.add('active');
 
-      // Handle admin submenu - only close when explicitly navigating to dashboard
-      // Don't auto-close when just toggling the submenu
-      if (pageId === 'dashboardPage') {
-        const adminSection = document.querySelector('.nav-section-admin');
-        if (adminSection) adminSection.classList.remove('open');
-      }
+    // Handle admin submenu - only close when explicitly navigating to dashboard
+    // Don't auto-close when just toggling the submenu
+    if (pageId === 'dashboardPage') {
+      const adminSection = document.querySelector('.nav-section-admin');
+      if (adminSection) adminSection.classList.remove('open');
     }
   }
 
@@ -1676,23 +1676,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       logoutBtn.classList.add('hidden');
     }
   }
-
-  // Navigation
-  document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', (e) => {
-      e.preventDefault();
-      const page = item.dataset.page;
-      showPage(page + 'Page');
-
-      // Close sidebar on mobile
-      if (window.innerWidth <= 780) {
-        const sidebar = document.getElementById('sidebar');
-        const mobileOverlay = document.getElementById('mobileOverlay');
-        sidebar.classList.remove('open');
-        mobileOverlay.classList.remove('show');
-      }
-    });
-  });
 
   // Auth functions
   async function handleLogout() {
@@ -2555,6 +2538,14 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       if (page === 'shortcuts') loadShortcuts();
       if (page === 'analytics') loadAnalytics();
       if (page === 'activity') loadActivityLog();
+
+      // Close sidebar on mobile
+      if (window.innerWidth <= 780) {
+        const sidebar = document.getElementById('sidebar');
+        const mobileOverlay = document.getElementById('mobileOverlay');
+        sidebar.classList.remove('open');
+        mobileOverlay.classList.remove('show');
+      }
     });
   });
 
