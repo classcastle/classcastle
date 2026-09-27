@@ -1480,7 +1480,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
 
   createRoomBtn.addEventListener('click', createNewRoom);
 
-  // Handle create first room button
+  // Handle create first room button (dynamically added)
   const firstRoomBtn = document.getElementById('createFirstRoomBtn');
   if (firstRoomBtn) {
     firstRoomBtn.addEventListener('click', createNewRoom);
@@ -1492,6 +1492,9 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       e.stopPropagation();
       const roomId = e.target.dataset.roomId;
       deleteRoom(roomId);
+    }
+    if (e.target.id === 'createFirstRoomBtn') {
+      createNewRoom();
     }
   });
 
