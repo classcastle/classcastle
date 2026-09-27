@@ -1568,12 +1568,11 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       const navItem = document.querySelector(`[data-page="${pageId.replace('Page', '')}"]`);
       if (navItem) navItem.classList.add('active');
 
-      // Handle admin submenu
-      const adminSection = document.querySelector('.nav-section-admin');
-      if (pageId === 'deploymentPage' || pageId === 'pricingPage') {
-        adminSection.classList.add('open');
-      } else if (pageId === 'dashboardPage') {
-        adminSection.classList.remove('open');
+      // Handle admin submenu - only close when explicitly navigating to dashboard
+      // Don't auto-close when just toggling the submenu
+      if (pageId === 'dashboardPage') {
+        const adminSection = document.querySelector('.nav-section-admin');
+        if (adminSection) adminSection.classList.remove('open');
       }
     }
   }
@@ -2521,6 +2520,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   if (adminParent) {
     adminParent.addEventListener('click', (e) => {
       e.preventDefault();
+      e.stopPropagation(); // Prevent triggering the general nav-item handler
       adminSection.classList.toggle('open');
     });
   }
@@ -2547,8 +2547,14 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
     item.addEventListener('click', (e) => {
       e.preventDefault();
       const page = item.dataset.page;
-      if (!page) return; // Skip parent items
+      if (!page) return; // Skip parent items (like Admin)
       showPage(page + 'Page');
+
+      // Open admin submenu when navigating to admin pages
+      if (page === 'deployment' || page === 'pricing') {
+        const adminSection = document.querySelector('.nav-section-admin');
+        if (adminSection) adminSection.classList.add('open');
+      }
 
       // Load data for specific pages
       if (page === 'templates') loadTemplates();
