@@ -1278,9 +1278,16 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
         filter: `teacher_id=eq.${currentUser.id}`
       }, (payload) => {
         if (payload.eventType === 'INSERT') {
-          rooms.unshift(payload.new);
-          renderRooms();
-          showNotification('New room created');
+          // Guard against duplicates: createNewRoom() already adds its own
+          // room to the local array immediately for a snappy UI, so this
+          // realtime echo of that same insert should be a no-op, not a
+          // second copy of the same room.
+          const alreadyPresent = rooms.some(r => r.id === payload.new.id);
+          if (!alreadyPresent) {
+            rooms.unshift(payload.new);
+            renderRooms();
+            showNotification('New room created');
+          }
         } else if (payload.eventType === 'UPDATE') {
           const index = rooms.findIndex(r => r.id === payload.new.id);
           if (index !== -1) {
@@ -1352,8 +1359,11 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
 
       if (error) throw error;
 
-      rooms.unshift(newRoom);
-      renderRooms();
+      const alreadyPresent = rooms.some(r => r.id === newRoom.id);
+      if (!alreadyPresent) {
+        rooms.unshift(newRoom);
+        renderRooms();
+      }
       showNotification('Room created successfully');
     } catch (error) {
       console.error('Error creating room:', error);
@@ -1503,7 +1513,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       currentUser = session.user;
       updateUserInfo();
       // Call showPage to ensure dashboard content renders properly
-      showPage('dashboard');
+      showPage('dashboardPage');
       await loadRooms();
       subscribeToRooms();
       subscribeToStudents();
@@ -1520,7 +1530,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
     if (event === 'SIGNED_IN') {
       currentUser = session.user;
       updateUserInfo();
-      showPage('dashboard');
+      showPage('dashboardPage');
       loadRooms();
     } else if (event === 'SIGNED_OUT') {
       currentUser = null;
