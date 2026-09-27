@@ -749,6 +749,138 @@
     transition: all 0.15s ease;
   }
 
+  .modal-btn-primary {
+    background: var(--ink);
+    color: #fff;
+  }
+  .modal-btn-primary:hover {
+    background: #1a1a1a;
+  }
+
+  .modal-btn-secondary {
+    background: var(--paper);
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+  .modal-btn-secondary:hover {
+    background: var(--line);
+  }
+
+  /* Analytics Grid */
+  .analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .analytics-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .analytics-card h3 {
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .analytics-value {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* Activity Log */
+  .activity-item {
+    padding: 16px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .activity-item:last-child {
+    border-bottom: none;
+  }
+
+  .activity-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--sky-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .activity-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .activity-action {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .activity-details {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+
+  .activity-time {
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    margin-top: 4px;
+  }
+
+  /* Tags */
+  .tag {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    background: var(--sky-soft);
+    color: var(--sky);
+    margin-right: 4px;
+    margin-bottom: 4px;
+  }
+
+  /* Room Search/Filter */
+  .room-controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .room-search {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .room-filter {
+    min-width: 150px;
+  }
+
+  .bulk-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .room-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+  }
+
   .modal-btn-cancel {
     border: 1.5px solid var(--line);
     background: var(--paper);
@@ -826,6 +958,22 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         Dashboard
       </a>
+      <a class="nav-item" data-page="templates" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/><path d="M14 2v6l6-3-6-3z"/><path d="M2 13h6"/><path d="M2 17h6"/><path d="M2 9h12"/></svg>
+        Templates
+      </a>
+      <a class="nav-item" data-page="shortcuts" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 7a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        Shortcuts
+      </a>
+      <a class="nav-item" data-page="analytics" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Analytics
+      </a>
+      <a class="nav-item" data-page="activity" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/><polyline points="12 10 12 12 12 12"/></svg>
+        Activity Log
+      </a>
       <a class="nav-item" data-page="deployment" href="#">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
         IT Deployment
@@ -869,6 +1017,32 @@
           <span class="btn-text">Create new room</span>
           <span class="loading" style="display: none;"></span>
         </button>
+      </div>
+
+      <div class="room-controls">
+        <input type="text" class="form-input room-search" id="roomSearch" placeholder="Search rooms by name or code...">
+        <select class="form-input room-filter" id="roomFilter">
+          <option value="all">All Rooms</option>
+          <option value="active">Active</option>
+          <option value="closed">Closed</option>
+          <option value="archived">Archived</option>
+        </select>
+        <select class="form-input room-filter" id="roomSort">
+          <option value="created_desc">Newest First</option>
+          <option value="created_asc">Oldest First</option>
+          <option value="name_asc">Name A-Z</option>
+          <option value="name_desc">Name Z-A</option>
+        </select>
+      </div>
+
+      <div class="bulk-actions" id="bulkActions" style="display: none;">
+        <span style="display: flex; align-items: center; color: var(--ink-soft); font-size: 0.9rem;">
+          <span id="selectedCount">0</span> selected
+        </span>
+        <button class="btn btn-secondary" id="bulkArchiveBtn">Archive</button>
+        <button class="btn btn-secondary" id="bulkDeleteBtn">Delete</button>
+        <button class="btn btn-secondary" id="bulkCloseBtn">Close</button>
+        <button class="btn btn-secondary" id="bulkCancelBtn">Cancel</button>
       </div>
 
       <div class="rooms-grid" id="roomsGrid">
@@ -930,6 +1104,104 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
           <div class="deployment-step">
             <h3>05. Testing</h3>
             <p>Before full deployment, test on a single device to ensure the extension appears and can join a test room.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Templates Page -->
+    <div class="page" id="templatesPage">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Room Templates</h1>
+          <p class="page-subtitle">Create reusable room templates for quick setup</p>
+        </div>
+        <button class="btn btn-primary" id="createTemplateBtn">Create Template</button>
+      </div>
+
+      <div class="rooms-grid" id="templatesGrid">
+        <div class="loading-state">
+          <div class="loading-spinner"></div>
+          <p>Loading templates...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shortcuts Page -->
+    <div class="page" id="shortcutsPage">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">URL Shortcuts</h1>
+          <p class="page-subtitle">Save frequently used URLs for quick access</p>
+        </div>
+        <button class="btn btn-primary" id="createShortcutBtn">Add Shortcut</button>
+      </div>
+
+      <div class="rooms-grid" id="shortcutsGrid">
+        <div class="loading-state">
+          <div class="loading-spinner"></div>
+          <p>Loading shortcuts...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analytics Page -->
+    <div class="page" id="analyticsPage">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Analytics Dashboard</h1>
+          <p class="page-subtitle">Overview of your classroom usage and engagement</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title" style="margin-bottom: 24px;">Overview</h2>
+        <div class="analytics-grid">
+          <div class="analytics-card">
+            <h3>Total Rooms Created</h3>
+            <p class="analytics-value" id="totalRooms">0</p>
+          </div>
+          <div class="analytics-card">
+            <h3>Total Students Joined</h3>
+            <p class="analytics-value" id="totalStudents">0</p>
+          </div>
+          <div class="analytics-card">
+            <h3>Active Rooms</h3>
+            <p class="analytics-value" id="activeRooms">0</p>
+          </div>
+          <div class="analytics-card">
+            <h3>Archived Rooms</h3>
+            <p class="analytics-value" id="archivedRooms">0</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title" style="margin-bottom: 24px;">Most Used URLs</h2>
+        <div id="topUrlsList">
+          <div class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Loading analytics...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activity Log Page -->
+    <div class="page" id="activityPage">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Activity Log</h1>
+          <p class="page-subtitle">Track all room activities and actions</p>
+        </div>
+        <button class="btn btn-secondary" id="clearActivityBtn">Clear Log</button>
+      </div>
+
+      <div class="card">
+        <div id="activityList">
+          <div class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Loading activity log...</p>
           </div>
         </div>
       </div>
@@ -1000,6 +1272,10 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   // App state
   let currentUser = null;
   let rooms = [];
+  let templates = [];
+  let shortcuts = [];
+  let activities = [];
+  let selectedRooms = new Set();
   let roomSubscription = null;
   let studentSubscription = null;
 
@@ -1022,6 +1298,34 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   const createRoomBtnText = createRoomBtn.querySelector('.btn-text');
   const createRoomBtnLoading = createRoomBtn.querySelector('.loading');
   const createFirstRoomBtn = document.getElementById('createFirstRoomBtn');
+  const roomSearch = document.getElementById('roomSearch');
+  const roomFilter = document.getElementById('roomFilter');
+  const roomSort = document.getElementById('roomSort');
+  const bulkActions = document.getElementById('bulkActions');
+  const selectedCount = document.getElementById('selectedCount');
+  const bulkArchiveBtn = document.getElementById('bulkArchiveBtn');
+  const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+  const bulkCloseBtn = document.getElementById('bulkCloseBtn');
+  const bulkCancelBtn = document.getElementById('bulkCancelBtn');
+
+  // Templates elements
+  const templatesGrid = document.getElementById('templatesGrid');
+  const createTemplateBtn = document.getElementById('createTemplateBtn');
+
+  // Shortcuts elements
+  const shortcutsGrid = document.getElementById('shortcutsGrid');
+  const createShortcutBtn = document.getElementById('createShortcutBtn');
+
+  // Analytics elements
+  const totalRooms = document.getElementById('totalRooms');
+  const totalStudents = document.getElementById('totalStudents');
+  const activeRooms = document.getElementById('activeRooms');
+  const archivedRooms = document.getElementById('archivedRooms');
+  const topUrlsList = document.getElementById('topUrlsList');
+
+  // Activity log elements
+  const activityList = document.getElementById('activityList');
+  const clearActivityBtn = document.getElementById('clearActivityBtn');
 
   // Settings elements
   const settingsName = document.getElementById('settingsName');
@@ -1089,12 +1393,12 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   }
 
   function showPage(pageId) {
-    // Only handle internal pages (dashboard, deployment, settings)
+    // Handle all pages
     document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
     const page = document.getElementById(pageId);
     if (page) {
       page.classList.add('active');
-      
+
       document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
       const navItem = document.querySelector(`[data-page="${pageId.replace('Page', '')}"]`);
       if (navItem) navItem.classList.add('active');
@@ -1133,24 +1437,32 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       return;
     }
 
-    roomsGrid.innerHTML = rooms.map(room => `
+    roomsGrid.innerHTML = filtered.map(room => `
       <div class="room-card" data-room-id="${room.id}">
         <div class="room-card-header">
+          <input type="checkbox" class="room-checkbox" data-room-id="${room.id}" ${selectedRooms.has(room.id) ? 'checked' : ''}>
           <span class="room-card-code">${room.code}</span>
-          <span class="room-card-status">${room.active ? 'Active' : 'Closed'}</span>
+          <span class="room-card-status">${room.archived ? 'Archived' : (room.active ? 'Active' : 'Closed')}</span>
         </div>
         <div class="room-card-info">
           Created ${new Date(room.created_at).toLocaleDateString()}
         </div>
         <div class="room-card-students" id="studentCount-${room.id}">Loading students...</div>
         <div class="room-card-actions">
-          <button class="room-card-btn room-card-btn-delete" data-room-id="${room.id}">Delete room</button>
+          <button class="room-card-btn room-card-btn-manage" data-room-id="${room.id}">Manage</button>
+          ${room.archived ? `
+            <button class="room-card-btn room-card-btn-restore" data-room-id="${room.id}">Restore</button>
+          ` : `
+            <button class="room-card-btn room-card-btn-archive" data-room-id="${room.id}">Archive</button>
+          `}
+          <button class="room-card-btn room-card-btn-delete" data-room-id="${room.id}" style="color: var(--red);">Delete</button>
+          <button class="room-card-btn room-card-btn-export" data-room-id="${room.id}">Export</button>
         </div>
       </div>
     `).join('');
 
     // Load student counts for each room
-    rooms.forEach(room => {
+    filtered.forEach(room => {
       loadRoomStudentCount(room.id).then(count => {
         const countEl = document.getElementById(`studentCount-${room.id}`);
         if (countEl) {
@@ -1452,7 +1764,623 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
     }
   }
 
-  // Event listeners
+  // ==================== NEW FEATURES ====================
+
+  // Log activity
+  async function logActivity(action, details = {}) {
+    if (!currentUser) return;
+    try {
+      await SupabaseClient.from('activity_log').insert({
+        teacher_id: currentUser.id,
+        action,
+        details
+      });
+    } catch (error) {
+      console.error('Error logging activity:', error);
+    }
+  }
+
+  // Room search, filter, and sort
+  function getFilteredRooms() {
+    let filtered = [...rooms];
+
+    // Search
+    const search = roomSearch.value.toLowerCase();
+    if (search) {
+      filtered = filtered.filter(r =>
+        r.name?.toLowerCase().includes(search) ||
+        r.code.toLowerCase().includes(search)
+      );
+    }
+
+    // Filter
+    const filter = roomFilter.value;
+    if (filter === 'active') {
+      filtered = filtered.filter(r => r.active && !r.archived);
+    } else if (filter === 'closed') {
+      filtered = filtered.filter(r => !r.active && !r.archived);
+    } else if (filter === 'archived') {
+      filtered = filtered.filter(r => r.archived);
+    }
+
+    // Sort
+    const sort = roomSort.value;
+    if (sort === 'created_desc') {
+      filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    } else if (sort === 'created_asc') {
+      filtered.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    } else if (sort === 'name_asc') {
+      filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    } else if (sort === 'name_desc') {
+      filtered.sort((a, b) => (b.name || '').localeCompare(a.name || ''));
+    }
+
+    return filtered;
+  }
+
+  // Archive room
+  async function archiveRoom(roomId) {
+    try {
+      const { error } = await SupabaseClient
+        .from('rooms')
+        .update({ archived: true, active: false })
+        .eq('id', roomId);
+
+      if (error) throw error;
+      await logActivity('archive_room', { room_id: roomId });
+      showNotification('Room archived');
+    } catch (error) {
+      console.error('Error archiving room:', error);
+      showNotification('Error archiving room');
+    }
+  }
+
+  // Restore room
+  async function restoreRoom(roomId) {
+    try {
+      const { error } = await SupabaseClient
+        .from('rooms')
+        .update({ archived: false })
+        .eq('id', roomId);
+
+      if (error) throw error;
+      await logActivity('restore_room', { room_id: roomId });
+      showNotification('Room restored');
+    } catch (error) {
+      console.error('Error restoring room:', error);
+      showNotification('Error restoring room');
+    }
+  }
+
+  // Bulk operations
+  function updateBulkActions() {
+    if (selectedRooms.size > 0) {
+      bulkActions.style.display = 'flex';
+      selectedCount.textContent = selectedRooms.size;
+    } else {
+      bulkActions.style.display = 'none';
+    }
+  }
+
+  async function bulkArchive() {
+    const confirmed = await showConfirm({
+      title: 'Archive Rooms',
+      message: `Archive ${selectedRooms.size} room(s)?`
+    });
+    if (!confirmed) return;
+
+    for (const roomId of selectedRooms) {
+      await archiveRoom(roomId);
+    }
+    selectedRooms.clear();
+    updateBulkActions();
+  }
+
+  async function bulkDelete() {
+    const confirmed = await showConfirm({
+      title: 'Delete Rooms',
+      message: `Delete ${selectedRooms.size} room(s)? This cannot be undone.`
+    });
+    if (!confirmed) return;
+
+    for (const roomId of selectedRooms) {
+      await deleteRoom(roomId);
+    }
+    selectedRooms.clear();
+    updateBulkActions();
+  }
+
+  async function bulkClose() {
+    for (const roomId of selectedRooms) {
+      await SupabaseClient.from('rooms').update({ active: false }).eq('id', roomId);
+    }
+    await logActivity('bulk_close_rooms', { room_ids: Array.from(selectedRooms) });
+    selectedRooms.clear();
+    updateBulkActions();
+    showNotification('Rooms closed');
+  }
+
+  // Templates
+  async function loadTemplates() {
+    try {
+      const { data, error } = await SupabaseClient
+        .from('room_templates')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      templates = data || [];
+      renderTemplates();
+    } catch (error) {
+      console.error('Error loading templates:', error);
+      templatesGrid.innerHTML = '<p>Error loading templates</p>';
+    }
+  }
+
+  function renderTemplates() {
+    if (templates.length === 0) {
+      templatesGrid.innerHTML = `
+        <div class="empty-state">
+          <h3>No templates yet</h3>
+          <p>Create templates to quickly set up new rooms.</p>
+        </div>
+      `;
+      return;
+    }
+
+    templatesGrid.innerHTML = templates.map(template => `
+      <div class="room-card">
+        <div class="room-card-header">
+          <span class="room-card-code">${template.name}</span>
+        </div>
+        <div class="room-card-body">
+          <p class="room-card-desc">${template.description || 'No description'}</p>
+          ${template.default_tags?.length ? template.default_tags.map(t => `<span class="tag">${t}</span>`).join('') : ''}
+        </div>
+        <div class="room-card-actions">
+          <button class="btn btn-secondary" onclick="createFromTemplate('${template.id}')">Use Template</button>
+          <button class="btn btn-secondary" onclick="deleteTemplate('${template.id}')" style="color: var(--red);">Delete</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function createTemplate() {
+    const name = prompt('Template name:');
+    if (!name) return;
+
+    const description = prompt('Description (optional):') || '';
+    const tagsInput = prompt('Tags (comma-separated, optional):') || '';
+    const tags = tagsInput.split(',').map(t => t.trim()).filter(t => t);
+
+    try {
+      const { error } = await SupabaseClient.from('room_templates').insert({
+        teacher_id: currentUser.id,
+        name,
+        description,
+        default_tags: tags
+      });
+
+      if (error) throw error;
+      await logActivity('create_template', { name });
+      showNotification('Template created');
+      loadTemplates();
+    } catch (error) {
+      console.error('Error creating template:', error);
+      showNotification('Error creating template');
+    }
+  }
+
+  async function createFromTemplate(templateId) {
+    const template = templates.find(t => t.id === templateId);
+    if (!template) return;
+
+    try {
+      const roomCode = generateRoomCode();
+      const { data: newRoom, error } = await SupabaseClient
+        .from('rooms')
+        .insert({
+          teacher_id: currentUser.id,
+          code: roomCode,
+          name: template.name,
+          description: template.description,
+          tags: template.default_tags,
+          active: true
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      await logActivity('create_room_from_template', { template_id: templateId });
+      showNotification('Room created from template');
+      showPage('dashboardPage');
+    } catch (error) {
+      console.error('Error creating room from template:', error);
+      showNotification('Error creating room');
+    }
+  }
+
+  async function deleteTemplate(templateId) {
+    const confirmed = await showConfirm({
+      title: 'Delete Template',
+      message: 'Delete this template?'
+    });
+    if (!confirmed) return;
+
+    try {
+      const { error } = await SupabaseClient
+        .from('room_templates')
+        .delete()
+        .eq('id', templateId);
+
+      if (error) throw error;
+      await logActivity('delete_template', { template_id: templateId });
+      showNotification('Template deleted');
+      loadTemplates();
+    } catch (error) {
+      console.error('Error deleting template:', error);
+      showNotification('Error deleting template');
+    }
+  }
+
+  // Shortcuts
+  async function loadShortcuts() {
+    try {
+      const { data, error } = await SupabaseClient
+        .from('url_shortcuts')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      shortcuts = data || [];
+      renderShortcuts();
+    } catch (error) {
+      console.error('Error loading shortcuts:', error);
+      shortcutsGrid.innerHTML = '<p>Error loading shortcuts</p>';
+    }
+  }
+
+  function renderShortcuts() {
+    if (shortcuts.length === 0) {
+      shortcutsGrid.innerHTML = `
+        <div class="empty-state">
+          <h3>No shortcuts yet</h3>
+          <p>Add frequently used URLs for quick access.</p>
+        </div>
+      `;
+      return;
+    }
+
+    shortcutsGrid.innerHTML = shortcuts.map(shortcut => `
+      <div class="room-card">
+        <div class="room-card-header">
+          <span class="room-card-code">${shortcut.name}</span>
+        </div>
+        <div class="room-card-body">
+          <p class="room-card-desc">${shortcut.url}</p>
+          ${shortcut.tags?.length ? shortcut.tags.map(t => `<span class="tag">${t}</span>`).join('') : ''}
+        </div>
+        <div class="room-card-actions">
+          <button class="btn btn-secondary" onclick="copyShortcut('${shortcut.url}')">Copy URL</button>
+          <button class="btn btn-secondary" onclick="deleteShortcut('${shortcut.id}')" style="color: var(--red);">Delete</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function createShortcut() {
+    const name = prompt('Shortcut name:');
+    if (!name) return;
+
+    const url = prompt('URL:');
+    if (!url) return;
+
+    const tagsInput = prompt('Tags (comma-separated, optional):') || '';
+    const tags = tagsInput.split(',').map(t => t.trim()).filter(t => t);
+
+    try {
+      const { error } = await SupabaseClient.from('url_shortcuts').insert({
+        teacher_id: currentUser.id,
+        name,
+        url: url.startsWith('http') ? url : `https://${url}`,
+        tags
+      });
+
+      if (error) throw error;
+      await logActivity('create_shortcut', { name, url });
+      showNotification('Shortcut created');
+      loadShortcuts();
+    } catch (error) {
+      console.error('Error creating shortcut:', error);
+      showNotification('Error creating shortcut');
+    }
+  }
+
+  function copyShortcut(url) {
+    navigator.clipboard.writeText(url);
+    showNotification('URL copied to clipboard');
+  }
+
+  async function deleteShortcut(shortcutId) {
+    const confirmed = await showConfirm({
+      title: 'Delete Shortcut',
+      message: 'Delete this shortcut?'
+    });
+    if (!confirmed) return;
+
+    try {
+      const { error } = await SupabaseClient
+        .from('url_shortcuts')
+        .delete()
+        .eq('id', shortcutId);
+
+      if (error) throw error;
+      await logActivity('delete_shortcut', { shortcut_id: shortcutId });
+      showNotification('Shortcut deleted');
+      loadShortcuts();
+    } catch (error) {
+      console.error('Error deleting shortcut:', error);
+      showNotification('Error deleting shortcut');
+    }
+  }
+
+  // Analytics
+  async function loadAnalytics() {
+    try {
+      // Total rooms
+      const { count: totalRoomsCount } = await SupabaseClient
+        .from('rooms')
+        .select('*', { count: 'exact', head: true })
+        .eq('teacher_id', currentUser.id);
+
+      // Total students
+      const { count: totalStudentsCount } = await SupabaseClient
+        .from('students')
+        .select('*', { count: 'exact', head: true })
+        .in('room_id', rooms.map(r => r.id));
+
+      // Active rooms
+      const { count: activeRoomsCount } = await SupabaseClient
+        .from('rooms')
+        .select('*', { count: 'exact', head: true })
+        .eq('teacher_id', currentUser.id)
+        .eq('active', true)
+        .eq('archived', false);
+
+      // Archived rooms
+      const { count: archivedRoomsCount } = await SupabaseClient
+        .from('rooms')
+        .select('*', { count: 'exact', head: true })
+        .eq('teacher_id', currentUser.id)
+        .eq('archived', true);
+
+      // Top URLs
+      const { data: topUrls } = await SupabaseClient
+        .from('url_history')
+        .select('url')
+        .in('room_id', rooms.map(r => r.id));
+
+      // Count URL frequencies
+      const urlCounts = {};
+      topUrls?.forEach(({ url }) => {
+        urlCounts[url] = (urlCounts[url] || 0) + 1;
+      });
+
+      const sortedUrls = Object.entries(urlCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10);
+
+      totalRooms.textContent = totalRoomsCount || 0;
+      totalStudents.textContent = totalStudentsCount || 0;
+      activeRooms.textContent = activeRoomsCount || 0;
+      archivedRooms.textContent = archivedRoomsCount || 0;
+
+      if (sortedUrls.length === 0) {
+        topUrlsList.innerHTML = '<p style="color: var(--ink-soft);">No URL data yet</p>';
+      } else {
+        topUrlsList.innerHTML = sortedUrls.map(([url, count]) => `
+          <div class="activity-item">
+            <div class="activity-content">
+              <div class="activity-action">${url}</div>
+              <div class="activity-details">Used ${count} time${count !== 1 ? 's' : ''}</div>
+            </div>
+          </div>
+        `).join('');
+      }
+    } catch (error) {
+      console.error('Error loading analytics:', error);
+    }
+  }
+
+  // Activity Log
+  async function loadActivityLog() {
+    try {
+      const { data, error } = await SupabaseClient
+        .from('activity_log')
+        .select('*')
+        .eq('teacher_id', currentUser.id)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+      activities = data || [];
+      renderActivityLog();
+    } catch (error) {
+      console.error('Error loading activity log:', error);
+      activityList.innerHTML = '<p>Error loading activity log</p>';
+    }
+  }
+
+  function renderActivityLog() {
+    if (activities.length === 0) {
+      activityList.innerHTML = `
+        <div class="empty-state">
+          <h3>No activity yet</h3>
+          <p>Your activity will appear here.</p>
+        </div>
+      `;
+      return;
+    }
+
+    activityList.innerHTML = activities.map(activity => {
+      const time = new Date(activity.created_at).toLocaleString();
+      return `
+        <div class="activity-item">
+          <div class="activity-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <div class="activity-content">
+            <div class="activity-action">${formatActivityAction(activity.action)}</div>
+            <div class="activity-details">${JSON.stringify(activity.details)}</div>
+            <div class="activity-time">${time}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function formatActivityAction(action) {
+    return action
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+
+  async function clearActivityLog() {
+    const confirmed = await showConfirm({
+      title: 'Clear Activity Log',
+      message: 'Clear all activity history?'
+    });
+    if (!confirmed) return;
+
+    try {
+      const { error } = await SupabaseClient
+        .from('activity_log')
+        .delete()
+        .eq('teacher_id', currentUser.id);
+
+      if (error) throw error;
+      showNotification('Activity log cleared');
+      loadActivityLog();
+    } catch (error) {
+      console.error('Error clearing activity log:', error);
+      showNotification('Error clearing activity log');
+    }
+  }
+
+  // Export room data
+  async function exportRoomData(roomId) {
+    try {
+      const { data: students } = await SupabaseClient
+        .from('students')
+        .select('*')
+        .eq('room_id', roomId);
+
+      const { data: urls } = await SupabaseClient
+        .from('url_history')
+        .select('*')
+        .eq('room_id', roomId);
+
+      const csv = [
+        'Student Name,Joined At,Current URL,Online Status',
+        ...(students || []).map(s =>
+          `"${s.name}","${s.joined_at}","${s.current_url || ''}","${s.online ? 'Online' : 'Offline'}"`
+        ),
+        '',
+        'URL History',
+        'URL,Pushed At',
+        ...(urls || []).map(u => `"${u.url}","${u.pushed_at}"`)
+      ].join('\n');
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `room-${roomId}-export.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      await logActivity('export_room_data', { room_id: roomId });
+      showNotification('Room data exported');
+    } catch (error) {
+      console.error('Error exporting room data:', error);
+      showNotification('Error exporting room data');
+    }
+  }
+
+  // ==================== EVENT LISTENERS ====================
+
+  // Room search, filter, sort
+  roomSearch.addEventListener('input', renderRooms);
+  roomFilter.addEventListener('change', renderRooms);
+  roomSort.addEventListener('change', renderRooms);
+
+  // Bulk actions
+  bulkArchiveBtn.addEventListener('click', bulkArchive);
+  bulkDeleteBtn.addEventListener('click', bulkDelete);
+  bulkCloseBtn.addEventListener('click', bulkClose);
+  bulkCancelBtn.addEventListener('click', () => {
+    selectedRooms.clear();
+    updateBulkActions();
+    renderRooms();
+  });
+
+  // Room checkboxes
+  document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('room-checkbox')) {
+      const roomId = e.target.dataset.roomId;
+      if (e.target.checked) {
+        selectedRooms.add(roomId);
+      } else {
+        selectedRooms.delete(roomId);
+      }
+      updateBulkActions();
+    }
+  });
+
+  // Room action buttons
+  document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('room-card-btn-archive')) {
+      const roomId = e.target.dataset.roomId;
+      archiveRoom(roomId);
+    }
+    if (e.target.classList.contains('room-card-btn-restore')) {
+      const roomId = e.target.dataset.roomId;
+      restoreRoom(roomId);
+    }
+    if (e.target.classList.contains('room-card-btn-export')) {
+      const roomId = e.target.dataset.roomId;
+      exportRoomData(roomId);
+    }
+  });
+
+  // Templates
+  createTemplateBtn.addEventListener('click', createTemplate);
+
+  // Shortcuts
+  createShortcutBtn.addEventListener('click', createShortcut);
+
+  // Activity log
+  clearActivityBtn.addEventListener('click', clearActivityLog);
+
+  // Navigation
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      const page = item.dataset.page;
+      showPage(page + 'Page');
+
+      // Load data for specific pages
+      if (page === 'templates') loadTemplates();
+      if (page === 'shortcuts') loadShortcuts();
+      if (page === 'analytics') loadAnalytics();
+      if (page === 'activity') loadActivityLog();
+    });
+  });
+
   logoutBtn.addEventListener('click', handleLogout);
 
   // Mobile sidebar
@@ -1520,6 +2448,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       await loadRooms();
       subscribeToRooms();
       subscribeToStudents();
+      await loadTemplates();
+      await loadShortcuts();
     } else {
       window.location.href = '/login.html';
     }
