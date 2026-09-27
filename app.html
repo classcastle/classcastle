@@ -1090,7 +1090,7 @@
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
             Donate
           </a>
-          <a class="nav-item nav-item-sub" href="/about.html" target="_blank">
+          <a class="nav-item nav-item-sub" data-page="about" href="#">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16"/></svg>
             About Classcastle
           </a>
@@ -1402,6 +1402,46 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
         <h2 class="section-title" style="margin-bottom: 16px;">Danger Zone</h2>
         <p style="color: var(--ink-soft); margin-bottom: 16px;">To delete your teacher account, please contact our support team. We'll help you securely remove your data.</p>
         <a href="mailto:support@classcastle.org?subject=Delete%20My%20Account" class="btn btn-secondary" style="color: #fff; background: var(--red); border-color: var(--red);">Contact Support to Delete Account</a>
+      </div>
+    </div>
+
+    <!-- About Page -->
+    <div class="page" id="aboutPage">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">About Classcastle</h1>
+          <p class="page-subtitle">Learn more about Classcastle</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title" style="margin-bottom: 24px;">What is Classcastle?</h2>
+        <p style="color: var(--ink-soft); margin-bottom: 16px;">Classcastle is a free classroom management tool that helps teachers guide students to the same webpage instantly. Watch the video below to learn more about how it works:</p>
+
+        <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; margin: 24px 0; background: #000;">
+          <iframe 
+            src="https://www.youtube.com/embed/Bzb4_y3rUW4" 
+            title="About Classcastle"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen
+            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;">
+          </iframe>
+        </div>
+
+        <p style="color: var(--ink-soft); margin-bottom: 16px;">Classcastle makes it easy for teachers to manage their classroom by:</p>
+        <ul style="color: var(--ink-soft); line-height: 1.8; margin-left: 20px;">
+          <li>Sending all students to the same URL instantly</li>
+          <li>Creating and managing multiple rooms</li>
+          <li>Tracking student attendance and engagement</li>
+          <li>Keeping a history of URLs pushed to each room</li>
+          <li>Using room templates and shortcuts for quick setup</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title" style="margin-bottom: 16px;">Contact Us</h2>
+        <p style="color: var(--ink-soft); margin-bottom: 16px;">Have questions or feedback? We'd love to hear from you.</p>
+        <a href="mailto:support@classcastle.org" class="btn btn-primary">Contact Support</a>
       </div>
     </div>
   </main>
@@ -3052,7 +3092,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       showPage(page + 'Page');
 
       // Open admin submenu when navigating to admin pages
-      if (page === 'deployment' || page === 'pricing') {
+      if (page === 'deployment' || page === 'pricing' || page === 'about') {
         const adminSection = document.querySelector('.nav-section-admin');
         if (adminSection) adminSection.classList.add('open');
       }
