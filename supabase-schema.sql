@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS rooms (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   teacher_id UUID REFERENCES auth.users NOT NULL,
   code TEXT NOT NULL UNIQUE,
+  name TEXT,
   target_url TEXT,
   active BOOLEAN DEFAULT true,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -23,16 +24,28 @@ CREATE TABLE IF NOT EXISTS students (
   last_seen TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Create url_history table
+CREATE TABLE IF NOT EXISTS url_history (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  room_id UUID REFERENCES rooms(id) ON DELETE CASCADE,
+  url TEXT NOT NULL,
+  pushed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_rooms_teacher_id ON rooms(teacher_id);
 CREATE INDEX IF NOT EXISTS idx_rooms_code ON rooms(code);
 CREATE INDEX IF NOT EXISTS idx_rooms_active ON rooms(active);
 CREATE INDEX IF NOT EXISTS idx_students_room_id ON students(room_id);
 CREATE INDEX IF NOT EXISTS idx_students_online ON students(online);
+CREATE INDEX IF NOT EXISTS idx_students_name ON students(name);
+CREATE INDEX IF NOT EXISTS idx_url_history_room_id ON url_history(room_id);
+CREATE INDEX IF NOT EXISTS idx_url_history_pushed_at ON url_history(pushed_at);
 
 -- Enable Row Level Security
 ALTER TABLE rooms ENABLE ROW LEVEL SECURITY;
 ALTER TABLE students ENABLE ROW LEVEL SECURITY;
+ALTER TABLE url_history ENABLE ROW LEVEL SECURITY;
 
 -- RLS policies for rooms
 DROP POLICY IF EXISTS "Teachers can view their own rooms" ON rooms;
@@ -145,6 +158,40 @@ CREATE POLICY "Teachers can delete students in their rooms"
     EXISTS (
       SELECT 1 FROM rooms
       WHERE rooms.id = students.room_id
+      AND rooms.teacher_id = auth.uid()
+    )
+  );
+
+-- RLS policies for url_history
+DROP POLICY IF EXISTS "Teachers can view url history in their rooms" ON url_history;
+CREATE POLICY "Teachers can view url history in their rooms"
+  ON url_history FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM rooms
+      WHERE rooms.id = url_history.room_id
+      AND rooms.teacher_id = auth.uid()
+    )
+  );
+
+DROP POLICY IF EXISTS "Teachers can insert url history in their rooms" ON url_history;
+CREATE POLICY "Teachers can insert url history in their rooms"
+  ON url_history FOR INSERT
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM rooms
+      WHERE rooms.id = url_history.room_id
+      AND rooms.teacher_id = auth.uid()
+    )
+  );
+
+DROP POLICY IF EXISTS "Teachers can delete url history in their rooms" ON url_history;
+CREATE POLICY "Teachers can delete url history in their rooms"
+  ON url_history FOR DELETE
+  USING (
+    EXISTS (
+      SELECT 1 FROM rooms
+      WHERE rooms.id = url_history.room_id
       AND rooms.teacher_id = auth.uid()
     )
   );

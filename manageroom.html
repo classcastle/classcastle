@@ -563,6 +563,80 @@
     font-size: 0.95rem;
   }
 
+  .url-history {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 8px;
+  }
+
+  .url-history-item {
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+    background: var(--paper);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+  }
+
+  .url-history-item:hover {
+    background: var(--line);
+  }
+
+  .url-history-url {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--ink);
+  }
+
+  .url-history-time {
+    color: var(--ink-soft);
+    font-size: 0.75rem;
+    margin-left: 12px;
+  }
+
+  .students-area-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .students-controls {
+    display: flex;
+    gap: 8px;
+  }
+
+  .search-input {
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 0.85rem;
+    background: var(--paper);
+    color: var(--ink);
+    outline: none;
+    width: 200px;
+  }
+
+  .search-input:focus {
+    border-color: var(--green);
+  }
+
+  .sort-select {
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 0.85rem;
+    background: var(--paper);
+    color: var(--ink);
+    outline: none;
+  }
+
   .empty-state {
     text-align: center;
     padding: 64px 32px;
@@ -773,7 +847,15 @@
     <div class="students-area">
       <div class="students-area-header">
         <h2 class="students-area-title">Students</h2>
-        <span class="student-count" id="studentCount">0 joined</span>
+        <div class="students-controls">
+          <input type="text" class="search-input" id="searchInput" placeholder="Search students...">
+          <select class="sort-select" id="sortSelect">
+            <option value="name">Sort by name</option>
+            <option value="joined">Sort by joined time</option>
+            <option value="online">Sort by online status</option>
+          </select>
+          <span class="student-count" id="studentCount">0 joined</span>
+        </div>
       </div>
       <div class="student-grid" id="studentList">
         <div class="empty-state">
@@ -825,6 +907,30 @@
               <button class="btn btn-secondary btn-small" id="closeRoomBtn">Close</button>
               <button class="btn btn-secondary btn-small" id="reopenRoomBtn" style="display: none;">Reopen</button>
               <button class="btn btn-danger btn-small" id="deleteRoomBtn">Delete</button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">Bulk Actions</label>
+            <div class="control-actions">
+              <button class="btn btn-danger btn-small" id="kickAllBtn">Kick All</button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">Room Settings</label>
+            <div class="control-actions">
+              <button class="btn btn-secondary btn-small" id="renameRoomBtn">Rename</button>
+              <button class="btn btn-secondary btn-small" id="regenerateCodeBtn">Regenerate Code</button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">URL History</label>
+            <div class="url-history" id="urlHistory">
+              <div class="empty-state" style="padding: 16px;">
+                <p style="font-size: 0.85rem;">No URLs pushed yet</p>
+              </div>
             </div>
           </div>
         </div>
@@ -884,6 +990,12 @@
   const liveSession = document.getElementById('liveSession');
   const fullscreenBtn = document.getElementById('fullscreenBtn');
   const wrap = document.querySelector('.wrap');
+  const kickAllBtn = document.getElementById('kickAllBtn');
+  const renameRoomBtn = document.getElementById('renameRoomBtn');
+  const regenerateCodeBtn = document.getElementById('regenerateCodeBtn');
+  const urlHistory = document.getElementById('urlHistory');
+  const searchInput = document.getElementById('searchInput');
+  const sortSelect = document.getElementById('sortSelect');
 
   let currentRoom = null;
   let currentUser = null;
@@ -992,6 +1104,7 @@
       }
 
       await loadStudents();
+      await loadUrlHistory();
     } catch (error) {
       console.error('Error loading room:', error);
       window.location.href = '/app.html';
@@ -1009,15 +1122,15 @@
       if (error) throw error;
 
       students = studentsData || [];
-      renderStudents();
+      filterAndSortStudents();
     } catch (error) {
       console.error('Error loading students:', error);
     }
   }
 
   // Render students (both views)
-  function renderStudents() {
-    if (students.length === 0) {
+  function renderStudents(studentsToRender = students) {
+    if (studentsToRender.length === 0) {
       studentList.innerHTML = `
         <div class="empty-state">
           <h3>No students yet</h3>
@@ -1034,7 +1147,7 @@
     }
 
     // Render waiting room grid
-    studentList.innerHTML = students.map(student => `
+    studentList.innerHTML = studentsToRender.map(student => `
       <div class="student-badge ${student.online ? 'online' : ''}" data-student-id="${student.id}" data-student-name="${student.name}">
         <div class="student-avatar">${student.name.charAt(0).toUpperCase()}</div>
         <div class="student-name">${student.name}</div>
@@ -1043,7 +1156,7 @@
     `).join('');
 
     // Render live session list
-    membersList.innerHTML = students.map(student => `
+    membersList.innerHTML = studentsToRender.map(student => `
       <div class="member-item ${student.online ? 'online' : ''}" data-student-id="${student.id}" data-student-name="${student.name}">
         <div class="member-avatar-small">${student.name.charAt(0).toUpperCase()}</div>
         <span class="member-name">${student.name}</span>
@@ -1051,7 +1164,7 @@
       </div>
     `).join('');
 
-    studentCount.textContent = `${students.length} joined`;
+    studentCount.textContent = `${studentsToRender.length} joined`;
 
     // Add kick handlers
     document.querySelectorAll('.student-badge, .member-item').forEach(el => {
@@ -1186,11 +1299,170 @@
 
       if (error) throw error;
 
+      // Add to URL history
+      await SupabaseClient
+        .from('url_history')
+        .insert({
+          room_id: currentRoom.id,
+          url: url
+        });
+
+      loadUrlHistory();
       showNotification('Navigating students...');
     } catch (error) {
       console.error('Error navigating students:', error);
       showNotification('Error navigating students');
     }
+  }
+
+  // Load URL history
+  async function loadUrlHistory() {
+    if (!currentRoom) return;
+
+    try {
+      const { data: history, error } = await SupabaseClient
+        .from('url_history')
+        .select('url, pushed_at')
+        .eq('room_id', currentRoom.id)
+        .order('pushed_at', { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+
+      if (history && history.length > 0) {
+        urlHistory.innerHTML = history.map(item => `
+          <div class="url-history-item">
+            <span class="url-history-url">${item.url}</span>
+            <span class="url-history-time">${formatTime(item.pushed_at)}</span>
+          </div>
+        `).join('');
+      } else {
+        urlHistory.innerHTML = `
+          <div class="empty-state" style="padding: 16px;">
+            <p style="font-size: 0.85rem;">No URLs pushed yet</p>
+          </div>
+        `;
+      }
+    } catch (error) {
+      console.error('Error loading URL history:', error);
+    }
+  }
+
+  // Format time for display
+  function formatTime(timestamp) {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diff = now - date;
+
+    if (diff < 60000) return 'Just now';
+    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+    return date.toLocaleDateString();
+  }
+
+  // Kick all students
+  async function kickAllStudents() {
+    if (!currentRoom) return;
+
+    const confirmed = await showConfirm({
+      title: 'Kick All Students',
+      message: 'Are you sure you want to kick all students from this room?'
+    });
+
+    if (!confirmed) return;
+
+    try {
+      const { error } = await SupabaseClient
+        .from('students')
+        .delete()
+        .eq('room_id', currentRoom.id);
+
+      if (error) throw error;
+
+      showNotification('All students kicked');
+    } catch (error) {
+      console.error('Error kicking all students:', error);
+      showNotification('Error kicking students');
+    }
+  }
+
+  // Rename room
+  async function renameRoom() {
+    if (!currentRoom) return;
+
+    const newName = prompt('Enter new room name:', currentRoom.name || '');
+    if (!newName) return;
+
+    try {
+      const { error } = await SupabaseClient
+        .from('rooms')
+        .update({ name: newName })
+        .eq('id', currentRoom.id);
+
+      if (error) throw error;
+
+      currentRoom.name = newName;
+      showNotification('Room renamed');
+    } catch (error) {
+      console.error('Error renaming room:', error);
+      showNotification('Error renaming room');
+    }
+  }
+
+  // Regenerate room code
+  async function regenerateCode() {
+    if (!currentRoom) return;
+
+    const confirmed = await showConfirm({
+      title: 'Regenerate Room Code',
+      message: 'This will generate a new room code. The old code will no longer work. Continue?'
+    });
+
+    if (!confirmed) return;
+
+    try {
+      // Generate new 6-digit code
+      const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+      const { error } = await SupabaseClient
+        .from('rooms')
+        .update({ code: newCode })
+        .eq('id', currentRoom.id);
+
+      if (error) throw error;
+
+      currentRoom.code = newCode;
+      roomCodeEl.textContent = newCode;
+      showNotification('Room code regenerated');
+    } catch (error) {
+      console.error('Error regenerating code:', error);
+      showNotification('Error regenerating code');
+    }
+  }
+
+  // Filter and sort students
+  function filterAndSortStudents() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const sortBy = sortSelect.value;
+
+    let filtered = students.filter(student =>
+      student.name.toLowerCase().includes(searchTerm)
+    );
+
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'name':
+          return a.name.localeCompare(b.name);
+        case 'joined':
+          return new Date(a.joined_at) - new Date(b.joined_at);
+        case 'online':
+          return b.online - a.online;
+        default:
+          return 0;
+      }
+    });
+
+    renderStudents(filtered);
   }
 
   // Start room
@@ -1253,6 +1525,17 @@
   urlInput.addEventListener('input', () => {
     goBtn.disabled = !urlInput.value.trim();
   });
+
+  // Search and sort
+  searchInput.addEventListener('input', filterAndSortStudents);
+  sortSelect.addEventListener('change', filterAndSortStudents);
+
+  // Bulk actions
+  kickAllBtn.addEventListener('click', kickAllStudents);
+
+  // Room settings
+  renameRoomBtn.addEventListener('click', renameRoom);
+  regenerateCodeBtn.addEventListener('click', regenerateCode);
 
   goBtn.addEventListener('click', async () => {
     let url = urlInput.value.trim();
