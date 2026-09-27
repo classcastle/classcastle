@@ -7,94 +7,92 @@ class Modal {
     this.onConfirm = null;
     this.onCancel = null;
     this.initialized = false;
+    this.pendingShows = [];
   }
 
   init() {
     if (this.initialized) return;
 
-    // Wait for DOM to be ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => this.init());
-      return;
-    }
+    // Create modal elements
+    const overlay = document.createElement('div');
+    overlay.id = 'modal-overlay';
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      backdrop-filter: blur(4px);
+    `;
 
-    // Check if body exists
-    if (!document.body) {
-      setTimeout(() => this.init(), 10);
-      return;
-    }
+    const modal = document.createElement('div');
+    modal.id = 'modal';
+    modal.style.cssText = `
+      background: var(--paper, #F7F6F1);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      animation: modalSlideIn 0.2s ease-out;
+    `;
 
-    // Create modal elements if they don't exist
-    if (!document.getElementById('modal-overlay')) {
-      const overlay = document.createElement('div');
-      overlay.id = 'modal-overlay';
-      overlay.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 10000;
-        backdrop-filter: blur(4px);
-      `;
-
-      const modal = document.createElement('div');
-      modal.id = 'modal';
-      modal.style.cssText = `
-        background: var(--paper, #F7F6F1);
-        border-radius: 16px;
-        padding: 24px;
-        max-width: 400px;
-        width: 90%;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-        animation: modalSlideIn 0.2s ease-out;
-      `;
-
-      const style = document.createElement('style');
-      style.textContent = `
-        @keyframes modalSlideIn {
-          from {
-            opacity: 0;
-            transform: translateY(20px) scale(0.95);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes modalSlideIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px) scale(0.95);
         }
-        @media (prefers-color-scheme: dark) {
-          #modal {
-            background: var(--paper, #1C1B17);
-          }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
         }
-      `;
+      }
+      @media (prefers-color-scheme: dark) {
+        #modal {
+          background: var(--paper, #1C1B17);
+        }
+      }
+    `;
 
-      document.head.appendChild(style);
-      overlay.appendChild(modal);
-      document.body.appendChild(overlay);
+    document.head.appendChild(style);
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
 
-      this.overlay = overlay;
-      this.modal = modal;
-    } else {
-      this.overlay = document.getElementById('modal-overlay');
-      this.modal = document.getElementById('modal');
-    }
-
+    this.overlay = overlay;
+    this.modal = modal;
     this.initialized = true;
+
+    // Process any pending shows
+    while (this.pendingShows.length > 0) {
+      const options = this.pendingShows.shift();
+      this.show(options);
+    }
   }
 
   show(options) {
-    // Ensure modal is initialized
+    // If not initialized, wait for DOM to be ready
     if (!this.initialized) {
-      this.init();
-      // If still not initialized, schedule retry
-      if (!this.initialized) {
-        setTimeout(() => this.show(options), 50);
+      if (document.readyState === 'loading' || !document.body) {
+        this.pendingShows.push(options);
+        if (this.pendingShows.length === 1) {
+          // Only add listener once
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.init());
+          } else {
+            // DOM is ready but body doesn't exist (edge case)
+            setTimeout(() => this.init(), 10);
+          }
+        }
         return;
+      } else {
+        this.init();
       }
     }
 
