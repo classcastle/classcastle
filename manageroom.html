@@ -69,51 +69,105 @@
 
   .wrap { max-width: 1080px; margin: 0 auto; padding: 0 32px; }
 
-  .container {
-    display: flex;
-    gap: 32px;
-    margin-top: 32px;
+  /* Waiting Room State */
+  .waiting-room {
+    display: block;
+  }
+  .waiting-room.hidden {
+    display: none;
   }
 
-  .main-panel {
-    flex: 1;
-  }
-
-  .side-panel {
-    width: 320px;
-  }
-
-  .room-card {
-    background: #fff;
-    border: 1px solid var(--line);
+  .banner {
+    background: var(--green);
+    padding: 32px 40px;
     border-radius: 16px;
-    padding: 40px;
-    text-align: center;
     margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
   }
 
-  .room-code-display {
-    font-family: 'Fraunces', serif;
-    font-size: 4rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
+  .banner-left {
+    flex-shrink: 0;
+  }
+
+  .qr-placeholder {
+    width: 120px;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: var(--green);
-    margin: 24px 0;
-    line-height: 1;
+    font-size: 0.85rem;
+    font-weight: 500;
   }
 
-  .room-label {
-    font-size: 0.95rem;
-    color: var(--ink-soft);
-    margin-bottom: 8px;
+  .banner-center {
+    flex: 1;
+    text-align: center;
+  }
+
+  .banner-text {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+  }
+
+  .room-code-huge {
+    font-family: 'Fraunces', serif;
+    font-size: 5rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 20px;
+  }
+
+  .banner-right {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .copy-link {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .icon-row {
+    display: flex;
+    gap: 12px;
+  }
+
+  .icon-btn {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .icon-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
   }
 
   .btn {
-    padding: 14px 32px;
+    padding: 16px 48px;
     border: none;
     border-radius: 12px;
     font-family: 'Inter', sans-serif;
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -124,12 +178,281 @@
   }
 
   .btn-primary {
-    background: var(--green);
-    color: #fff;
+    background: #fff;
+    color: var(--green);
   }
   .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(47, 82, 51, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  }
+
+  .students-area {
+    background: var(--green-soft);
+    border-radius: 16px;
+    padding: 32px;
+    min-height: 300px;
+  }
+
+  .students-area-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .students-area-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .student-count {
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    background: rgba(255, 255, 255, 0.8);
+    padding: 6px 12px;
+    border-radius: 20px;
+  }
+
+  .student-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+  }
+
+  .student-badge {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+  }
+
+  .student-badge:hover {
+    border-color: var(--red);
+    background: #f5e0e0;
+  }
+
+  .student-badge:hover .student-name {
+    text-decoration: line-through;
+    color: var(--red);
+  }
+
+  .student-avatar {
+    width: 64px;
+    height: 64px;
+    background: var(--green-soft);
+    border-radius: 50%;
+    margin: 0 auto 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--green);
+  }
+
+  .student-name {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--ink);
+    transition: all 0.2s ease;
+  }
+
+  .student-status {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--line);
+    margin: 8px auto 0;
+  }
+
+  .student-badge.online .student-status {
+    background: var(--green);
+  }
+
+  /* Live Session State */
+  .live-session {
+    display: none;
+  }
+  .live-session.active {
+    display: block;
+  }
+
+  .live-container {
+    display: flex;
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  .left-column {
+    width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .teacher-panel {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+  }
+
+  .teacher-avatar {
+    width: 80px;
+    height: 80px;
+    background: var(--green-soft);
+    border-radius: 50%;
+    margin: 0 auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--green);
+  }
+
+  .teacher-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .teacher-label {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+
+  .members-strip {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 20px;
+    flex: 1;
+  }
+
+  .members-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 16px;
+  }
+
+  .members-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .member-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background: var(--paper);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .member-item:hover {
+    border: 1.5px solid var(--red);
+    background: #f5e0e0;
+  }
+
+  .member-item:hover .member-name {
+    text-decoration: line-through;
+    color: var(--red);
+  }
+
+  .member-avatar-small {
+    width: 32px;
+    height: 32px;
+    background: var(--green-soft);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--green);
+  }
+
+  .member-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--ink);
+    flex: 1;
+    transition: all 0.2s ease;
+  }
+
+  .member-status {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--line);
+  }
+
+  .member-item.online .member-status {
+    background: var(--green);
+  }
+
+  .right-column {
+    flex: 1;
+  }
+
+  .management-panel {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 40px;
+    height: 100%;
+    display: none;
+  }
+
+  .management-panel.active {
+    display: block;
+  }
+
+  .control-group {
+    margin-bottom: 32px;
+  }
+
+  .control-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .url-input {
+    width: 100%;
+    padding: 16px 20px;
+    border: 2px solid var(--line);
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    background: var(--paper);
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .url-input:focus {
+    border-color: var(--green);
+    background: #fff;
+  }
+
+  .control-actions {
+    display: flex;
+    gap: 12px;
   }
 
   .btn-secondary {
@@ -149,128 +472,8 @@
   }
 
   .btn-small {
-    padding: 8px 16px;
+    padding: 10px 20px;
     font-size: 0.9rem;
-  }
-
-  .students-section {
-    background: #fff;
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 32px;
-  }
-
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-  }
-
-  .section-title {
-    font-size: 1.4rem;
-    letter-spacing: -0.01em;
-  }
-
-  .student-count {
-    font-size: 0.95rem;
-    color: var(--ink-soft);
-    background: var(--green-soft);
-    padding: 6px 12px;
-    border-radius: 20px;
-  }
-
-  .student-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .student-item {
-    display: flex;
-    align-items: center;
-    padding: 16px 20px;
-    background: var(--paper);
-    border: 1.5px solid var(--line);
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    position: relative;
-  }
-
-  .student-item:hover {
-    border-color: var(--red);
-    background: #f5e0e0;
-  }
-
-  .student-item:hover .student-name {
-    text-decoration: line-through;
-    color: var(--red);
-  }
-
-  .student-name {
-    font-size: 1rem;
-    font-weight: 500;
-    flex: 1;
-    transition: all 0.2s ease;
-  }
-
-  .student-status {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: var(--line);
-    margin-left: 12px;
-  }
-
-  .student-item.online .student-status {
-    background: var(--green);
-  }
-
-  .management-panel {
-    background: #fff;
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 32px;
-    display: none;
-  }
-
-  .management-panel.active {
-    display: block;
-  }
-
-  .control-group {
-    margin-bottom: 24px;
-  }
-
-  .control-label {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--ink-soft);
-    margin-bottom: 8px;
-    display: block;
-  }
-
-  .url-input {
-    width: 100%;
-    padding: 12px 16px;
-    border: 1.5px solid var(--line);
-    border-radius: 8px;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.98rem;
-    background: var(--paper);
-    color: var(--ink);
-    outline: none;
-    transition: border-color 0.15s ease, background 0.15s ease;
-  }
-  .url-input:focus {
-    border-color: var(--green);
-    background: #fff;
-  }
-
-  .control-actions {
-    display: flex;
-    gap: 12px;
   }
 
   .empty-state {
@@ -322,10 +525,17 @@
   }
 
   @media (max-width: 900px) {
-    .container {
+    .banner {
+      flex-direction: column;
+      text-align: center;
+    }
+    .banner-left, .banner-right {
+      align-items: center;
+    }
+    .live-container {
       flex-direction: column;
     }
-    .side-panel {
+    .left-column {
       width: 100%;
     }
   }
@@ -333,8 +543,11 @@
   @media (max-width: 780px) {
     nav { padding: 22px 24px; }
     .wrap { padding: 24px; }
-    .room-code-display {
-      font-size: 3rem;
+    .room-code-huge {
+      font-size: 3.5rem;
+    }
+    .student-grid {
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     }
   }
 </style>
@@ -347,51 +560,86 @@
 </nav>
 
 <div class="wrap">
-  <div class="container">
-    <div class="main-panel">
-      <div class="room-card">
-        <p class="room-label">Room Code</p>
-        <div class="room-code-display" id="roomCode">---</div>
+  <!-- Waiting Room State -->
+  <div class="waiting-room" id="waitingRoom">
+    <div class="banner">
+      <div class="banner-left">
+        <div class="qr-placeholder">
+          QR Code
+        </div>
+      </div>
+      <div class="banner-center">
+        <p class="banner-text">Go to classcastle.org and enter Room Code:</p>
+        <div class="room-code-huge" id="roomCode">---</div>
         <button class="btn btn-primary" id="startBtn">
           <span class="btn-text">Start</span>
         </button>
       </div>
-
-      <div class="students-section">
-        <div class="section-header">
-          <h2 class="section-title">Students</h2>
-          <span class="student-count" id="studentCount">0 joined</span>
-        </div>
-        <div class="student-list" id="studentList">
-          <div class="empty-state">
-            <h3>No students yet</h3>
-            <p>Share your room code with students. They'll appear here once they join with the Classcastle extension.</p>
-          </div>
+      <div class="banner-right">
+        <a class="copy-link" id="copyLink">Copy Join Link</a>
+        <div class="icon-row">
+          <button class="icon-btn" title="Fullscreen">⛶</button>
+          <button class="icon-btn" title="Mute">🔇</button>
         </div>
       </div>
     </div>
 
-    <div class="side-panel">
-      <div class="management-panel" id="managementPanel">
-        <h3 style="margin-bottom: 20px;">Room Controls</h3>
+    <div class="students-area">
+      <div class="students-area-header">
+        <h2 class="students-area-title">Students</h2>
+        <span class="student-count" id="studentCount">0 joined</span>
+      </div>
+      <div class="student-grid" id="studentList">
+        <div class="empty-state">
+          <h3>No students yet</h3>
+          <p>Share your room code with students. They'll appear here once they join with the Classcastle extension.</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        <div class="control-group">
-          <label class="control-label">Navigate Students</label>
-          <input type="url" class="url-input" id="urlInput" placeholder="Enter URL (e.g., https://microbit.org)">
-          <div class="control-actions" style="margin-top: 12px;">
-            <button class="btn btn-primary btn-small" id="goBtn" disabled>
-              <span class="btn-text">Go</span>
-              <span class="loading" style="display: none;"></span>
-            </button>
-          </div>
+  <!-- Live Session State -->
+  <div class="live-session" id="liveSession">
+    <div class="live-container">
+      <div class="left-column">
+        <div class="teacher-panel">
+          <div class="teacher-avatar">T</div>
+          <div class="teacher-name">Teacher</div>
+          <div class="teacher-label">Room Host</div>
         </div>
 
-        <div class="control-group">
-          <label class="control-label">Room Actions</label>
-          <div class="control-actions">
-            <button class="btn btn-secondary btn-small" id="closeRoomBtn">Close</button>
-            <button class="btn btn-secondary btn-small" id="reopenRoomBtn" style="display: none;">Reopen</button>
-            <button class="btn btn-danger btn-small" id="deleteRoomBtn">Delete</button>
+        <div class="members-strip">
+          <h3 class="members-title">Room Members</h3>
+          <div class="members-list" id="membersList">
+            <div class="empty-state" style="padding: 24px 12px;">
+              <p>No students yet</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-column">
+        <div class="management-panel" id="managementPanel">
+          <h3 style="margin-bottom: 24px; font-size: 1.4rem;">Room Controls</h3>
+
+          <div class="control-group">
+            <label class="control-label">Navigate Students</label>
+            <input type="url" class="url-input" id="urlInput" placeholder="Enter URL (e.g., https://microbit.org)">
+            <div class="control-actions" style="margin-top: 12px;">
+              <button class="btn btn-primary btn-small" id="goBtn" disabled>
+                <span class="btn-text">Go</span>
+                <span class="loading" style="display: none;"></span>
+              </button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">Room Actions</label>
+            <div class="control-actions">
+              <button class="btn btn-secondary btn-small" id="closeRoomBtn">Close</button>
+              <button class="btn btn-secondary btn-small" id="reopenRoomBtn" style="display: none;">Reopen</button>
+              <button class="btn btn-danger btn-small" id="deleteRoomBtn">Delete</button>
+            </div>
           </div>
         </div>
       </div>
@@ -428,12 +676,16 @@
   const startBtn = document.getElementById('startBtn');
   const managementPanel = document.getElementById('managementPanel');
   const studentList = document.getElementById('studentList');
+  const membersList = document.getElementById('membersList');
   const studentCount = document.getElementById('studentCount');
   const urlInput = document.getElementById('urlInput');
   const goBtn = document.getElementById('goBtn');
   const closeRoomBtn = document.getElementById('closeRoomBtn');
   const reopenRoomBtn = document.getElementById('reopenRoomBtn');
   const deleteRoomBtn = document.getElementById('deleteRoomBtn');
+  const waitingRoom = document.getElementById('waitingRoom');
+  const liveSession = document.getElementById('liveSession');
+  const copyLink = document.getElementById('copyLink');
 
   let currentRoom = null;
   let currentUser = null;
@@ -514,7 +766,7 @@
     }
   }
 
-  // Render students
+  // Render students (both views)
   function renderStudents() {
     if (students.length === 0) {
       studentList.innerHTML = `
@@ -523,21 +775,37 @@
           <p>Share your room code with students. They'll appear here once they join with the Classcastle extension.</p>
         </div>
       `;
+      membersList.innerHTML = `
+        <div class="empty-state" style="padding: 24px 12px;">
+          <p>No students yet</p>
+        </div>
+      `;
       studentCount.textContent = '0 joined';
       return;
     }
 
+    // Render waiting room grid
     studentList.innerHTML = students.map(student => `
-      <div class="student-item ${student.online ? 'online' : ''}" data-student-id="${student.id}" data-student-name="${student.name}">
-        <span class="student-name">${student.name}</span>
+      <div class="student-badge ${student.online ? 'online' : ''}" data-student-id="${student.id}" data-student-name="${student.name}">
+        <div class="student-avatar">${student.name.charAt(0).toUpperCase()}</div>
+        <div class="student-name">${student.name}</div>
         <div class="student-status"></div>
+      </div>
+    `).join('');
+
+    // Render live session list
+    membersList.innerHTML = students.map(student => `
+      <div class="member-item ${student.online ? 'online' : ''}" data-student-id="${student.id}" data-student-name="${student.name}">
+        <div class="member-avatar-small">${student.name.charAt(0).toUpperCase()}</div>
+        <span class="member-name">${student.name}</span>
+        <div class="member-status"></div>
       </div>
     `).join('');
 
     studentCount.textContent = `${students.length} joined`;
 
-    // Add click handlers for kicking
-    document.querySelectorAll('.student-item').forEach(item => {
+    // Add click handlers for kicking (both views)
+    document.querySelectorAll('.student-badge, .member-item').forEach(item => {
       item.addEventListener('click', () => {
         const studentId = item.dataset.studentId;
         const studentName = item.dataset.studentName;
@@ -546,10 +814,21 @@
     });
   }
 
+  // Copy join link
+  copyLink.addEventListener('click', () => {
+    const joinUrl = `https://classcastle.org/join.html?code=${currentRoom.code}`;
+    navigator.clipboard.writeText(joinUrl).then(() => {
+      showNotification('Join link copied!');
+    }).catch(() => {
+      showNotification('Failed to copy link');
+    });
+  });
+
   // Start room
   startBtn.addEventListener('click', () => {
     isStarted = true;
-    startBtn.style.display = 'none';
+    waitingRoom.classList.add('hidden');
+    liveSession.classList.add('active');
     managementPanel.classList.add('active');
   });
 
