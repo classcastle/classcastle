@@ -518,6 +518,15 @@
     if (savedSession) {
       try {
         const session = JSON.parse(savedSession);
+
+        // If we're coming from extension with a new room code, leave the previous room
+        if (fromExtension && prefillCode && prefillCode !== session.code) {
+          currentRoomId = session.roomId;
+          currentStudentId = session.studentId;
+          leavePreviousRoom();
+          return false;
+        }
+
         // Restore the session
         currentRoomId = session.roomId;
         currentStudentId = session.studentId;
@@ -733,6 +742,11 @@
       return;
     }
 
+    // Leave previous room if exists
+    if (currentRoomId && currentStudentId) {
+      await leavePreviousRoom();
+    }
+
     joinBtn.disabled = true;
     joinBtn.textContent = 'Joining…';
 
@@ -822,12 +836,22 @@
     }
   });
 
-  leaveBtn.addEventListener('click', async () => {
-    const code = currentCode();
-    const name = nameInput.value.trim();
-
+  // Function to leave previous room
+  async function leavePreviousRoom() {
     // Stop kick checking
     stopKickCheck();
+
+    // Try to delete student record from previous room
+    try {
+      if (currentRoomId && currentStudentId) {
+        await SupabaseClient
+          .from('students')
+          .delete()
+          .eq('id', currentStudentId);
+      }
+    } catch (error) {
+      console.error('Error leaving previous room:', error);
+    }
 
     // Clear state
     currentRoomId = null;
@@ -835,25 +859,13 @@
 
     // Clear localStorage
     localStorage.removeItem(STORAGE_KEY);
+  }
 
-    // Try to delete student record
-    try {
-      const { data: room } = await SupabaseClient
-        .from('rooms')
-        .select('id')
-        .eq('code', code)
-        .single();
+  leaveBtn.addEventListener('click', async () => {
+    const code = currentCode();
+    const name = nameInput.value.trim();
 
-      if (room) {
-        await SupabaseClient
-          .from('students')
-          .delete()
-          .eq('room_id', room.id)
-          .eq('name', name);
-      }
-    } catch (error) {
-      console.error('Error leaving room:', error);
-    }
+    await leavePreviousRoom();
 
     digits.forEach(d => d.value = '');
     nameInput.value = '';
