@@ -236,18 +236,17 @@
   </div>
 
   <script>
-    // Check for Stripe payment confirmation
+    // Check for Stripe Checkout Session ID
     const urlParams = new URLSearchParams(window.location.search);
-    const paymentIntent = urlParams.get('payment_intent');
-    const paymentIntentClientSecret = urlParams.get('payment_intent_client_secret');
+    const checkoutSessionId = urlParams.get('code');
 
-    if (paymentIntent && paymentIntentClientSecret) {
+    if (checkoutSessionId) {
       // In a real implementation, you would verify this with your backend
       // For now, we'll show the success page
       document.getElementById('loading').style.display = 'none';
       document.getElementById('content').style.display = 'block';
     } else {
-      // No payment confirmation parameters
+      // No checkout session ID
       document.getElementById('loading').style.display = 'none';
       document.getElementById('error').style.display = 'block';
     }
