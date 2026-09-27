@@ -221,25 +221,19 @@ async function handleAlarm() {
   }
 }
 
-// Navigate the active tab to a new URL and record it on the student row
+// Navigate to a new URL in a new tab and record it on the student row
 async function navigateToUrl(url, studentId) {
   if (!url) return;
 
   console.log('Navigating to URL:', url);
 
   try {
-    // Get the active tab in the current window
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    // Always open in a new tab
+    chrome.tabs.create({ url: url }, (tab) => {
+      console.log('Opened new tab:', tab.id, 'for URL:', url);
+    });
 
-    if (tab && tab.id !== undefined) {
-      console.log('Navigating tab:', tab.id, 'to:', url);
-      await chrome.tabs.update(tab.id, { url: url });
-    } else {
-      console.error('No active tab found to navigate');
-    }
-
-    // Update student's current_url in the database regardless of whether
-    // we found a tab, so the teacher's dashboard reflects the attempt
+    // Update student's current_url in the database
     await SupabaseClient
       .from('students')
       .update({

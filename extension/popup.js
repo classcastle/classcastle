@@ -139,18 +139,23 @@ function handleCancel() {
 
 // Handle leave room
 function handleLeave() {
-  // Leave room via background script
-  chrome.runtime.sendMessage({ action: 'leaveRoom' }, () => {
+  function resetForm() {
     showJoinForm();
     roomIdInput.value = '';
     studentNameInput.value = '';
-  }).catch(err => {
-    console.log('Failed to send leave message:', err);
-    // Fallback: clear storage directly
-    chrome.storage.local.remove(['roomId', 'studentId'], () => {
-      showJoinForm();
-      roomIdInput.value = '';
-      studentNameInput.value = '';
-    });
+  }
+
+  // Leave room via background script.
+  // Using a callback (not a Promise chain) here, since chrome.runtime.sendMessage
+  // returns undefined -- not a Promise -- whenever a callback is supplied.
+  // Errors are surfaced via chrome.runtime.lastError, not a rejected promise.
+  chrome.runtime.sendMessage({ action: 'leaveRoom' }, () => {
+    if (chrome.runtime.lastError) {
+      console.log('Failed to send leave message:', chrome.runtime.lastError.message);
+      // Fallback: clear storage directly
+      chrome.storage.local.remove(['roomId', 'studentId'], resetForm);
+      return;
+    }
+    resetForm();
   });
 }
