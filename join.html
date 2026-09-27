@@ -793,16 +793,21 @@
 
       // Send message to extension background script with actual IDs
       if (fromExtension && typeof chrome !== 'undefined' && chrome.runtime) {
-        try {
-          chrome.runtime.sendMessage({
-            action: 'studentJoined',
-            roomId: room.id,
-            studentId: studentData.id
-          }, (response) => {
-            console.log('Extension notified of join:', response);
-          });
-        } catch (e) {
-          console.log('Chrome runtime not available:', e);
+        const extensionId = new URLSearchParams(window.location.search).get('extension_id');
+        if (extensionId) {
+          try {
+            chrome.runtime.sendMessage(extensionId, {
+              action: 'studentJoined',
+              roomId: room.id,
+              studentId: studentData.id
+            }, (response) => {
+              console.log('Extension notified of join:', response);
+            });
+          } catch (e) {
+            console.log('Chrome runtime error:', e);
+          }
+        } else {
+          console.warn('No extension_id in URL, cannot notify extension');
         }
       }
 

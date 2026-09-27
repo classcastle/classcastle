@@ -6,11 +6,15 @@
   "permissions": [
     "storage",
     "tabs",
-    "activeTab"
+    "activeTab",
+    "alarms"
   ],
   "host_permissions": [
     "https://hduyofdbpspjcuwvackd.supabase.co/*"
   ],
+  "externally_connectable": {
+    "matches": ["https://classcastle.org/*"]
+  },
   "background": {
     "service_worker": "background.js"
   },

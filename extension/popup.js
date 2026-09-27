@@ -52,6 +52,9 @@ function checkStatus() {
   });
 }
 
+// Periodically check status (in case background script misses storage changes)
+setInterval(checkStatus, 2000);
+
 // Show join form
 function showJoinForm() {
   statusEl.classList.remove('active');
@@ -115,8 +118,11 @@ async function handleJoin() {
   hideError();
   showWaiting();
 
-  // Open join.html on classcastle.org with room code and student name
-  const joinUrl = `https://classcastle.org/join.html?code=${encodeURIComponent(roomId)}&name=${encodeURIComponent(studentName)}&from_extension=true`;
+  // Get extension ID
+  const extensionId = chrome.runtime.id;
+
+  // Open join.html on classcastle.org with room code, student name, and extension ID
+  const joinUrl = `https://classcastle.org/join.html?code=${encodeURIComponent(roomId)}&name=${encodeURIComponent(studentName)}&from_extension=true&extension_id=${encodeURIComponent(extensionId)}`;
 
   // Create a new tab instead of updating the existing one
   chrome.tabs.create({ url: joinUrl }, (tab) => {
