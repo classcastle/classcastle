@@ -61,10 +61,26 @@ CREATE POLICY "Teachers can delete their own rooms"
   USING (auth.uid() = teacher_id);
 
 -- Realtime publication for rooms
-ALTER PUBLICATION supabase_realtime ADD TABLE rooms;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'rooms'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE rooms;
+  END IF;
+END $$;
 
 -- Realtime publication for students
-ALTER PUBLICATION supabase_realtime ADD TABLE students;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'students'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE students;
+  END IF;
+END $$;
 
 -- RLS policies for students
 DROP POLICY IF EXISTS "Teachers can view students in their rooms" ON students;
