@@ -9,6 +9,12 @@ class Modal {
   }
 
   init() {
+    // Wait for DOM to be ready
+    if (!document.body) {
+      document.addEventListener('DOMContentLoaded', () => this.init());
+      return;
+    }
+
     // Create modal elements if they don't exist
     if (!document.getElementById('modal-overlay')) {
       const overlay = document.createElement('div');
@@ -71,6 +77,16 @@ class Modal {
   }
 
   show(options) {
+    // Ensure modal is initialized
+    if (!this.overlay || !this.modal) {
+      this.init();
+      // If still not initialized (DOM not ready), retry after DOMContentLoaded
+      if (!this.overlay || !this.modal) {
+        document.addEventListener('DOMContentLoaded', () => this.show(options));
+        return;
+      }
+    }
+
     const {
       title = 'Confirm',
       message = '',
@@ -162,13 +178,12 @@ class Modal {
   }
 }
 
-// Global instance - initialize after DOM is ready
+// Global instance - initialize lazily
 let modalInstance = null;
 
 function getModal() {
   if (!modalInstance) {
     modalInstance = new Modal();
-    modalInstance.init();
   }
   return modalInstance;
 }
