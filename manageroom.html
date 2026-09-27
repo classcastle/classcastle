@@ -87,11 +87,15 @@
     align-items: center;
     justify-content: center;
     gap: 40px;
+    text-align: center;
   }
 
   .banner-center {
     flex: 1;
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
 
   .banner-text {
@@ -147,12 +151,18 @@
   }
 
   .btn-primary {
-    background: #fff;
-    color: var(--green);
+    background: var(--green);
+    color: #fff;
   }
   .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 24px rgba(47, 82, 51, 0.3);
+  }
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
 
   .students-area {
@@ -663,6 +673,7 @@
   const waitingRoom = document.getElementById('waitingRoom');
   const liveSession = document.getElementById('liveSession');
   const fullscreenBtn = document.getElementById('fullscreenBtn');
+  const wrap = document.querySelector('.wrap');
 
   let currentRoom = null;
   let currentUser = null;
@@ -794,6 +805,7 @@
   // Fullscreen
   fullscreenBtn.addEventListener('click', () => {
     const nav = document.querySelector('nav');
+    const wrap = document.querySelector('.wrap');
 
     if (document.documentElement.requestFullscreen) {
       document.documentElement.requestFullscreen();
@@ -803,15 +815,19 @@
       document.documentElement.msRequestFullscreen();
     }
 
-    // Hide nav after entering fullscreen
+    // Hide nav and center content in fullscreen
     setTimeout(() => {
       nav.style.display = 'none';
+      wrap.style.maxWidth = '100%';
+      wrap.style.padding = '0 32px';
     }, 100);
 
     // Exit fullscreen handler
     const exitHandler = () => {
       if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
         nav.style.display = 'flex';
+        wrap.style.maxWidth = '1080px';
+        wrap.style.padding = '0 32px';
         document.removeEventListener('fullscreenchange', exitHandler);
         document.removeEventListener('webkitfullscreenchange', exitHandler);
         document.removeEventListener('msfullscreenchange', exitHandler);
@@ -825,6 +841,17 @@
 
   // Start room
   startBtn.addEventListener('click', () => {
+    // Exit fullscreen if in fullscreen mode
+    if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+    }
+
     isStarted = true;
     waitingRoom.classList.add('hidden');
     liveSession.classList.add('active');
