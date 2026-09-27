@@ -6,7 +6,6 @@ class Modal {
     this.modal = null;
     this.onConfirm = null;
     this.onCancel = null;
-    this.init();
   }
 
   init() {
@@ -163,12 +162,21 @@ class Modal {
   }
 }
 
-// Global instance
-const modal = new Modal();
+// Global instance - initialize after DOM is ready
+let modalInstance = null;
+
+function getModal() {
+  if (!modalInstance) {
+    modalInstance = new Modal();
+    modalInstance.init();
+  }
+  return modalInstance;
+}
 
 // Convenience function
 function showConfirm(options) {
   return new Promise((resolve) => {
+    const modal = getModal();
     modal.show({
       ...options,
       onConfirm: () => resolve(true),
@@ -179,6 +187,7 @@ function showConfirm(options) {
 
 function showAlert(options) {
   return new Promise((resolve) => {
+    const modal = getModal();
     modal.show({
       ...options,
       showCancel: false,
