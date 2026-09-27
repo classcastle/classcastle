@@ -1255,8 +1255,13 @@
   });
 
   goBtn.addEventListener('click', async () => {
-    const url = urlInput.value.trim();
+    let url = urlInput.value.trim();
     if (!url) return;
+
+    // Add https:// if no protocol is specified
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
+    }
 
     const btnText = goBtn.querySelector('.btn-text');
     const loading = goBtn.querySelector('.loading');
