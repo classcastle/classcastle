@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/modal.js"></script>
 <style>
   :root {
     --paper: #F7F6F1;
@@ -211,17 +212,6 @@
   }
   .name-field input:focus { border-color: var(--green); background: #fff; }
 
-  #messageArea {
-    max-height: 200px;
-    overflow-y: auto;
-    text-align: left;
-    margin-top: 24px;
-    padding: 0;
-  }
-  #messageArea:empty {
-    display: none;
-  }
-
   .btn-join {
     margin-top: 26px;
     width: 100%;
@@ -334,7 +324,6 @@
       </div>
       <h1 id="joinedTitle">You're in the room</h1>
       <p class="sub" id="joinedSub">Sit tight — your teacher controls where this browser goes next.</p>
-      <div id="messageArea"></div>
       <button class="btn-join" id="leaveBtn" style="margin-top:26px; background: var(--paper); color: var(--ink); border: 1.5px solid var(--line);">Leave room</button>
     </div>
 
@@ -408,8 +397,8 @@
         formState.classList.add('hide');
         joinedState.classList.add('show');
 
-        // Start message polling
-        startMessagePolling();
+        // Start kick checking
+        startKickCheck();
 
         return true;
       } catch (error) {
@@ -664,9 +653,6 @@
         name: name
       }));
 
-      // Start polling for messages
-      startMessagePolling();
-
       // Notify extension that student joined (if running in extension context)
       if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
         try {
@@ -680,6 +666,9 @@
           console.log('Not in extension context, skipping extension notification');
         }
       }
+
+      // Start kick checking
+      startKickCheck();
     } catch (error) {
       console.error('Error joining room:', error);
       statusLine.textContent = 'Error joining room. Please try again.';
@@ -693,8 +682,8 @@
     const code = currentCode();
     const name = nameInput.value.trim();
 
-    // Stop message polling
-    stopMessagePolling();
+    // Stop kick checking
+    stopKickCheck();
 
     // Clear state
     currentRoomId = null;
@@ -734,10 +723,11 @@
     goToStep(0);
   });
 
-  function startMessagePolling() {
+  // Start kick checking (polling for if student was removed)
+  function startKickCheck() {
     if (messageInterval) clearInterval(messageInterval);
 
-    // Poll for messages every 3 seconds
+    // Poll for kick status every 3 seconds
     messageInterval = setInterval(async () => {
       if (!currentRoomId || !currentStudentId) return;
 
@@ -751,71 +741,32 @@
 
         if (studentError || !student) {
           // Student was kicked, clear session and show join form
-          stopMessagePolling();
+          stopKickCheck();
           localStorage.removeItem(STORAGE_KEY);
           currentRoomId = null;
           currentStudentId = null;
 
-          alert('You have been removed from the room by your teacher.');
-          joinedState.classList.remove('show');
-          formState.classList.remove('hide');
-          goToStep(0);
+          showAlert({
+            title: 'Removed from Room',
+            message: 'You have been removed from the room by your teacher.'
+          }).then(() => {
+            joinedState.classList.remove('show');
+            formState.classList.remove('hide');
+            goToStep(0);
+          });
           return;
         }
-
-        // Skip message polling if messages table doesn't exist
-        // This prevents errors when schema hasn't been updated
-        try {
-          const { data: messages, error } = await SupabaseClient
-            .from('messages')
-            .select('*')
-            .eq('room_id', currentRoomId)
-            .eq('student_id', currentStudentId)
-            .order('created_at', { ascending: false })
-            .limit(10);
-
-          if (error) {
-            // Table doesn't exist or other error, just skip polling
-            console.log('Message polling skipped:', error.message);
-            return;
-          }
-
-          if (messages && messages.length > 0) {
-            displayMessages(messages);
-          }
-        } catch (err) {
-          // Ignore message polling errors
-          console.log('Message polling error:', err.message);
-        }
       } catch (error) {
-        console.error('Error polling messages:', error);
+        console.error('Error checking kick status:', error);
       }
     }, 3000);
   }
 
-  function stopMessagePolling() {
+  function stopKickCheck() {
     if (messageInterval) {
       clearInterval(messageInterval);
       messageInterval = null;
     }
-  }
-
-  function displayMessages(messages) {
-    const messageArea = document.getElementById('messageArea');
-    if (!messageArea) return;
-
-    if (messages.length === 0) {
-      messageArea.innerHTML = '';
-      return;
-    }
-
-    messageArea.innerHTML = messages.map(msg => `
-      <div style="background: var(--green-soft); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 3px solid var(--green);">
-        <div style="font-weight: 500; font-size: 0.9rem; margin-bottom: 4px;">${msg.sender_name}</div>
-        <div style="font-size: 0.85rem; color: var(--ink);">${msg.message}</div>
-        <div style="font-size: 0.75rem; color: var(--ink-soft); margin-top: 4px;">${new Date(msg.created_at).toLocaleTimeString()}</div>
-      </div>
-    `).join('');
   }
 
   // Check for existing session on page load

@@ -23,25 +23,12 @@ CREATE TABLE IF NOT EXISTS students (
   last_seen TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create messages table
-CREATE TABLE IF NOT EXISTS messages (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  room_id UUID REFERENCES rooms(id) ON DELETE CASCADE,
-  student_id UUID REFERENCES students(id) ON DELETE CASCADE,
-  sender_name TEXT NOT NULL,
-  message TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_rooms_teacher_id ON rooms(teacher_id);
 CREATE INDEX IF NOT EXISTS idx_rooms_code ON rooms(code);
 CREATE INDEX IF NOT EXISTS idx_rooms_active ON rooms(active);
 CREATE INDEX IF NOT EXISTS idx_students_room_id ON students(room_id);
 CREATE INDEX IF NOT EXISTS idx_students_online ON students(online);
-CREATE INDEX IF NOT EXISTS idx_messages_room_id ON messages(room_id);
-CREATE INDEX IF NOT EXISTS idx_messages_student_id ON messages(student_id);
-CREATE INDEX IF NOT EXISTS idx_messages_created_at ON messages(created_at);
 
 -- Enable Row Level Security
 ALTER TABLE rooms ENABLE ROW LEVEL SECURITY;
@@ -134,36 +121,6 @@ CREATE POLICY "Teachers can delete students in their rooms"
       AND rooms.teacher_id = auth.uid()
     )
   );
-
--- RLS policies for messages
-ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "Teachers can view messages in their rooms" ON messages;
-CREATE POLICY "Teachers can view messages in their rooms"
-  ON messages FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM rooms
-      WHERE rooms.id = messages.room_id
-      AND rooms.teacher_id = auth.uid()
-    )
-  );
-
-DROP POLICY IF EXISTS "Teachers can insert messages in their rooms" ON messages;
-CREATE POLICY "Teachers can insert messages in their rooms"
-  ON messages FOR INSERT
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM rooms
-      WHERE rooms.id = messages.room_id
-      AND rooms.teacher_id = auth.uid()
-    )
-  );
-
-DROP POLICY IF EXISTS "Students can view messages for themselves" ON messages;
-CREATE POLICY "Students can view messages for themselves"
-  ON messages FOR SELECT
-  USING (true);
 
 -- Function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
