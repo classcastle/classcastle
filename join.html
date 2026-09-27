@@ -791,7 +791,7 @@
         name: name
       }));
 
-      // Send message to extension background script
+      // Send message to extension background script with actual IDs
       if (fromExtension && typeof chrome !== 'undefined' && chrome.runtime) {
         try {
           chrome.runtime.sendMessage({

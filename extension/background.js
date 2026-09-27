@@ -39,6 +39,8 @@ setInterval(() => {
       chrome.runtime.sendMessage({
         action: 'statusUpdate',
         joined: true
+      }).catch(err => {
+        console.log('Failed to notify popup (popup may be closed):', err);
       });
     } else if (!isJoined && wasJoined) {
       // Just left
@@ -60,6 +62,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     chrome.runtime.sendMessage({
       action: 'statusUpdate',
       joined: true
+    }).catch(err => {
+      console.log('Failed to notify popup (popup may be closed):', err);
     });
     sendResponse({ success: true });
   } else if (request.action === 'leaveRoom') {
@@ -68,6 +72,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     chrome.runtime.sendMessage({
       action: 'statusUpdate',
       joined: false
+    }).catch(err => {
+      console.log('Failed to notify popup (popup may be closed):', err);
     });
   } else if (request.action === 'getStatus') {
     sendResponse({

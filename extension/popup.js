@@ -115,14 +115,6 @@ async function handleJoin() {
   hideError();
   showWaiting();
 
-  // Save to chrome.storage.local before opening join.html
-  chrome.storage.local.set({
-    roomId: roomId,
-    studentName: studentName
-  }, () => {
-    console.log('Saved room info to storage before opening join.html');
-  });
-
   // Open join.html on classcastle.org with room code and student name
   const joinUrl = `https://classcastle.org/join.html?code=${encodeURIComponent(roomId)}&name=${encodeURIComponent(studentName)}&from_extension=true`;
 
@@ -146,5 +138,13 @@ function handleLeave() {
     showJoinForm();
     roomIdInput.value = '';
     studentNameInput.value = '';
+  }).catch(err => {
+    console.log('Failed to send leave message:', err);
+    // Fallback: clear storage directly
+    chrome.storage.local.remove(['roomId', 'studentId'], () => {
+      showJoinForm();
+      roomIdInput.value = '';
+      studentNameInput.value = '';
+    });
   });
 }
