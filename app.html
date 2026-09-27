@@ -9,7 +9,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/assets/icons/lucide.min.js"></script>
 <style>
   :root {
     --paper: #F7F6F1;
@@ -819,7 +818,7 @@
     flex-shrink: 0;
   }
 
-  .activity-icon i {
+  .activity-icon svg {
     width: 20px;
     height: 20px;
   }
@@ -942,15 +941,10 @@
     font-size: 0.9rem;
   }
 
-  .nav-item i {
+  .nav-item svg {
     width: 20px;
     height: 20px;
     margin-right: 12px;
-    display: inline-block;
-    vertical-align: middle;
-  }
-
-  i[data-lucide] {
     display: inline-block;
     vertical-align: middle;
   }
@@ -974,7 +968,7 @@
     color: var(--ink);
   }
 
-  .back-button i {
+  .back-button svg {
     width: 20px;
     height: 20px;
   }
@@ -1059,46 +1053,46 @@
     </div>
     <nav class="sidebar-nav">
       <a class="nav-item active" data-page="dashboard" href="#">
-        <i data-lucide="layout-grid"></i>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
         Dashboard
       </a>
       <a class="nav-item" data-page="templates" href="#">
-        <i data-lucide="file-text"></i>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
         Templates
       </a>
       <a class="nav-item" data-page="shortcuts" href="#">
-        <i data-lucide="link"></i>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 7a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
         Shortcuts
       </a>
       <a class="nav-item" data-page="analytics" href="#">
-        <i data-lucide="bar-chart-3"></i>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="4" y2="20"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
         Analytics
       </a>
       <a class="nav-item" data-page="activity" href="#">
-        <i data-lucide="clock"></i>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         Activity Log
       </a>
       <div class="nav-divider"></div>
       <div class="nav-section nav-section-admin">
         <a class="nav-item nav-item-parent" data-parent="admin" href="#">
-          <i data-lucide="settings"></i>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
           <span>Admin</span>
-          <i data-lucide="chevron-down" class="nav-chevron"></i>
+          <svg class="nav-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </a>
         <div class="nav-submenu" id="adminSubmenu">
           <a class="nav-item nav-item-sub" data-page="deployment" href="#">
-            <i data-lucide="server"></i>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="8" x="4" y="2" rx="1"/><rect width="16" height="8" x="4" y="14" rx="1"/><line x1="8" x2="8" y1="6" y2="6"/><line x1="8" x2="8" y1="18" y2="18"/></svg>
             IT Deployment
           </a>
           <a class="nav-item nav-item-sub" data-page="pricing" href="#">
-            <i data-lucide="dollar-sign"></i>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
             Pricing
           </a>
         </div>
       </div>
       <div class="nav-divider"></div>
       <a class="nav-item" data-page="settings" href="#">
-        <i data-lucide="user"></i>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         Settings
       </a>
     </nav>
@@ -1115,7 +1109,7 @@
   </aside>
 
   <button class="mobile-menu-btn" id="mobileMenuBtn">
-    <i data-lucide="menu"></i>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
   </button>
 
   <div class="mobile-overlay" id="mobileOverlay"></div>
@@ -1172,7 +1166,7 @@
     <div class="page" id="deploymentPage">
       <div class="page-header page-header-with-back">
         <button class="back-button" id="backToDashboard">
-          <i data-lucide="arrow-left"></i>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
           Back
         </button>
         <div>
@@ -1330,7 +1324,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
     <div class="page" id="pricingPage">
       <div class="page-header page-header-with-back">
         <button class="back-button" id="backToDashboardFromPricing">
-          <i data-lucide="arrow-left"></i>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
           Back
         </button>
         <div>
@@ -1615,7 +1609,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
           <button class="btn btn-primary" id="createFirstRoomBtn" style="margin-top: 16px;">Create room</button>
         </div>
       `;
-      lucide.createIcons();
       return;
     }
 
@@ -2084,7 +2077,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
           <p>Create templates to quickly set up new rooms.</p>
         </div>
       `;
-      lucide.createIcons();
       return;
     }
 
@@ -2103,7 +2095,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
         </div>
       </div>
     `).join('');
-    lucide.createIcons();
   }
 
   async function createTemplate() {
@@ -2209,7 +2200,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
           <p>Add frequently used URLs for quick access.</p>
         </div>
       `;
-      lucide.createIcons();
       return;
     }
 
@@ -2228,7 +2218,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
         </div>
       </div>
     `).join('');
-    lucide.createIcons();
   }
 
   async function createShortcut() {
@@ -2350,7 +2339,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
           </div>
         `).join('');
       }
-      lucide.createIcons();
     } catch (error) {
       console.error('Error loading analytics:', error);
     }
@@ -2383,7 +2371,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
           <p>Your activity will appear here.</p>
         </div>
       `;
-      lucide.createIcons();
       return;
     }
 
@@ -2392,7 +2379,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       return `
         <div class="activity-item">
           <div class="activity-icon">
-            <i data-lucide="clock"></i>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
           <div class="activity-content">
             <div class="activity-action">${formatActivityAction(activity.action)}</div>
@@ -2402,7 +2389,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
         </div>
       `;
     }).join('');
-    lucide.createIcons();
   }
 
   function formatActivityAction(action) {
@@ -2662,9 +2648,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       window.location.href = '/login.html';
     }
   });
-
-  // Initialize Lucide icons
-  lucide.createIcons();
 </script>
 
 </body>
