@@ -58,6 +58,7 @@
     display: flex; align-items: center; justify-content: space-between;
     padding: 20px 32px;
     max-width: 1080px; margin: 0 auto;
+    transition: display 0.2s ease;
   }
   .wordmark { font-family: 'Fraunces', serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; display: flex; align-items: center; gap: 9px; }
   .logo-mark { width: 24px; height: 24px; display: block; }
@@ -84,24 +85,8 @@
     margin-bottom: 24px;
     display: flex;
     align-items: center;
-    gap: 40px;
-  }
-
-  .banner-left {
-    flex-shrink: 0;
-  }
-
-  .qr-placeholder {
-    width: 120px;
-    height: 120px;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
     justify-content: center;
-    color: var(--green);
-    font-size: 0.85rem;
-    font-weight: 500;
+    gap: 40px;
   }
 
   .banner-center {
@@ -127,36 +112,20 @@
 
   .banner-right {
     flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .copy-link {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 0.9rem;
-    font-weight: 500;
-    text-decoration: underline;
-    cursor: pointer;
-  }
-
-  .icon-row {
-    display: flex;
-    gap: 12px;
   }
 
   .icon-btn {
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
     background: rgba(255, 255, 255, 0.2);
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: background 0.2s ease;
+    font-size: 1.5rem;
   }
   .icon-btn:hover {
     background: rgba(255, 255, 255, 0.3);
@@ -573,13 +542,8 @@
   <!-- Waiting Room State -->
   <div class="waiting-room" id="waitingRoom">
     <div class="banner">
-      <div class="banner-left">
-        <div class="qr-placeholder">
-          QR Code
-        </div>
-      </div>
       <div class="banner-center">
-        <p class="banner-text">Go to classcastle.org and enter Room Code:</p>
+        <p class="banner-text">Click on the extension and enter Room Code:</p>
         <div class="room-code-huge" id="roomCode">
           <div class="loading-large"></div>
         </div>
@@ -588,11 +552,11 @@
         </button>
       </div>
       <div class="banner-right">
-        <a class="copy-link" id="copyLink">Copy Join Link</a>
-        <div class="icon-row">
-          <button class="icon-btn" title="Fullscreen">⛶</button>
-          <button class="icon-btn" title="Mute">🔇</button>
-        </div>
+        <button class="icon-btn" id="fullscreenBtn" title="Fullscreen">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+          </svg>
+        </button>
       </div>
     </div>
 
@@ -697,7 +661,7 @@
   const deleteRoomBtn = document.getElementById('deleteRoomBtn');
   const waitingRoom = document.getElementById('waitingRoom');
   const liveSession = document.getElementById('liveSession');
-  const copyLink = document.getElementById('copyLink');
+  const fullscreenBtn = document.getElementById('fullscreenBtn');
 
   let currentRoom = null;
   let currentUser = null;
@@ -826,14 +790,36 @@
     });
   }
 
-  // Copy join link
-  copyLink.addEventListener('click', () => {
-    const joinUrl = `https://classcastle.org/join.html?code=${currentRoom.code}`;
-    navigator.clipboard.writeText(joinUrl).then(() => {
-      showNotification('Join link copied!');
-    }).catch(() => {
-      showNotification('Failed to copy link');
-    });
+  // Fullscreen
+  fullscreenBtn.addEventListener('click', () => {
+    const nav = document.querySelector('nav');
+
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen();
+    } else if (document.documentElement.webkitRequestFullscreen) {
+      document.documentElement.webkitRequestFullscreen();
+    } else if (document.documentElement.msRequestFullscreen) {
+      document.documentElement.msRequestFullscreen();
+    }
+
+    // Hide nav after entering fullscreen
+    setTimeout(() => {
+      nav.style.display = 'none';
+    }, 100);
+
+    // Exit fullscreen handler
+    const exitHandler = () => {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+        nav.style.display = 'flex';
+        document.removeEventListener('fullscreenchange', exitHandler);
+        document.removeEventListener('webkitfullscreenchange', exitHandler);
+        document.removeEventListener('msfullscreenchange', exitHandler);
+      }
+    };
+
+    document.addEventListener('fullscreenchange', exitHandler);
+    document.addEventListener('webkitfullscreenchange', exitHandler);
+    document.addEventListener('msfullscreenchange', exitHandler);
   });
 
   // Start room
