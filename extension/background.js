@@ -104,6 +104,31 @@ async function joinRoom(roomId, studentId) {
   subscribeToRoom(roomId, studentId);
 }
 
+// Handle being kicked by the teacher: unsubscribe, stop polling, clear
+// session storage, and tell any open popup so it can show the join form
+// with an explanation instead of silently sitting in the "joined" state.
+async function handleKicked() {
+  const data = await getStorageData();
+
+  if (data.roomId && data.studentId) {
+    unsubscribeFromRoom(data.roomId, data.studentId);
+  }
+
+  chrome.alarms.clear(ALARM_NAME);
+
+  await saveStorageData({
+    roomId: null,
+    studentId: null,
+    currentTargetUrl: null
+  });
+
+  chrome.runtime.sendMessage({
+    action: 'kicked'
+  }).catch(err => {
+    console.log('Failed to notify popup of kick (popup may be closed):', err);
+  });
+}
+
 // Leave the current room
 async function leaveRoom() {
   // Unsubscribe from room
@@ -156,6 +181,16 @@ function subscribeToRoom(roomId, studentId) {
         }
       }
     })
+    .on('postgres_changes', {
+      event: 'DELETE',
+      schema: 'public',
+      table: 'students',
+      filter: `id=eq.${studentId}`
+    }, (payload) => {
+      // Teacher removed this student's row -- treat as a kick
+      console.log('Student row deleted (kicked):', payload);
+      handleKicked();
+    })
     .subscribe((status) => {
       console.log('Subscription status:', status);
       if (status === 'SUBSCRIBED') {
@@ -189,6 +224,23 @@ async function handleAlarm() {
   }
 
   console.log('Alarm fired, checking for changes:', data);
+
+  // Check whether this student's row still exists (teacher may have kicked them)
+  try {
+    const { data: student, error: studentError } = await SupabaseClient
+      .from('students')
+      .select('id')
+      .eq('id', data.studentId)
+      .single();
+
+    if (studentError || !student) {
+      console.log('Student row missing, treating as kicked');
+      await handleKicked();
+      return;
+    }
+  } catch (error) {
+    console.error('Error checking kick status:', error);
+  }
 
   // Poll for URL changes
   try {

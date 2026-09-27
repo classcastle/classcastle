@@ -28,6 +28,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     } else {
       showJoinForm();
     }
+  } else if (request.action === 'kicked') {
+    roomIdInput.value = '';
+    studentNameInput.value = '';
+    showJoinForm();
+    showError('You were removed from the room by your teacher.');
   }
   return true;
 });
