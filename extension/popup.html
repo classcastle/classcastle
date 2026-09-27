@@ -44,30 +44,48 @@
 
     .status {
       background: #E7EDE4;
-      padding: 12px;
-      border-radius: 8px;
+      padding: 20px;
+      border-radius: 12px;
       margin-bottom: 20px;
       display: none;
+      text-align: center;
     }
 
     .status.active {
       display: block;
     }
 
+    .status-icon {
+      width: 48px;
+      height: 48px;
+      background: #2F5233;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+    }
+
+    .status-icon svg {
+      width: 28px;
+      height: 28px;
+      color: white;
+    }
+
     .status h2 {
-      font-size: 0.9rem;
+      font-size: 1.1rem;
       font-weight: 600;
       margin-bottom: 4px;
       color: #2F5233;
     }
 
     .status p {
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       color: #6B6A61;
     }
 
     .status button {
-      margin-top: 12px;
+      margin-top: 16px;
     }
 
     .form {
@@ -217,9 +235,14 @@
     </div>
 
     <div class="status" id="status">
-      <h2>✓ Connected to Room</h2>
+      <div class="status-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+      <h2>You're in!</h2>
       <p>Your browser is being managed by your teacher</p>
-      <button class="btn btn-secondary" id="leaveBtn" style="margin-top: 12px;">Leave Room</button>
+      <button class="btn btn-secondary" id="leaveBtn">Leave Room</button>
     </div>
 
     <div class="form" id="joinForm">
@@ -238,12 +261,12 @@
       <button class="btn btn-primary" id="joinBtn">Join Room</button>
     </div>
 
-    <div class="loading" id="loading">
+    <div class="loading" id="joiningLoading">
       <div class="spinner"></div>
       <p>Joining room...</p>
     </div>
 
-    <div class="loading" id="loading">
+    <div class="loading" id="waitingLoading">
       <div class="spinner"></div>
       <h2>Please wait a moment...</h2>
       <p>Continue in the opened window.</p>

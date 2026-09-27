@@ -6,7 +6,8 @@ const studentNameInput = document.getElementById('studentName');
 const joinBtn = document.getElementById('joinBtn');
 const leaveBtn = document.getElementById('leaveBtn');
 const errorEl = document.getElementById('error');
-const loadingEl = document.getElementById('loading');
+const joiningLoadingEl = document.getElementById('joiningLoading');
+const waitingLoadingEl = document.getElementById('waitingLoading');
 const cancelBtn = document.getElementById('cancelBtn');
 
 // Load Supabase
@@ -34,6 +35,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 // Event listeners
 joinBtn.addEventListener('click', handleJoin);
 cancelBtn.addEventListener('click', handleCancel);
+leaveBtn.addEventListener('click', handleLeave);
 
 // Check current extension status
 function checkStatus() {
@@ -59,19 +61,24 @@ function showJoinedState() {
   statusEl.classList.add('active');
   joinForm.classList.add('hidden');
   leaveBtn.style.display = 'block';
-  // Re-attach event listener to ensure it works
-  leaveBtn.onclick = handleLeave;
 }
 
 // Show loading state
 function showLoading() {
-  loadingEl.classList.add('show');
+  joiningLoadingEl.classList.add('show');
+  joinForm.classList.add('hidden');
+}
+
+// Show waiting state
+function showWaiting() {
+  waitingLoadingEl.classList.add('show');
   joinForm.classList.add('hidden');
 }
 
 // Hide loading state
 function hideLoading() {
-  loadingEl.classList.remove('show');
+  joiningLoadingEl.classList.remove('show');
+  waitingLoadingEl.classList.remove('show');
 }
 
 // Show error
@@ -102,7 +109,7 @@ async function handleJoin() {
   }
 
   hideError();
-  showLoading();
+  showWaiting();
 
   // Open join.html on classcastle.org with room code and student name
   const joinUrl = `https://classcastle.org/join.html?code=${encodeURIComponent(roomId)}&name=${encodeURIComponent(studentName)}&from_extension=true`;
