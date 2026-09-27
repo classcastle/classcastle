@@ -55,6 +55,18 @@
       display: block;
     }
 
+    .status.kicked {
+      background: #f5e0e0;
+    }
+
+    .status.kicked .status-icon {
+      background: #B23A2E;
+    }
+
+    .status.kicked h2 {
+      color: #B23A2E;
+    }
+
     .status-icon {
       width: 48px;
       height: 48px;
@@ -235,13 +247,17 @@
     </div>
 
     <div class="status" id="status">
-      <div class="status-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <div class="status-icon" id="statusIcon">
+        <svg id="checkIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
+        <svg id="kickedIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
       </div>
-      <h2>You're in!</h2>
-      <p>Your browser is being managed by your teacher</p>
+      <h2 id="statusTitle">You're in!</h2>
+      <p id="statusMessage">Your browser is being managed by your teacher</p>
       <button class="btn btn-secondary" id="leaveBtn">Leave Room</button>
     </div>
 

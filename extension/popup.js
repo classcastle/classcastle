@@ -1,5 +1,10 @@
 // DOM elements
 const statusEl = document.getElementById('status');
+const statusIcon = document.getElementById('statusIcon');
+const checkIcon = document.getElementById('checkIcon');
+const kickedIcon = document.getElementById('kickedIcon');
+const statusTitle = document.getElementById('statusTitle');
+const statusMessage = document.getElementById('statusMessage');
 const joinForm = document.getElementById('joinForm');
 const roomIdInput = document.getElementById('roomId');
 const studentNameInput = document.getElementById('studentName');
@@ -29,10 +34,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       showJoinForm();
     }
   } else if (request.action === 'kicked') {
-    roomIdInput.value = '';
-    studentNameInput.value = '';
-    showJoinForm();
-    showError('You were removed from the room by your teacher.');
+    showKickedState();
   }
   return true;
 });
@@ -62,17 +64,36 @@ setInterval(checkStatus, 2000);
 
 // Show join form
 function showJoinForm() {
-  statusEl.classList.remove('active');
+  statusEl.classList.remove('active', 'kicked');
   joinForm.classList.remove('hidden');
   joinBtn.style.display = 'block';
   leaveBtn.style.display = 'none';
+  hideError();
 }
 
 // Show joined state
 function showJoinedState() {
+  statusEl.classList.remove('kicked');
   statusEl.classList.add('active');
-  joinForm.classList.add('hidden');
+  checkIcon.style.display = 'block';
+  kickedIcon.style.display = 'none';
+  statusTitle.textContent = "You're in!";
+  statusMessage.textContent = 'Your browser is being managed by your teacher';
   leaveBtn.style.display = 'block';
+  joinForm.classList.add('hidden');
+}
+
+// Show kicked state
+function showKickedState() {
+  statusEl.classList.add('active', 'kicked');
+  checkIcon.style.display = 'none';
+  kickedIcon.style.display = 'block';
+  statusTitle.textContent = 'You were removed';
+  statusMessage.textContent = 'Your teacher removed you from the room';
+  leaveBtn.style.display = 'none';
+  joinForm.classList.add('hidden');
+  roomIdInput.value = '';
+  studentNameInput.value = '';
 }
 
 // Show loading state

@@ -15,8 +15,12 @@ const ALARM_INTERVAL_MINUTES = 0.33; // ~20 seconds
 const STORAGE_KEYS = {
   roomId: 'roomId',
   studentId: 'studentId',
-  currentTargetUrl: 'currentTargetUrl'
+  currentTargetUrl: 'currentTargetUrl',
+  joinedAt: 'joinedAt'
 };
+
+// Constants
+const KICK_GRACE_PERIOD_MS = 60000; // 1 minute grace period for joins
 
 // Listen for messages from popup and content scripts
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -94,7 +98,8 @@ async function joinRoom(roomId, studentId) {
   await saveStorageData({
     roomId: roomId,
     studentId: studentId,
-    currentTargetUrl: null
+    currentTargetUrl: null,
+    joinedAt: Date.now()
   });
 
   // Start alarm-based polling
@@ -119,7 +124,8 @@ async function handleKicked() {
   await saveStorageData({
     roomId: null,
     studentId: null,
-    currentTargetUrl: null
+    currentTargetUrl: null,
+    joinedAt: null
   });
 
   chrome.runtime.sendMessage({
@@ -144,7 +150,8 @@ async function leaveRoom() {
   await saveStorageData({
     roomId: null,
     studentId: null,
-    currentTargetUrl: null
+    currentTargetUrl: null,
+    joinedAt: null
   });
 }
 
@@ -226,20 +233,26 @@ async function handleAlarm() {
   console.log('Alarm fired, checking for changes:', data);
 
   // Check whether this student's row still exists (teacher may have kicked them)
-  try {
-    const { data: student, error: studentError } = await SupabaseClient
-      .from('students')
-      .select('id')
-      .eq('id', data.studentId)
-      .single();
+  // But only after a grace period to avoid race conditions during join
+  const timeSinceJoin = data.joinedAt ? Date.now() - data.joinedAt : Infinity;
+  if (timeSinceJoin > KICK_GRACE_PERIOD_MS) {
+    try {
+      const { data: student, error: studentError } = await SupabaseClient
+        .from('students')
+        .select('id')
+        .eq('id', data.studentId)
+        .single();
 
-    if (studentError || !student) {
-      console.log('Student row missing, treating as kicked');
-      await handleKicked();
-      return;
+      if (studentError || !student) {
+        console.log('Student row missing, treating as kicked');
+        await handleKicked();
+        return;
+      }
+    } catch (error) {
+      console.error('Error checking kick status:', error);
     }
-  } catch (error) {
-    console.error('Error checking kick status:', error);
+  } else {
+    console.log('Within grace period, skipping kick check');
   }
 
   // Poll for URL changes
