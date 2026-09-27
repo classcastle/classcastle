@@ -63,6 +63,9 @@ CREATE POLICY "Teachers can delete their own rooms"
 -- Realtime publication for rooms
 ALTER PUBLICATION supabase_realtime ADD TABLE rooms;
 
+-- Realtime publication for students
+ALTER PUBLICATION supabase_realtime ADD TABLE students;
+
 -- RLS policies for students
 DROP POLICY IF EXISTS "Teachers can view students in their rooms" ON students;
 CREATE POLICY "Teachers can view students in their rooms"

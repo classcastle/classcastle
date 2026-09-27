@@ -1277,19 +1277,26 @@
   reopenRoomBtn.addEventListener('click', reopenRoom);
   deleteRoomBtn.addEventListener('click', deleteRoom);
 
-  // Subscribe to students
-  function subscribeToStudents() {
-    const subscription = SupabaseClient
-      .channel('students-changes')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'students',
-        filter: `room_id=eq.${currentRoom.id}`
-      }, () => {
-        loadStudents();
-      })
-      .subscribe();
+  // Poll for students every 3 seconds
+  let studentPollInterval = null;
+
+  function startStudentPolling() {
+    // Clear any existing interval
+    if (studentPollInterval) {
+      clearInterval(studentPollInterval);
+    }
+
+    // Poll every 3 seconds
+    studentPollInterval = setInterval(() => {
+      loadStudents();
+    }, 3000);
+  }
+
+  function stopStudentPolling() {
+    if (studentPollInterval) {
+      clearInterval(studentPollInterval);
+      studentPollInterval = null;
+    }
   }
 
   // Initialize
@@ -1297,7 +1304,7 @@
     const authenticated = await checkAuth();
     if (authenticated) {
       await loadRoom();
-      subscribeToStudents();
+      startStudentPolling();
     }
   })();
 </script>
