@@ -1074,6 +1074,14 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 7a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
         Shortcuts
       </a>
+      <a class="nav-item" data-page="analytics" href="#">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="4" y2="20"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+        Analytics
+      </a>
+      <a class="nav-item" data-page="activity" href="#">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Activity Log
+      </a>
       <div class="nav-divider"></div>
       <div class="nav-section nav-section-admin">
         <a class="nav-item nav-item-parent" data-parent="admin" href="#">
@@ -1755,7 +1763,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
 
     // Handle admin submenu - only close when explicitly navigating to dashboard
     // Don't auto-close when just toggling the submenu
-    if (pageId === 'dashboardPage') {
+    if (pageId === 'dashboardPage' || pageId === 'analyticsPage' || pageId === 'activityPage') {
       const adminSection = document.querySelector('.nav-section-admin');
       if (adminSection) adminSection.classList.remove('open');
     }
@@ -3092,7 +3100,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       showPage(page + 'Page');
 
       // Open admin submenu when navigating to admin pages
-      if (page === 'deployment' || page === 'pricing' || page === 'about') {
+      if (page === 'deployment' || page === 'pricing') {
         const adminSection = document.querySelector('.nav-section-admin');
         if (adminSection) adminSection.classList.add('open');
       }
