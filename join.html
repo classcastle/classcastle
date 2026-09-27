@@ -512,8 +512,11 @@
     document.getElementById('formState').classList.add('hide');
   }
 
-  // Check for existing session on page load
-  function checkExistingSession() {
+  // Check for existing session on page load. A saved session is only ever
+  // a hint -- it can go stale (kicked, room closed, code reused for a new
+  // room) so we must confirm with Supabase before trusting it and jumping
+  // straight to the "joined" screen.
+  async function checkExistingSession() {
     const savedSession = localStorage.getItem(STORAGE_KEY);
     if (savedSession) {
       try {
@@ -523,31 +526,55 @@
         if (fromExtension && prefillCode && prefillCode !== session.code) {
           currentRoomId = session.roomId;
           currentStudentId = session.studentId;
-          leavePreviousRoom();
+          await leavePreviousRoom();
           return false;
         }
 
-        // Restore the session
-        currentRoomId = session.roomId;
-        currentStudentId = session.studentId;
+        // Verify the saved session is still valid before restoring it --
+        // the student may have been kicked, the room may have been closed,
+        // or the code may since have been reused for a different room.
+        const { data: student, error: studentError } = await SupabaseClient
+          .from('students')
+          .select('id, room_id, rooms:room_id(id, code, active)')
+          .eq('id', session.studentId)
+          .single();
 
-        // Pre-fill the form
-        const codeStr = session.code.toString();
-        digits.forEach((digit, i) => {
-          digit.value = codeStr[i] || '';
-        });
-        nameInput.value = session.name;
+        const stillValid = !studentError
+          && student
+          && student.room_id === session.roomId
+          && student.rooms
+          && student.rooms.active
+          && String(student.rooms.code) === String(session.code);
 
-        // Show joined state
-        joinedTitle.textContent = 'You\u2019re in the room';
-        joinedSub.textContent = session.name + ', you\u2019ve joined room ' + session.code + '. Sit tight \u2014 your teacher controls where this browser goes next.';
-        formState.classList.add('hide');
-        joinedState.classList.add('show');
+        if (!stillValid) {
+          console.log('Saved session is stale, clearing it');
+          localStorage.removeItem(STORAGE_KEY);
+          currentRoomId = null;
+          currentStudentId = null;
+          // Fall through to the normal join flow below
+        } else {
+          // Restore the session
+          currentRoomId = session.roomId;
+          currentStudentId = session.studentId;
 
-        // Start kick checking
-        startKickCheck();
+          // Pre-fill the form
+          const codeStr = session.code.toString();
+          digits.forEach((digit, i) => {
+            digit.value = codeStr[i] || '';
+          });
+          nameInput.value = session.name;
 
-        return true;
+          // Show joined state
+          joinedTitle.textContent = 'You\u2019re in the room';
+          joinedSub.textContent = session.name + ', you\u2019ve joined room ' + session.code + '. Sit tight \u2014 your teacher controls where this browser goes next.';
+          formState.classList.add('hide');
+          joinedState.classList.add('show');
+
+          // Start kick checking
+          startKickCheck();
+
+          return true;
+        }
       } catch (error) {
         console.error('Error restoring session:', error);
         localStorage.removeItem(STORAGE_KEY);
