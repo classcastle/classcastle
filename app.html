@@ -1333,7 +1333,10 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
           <h1 class="page-title">Activity Log</h1>
           <p class="page-subtitle">Track all room activities and actions</p>
         </div>
-        <button class="btn btn-secondary" id="clearActivityBtn">Clear Log</button>
+        <div style="display: flex; gap: 12px;">
+          <button class="btn btn-secondary" id="exportActivityBtn">Export</button>
+          <button class="btn btn-secondary" id="clearActivityBtn">Clear Log</button>
+        </div>
       </div>
 
       <div class="card">
@@ -1429,6 +1432,22 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   </div>
 </div>
 
+<div class="modal-overlay" id="exportModalOverlay">
+  <div class="modal" id="exportModal">
+    <h2 id="exportModalTitle">Export Activity Log</h2>
+    <p id="exportModalMessage">Choose export format:</p>
+    <div class="export-options" id="exportOptions" style="display: flex; flex-direction: column; gap: 12px; margin: 20px 0;">
+      <button class="btn btn-secondary export-option" data-format="json">JSON</button>
+      <button class="btn btn-secondary export-option" data-format="pdf">PDF</button>
+      <button class="btn btn-secondary export-option" data-format="xlsx">XLSX</button>
+      <button class="btn btn-secondary export-option" data-format="docx">DOCX</button>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" id="exportModalCancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <script>
   // Supabase configuration
   const SUPABASE_URL = 'https://hduyofdbpspjcuwvackd.supabase.co';
@@ -1473,6 +1492,12 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   const modalMessage = document.getElementById('modalMessage');
   const modalCancel = document.getElementById('modalCancel');
   const modalConfirm = document.getElementById('modalConfirm');
+  const exportModalOverlay = document.getElementById('exportModalOverlay');
+  const exportModal = document.getElementById('exportModal');
+  const exportModalTitle = document.getElementById('exportModalTitle');
+  const exportModalMessage = document.getElementById('exportModalMessage');
+  const exportModalCancel = document.getElementById('exportModalCancel');
+  const exportOptions = document.getElementById('exportOptions');
 
   // Pages
   const dashboardPage = document.getElementById('dashboardPage');
@@ -1513,6 +1538,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   // Activity log elements
   const activityList = document.getElementById('activityList');
   const clearActivityBtn = document.getElementById('clearActivityBtn');
+  const exportActivityBtn = document.getElementById('exportActivityBtn');
 
   // Settings elements
   const settingsName = document.getElementById('settingsName');
@@ -1625,6 +1651,53 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       // Close on overlay click
       modalOverlay.addEventListener('click', (e) => {
         if (e.target === modalOverlay) {
+          handleCancel();
+        }
+      });
+
+      // Close on Escape key
+      const escapeHandler = (e) => {
+        if (e.key === 'Escape') {
+          handleCancel();
+          document.removeEventListener('keydown', escapeHandler);
+        }
+      };
+      document.addEventListener('keydown', escapeHandler);
+    });
+  }
+
+  // Export format selection modal
+  function showExportModal() {
+    return new Promise((resolve) => {
+      exportModalOverlay.classList.add('show');
+
+      const handleCancel = () => {
+        exportModalOverlay.classList.remove('show');
+        exportModalCancel.removeEventListener('click', handleCancel);
+        document.querySelectorAll('.export-option').forEach(btn => {
+          btn.removeEventListener('click', handleOption);
+        });
+        resolve(null);
+      };
+
+      const handleOption = (e) => {
+        const format = e.target.dataset.format;
+        exportModalOverlay.classList.remove('show');
+        exportModalCancel.removeEventListener('click', handleCancel);
+        document.querySelectorAll('.export-option').forEach(btn => {
+          btn.removeEventListener('click', handleOption);
+        });
+        resolve(format);
+      };
+
+      exportModalCancel.addEventListener('click', handleCancel);
+      document.querySelectorAll('.export-option').forEach(btn => {
+        btn.addEventListener('click', handleOption);
+      });
+
+      // Close on overlay click
+      exportModalOverlay.addEventListener('click', (e) => {
+        if (e.target === exportModalOverlay) {
           handleCancel();
         }
       });
@@ -1917,6 +1990,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
         renderRooms();
       }
       showNotification('Room created successfully');
+      await logActivity('create_room', { room_code: roomCode, room_id: newRoom.id });
     } catch (error) {
       console.error('Error creating room:', error);
       showNotification('Error creating room');
@@ -1950,6 +2024,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       rooms = rooms.filter(r => r.id !== roomId);
       renderRooms();
       showNotification('Room deleted successfully');
+      await logActivity('delete_room', { room_id: roomId });
     } catch (error) {
       console.error('Error deleting room:', error);
       showNotification('Error deleting room');
@@ -1994,6 +2069,84 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       });
     } catch (error) {
       console.error('Error logging activity:', error);
+    }
+  }
+
+  async function exportActivityLog() {
+    const format = await showExportModal();
+    if (!format) return;
+
+    try {
+      const { data: activities, error } = await SupabaseClient
+        .from('activity_log')
+        .select('*')
+        .eq('teacher_id', currentUser.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      if (!activities || activities.length === 0) {
+        showNotification('No activity to export');
+        return;
+      }
+
+      let content, filename, mimeType;
+
+      switch (format) {
+        case 'json':
+          content = JSON.stringify(activities, null, 2);
+          filename = `activity-log-${new Date().toISOString().split('T')[0]}.json`;
+          mimeType = 'application/json';
+          break;
+        case 'pdf':
+          // Simple text-based PDF-like export
+          content = activities.map(a => 
+            `${new Date(a.created_at).toLocaleString()} - ${a.action}\n${JSON.stringify(a.details, null, 2)}\n\n`
+          ).join('');
+          filename = `activity-log-${new Date().toISOString().split('T')[0]}.txt`;
+          mimeType = 'text/plain';
+          showNotification('PDF export not available, downloaded as text file');
+          break;
+        case 'xlsx':
+          // CSV format for Excel
+          const headers = ['Date', 'Action', 'Details'];
+          const rows = activities.map(a => [
+            new Date(a.created_at).toLocaleString(),
+            a.action,
+            JSON.stringify(a.details)
+          ]);
+          content = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+          filename = `activity-log-${new Date().toISOString().split('T')[0]}.csv`;
+          mimeType = 'text/csv';
+          showNotification('XLSX export not available, downloaded as CSV file');
+          break;
+        case 'docx':
+          // Simple text format for Word
+          content = activities.map(a => 
+            `${new Date(a.created_at).toLocaleString()}\n${a.action}\n${JSON.stringify(a.details, null, 2)}\n${'='.repeat(50)}\n\n`
+          ).join('');
+          filename = `activity-log-${new Date().toISOString().split('T')[0]}.txt`;
+          mimeType = 'text/plain';
+          showNotification('DOCX export not available, downloaded as text file');
+          break;
+      }
+
+      // Create download
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      showNotification(`Activity log exported as ${format.toUpperCase()}`);
+      await logActivity('export_activity_log', { format, count: activities.length });
+    } catch (error) {
+      console.error('Error exporting activity log:', error);
+      showNotification('Error exporting activity log');
     }
   }
 
@@ -2089,6 +2242,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
     for (const roomId of selectedRooms) {
       await archiveRoom(roomId);
     }
+    await logActivity('bulk_archive_rooms', { count: selectedRooms.size, room_ids: Array.from(selectedRooms) });
     selectedRooms.clear();
     updateBulkActions();
   }
@@ -2103,6 +2257,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
     for (const roomId of selectedRooms) {
       await deleteRoom(roomId);
     }
+    await logActivity('bulk_delete_rooms', { count: selectedRooms.size, room_ids: Array.from(selectedRooms) });
     selectedRooms.clear();
     updateBulkActions();
   }
@@ -2603,6 +2758,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
 
   // Activity log
   clearActivityBtn.addEventListener('click', clearActivityLog);
+  exportActivityBtn.addEventListener('click', exportActivityLog);
 
   // Admin submenu toggle
   const adminParent = document.querySelector('.nav-item-parent[data-parent="admin"]');
