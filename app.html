@@ -63,12 +63,8 @@
     left: 0;
     top: 0;
     bottom: 0;
-    z-index: 100;
-    transition: width 0.3s ease, transform 0.3s ease;
-  }
-
-  .sidebar.nav-expanded {
-    width: 300px;
+    z-index: 10;
+    transition: transform 0.3s ease;
   }
 
   .sidebar-header {
@@ -247,11 +243,6 @@
     flex: 1;
     margin-left: 260px;
     padding: 32px;
-    transition: margin-left 0.3s ease;
-  }
-
-  .main-content.nav-expanded {
-    margin-left: 300px;
   }
 
   .page {
@@ -1592,10 +1583,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       if (pageId === 'dashboardPage') {
         const adminSection = document.querySelector('.nav-section-admin');
         if (adminSection) adminSection.classList.remove('open');
-        const sidebar = document.querySelector('.sidebar');
-        const mainContent = document.querySelector('.main-content');
-        if (sidebar) sidebar.classList.remove('nav-expanded');
-        if (mainContent) mainContent.classList.remove('nav-expanded');
       }
     }
   }
@@ -2540,20 +2527,13 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   // Admin submenu toggle
   const adminParent = document.querySelector('.nav-item-parent[data-parent="admin"]');
   const adminSection = document.querySelector('.nav-section-admin');
-  const sidebar = document.querySelector('.sidebar');
-  const mainContent = document.querySelector('.main-content');
   if (adminParent) {
     adminParent.addEventListener('click', (e) => {
       e.preventDefault();
-      e.stopPropagation(); // Prevent triggering the general nav-item handler
-      const isOpen = adminSection.classList.toggle('open');
-      if (isOpen) {
-        sidebar.classList.add('nav-expanded');
-        mainContent.classList.add('nav-expanded');
-      } else {
-        sidebar.classList.remove('nav-expanded');
-        mainContent.classList.remove('nav-expanded');
-      }
+      e.stopPropagation();
+      // Only toggle the submenu, don't affect pages
+      adminSection.classList.toggle('open');
+      e.stopImmediatePropagation(); // Ensure no other handlers run
     });
   }
 
@@ -2563,8 +2543,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
     backToDashboard.addEventListener('click', () => {
       showPage('dashboardPage');
       adminSection.classList.remove('open');
-      sidebar.classList.remove('nav-expanded');
-      mainContent.classList.remove('nav-expanded');
     });
   }
 
@@ -2573,8 +2551,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
     backToDashboardFromPricing.addEventListener('click', () => {
       showPage('dashboardPage');
       adminSection.classList.remove('open');
-      sidebar.classList.remove('nav-expanded');
-      mainContent.classList.remove('nav-expanded');
     });
   }
 
@@ -2589,11 +2565,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       // Open admin submenu when navigating to admin pages
       if (page === 'deployment' || page === 'pricing') {
         const adminSection = document.querySelector('.nav-section-admin');
-        const sidebar = document.querySelector('.sidebar');
-        const mainContent = document.querySelector('.main-content');
         if (adminSection) adminSection.classList.add('open');
-        if (sidebar) sidebar.classList.add('nav-expanded');
-        if (mainContent) mainContent.classList.add('nav-expanded');
       }
 
       // Load data for specific pages
