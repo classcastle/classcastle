@@ -10,6 +10,7 @@ const roomIdInput = document.getElementById('roomId');
 const studentNameInput = document.getElementById('studentName');
 const joinBtn = document.getElementById('joinBtn');
 const leaveBtn = document.getElementById('leaveBtn');
+const dismissKickedBtn = document.getElementById('dismissKickedBtn');
 const errorEl = document.getElementById('error');
 const joiningLoadingEl = document.getElementById('joiningLoading');
 const waitingLoadingEl = document.getElementById('waitingLoading');
@@ -43,13 +44,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 joinBtn.addEventListener('click', handleJoin);
 cancelBtn.addEventListener('click', handleCancel);
 leaveBtn.addEventListener('click', handleLeave);
+dismissKickedBtn.addEventListener('click', handleDismissKicked);
 
 // Check current extension status
 function checkStatus() {
   console.log('Checking extension status...');
-  chrome.storage.local.get(['roomId', 'studentId'], (result) => {
+  chrome.storage.local.get(['roomId', 'studentId', 'wasKicked'], (result) => {
     console.log('Storage result:', result);
-    if (result.roomId && result.studentId) {
+    if (result.wasKicked) {
+      console.log('User was kicked, showing kicked state');
+      showKickedState();
+    } else if (result.roomId && result.studentId) {
       console.log('User is joined, showing joined state');
       showJoinedState();
     } else {
@@ -91,9 +96,17 @@ function showKickedState() {
   statusTitle.textContent = 'You were removed';
   statusMessage.textContent = 'Your teacher removed you from the room';
   leaveBtn.style.display = 'none';
+  dismissKickedBtn.style.display = 'block';
   joinForm.classList.add('hidden');
   roomIdInput.value = '';
   studentNameInput.value = '';
+}
+
+// Handle dismiss kicked notification
+function handleDismissKicked() {
+  chrome.storage.local.set({ wasKicked: false }, () => {
+    showJoinForm();
+  });
 }
 
 // Show loading state

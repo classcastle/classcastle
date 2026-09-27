@@ -16,7 +16,8 @@ const STORAGE_KEYS = {
   roomId: 'roomId',
   studentId: 'studentId',
   currentTargetUrl: 'currentTargetUrl',
-  joinedAt: 'joinedAt'
+  joinedAt: 'joinedAt',
+  wasKicked: 'wasKicked'
 };
 
 // Constants
@@ -125,7 +126,8 @@ async function handleKicked() {
     roomId: null,
     studentId: null,
     currentTargetUrl: null,
-    joinedAt: null
+    joinedAt: null,
+    wasKicked: true
   });
 
   chrome.runtime.sendMessage({
@@ -151,7 +153,8 @@ async function leaveRoom() {
     roomId: null,
     studentId: null,
     currentTargetUrl: null,
-    joinedAt: null
+    joinedAt: null,
+    wasKicked: false
   });
 }
 
