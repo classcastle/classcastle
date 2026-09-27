@@ -881,6 +881,22 @@
     cursor: pointer;
   }
 
+  /* Nav divider and section label */
+  .nav-divider {
+    height: 1px;
+    background: var(--line);
+    margin: 8px 16px;
+  }
+
+  .nav-section-label {
+    padding: 8px 16px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
   .modal-btn-cancel {
     border: 1.5px solid var(--line);
     background: var(--paper);
@@ -974,10 +990,17 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/><polyline points="12 10 12 12 12 12"/></svg>
         Activity Log
       </a>
+      <div class="nav-divider"></div>
+      <div class="nav-section-label">Admin</div>
       <a class="nav-item" data-page="deployment" href="#">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
         IT Deployment
       </a>
+      <a class="nav-item" data-page="pricing" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Pricing
+      </a>
+      <div class="nav-divider"></div>
       <a class="nav-item" data-page="settings" href="#">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         Settings
@@ -1207,6 +1230,55 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
       </div>
     </div>
 
+    <!-- Pricing Page -->
+    <div class="page" id="pricingPage">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Pricing</h1>
+          <p class="page-subtitle">Choose the plan that works for your school</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title" style="margin-bottom: 24px;">Classroom Management</h2>
+        <div class="analytics-grid">
+          <div class="analytics-card" style="border: 2px solid var(--sky);">
+            <h3 style="color: var(--sky);">Free</h3>
+            <p class="analytics-value" style="font-size: 2.5rem;">$0</p>
+            <p style="color: var(--ink-soft); margin-top: 8px;">Forever free for individual teachers</p>
+            <ul style="list-style: none; padding: 0; margin-top: 16px; text-align: left;">
+              <li style="padding: 8px 0; border-bottom: 1px solid var(--line);">✓ Unlimited rooms</li>
+              <li style="padding: 8px 0; border-bottom: 1px solid var(--line);">✓ Unlimited students</li>
+              <li style="padding: 8px 0; border-bottom: 1px solid var(--line);">✓ Real-time navigation</li>
+              <li style="padding: 8px 0; border-bottom: 1px solid var(--line);">✓ Room templates</li>
+              <li style="padding: 8px 0; border-bottom: 1px solid var(--line);">✓ URL shortcuts</li>
+              <li style="padding: 8px 0;">✓ Activity logging</li>
+            </ul>
+          </div>
+          <div class="analytics-card" style="border: 2px solid var(--ink);">
+            <h3 style="color: var(--ink);">School / District</h3>
+            <p class="analytics-value" style="font-size: 2.5rem;">Custom</p>
+            <p style="color: var(--ink-soft); margin-top: 8px;">Contact us for enterprise pricing</p>
+            <ul style="list-style: none; padding: 0; margin-top: 16px; text-align: left;">
+              <li style="padding: 8px 0; border-bottom: 1px solid var(--line);">✓ Everything in Free</li>
+              <li style="padding: 8px 0; border-bottom: 1px solid var(--line);">✓ SSO integration</li>
+              <li style="padding: 8px 0; border-bottom: 1px solid var(--line);">✓ Bulk enrollment</li>
+              <li style="padding: 8px 0; border-bottom: 1px solid var(--line);">✓ Advanced analytics</li>
+              <li style="padding: 8px 0; border-bottom: 1px solid var(--line);">✓ Priority support</li>
+              <li style="padding: 8px 0;">✓ Custom integrations</li>
+            </ul>
+            <button class="btn btn-primary" style="margin-top: 16px; width: 100%;">Contact Sales</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title" style="margin-bottom: 16px;">Need help choosing?</h2>
+        <p style="color: var(--ink-soft); margin-bottom: 16px;">Our team is here to help you find the right solution for your school or district.</p>
+        <a href="mailto:support@classcastle.org" class="btn btn-secondary">Contact Support</a>
+      </div>
+    </div>
+
     <!-- Settings Page -->
     <div class="page" id="settingsPage">
       <div class="page-header">
@@ -1231,8 +1303,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
 
       <div class="card">
         <h2 class="section-title" style="margin-bottom: 16px;">Danger Zone</h2>
-        <p style="color: var(--ink-soft); margin-bottom: 16px;">Once you delete your teacher account, there is no going back. Please be certain.</p>
-        <button class="btn btn-secondary" style="color: var(--red); border-color: var(--red);" id="deleteAccountBtn">Delete teacher account</button>
+        <p style="color: var(--ink-soft); margin-bottom: 16px;">To delete your teacher account, please contact our support team. We'll help you securely remove your data.</p>
+        <a href="mailto:support@classcastle.org?subject=Delete%20My%20Account" class="btn btn-secondary" style="color: var(--red); border-color: var(--red);">Contact Support to Delete Account</a>
       </div>
     </div>
   </main>
@@ -1331,7 +1403,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   const settingsName = document.getElementById('settingsName');
   const settingsEmail = document.getElementById('settingsEmail');
   const saveSettingsBtn = document.getElementById('saveSettingsBtn');
-  const deleteAccountBtn = document.getElementById('deleteAccountBtn');
 
   function showNotification(message, duration = 3000) {
     notification.textContent = message;
@@ -1738,29 +1809,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
     } catch (error) {
       console.error('Error saving settings:', error);
       showNotification('Error saving settings');
-    }
-  }
-
-  async function deleteAccount() {
-    if (!currentUser) return;
-    const confirmed = await showConfirm({
-      title: 'Delete Account',
-      message: 'Are you sure you want to delete your account? This cannot be undone.',
-      confirmText: 'Delete',
-      cancelText: 'Cancel'
-    });
-    if (!confirmed) return;
-
-    try {
-      const { error } = await SupabaseClient.auth.admin.deleteUser(currentUser.id);
-      
-      if (error) throw error;
-
-      showNotification('Teacher account deleted');
-      handleLogout();
-    } catch (error) {
-      console.error('Error deleting account:', error);
-      showNotification('Error deleting teacher account');
     }
   }
 
@@ -2427,7 +2475,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
   });
 
   saveSettingsBtn.addEventListener('click', saveSettings);
-  deleteAccountBtn.addEventListener('click', deleteAccount);
 
   // Handle visibility change for refresh
   document.addEventListener('visibilitychange', async () => {
