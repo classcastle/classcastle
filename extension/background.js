@@ -23,6 +23,31 @@ chrome.storage.local.get(['roomId', 'studentId'], (result) => {
   }
 });
 
+// Poll for storage changes
+setInterval(() => {
+  chrome.storage.local.get(['roomId', 'studentId'], (result) => {
+    const wasJoined = currentRoomId !== null && currentStudentId !== null;
+    const isJoined = result.roomId !== null && result.studentId !== null;
+
+    if (isJoined && !wasJoined) {
+      // Just joined
+      console.log('Storage changed, joining new room:', result.roomId);
+      currentRoomId = result.roomId;
+      currentStudentId = result.studentId;
+      subscribeToRoom();
+      // Notify popup
+      chrome.runtime.sendMessage({
+        action: 'statusUpdate',
+        joined: true
+      });
+    } else if (!isJoined && wasJoined) {
+      // Just left
+      console.log('Storage cleared, leaving room');
+      leaveRoom();
+    }
+  });
+}, 1000);
+
 // Listen for messages from popup and content scripts
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'joinRoom') {
@@ -59,10 +84,14 @@ async function joinRoom(roomId, studentId) {
   currentRoomId = roomId;
   currentStudentId = studentId;
 
+  console.log('Joining room:', roomId, 'student:', studentId);
+
   // Save to storage
   chrome.storage.local.set({
     roomId: roomId,
     studentId: studentId
+  }, () => {
+    console.log('Saved to chrome.storage.local');
   });
 
   // Subscribe to room updates

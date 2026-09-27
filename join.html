@@ -791,25 +791,18 @@
         name: name
       }));
 
-      // Save to chrome.storage.local for extension background script
-      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+      // Send message to extension background script
+      if (fromExtension && typeof chrome !== 'undefined' && chrome.runtime) {
         try {
-          chrome.storage.local.set({
+          chrome.runtime.sendMessage({
+            action: 'studentJoined',
             roomId: room.id,
             studentId: studentData.id
-          }, () => {
-            console.log('Saved to chrome.storage.local');
-            // Notify background script to start subscription
-            chrome.runtime.sendMessage({
-              action: 'studentJoined',
-              roomId: room.id,
-              studentId: studentData.id
-            }, (response) => {
-              console.log('Background script notified:', response);
-            });
+          }, (response) => {
+            console.log('Extension notified of join:', response);
           });
         } catch (e) {
-          console.log('Chrome storage not available:', e);
+          console.log('Chrome runtime not available:', e);
         }
       }
 

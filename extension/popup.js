@@ -115,11 +115,20 @@ async function handleJoin() {
   hideError();
   showWaiting();
 
+  // Save to chrome.storage.local before opening join.html
+  chrome.storage.local.set({
+    roomId: roomId,
+    studentName: studentName
+  }, () => {
+    console.log('Saved room info to storage before opening join.html');
+  });
+
   // Open join.html on classcastle.org with room code and student name
   const joinUrl = `https://classcastle.org/join.html?code=${encodeURIComponent(roomId)}&name=${encodeURIComponent(studentName)}&from_extension=true`;
 
   // Create a new tab instead of updating the existing one
-  chrome.tabs.create({ url: joinUrl }, () => {
+  chrome.tabs.create({ url: joinUrl }, (tab) => {
+    console.log('Opened join.html in tab:', tab.id);
     // Don't close popup, keep it open with loading state
   });
 }
