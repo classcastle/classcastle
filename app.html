@@ -9,7 +9,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/modal.js"></script>
 <style>
   :root {
     --paper: #F7F6F1;
@@ -681,6 +680,95 @@
     transform: translateY(0);
   }
 
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-overlay.show {
+    display: flex;
+  }
+
+  .modal {
+    background: var(--paper);
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    animation: modalSlideIn 0.2s ease-out;
+  }
+
+  @keyframes modalSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .modal h2 {
+    font-size: 1.4rem;
+    margin-bottom: 12px;
+    color: var(--ink);
+  }
+
+  .modal p {
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+  }
+
+  .modal-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .modal-btn-cancel {
+    border: 1.5px solid var(--line);
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  .modal-btn-cancel:hover {
+    background: var(--line);
+  }
+
+  .modal-btn-confirm {
+    background: var(--green);
+    color: var(--paper);
+  }
+
+  .modal-btn-confirm:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(47, 82, 51, 0.3);
+  }
+
   .loading {
     display: inline-block;
     width: 16px;
@@ -880,6 +968,17 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
 
 <div class="notification" id="notification"></div>
 
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <h2 id="modalTitle">Confirm</h2>
+    <p id="modalMessage">Are you sure?</p>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" id="modalCancel">Cancel</button>
+      <button class="modal-btn modal-btn-confirm" id="modalConfirm">Yes</button>
+    </div>
+  </div>
+</div>
+
 <script>
   // Supabase configuration
   const SUPABASE_URL = 'https://hduyofdbpspjcuwvackd.supabase.co';
@@ -936,6 +1035,57 @@ Value: 1;https://edge.microsoft.com/extensionstore/abcdefghijkabcdefghijk
     setTimeout(() => {
       notification.classList.remove('show');
     }, duration);
+  }
+
+  // Simple confirm modal
+  function showConfirm({ title, message, confirmText = 'Yes', cancelText = 'Cancel' }) {
+    return new Promise((resolve) => {
+      const modalOverlay = document.getElementById('modalOverlay');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalMessage = document.getElementById('modalMessage');
+      const modalConfirm = document.getElementById('modalConfirm');
+      const modalCancel = document.getElementById('modalCancel');
+
+      modalTitle.textContent = title;
+      modalMessage.textContent = message;
+      modalConfirm.textContent = confirmText;
+      modalCancel.textContent = cancelText;
+
+      modalOverlay.classList.add('show');
+
+      const handleConfirm = () => {
+        modalOverlay.classList.remove('show');
+        modalConfirm.removeEventListener('click', handleConfirm);
+        modalCancel.removeEventListener('click', handleCancel);
+        resolve(true);
+      };
+
+      const handleCancel = () => {
+        modalOverlay.classList.remove('show');
+        modalConfirm.removeEventListener('click', handleConfirm);
+        modalCancel.removeEventListener('click', handleCancel);
+        resolve(false);
+      };
+
+      modalConfirm.addEventListener('click', handleConfirm);
+      modalCancel.addEventListener('click', handleCancel);
+
+      // Close on overlay click
+      modalOverlay.addEventListener('click', (e) => {
+        if (e.target === modalOverlay) {
+          handleCancel();
+        }
+      });
+
+      // Close on Escape key
+      const escapeHandler = (e) => {
+        if (e.key === 'Escape') {
+          handleCancel();
+          document.removeEventListener('keydown', escapeHandler);
+        }
+      };
+      document.addEventListener('keydown', escapeHandler);
+    });
   }
 
   function showPage(pageId) {
