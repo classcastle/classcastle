@@ -39,8 +39,8 @@ leaveBtn.addEventListener('click', handleLeave);
 
 // Check current extension status
 function checkStatus() {
-  chrome.runtime.sendMessage({ action: 'getStatus' }, (response) => {
-    if (response && response.joined) {
+  chrome.storage.local.get(['roomId', 'studentId'], (result) => {
+    if (result.roomId && result.studentId) {
       showJoinedState();
     } else {
       showJoinForm();

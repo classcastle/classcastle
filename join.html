@@ -791,17 +791,17 @@
         name: name
       }));
 
-      // Notify extension that student joined (if running in extension context)
-      if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+      // Save to chrome.storage.local for extension background script
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
         try {
-          chrome.runtime.sendMessage({
-            action: 'studentJoined',
+          chrome.storage.local.set({
             roomId: room.id,
             studentId: studentData.id
+          }, () => {
+            console.log('Saved to chrome.storage.local');
           });
         } catch (e) {
-          // Not running in extension context, ignore
-          console.log('Not in extension context, skipping extension notification');
+          console.log('Chrome storage not available:', e);
         }
       }
 

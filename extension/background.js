@@ -11,6 +11,8 @@ const SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentRoomId = null;
 let currentStudentId = null;
 let subscription = null;
+let currentTargetUrl = null;
+let pollInterval = null;
 
 // Initialize extension
 chrome.storage.local.get(['roomId', 'studentId'], (result) => {
@@ -74,6 +76,12 @@ async function leaveRoom() {
     subscription = null;
   }
 
+  // Stop polling
+  stopPolling();
+
+  // Clear current URL
+  currentTargetUrl = null;
+
   // Clear storage
   chrome.storage.local.remove(['roomId', 'studentId']);
 
@@ -93,6 +101,9 @@ function subscribeToRoom() {
     subscription = null;
   }
 
+  // Start polling as fallback
+  startPolling();
+
   // Subscribe to room updates
   subscription = SupabaseClient
     .channel(`student:${currentStudentId}`)
@@ -107,6 +118,7 @@ function subscribeToRoom() {
       if (payload.new && payload.new.target_url) {
         if (!payload.old || payload.new.target_url !== payload.old.target_url) {
           console.log('Target URL changed to:', payload.new.target_url);
+          currentTargetUrl = payload.new.target_url;
           navigateToUrl(payload.new.target_url);
         }
       }
@@ -120,6 +132,40 @@ function subscribeToRoom() {
         setTimeout(subscribeToRoom, 5000);
       }
     });
+}
+
+// Poll for URL changes as fallback
+function startPolling() {
+  if (pollInterval) {
+    clearInterval(pollInterval);
+  }
+
+  pollInterval = setInterval(async () => {
+    if (!currentRoomId) return;
+
+    try {
+      const { data: room } = await SupabaseClient
+        .from('rooms')
+        .select('target_url')
+        .eq('id', currentRoomId)
+        .single();
+
+      if (room && room.target_url && room.target_url !== currentTargetUrl) {
+        console.log('Poll detected URL change:', room.target_url);
+        currentTargetUrl = room.target_url;
+        navigateToUrl(room.target_url);
+      }
+    } catch (error) {
+      console.error('Error polling for URL changes:', error);
+    }
+  }, 3000); // Poll every 3 seconds
+}
+
+function stopPolling() {
+  if (pollInterval) {
+    clearInterval(pollInterval);
+    pollInterval = null;
+  }
 }
 
 // Navigate to a URL
