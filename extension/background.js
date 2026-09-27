@@ -151,7 +151,7 @@ function subscribeToRoom(roomId, studentId) {
       if (payload.new && payload.new.target_url) {
         if (!payload.old || payload.new.target_url !== payload.old.target_url) {
           console.log('Target URL changed to:', payload.new.target_url);
-          saveStorageData({ currentTargetUrl: payload.new.targetUrl });
+          saveStorageData({ currentTargetUrl: payload.new.target_url });
           navigateToUrl(payload.new.target_url, studentId);
         }
       }
@@ -218,6 +218,37 @@ async function handleAlarm() {
       .eq('id', data.studentId);
   } catch (error) {
     console.error('Error updating online status:', error);
+  }
+}
+
+// Navigate the active tab to a new URL and record it on the student row
+async function navigateToUrl(url, studentId) {
+  if (!url) return;
+
+  console.log('Navigating to URL:', url);
+
+  try {
+    // Get the active tab in the current window
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+    if (tab && tab.id !== undefined) {
+      console.log('Navigating tab:', tab.id, 'to:', url);
+      await chrome.tabs.update(tab.id, { url: url });
+    } else {
+      console.error('No active tab found to navigate');
+    }
+
+    // Update student's current_url in the database regardless of whether
+    // we found a tab, so the teacher's dashboard reflects the attempt
+    await SupabaseClient
+      .from('students')
+      .update({
+        current_url: url,
+        last_seen: new Date().toISOString()
+      })
+      .eq('id', studentId);
+  } catch (error) {
+    console.error('Error navigating to URL:', error);
   }
 }
 
