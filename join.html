@@ -799,6 +799,14 @@
             studentId: studentData.id
           }, () => {
             console.log('Saved to chrome.storage.local');
+            // Notify background script to start subscription
+            chrome.runtime.sendMessage({
+              action: 'studentJoined',
+              roomId: room.id,
+              studentId: studentData.id
+            }, (response) => {
+              console.log('Background script notified:', response);
+            });
           });
         } catch (e) {
           console.log('Chrome storage not available:', e);

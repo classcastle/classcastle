@@ -28,7 +28,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'joinRoom') {
     joinRoom(request.roomId, request.studentId);
   } else if (request.action === 'studentJoined') {
-    // Student joined via join.html, update background script
+    // Student joined via join.html, start subscription
+    console.log('Student joined message received:', request);
     joinRoom(request.roomId, request.studentId);
     // Notify popup of status change
     chrome.runtime.sendMessage({

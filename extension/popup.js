@@ -39,10 +39,14 @@ leaveBtn.addEventListener('click', handleLeave);
 
 // Check current extension status
 function checkStatus() {
+  console.log('Checking extension status...');
   chrome.storage.local.get(['roomId', 'studentId'], (result) => {
+    console.log('Storage result:', result);
     if (result.roomId && result.studentId) {
+      console.log('User is joined, showing joined state');
       showJoinedState();
     } else {
+      console.log('User is not joined, showing join form');
       showJoinForm();
     }
   });
