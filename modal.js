@@ -6,12 +6,21 @@ class Modal {
     this.modal = null;
     this.onConfirm = null;
     this.onCancel = null;
+    this.initialized = false;
   }
 
   init() {
+    if (this.initialized) return;
+
     // Wait for DOM to be ready
-    if (!document.body) {
+    if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => this.init());
+      return;
+    }
+
+    // Check if body exists
+    if (!document.body) {
+      setTimeout(() => this.init(), 10);
       return;
     }
 
@@ -74,15 +83,17 @@ class Modal {
       this.overlay = document.getElementById('modal-overlay');
       this.modal = document.getElementById('modal');
     }
+
+    this.initialized = true;
   }
 
   show(options) {
     // Ensure modal is initialized
-    if (!this.overlay || !this.modal) {
+    if (!this.initialized) {
       this.init();
-      // If still not initialized (DOM not ready), retry after DOMContentLoaded
-      if (!this.overlay || !this.modal) {
-        document.addEventListener('DOMContentLoaded', () => this.show(options));
+      // If still not initialized, schedule retry
+      if (!this.initialized) {
+        setTimeout(() => this.show(options), 50);
         return;
       }
     }
