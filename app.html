@@ -1038,6 +1038,374 @@
     display: none !important;
   }
 
+  /* Onboarding Modal */
+  .onboarding-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(4px);
+  }
+
+  .onboarding-overlay.show {
+    display: flex;
+  }
+
+  .onboarding-modal {
+    background: var(--surface);
+    border-radius: 20px;
+    max-width: 700px;
+    width: 90%;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+    animation: onboardingSlideIn 0.4s ease-out;
+  }
+
+  @keyframes onboardingSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .onboarding-header {
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .onboarding-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
+    color: var(--ink);
+  }
+
+  .onboarding-skip {
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+  }
+
+  .onboarding-skip:hover {
+    background: var(--line);
+    color: var(--ink);
+  }
+
+  .onboarding-content {
+    padding: 32px;
+    overflow-y: auto;
+    max-height: calc(90vh - 140px);
+  }
+
+  .onboarding-step {
+    display: none;
+    animation: stepFadeIn 0.4s ease-out;
+  }
+
+  .onboarding-step.active {
+    display: block;
+  }
+
+  @keyframes stepFadeIn {
+    from {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .onboarding-step-number {
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    color: var(--green);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  .onboarding-step-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.6rem;
+    margin-bottom: 16px;
+    color: var(--ink);
+  }
+
+  .onboarding-step-text {
+    color: var(--ink-soft);
+    line-height: 1.6;
+    font-size: 1rem;
+    margin-bottom: 24px;
+  }
+
+  .onboarding-visual {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+  }
+
+  .onboarding-visual-icon {
+    width: 80px;
+    height: 80px;
+    color: var(--green);
+  }
+
+  .onboarding-visual-animation {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .visual-window {
+    width: 60px;
+    height: 45px;
+    background: var(--line);
+    border-radius: 4px;
+    position: relative;
+    animation: windowBounce 2s ease-in-out infinite;
+  }
+
+  .visual-window::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: var(--green-soft);
+    border-bottom: 1px solid var(--line);
+  }
+
+  @keyframes windowBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+
+  .visual-arrow {
+    width: 30px;
+    height: 30px;
+    color: var(--green);
+    animation: arrowPulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes arrowPulse {
+    0%, 100% { transform: translateX(0); opacity: 1; }
+    50% { transform: translateX(5px); opacity: 0.5; }
+  }
+
+  .visual-url {
+    background: var(--green-soft);
+    color: var(--green);
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    animation: urlGlow 2s ease-in-out infinite;
+  }
+
+  @keyframes urlGlow {
+    0%, 100% { box-shadow: 0 0 0 rgba(47, 82, 51, 0); }
+    50% { box-shadow: 0 0 10px rgba(47, 82, 51, 0.3); }
+  }
+
+  .visual-student {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: studentJoin 3s ease-in-out infinite;
+  }
+
+  @keyframes studentJoin {
+    0%, 100% { opacity: 0.5; transform: translateX(-10px); }
+    50% { opacity: 1; transform: translateX(0); }
+  }
+
+  .visual-avatar {
+    width: 32px;
+    height: 32px;
+    background: var(--green);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .visual-badge {
+    background: var(--green-soft);
+    color: var(--green);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .visual-extension {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .visual-puzzle {
+    width: 50px;
+    height: 50px;
+    background: var(--green-soft);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: puzzlePulse 2s ease-in-out infinite;
+  }
+
+  @keyframes puzzlePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+
+  .visual-check {
+    width: 40px;
+    height: 40px;
+    background: var(--green);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    animation: checkPop 1.5s ease-in-out infinite;
+  }
+
+  @keyframes checkPop {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+  }
+
+  .onboarding-footer {
+    padding: 20px 32px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .onboarding-progress {
+    display: flex;
+    gap: 8px;
+  }
+
+  .progress-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--line);
+    transition: background 0.3s ease;
+  }
+
+  .progress-dot.active {
+    background: var(--green);
+  }
+
+  .onboarding-buttons {
+    display: flex;
+    gap: 12px;
+  }
+
+  .onboarding-back {
+    background: var(--paper);
+    color: var(--ink);
+    border: 1.5px solid var(--line);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .onboarding-back:hover {
+    background: var(--line);
+  }
+
+  .onboarding-next {
+    background: var(--green-btn);
+    color: var(--on-green);
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .onboarding-next:hover {
+    opacity: 0.9;
+  }
+
+  .onboarding-next:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .feature-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .feature-list li:last-child {
+    border-bottom: none;
+  }
+
+  .feature-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--green);
+    flex-shrink: 0;
+  }
+
+  .feature-text {
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+  }
+
   @media (max-width: 780px) {
     .sidebar {
       transform: translateX(-100%);
@@ -1417,6 +1785,12 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       </div>
 
       <div class="card">
+        <h2 class="section-title" style="margin-bottom: 16px;">Help & Onboarding</h2>
+        <p style="color: var(--ink-soft); margin-bottom: 16px;">Want to see the onboarding tutorial again or need a refresher on how to use Classcastle?</p>
+        <button class="btn btn-secondary" id="replayOnboardingBtn">Replay Onboarding</button>
+      </div>
+
+      <div class="card">
         <h2 class="section-title" style="margin-bottom: 16px;">Danger Zone</h2>
         <p style="color: var(--ink-soft); margin-bottom: 16px;">To delete your teacher account, please contact our support team. We'll help you securely remove your data.</p>
         <a href="mailto:support@classcastle.org?subject=Delete%20My%20Account" class="btn btn-secondary" style="color: #fff; background: var(--red); border-color: var(--red);">Contact Support to Delete Account</a>
@@ -1490,6 +1864,111 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     </div>
     <div class="modal-actions">
       <button class="modal-btn modal-btn-cancel" id="exportModalCancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Onboarding Modal -->
+<div class="onboarding-overlay" id="onboardingOverlay">
+  <div class="onboarding-modal">
+    <div class="onboarding-header">
+      <h2 class="onboarding-title">Welcome to Classcastle</h2>
+      <button class="onboarding-skip" id="skipOnboarding">Skip</button>
+    </div>
+    <div class="onboarding-content">
+      <!-- Step 1: Welcome -->
+      <div class="onboarding-step active" data-step="1">
+        <div class="onboarding-step-number">Step 1 of 5</div>
+        <h3 class="onboarding-step-title">Welcome to Classcastle</h3>
+        <p class="onboarding-step-text">Classcastle helps you guide all your students to the same webpage instantly. No more reading URLs off the whiteboard or helping students find the right page.</p>
+        <div class="onboarding-visual">
+          <svg class="onboarding-visual-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Step 2: Create a Room -->
+      <div class="onboarding-step" data-step="2">
+        <div class="onboarding-step-number">Step 2 of 5</div>
+        <h3 class="onboarding-step-title">Create a Room</h3>
+        <p class="onboarding-step-text">Creating a room is simple. Just click "Create new room" in your dashboard. You'll get a 6-digit code to share with your students.</p>
+        <div class="onboarding-visual">
+          <div class="onboarding-visual-animation">
+            <div class="visual-window"></div>
+            <svg class="visual-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+              <polyline points="12 5 19 12 12 19"/>
+            </svg>
+            <div class="visual-url">123456</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Student Extension -->
+      <div class="onboarding-step" data-step="3">
+        <div class="onboarding-step-number">Step 3 of 5</div>
+        <h3 class="onboarding-step-title">Install Student Extension</h3>
+        <p class="onboarding-step-text">Students need the Classcastle extension to join rooms. It's lightweight and works on Chrome, Edge, and Chromebooks. Share the Chrome Web Store link with your IT team for easy deployment.</p>
+        <div class="onboarding-visual">
+          <div class="visual-extension">
+            <div class="visual-puzzle">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              </svg>
+            </div>
+            <div class="visual-check">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: Students Join -->
+      <div class="onboarding-step" data-step="4">
+        <div class="onboarding-step-number">Step 4 of 5</div>
+        <h3 class="onboarding-step-title">Students Join Your Room</h3>
+        <p class="onboarding-step-text">Students open the extension, enter your room code, and they're in! You'll see them light up green in your dashboard when they join.</p>
+        <div class="onboarding-visual">
+          <div class="visual-student">
+            <div class="visual-avatar">S</div>
+            <div class="visual-badge">Online</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5: Navigate Browsers -->
+      <div class="onboarding-step" data-step="5">
+        <div class="onboarding-step-number">Step 5 of 5</div>
+        <h3 class="onboarding-step-title">Navigate Everyone at Once</h3>
+        <p class="onboarding-step-text">Type any URL and click "Navigate". Every joined student's browser opens that page instantly. Close the tab when you're done.</p>
+        <div class="onboarding-visual">
+          <div class="onboarding-visual-animation">
+            <div class="visual-window"></div>
+            <svg class="visual-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+              <polyline points="12 5 19 12 12 19"/>
+            </svg>
+            <div class="visual-url">microbit.org</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="onboarding-footer">
+      <div class="onboarding-progress">
+        <div class="progress-dot active"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+      </div>
+      <div class="onboarding-buttons">
+        <button class="onboarding-back" id="onboardingBack" style="display: none;">Back</button>
+        <button class="onboarding-next" id="onboardingNext">Next</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1590,6 +2069,13 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   const settingsName = document.getElementById('settingsName');
   const settingsEmail = document.getElementById('settingsEmail');
   const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+  const replayOnboardingBtn = document.getElementById('replayOnboardingBtn');
+
+  // Onboarding elements
+  const onboardingOverlay = document.getElementById('onboardingOverlay');
+  const skipOnboarding = document.getElementById('skipOnboarding');
+  const onboardingBack = document.getElementById('onboardingBack');
+  const onboardingNext = document.getElementById('onboardingNext');
 
   function showNotification(message, duration = 3000) {
     notification.textContent = message;
@@ -3190,6 +3676,66 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
   saveSettingsBtn.addEventListener('click', saveSettings);
 
+  // Onboarding functionality
+  let currentOnboardingStep = 1;
+  const totalOnboardingSteps = 5;
+
+  function showOnboardingStep(step) {
+    document.querySelectorAll('.onboarding-step').forEach(s => s.classList.remove('active'));
+    document.querySelector(`[data-step="${step}"]`).classList.add('active');
+
+    // Update progress dots
+    document.querySelectorAll('.progress-dot').forEach((dot, index) => {
+      dot.classList.toggle('active', index < step);
+    });
+
+    // Update buttons
+    onboardingBack.style.display = step === 1 ? 'none' : 'block';
+    onboardingNext.textContent = step === totalOnboardingSteps ? 'Got it!' : 'Next';
+
+    currentOnboardingStep = step;
+  }
+
+  function nextOnboardingStep() {
+    if (currentOnboardingStep < totalOnboardingSteps) {
+      showOnboardingStep(currentOnboardingStep + 1);
+    } else {
+      closeOnboarding();
+    }
+  }
+
+  function prevOnboardingStep() {
+    if (currentOnboardingStep > 1) {
+      showOnboardingStep(currentOnboardingStep - 1);
+    }
+  }
+
+  function closeOnboarding() {
+    onboardingOverlay.classList.remove('show');
+  }
+
+  function startOnboarding() {
+    onboardingOverlay.classList.add('show');
+    showOnboardingStep(1);
+  }
+
+  // Event listeners for onboarding
+  replayOnboardingBtn.addEventListener('click', startOnboarding);
+  skipOnboarding.addEventListener('click', closeOnboarding);
+  onboardingBack.addEventListener('click', prevOnboardingStep);
+  onboardingNext.addEventListener('click', nextOnboardingStep);
+
+  // Check if user needs onboarding on first login
+  function checkOnboardingNeeded() {
+    const onboardingCompleted = localStorage.getItem('onboardingCompleted');
+    if (!onboardingCompleted) {
+      // Show onboarding after a short delay
+      setTimeout(() => {
+        startOnboarding();
+      }, 1000);
+    }
+  }
+
   // Handle visibility change for refresh
   document.addEventListener('visibilitychange', async () => {
     if (!document.hidden && currentUser) {
@@ -3211,6 +3757,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       subscribeToStudents();
       await loadTemplates();
       await loadShortcuts();
+      // Check if onboarding is needed
+      checkOnboardingNeeded();
     } else {
       window.location.href = '/login.html';
     }

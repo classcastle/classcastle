@@ -228,6 +228,402 @@
     nav { padding: 22px 24px; }
     main { padding: 24px; }
   }
+
+  /* Onboarding Modal */
+  .onboarding-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(4px);
+  }
+
+  .onboarding-overlay.show {
+    display: flex;
+  }
+
+  .onboarding-modal {
+    background: var(--surface);
+    border-radius: 20px;
+    max-width: 700px;
+    width: 90%;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+    animation: onboardingSlideIn 0.4s ease-out;
+  }
+
+  @keyframes onboardingSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .onboarding-header {
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .onboarding-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
+    color: var(--ink);
+  }
+
+  .onboarding-skip {
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+  }
+
+  .onboarding-skip:hover {
+    background: var(--line);
+    color: var(--ink);
+  }
+
+  .onboarding-content {
+    padding: 32px;
+    overflow-y: auto;
+    max-height: calc(90vh - 140px);
+  }
+
+  .onboarding-step {
+    display: none;
+    animation: stepFadeIn 0.4s ease-out;
+  }
+
+  .onboarding-step.active {
+    display: block;
+  }
+
+  @keyframes stepFadeIn {
+    from {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .onboarding-step-number {
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    color: var(--green);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  .onboarding-step-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.6rem;
+    margin-bottom: 16px;
+    color: var(--ink);
+  }
+
+  .onboarding-step-text {
+    color: var(--ink-soft);
+    line-height: 1.6;
+    font-size: 1rem;
+    margin-bottom: 24px;
+  }
+
+  .onboarding-visual {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+  }
+
+  .onboarding-visual-icon {
+    width: 80px;
+    height: 80px;
+    color: var(--green);
+  }
+
+  .onboarding-visual-animation {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .visual-window {
+    width: 60px;
+    height: 45px;
+    background: var(--line);
+    border-radius: 4px;
+    position: relative;
+    animation: windowBounce 2s ease-in-out infinite;
+  }
+
+  .visual-window::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: var(--green-soft);
+    border-bottom: 1px solid var(--line);
+  }
+
+  @keyframes windowBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+
+  .visual-arrow {
+    width: 30px;
+    height: 30px;
+    color: var(--green);
+    animation: arrowPulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes arrowPulse {
+    0%, 100% { transform: translateX(0); opacity: 1; }
+    50% { transform: translateX(5px); opacity: 0.5; }
+  }
+
+  .visual-url {
+    background: var(--green-soft);
+    color: var(--green);
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    animation: urlGlow 2s ease-in-out infinite;
+  }
+
+  @keyframes urlGlow {
+    0%, 100% { box-shadow: 0 0 0 rgba(47, 82, 51, 0); }
+    50% { box-shadow: 0 0 10px rgba(47, 82, 51, 0.3); }
+  }
+
+  .visual-student {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: studentJoin 3s ease-in-out infinite;
+  }
+
+  @keyframes studentJoin {
+    0%, 100% { opacity: 0.5; transform: translateX(-10px); }
+    50% { opacity: 1; transform: translateX(0); }
+  }
+
+  .visual-avatar {
+    width: 32px;
+    height: 32px;
+    background: var(--green);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .visual-badge {
+    background: var(--green-soft);
+    color: var(--green);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .visual-extension {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .visual-puzzle {
+    width: 50px;
+    height: 50px;
+    background: var(--green-soft);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: puzzlePulse 2s ease-in-out infinite;
+  }
+
+  @keyframes puzzlePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+
+  .visual-check {
+    width: 40px;
+    height: 40px;
+    background: var(--green);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    animation: checkPop 1.5s ease-in-out infinite;
+  }
+
+  @keyframes checkPop {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+  }
+
+  .onboarding-password-group {
+    margin-bottom: 24px;
+  }
+
+  .password-strength {
+    margin-top: 8px;
+    display: flex;
+    gap: 4px;
+  }
+
+  .strength-bar {
+    flex: 1;
+    height: 4px;
+    background: var(--line);
+    border-radius: 2px;
+    transition: background 0.3s ease;
+  }
+
+  .strength-bar.weak { background: var(--red); }
+  .strength-bar.medium { background: var(--amber); }
+  .strength-bar.strong { background: var(--green); }
+
+  .strength-text {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+
+  .onboarding-footer {
+    padding: 20px 32px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .onboarding-progress {
+    display: flex;
+    gap: 8px;
+  }
+
+  .progress-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--line);
+    transition: background 0.3s ease;
+  }
+
+  .progress-dot.active {
+    background: var(--green);
+  }
+
+  .onboarding-buttons {
+    display: flex;
+    gap: 12px;
+  }
+
+  .onboarding-back {
+    background: var(--paper);
+    color: var(--ink);
+    border: 1.5px solid var(--line);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .onboarding-back:hover {
+    background: var(--line);
+  }
+
+  .onboarding-next {
+    background: var(--green-btn);
+    color: var(--on-green);
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .onboarding-next:hover {
+    opacity: 0.9;
+  }
+
+  .onboarding-next:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .feature-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .feature-list li:last-child {
+    border-bottom: none;
+  }
+
+  .feature-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--green);
+    flex-shrink: 0;
+  }
+
+  .feature-text {
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+  }
 </style>
 </head>
 <body>
@@ -252,12 +648,8 @@
         <label class="form-label" for="signupEmail">Email</label>
         <input type="email" class="form-input" id="signupEmail" placeholder="you@school.edu">
       </div>
-      <div class="form-group">
-        <label class="form-label" for="signupPassword">Password</label>
-        <input type="password" class="form-input" id="signupPassword" placeholder="••••••••">
-      </div>
-      <button class="btn btn-primary btn-full" id="signupBtn">
-        <span class="btn-text">Create teacher account</span>
+      <button class="btn btn-primary btn-full" id="startOnboardingBtn">
+        <span class="btn-text">Next</span>
         <span class="loading" style="display: none;"></span>
       </button>
       <div class="auth-footer">
@@ -271,6 +663,130 @@
 </main>
 
 <div class="notification" id="notification"></div>
+
+<!-- Onboarding Modal -->
+<div class="onboarding-overlay" id="onboardingOverlay">
+  <div class="onboarding-modal">
+    <div class="onboarding-header">
+      <h2 class="onboarding-title">Welcome to Classcastle</h2>
+      <button class="onboarding-skip" id="skipOnboarding">Skip</button>
+    </div>
+    <div class="onboarding-content">
+      <!-- Step 1: Welcome -->
+      <div class="onboarding-step active" data-step="1">
+        <div class="onboarding-step-number">Step 1 of 6</div>
+        <h3 class="onboarding-step-title">Welcome to Classcastle</h3>
+        <p class="onboarding-step-text">Classcastle helps you guide all your students to the same webpage instantly. No more reading URLs off the whiteboard or helping students find the right page.</p>
+        <div class="onboarding-visual">
+          <svg class="onboarding-visual-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Step 2: Create a Room -->
+      <div class="onboarding-step" data-step="2">
+        <div class="onboarding-step-number">Step 2 of 6</div>
+        <h3 class="onboarding-step-title">Create a Room</h3>
+        <p class="onboarding-step-text">Creating a room is simple. Just click "Create new room" in your dashboard. You'll get a 6-digit code to share with your students.</p>
+        <div class="onboarding-visual">
+          <div class="onboarding-visual-animation">
+            <div class="visual-window"></div>
+            <svg class="visual-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+              <polyline points="12 5 19 12 12 19"/>
+            </svg>
+            <div class="visual-url">123456</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Student Extension -->
+      <div class="onboarding-step" data-step="3">
+        <div class="onboarding-step-number">Step 3 of 6</div>
+        <h3 class="onboarding-step-title">Install Student Extension</h3>
+        <p class="onboarding-step-text">Students need the Classcastle extension to join rooms. It's lightweight and works on Chrome, Edge, and Chromebooks. Share the Chrome Web Store link with your IT team for easy deployment.</p>
+        <div class="onboarding-visual">
+          <div class="visual-extension">
+            <div class="visual-puzzle">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              </svg>
+            </div>
+            <div class="visual-check">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: Students Join -->
+      <div class="onboarding-step" data-step="4">
+        <div class="onboarding-step-number">Step 4 of 6</div>
+        <h3 class="onboarding-step-title">Students Join Your Room</h3>
+        <p class="onboarding-step-text">Students open the extension, enter your room code, and they're in! You'll see them light up green in your dashboard when they join.</p>
+        <div class="onboarding-visual">
+          <div class="visual-student">
+            <div class="visual-avatar">S</div>
+            <div class="visual-badge">Online</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5: Navigate Browsers -->
+      <div class="onboarding-step" data-step="5">
+        <div class="onboarding-step-number">Step 5 of 6</div>
+        <h3 class="onboarding-step-title">Navigate Everyone at Once</h3>
+        <p class="onboarding-step-text">Type any URL and click "Navigate". Every joined student's browser opens that page instantly. Close the tab when you're done.</p>
+        <div class="onboarding-visual">
+          <div class="onboarding-visual-animation">
+            <div class="visual-window"></div>
+            <svg class="visual-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+              <polyline points="12 5 19 12 12 19"/>
+            </svg>
+            <div class="visual-url">microbit.org</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 6: Password -->
+      <div class="onboarding-step" data-step="6">
+        <div class="onboarding-step-number">Step 6 of 6</div>
+        <h3 class="onboarding-step-title">Create Your Password</h3>
+        <p class="onboarding-step-text">Choose a strong password to secure your teacher account. Your password should be at least 8 characters with a mix of letters, numbers, and symbols.</p>
+        <div class="onboarding-password-group">
+          <label class="form-label" for="onboardingPassword">Password</label>
+          <input type="password" class="form-input" id="onboardingPassword" placeholder="••••••••">
+          <div class="password-strength">
+            <div class="strength-bar" id="strength1"></div>
+            <div class="strength-bar" id="strength2"></div>
+            <div class="strength-bar" id="strength3"></div>
+            <div class="strength-bar" id="strength4"></div>
+          </div>
+          <div class="strength-text" id="strengthText">Enter a password</div>
+        </div>
+      </div>
+    </div>
+    <div class="onboarding-footer">
+      <div class="onboarding-progress">
+        <div class="progress-dot active"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+      </div>
+      <div class="onboarding-buttons">
+        <button class="onboarding-back" id="onboardingBack" style="display: none;">Back</button>
+        <button class="onboarding-next" id="onboardingNext">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
   // Supabase configuration
@@ -293,10 +809,27 @@
   const notification = document.getElementById('notification');
   const signupName = document.getElementById('signupName');
   const signupEmail = document.getElementById('signupEmail');
-  const signupPassword = document.getElementById('signupPassword');
-  const signupBtn = document.getElementById('signupBtn');
-  const signupBtnText = signupBtn.querySelector('.btn-text');
-  const signupBtnLoading = signupBtn.querySelector('.loading');
+  const startOnboardingBtn = document.getElementById('startOnboardingBtn');
+  const startOnboardingBtnText = startOnboardingBtn.querySelector('.btn-text');
+  const startOnboardingBtnLoading = startOnboardingBtn.querySelector('.loading');
+
+  // Onboarding elements
+  const onboardingOverlay = document.getElementById('onboardingOverlay');
+  const skipOnboarding = document.getElementById('skipOnboarding');
+  const onboardingBack = document.getElementById('onboardingBack');
+  const onboardingNext = document.getElementById('onboardingNext');
+  const onboardingPassword = document.getElementById('onboardingPassword');
+  const strengthBars = [
+    document.getElementById('strength1'),
+    document.getElementById('strength2'),
+    document.getElementById('strength3'),
+    document.getElementById('strength4')
+  ];
+  const strengthText = document.getElementById('strengthText');
+
+  let currentStep = 1;
+  const totalSteps = 6;
+  let onboardingSkipped = false;
 
   function showNotification(message, duration = 3000) {
     notification.textContent = message;
@@ -306,20 +839,123 @@
     }, duration);
   }
 
-  async function handleSignup() {
+  // Password strength checker
+  function checkPasswordStrength(password) {
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (password.length >= 12) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+    return Math.min(strength, 4);
+  }
+
+  function updatePasswordStrength(password) {
+    const strength = checkPasswordStrength(password);
+    
+    strengthBars.forEach((bar, index) => {
+      bar.className = 'strength-bar';
+      if (index < strength) {
+        if (strength <= 1) bar.classList.add('weak');
+        else if (strength <= 2) bar.classList.add('medium');
+        else bar.classList.add('strong');
+      }
+    });
+
+    const messages = ['Enter a password', 'Too weak', 'Weak', 'Medium', 'Strong'];
+    strengthText.textContent = messages[strength];
+  }
+
+  // Onboarding navigation
+  function showStep(step) {
+    document.querySelectorAll('.onboarding-step').forEach(s => s.classList.remove('active'));
+    document.querySelector(`[data-step="${step}"]`).classList.add('active');
+
+    // Update progress dots
+    document.querySelectorAll('.progress-dot').forEach((dot, index) => {
+      dot.classList.toggle('active', index < step);
+    });
+
+    // Update buttons
+    onboardingBack.style.display = step === 1 ? 'none' : 'block';
+    onboardingNext.textContent = step === totalSteps ? 'Create Account' : 'Next';
+
+    // Enable/disable next button based on step
+    if (step === totalSteps) {
+      const password = onboardingPassword.value;
+      const strength = checkPasswordStrength(password);
+      onboardingNext.disabled = strength < 2;
+    } else {
+      onboardingNext.disabled = false;
+    }
+
+    currentStep = step;
+  }
+
+  function nextStep() {
+    if (currentStep < totalSteps) {
+      showStep(currentStep + 1);
+    } else {
+      completeOnboarding();
+    }
+  }
+
+  function prevStep() {
+    if (currentStep > 1) {
+      showStep(currentStep - 1);
+    }
+  }
+
+  function startOnboarding() {
     const name = signupName.value.trim();
     const email = signupEmail.value.trim();
-    const password = signupPassword.value;
 
-    if (!name || !email || !password) {
-      showNotification('Please fill in all fields');
+    if (!name || !email) {
+      showNotification('Please fill in name and email');
+      return;
+    }
+
+    onboardingOverlay.classList.add('show');
+    showStep(1);
+  }
+
+  function skipOnboardingFlow() {
+    onboardingSkipped = true;
+    onboardingOverlay.classList.remove('show');
+    // Show password field in main form
+    const passwordGroup = document.createElement('div');
+    passwordGroup.className = 'form-group';
+    passwordGroup.innerHTML = `
+      <label class="form-label" for="signupPassword">Password</label>
+      <input type="password" class="form-input" id="signupPassword" placeholder="••••••••">
+    `;
+    startOnboardingBtn.parentNode.insertBefore(passwordGroup, startOnboardingBtn);
+    startOnboardingBtn.textContent = 'Create teacher account';
+    startOnboardingBtn.id = 'signupBtn';
+    startOnboardingBtn.removeEventListener('click', startOnboarding);
+    startOnboardingBtn.addEventListener('click', handleDirectSignup);
+  }
+
+  async function completeOnboarding() {
+    const name = signupName.value.trim();
+    const email = signupEmail.value.trim();
+    const password = onboardingPassword.value;
+
+    if (!password) {
+      showNotification('Please enter a password');
+      return;
+    }
+
+    const strength = checkPasswordStrength(password);
+    if (strength < 2) {
+      showNotification('Password is too weak');
       return;
     }
 
     // Show loading state
-    signupBtn.disabled = true;
-    signupBtnText.style.display = 'none';
-    signupBtnLoading.style.display = 'inline-block';
+    onboardingNext.disabled = true;
+    onboardingNext.textContent = 'Creating...';
 
     try {
       const { data, error } = await SupabaseClient.auth.signUp({
@@ -334,14 +970,15 @@
 
       if (error) throw error;
 
-      // If email confirmation is disabled, user is automatically logged in
+      // Mark onboarding as completed
+      localStorage.setItem('onboardingCompleted', 'true');
+
       if (data.session) {
         showNotification('Teacher account created successfully!');
         setTimeout(() => {
           window.location.href = '/app.html';
         }, 1000);
       } else {
-        // If email confirmation is required, show different message
         showNotification('Account created! Please check your email to confirm.');
         setTimeout(() => {
           window.location.href = '/login.html';
@@ -349,10 +986,54 @@
       }
     } catch (error) {
       showNotification(error.message);
-      // Reset button state
-      signupBtn.disabled = false;
-      signupBtnText.style.display = 'inline';
-      signupBtnLoading.style.display = 'none';
+      onboardingNext.disabled = false;
+      onboardingNext.textContent = 'Create Account';
+    }
+  }
+
+  async function handleDirectSignup() {
+    const name = signupName.value.trim();
+    const email = signupEmail.value.trim();
+    const password = document.getElementById('signupPassword').value;
+
+    if (!name || !email || !password) {
+      showNotification('Please fill in all fields');
+      return;
+    }
+
+    // Show loading state
+    const btn = document.getElementById('signupBtn');
+    btn.disabled = true;
+    btn.textContent = 'Creating...';
+
+    try {
+      const { data, error } = await SupabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name: name
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.session) {
+        showNotification('Teacher account created successfully!');
+        setTimeout(() => {
+          window.location.href = '/app.html';
+        }, 1000);
+      } else {
+        showNotification('Account created! Please check your email to confirm.');
+        setTimeout(() => {
+          window.location.href = '/login.html';
+        }, 2000);
+      }
+    } catch (error) {
+      showNotification(error.message);
+      btn.disabled = false;
+      btn.textContent = 'Create teacher account';
     }
   }
 
@@ -368,9 +1049,20 @@
     }
   }
 
-  signupBtn.addEventListener('click', handleSignup);
-  signupPassword.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') handleSignup();
+  // Event listeners
+  startOnboardingBtn.addEventListener('click', startOnboarding);
+  skipOnboarding.addEventListener('click', skipOnboardingFlow);
+  onboardingBack.addEventListener('click', prevStep);
+  onboardingNext.addEventListener('click', nextStep);
+  onboardingPassword.addEventListener('input', (e) => {
+    updatePasswordStrength(e.target.value);
+  });
+
+  // Handle Enter key in password field
+  onboardingPassword.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && currentStep === totalSteps) {
+      completeOnboarding();
+    }
   });
 
   checkSession();
