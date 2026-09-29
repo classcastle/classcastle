@@ -17,30 +17,41 @@
     --line: #E2E0D6;
     --green: #2F5233;
     --green-soft: #E7EDE4;
+    --green-btn: #2F5233;
+    --on-green: #fff;
+    --sky: var(--green);
+    --sky-soft: var(--green-soft);
     --green-light: #f0f4f1;
     --amber: #D98E2B;
     --red: #B23A2E;
     --red-light: #f5e0e0;
     --blue: #3B82F6;
     --blue-light: #E0E7FF;
+    --surface: #fff;
+    color-scheme: light dark;
     box-sizing: border-box;
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --paper: #1C1B17;
-      --ink: #F7F6F1;
-      --ink-soft: #B8B7AE;
-      --line: #3A3930;
+      --paper: #151512;
+      --ink: #F1F0E9;
+      --ink-soft: #A8A79D;
+      --line: #34332B;
       --green: #E7EDE4;
-      --green-soft: #2F5233;
+      --green-soft: #223324;
+      --green-btn: #3E7A47;
+      --on-green: #fff;
+      --sky: var(--green);
+      --sky-soft: var(--green-soft);
       --green-light: #1a2519;
       --amber: #F0B84D;
-      --red: #E86A5E;
+      --red: #D2503F;
       --red-light: #3d1a18;
       --blue: #60A5FA;
       --blue-light: #1E3A5F;
+      --surface: #1F1E19;
     }
   }
   * { box-sizing: inherit; }
@@ -176,7 +187,7 @@
   }
 
   .btn-primary {
-    background: #fff;
+    background: var(--surface);
     color: var(--green);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
   }
@@ -259,7 +270,7 @@
   }
 
   .student-badge {
-    background: #fff;
+    background: var(--surface);
     border-radius: 20px;
     padding: 28px 24px;
     text-align: center;
@@ -339,7 +350,7 @@
   }
 
   .teacher-panel {
-    background: #fff;
+    background: var(--surface);
     border: 1px solid var(--line);
     border-radius: 20px;
     padding: 32px;
@@ -376,7 +387,7 @@
   }
 
   .members-strip {
-    background: #fff;
+    background: var(--surface);
     border: 1px solid var(--line);
     border-radius: 20px;
     padding: 24px;
@@ -464,7 +475,7 @@
   }
 
   .management-panel {
-    background: #fff;
+    background: var(--surface);
     border: 1px solid var(--line);
     border-radius: 20px;
     padding: 48px;
@@ -519,7 +530,7 @@
   }
   .url-input:focus {
     border-color: var(--green);
-    background: #fff;
+    background: var(--surface);
     box-shadow: 0 0 0 3px rgba(47, 82, 51, 0.1);
   }
 
@@ -759,8 +770,8 @@
   }
 
   .modal-btn-confirm {
-    background: var(--green);
-    color: var(--paper);
+    background: var(--green-btn);
+    color: var(--on-green);
   }
 
   .modal-btn-confirm:hover {
