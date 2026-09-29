@@ -2003,7 +2003,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       <button class="btn btn-secondary export-option" data-format="json">JSON</button>
       <button class="btn btn-secondary export-option" data-format="pdf">PDF</button>
       <button class="btn btn-secondary export-option" data-format="xlsx">XLSX</button>
-      <button class="btn btn-secondary export-option" data-format="docx">Text</button>
+      <button class="btn btn-secondary export-option" data-format="docx" disabled style="opacity: 0.5; cursor: not-allowed;">Text (Temporarily Unavailable)</button>
+      <p style="font-size: 0.8rem; color: var(--ink-soft); text-align: center; margin-top: 8px;">We're having some issues with DOCX exports. We're working hard to fix it.</p>
     </div>
     <div class="modal-actions">
       <button class="modal-btn modal-btn-cancel" id="exportModalCancel">Cancel</button>
@@ -2369,6 +2370,9 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       };
 
       const handleOption = (e) => {
+        // Skip if button is disabled
+        if (e.target.disabled) return;
+        
         const format = e.target.dataset.format;
         exportModalOverlay.classList.remove('show');
         exportModalCancel.removeEventListener('click', handleCancel);
@@ -3756,17 +3760,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   closeOnboardingBtn.addEventListener('click', closeOnboarding);
   onboardingBack.addEventListener('click', prevOnboardingStep);
   onboardingNext.addEventListener('click', nextOnboardingStep);
-
-  // Check for skip_onboarding query parameter (from GitHub signup)
-  function checkSkipOnboardingParam() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const skipOnboarding = urlParams.get('skip_onboarding');
-    if (skipOnboarding === 'true') {
-      localStorage.setItem('onboardingCompleted', 'true');
-      // Clean up URL
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  }
 
   // Handle visibility change for refresh
   document.addEventListener('visibilitychange', async () => {

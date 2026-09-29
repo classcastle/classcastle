@@ -1292,10 +1292,7 @@
       const { data, error } = await SupabaseClient.auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: window.location.origin + '/app.html',
-          queryParams: {
-            skip_onboarding: 'true'
-          }
+          redirectTo: window.location.origin + '/app.html'
         }
       });
 
