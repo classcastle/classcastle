@@ -3888,6 +3888,17 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   onboardingBack.addEventListener('click', prevOnboardingStep);
   onboardingNext.addEventListener('click', nextOnboardingStep);
 
+  // Check for skip_onboarding query parameter (from GitHub signup)
+  function checkSkipOnboardingParam() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const skipOnboarding = urlParams.get('skip_onboarding');
+    if (skipOnboarding === 'true') {
+      localStorage.setItem('onboardingCompleted', 'true');
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }
+
   // Handle visibility change for refresh
   document.addEventListener('visibilitychange', async () => {
     if (!document.hidden && currentUser) {
@@ -3916,6 +3927,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
   // Initialize
   checkSession();
+  checkSkipOnboardingParam();
 
   // Listen for auth changes
   SupabaseClient.auth.onAuthStateChange((event, session) => {
