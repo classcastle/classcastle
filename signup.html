@@ -284,6 +284,28 @@
     color: var(--ink);
   }
 
+  .onboarding-close {
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    line-height: 1;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .onboarding-close:hover {
+    background: var(--line);
+    color: var(--ink);
+  }
+
   .onboarding-skip {
     background: none;
     border: none;
@@ -422,6 +444,127 @@
   @keyframes urlGlow {
     0%, 100% { box-shadow: 0 0 0 rgba(47, 82, 51, 0); }
     50% { box-shadow: 0 0 10px rgba(47, 82, 51, 0.3); }
+  }
+
+  .visual-room-card {
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    padding: 20px;
+    width: 200px;
+    animation: cardFloat 3s ease-in-out infinite;
+  }
+
+  @keyframes cardFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .visual-room-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .visual-room-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .visual-room-code {
+    background: var(--green-soft);
+    color: var(--green);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .visual-room-students {
+    display: flex;
+    gap: 8px;
+  }
+
+  .visual-student-dot {
+    width: 24px;
+    height: 24px;
+    background: var(--green-btn);
+    border-radius: 50%;
+    animation: dotPulse 2s ease-in-out infinite;
+  }
+
+  .visual-student-dot:nth-child(2) {
+    animation-delay: 0.3s;
+  }
+
+  .visual-student-dot:nth-child(3) {
+    animation-delay: 0.6s;
+  }
+
+  @keyframes dotPulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+  }
+
+  .visual-join-preview {
+    display: flex;
+    justify-content: center;
+  }
+
+  .visual-extension-popup {
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    padding: 16px;
+    width: 220px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    animation: popupSlide 2s ease-in-out infinite;
+  }
+
+  @keyframes popupSlide {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .visual-popup-header {
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .visual-popup-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .visual-input-label {
+    font-size: 0.75rem;
+    color: var(--ink-soft);
+    font-weight: 500;
+  }
+
+  .visual-input {
+    background: var(--paper);
+    border: 1.5px solid var(--line);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 0.85rem;
+    color: var(--ink);
+  }
+
+  .visual-join-btn {
+    background: var(--green-btn);
+    color: var(--on-green);
+    padding: 8px;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 500;
   }
 
   .visual-student {
@@ -669,7 +812,10 @@
   <div class="onboarding-modal">
     <div class="onboarding-header">
       <h2 class="onboarding-title">Welcome to Classcastle</h2>
-      <button class="onboarding-skip" id="skipOnboarding">Skip</button>
+      <div style="display: flex; gap: 8px;">
+        <button class="onboarding-skip" id="skipOnboarding">Skip</button>
+        <button class="onboarding-close" id="closeOnboarding">×</button>
+      </div>
     </div>
     <div class="onboarding-content">
       <!-- Step 1: Welcome -->
@@ -691,13 +837,16 @@
         <h3 class="onboarding-step-title">Create a Room</h3>
         <p class="onboarding-step-text">Creating a room is simple. Just click "Create new room" in your dashboard. You'll get a 6-digit code to share with your students.</p>
         <div class="onboarding-visual">
-          <div class="onboarding-visual-animation">
-            <div class="visual-window"></div>
-            <svg class="visual-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="5" y1="12" x2="19" y2="12"/>
-              <polyline points="12 5 19 12 12 19"/>
-            </svg>
-            <div class="visual-url">123456</div>
+          <div class="visual-room-card">
+            <div class="visual-room-header">
+              <div class="visual-room-name">Period 1 Science</div>
+              <div class="visual-room-code">ABC123</div>
+            </div>
+            <div class="visual-room-students">
+              <div class="visual-student-dot"></div>
+              <div class="visual-student-dot"></div>
+              <div class="visual-student-dot"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -729,9 +878,15 @@
         <h3 class="onboarding-step-title">Students Join Your Room</h3>
         <p class="onboarding-step-text">Students open the extension, enter your room code, and they're in! You'll see them light up green in your dashboard when they join.</p>
         <div class="onboarding-visual">
-          <div class="visual-student">
-            <div class="visual-avatar">S</div>
-            <div class="visual-badge">Online</div>
+          <div class="visual-join-preview">
+            <div class="visual-extension-popup">
+              <div class="visual-popup-header">Classcastle</div>
+              <div class="visual-popup-body">
+                <div class="visual-input-label">Room Code</div>
+                <div class="visual-input">ABC123</div>
+                <div class="visual-join-btn">Join Room</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -816,6 +971,7 @@
   // Onboarding elements
   const onboardingOverlay = document.getElementById('onboardingOverlay');
   const skipOnboarding = document.getElementById('skipOnboarding');
+  const closeOnboarding = document.getElementById('closeOnboarding');
   const onboardingBack = document.getElementById('onboardingBack');
   const onboardingNext = document.getElementById('onboardingNext');
   const onboardingPassword = document.getElementById('onboardingPassword');
@@ -935,6 +1091,10 @@
     startOnboardingBtn.id = 'signupBtn';
     startOnboardingBtn.removeEventListener('click', startOnboarding);
     startOnboardingBtn.addEventListener('click', handleDirectSignup);
+  }
+
+  function closeOnboardingFlow() {
+    onboardingOverlay.classList.remove('show');
   }
 
   async function completeOnboarding() {
@@ -1070,6 +1230,7 @@
   // Event listeners
   startOnboardingBtn.addEventListener('click', startOnboarding);
   skipOnboarding.addEventListener('click', skipOnboardingFlow);
+  closeOnboarding.addEventListener('click', closeOnboardingFlow);
   onboardingBack.addEventListener('click', prevStep);
   onboardingNext.addEventListener('click', nextStep);
   onboardingPassword.addEventListener('input', (e) => {
