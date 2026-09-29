@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
     --paper: #F7F6F1;
@@ -229,7 +230,7 @@
       <h1>One click, and thirty screens land in the same place.</h1>
       <p class="lede">Classcastle is a teacher web app paired with a lightweight browser extension for students. You run the room from any browser; they join with a code. When it's time for the task, you press one button, and every student's browser opens the same page — no reading URLs off the whiteboard, no lost kids.</p>
       <div class="hero-ctas">
-        <a class="btn-primary" href="/login.html" id="access">Open the teacher app</a>
+        <a class="btn-primary" href="/login.html">Open the teacher app</a>
         <a class="btn-secondary" href="https://chromewebstore.google.com/detail/classcastle/acfkgmbemlolnjcnhfokelioeienonoi" target="_blank">Get the student extension</a>
       </div>
       <p class="free-note">Free for teachers. Works on Chromebooks. No student accounts needed.</p>
@@ -492,6 +493,21 @@
       });
     }, 500);
   }
+
+  // Check if user is already logged in and redirect to app.html
+  async function checkSession() {
+    const SUPABASE_URL = 'https://hduyofdbpspjcuwvackd.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK';
+    const SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const { data: { session } } = await SupabaseClient.auth.getSession();
+
+    if (session) {
+      window.location.href = '/app.html';
+    }
+  }
+
+  checkSession();
 </script>
 
 </body>
