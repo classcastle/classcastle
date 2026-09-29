@@ -925,10 +925,25 @@
           <div class="strength-text" id="strengthText">Enter a password</div>
         </div>
       </div>
+
+      <!-- Step 7: Account Already Exists -->
+      <div class="onboarding-step" data-step="7">
+        <div class="onboarding-step-number">Account Already Exists</div>
+        <h3 class="onboarding-step-title">It looks like you already have an account</h3>
+        <p class="onboarding-step-text">An account with this email address already exists. Please sign in to your existing account instead of creating a new one.</p>
+        <div class="onboarding-visual">
+          <svg class="onboarding-visual-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+      </div>
     </div>
     <div class="onboarding-footer">
-      <div class="onboarding-progress">
+      <div class="onboarding-progress" id="onboardingProgress">
         <div class="progress-dot active"></div>
+        <div class="progress-dot"></div>
         <div class="progress-dot"></div>
         <div class="progress-dot"></div>
         <div class="progress-dot"></div>
@@ -986,6 +1001,7 @@
   let currentStep = 1;
   const totalSteps = 6;
   let onboardingSkipped = false;
+  let accountExistsError = false;
 
   function showNotification(message, duration = 3000) {
     notification.textContent = message;
@@ -1028,14 +1044,26 @@
     document.querySelectorAll('.onboarding-step').forEach(s => s.classList.remove('active'));
     document.querySelector(`[data-step="${step}"]`).classList.add('active');
 
-    // Update progress dots
-    document.querySelectorAll('.progress-dot').forEach((dot, index) => {
-      dot.classList.toggle('active', index < step);
-    });
+    // Update progress dots (hide for account exists step)
+    const progressContainer = document.getElementById('onboardingProgress');
+    if (accountExistsError && step === totalSteps + 1) {
+      progressContainer.style.display = 'none';
+    } else {
+      progressContainer.style.display = 'flex';
+      document.querySelectorAll('.progress-dot').forEach((dot, index) => {
+        dot.classList.toggle('active', index < step);
+      });
+    }
 
     // Update buttons
     onboardingBack.style.display = step === 1 ? 'none' : 'block';
-    onboardingNext.textContent = step === totalSteps ? 'Create Account' : 'Next';
+    
+    if (accountExistsError && step === totalSteps + 1) {
+      onboardingNext.textContent = 'Go to Login';
+      onboardingBack.style.display = 'none';
+    } else {
+      onboardingNext.textContent = step === totalSteps ? 'Create Account' : 'Next';
+    }
 
     // Enable/disable next button based on step
     if (step === totalSteps) {
@@ -1050,6 +1078,12 @@
   }
 
   function nextStep() {
+    if (accountExistsError && currentStep === totalSteps + 1) {
+      // Go to login page
+      window.location.href = '/login.html';
+      return;
+    }
+    
     if (currentStep < totalSteps) {
       showStep(currentStep + 1);
     } else {
@@ -1078,6 +1112,7 @@
 
   function skipOnboardingFlow() {
     onboardingSkipped = true;
+    accountExistsError = false;
     onboardingOverlay.classList.remove('show');
     // Show password field in main form
     const passwordGroup = document.createElement('div');
@@ -1094,6 +1129,7 @@
   }
 
   function closeOnboardingFlow() {
+    accountExistsError = false;
     onboardingOverlay.classList.remove('show');
   }
 
@@ -1146,17 +1182,25 @@
       }
     } catch (error) {
       // Show specific error messages
-      let errorMessage = error.message;
       if (error.message.includes('already registered') || error.message.includes('already been registered')) {
-        errorMessage = 'An account with this email already exists. Please log in instead.';
+        // Show account exists step instead of toast
+        accountExistsError = true;
+        onboardingNext.disabled = false;
+        onboardingNext.textContent = 'Go to Login';
+        showStep(totalSteps + 1); // Show account exists step
       } else if (error.message.includes('invalid email')) {
-        errorMessage = 'Please enter a valid email address.';
+        showNotification('Please enter a valid email address.');
+        onboardingNext.disabled = false;
+        onboardingNext.textContent = 'Create Account';
       } else if (error.message.includes('password')) {
-        errorMessage = 'Password is too weak. Please use a stronger password.';
+        showNotification('Password is too weak. Please use a stronger password.');
+        onboardingNext.disabled = false;
+        onboardingNext.textContent = 'Create Account';
+      } else {
+        showNotification(error.message);
+        onboardingNext.disabled = false;
+        onboardingNext.textContent = 'Create Account';
       }
-      showNotification(errorMessage);
-      onboardingNext.disabled = false;
-      onboardingNext.textContent = 'Create Account';
     }
   }
 
@@ -1201,15 +1245,15 @@
       }
     } catch (error) {
       // Show specific error messages
-      let errorMessage = error.message;
       if (error.message.includes('already registered') || error.message.includes('already been registered')) {
-        errorMessage = 'An account with this email already exists. Please log in instead.';
+        showNotification('An account with this email already exists. Please log in instead.');
       } else if (error.message.includes('invalid email')) {
-        errorMessage = 'Please enter a valid email address.';
+        showNotification('Please enter a valid email address.');
       } else if (error.message.includes('password')) {
-        errorMessage = 'Password is too weak. Please use a stronger password.';
+        showNotification('Password is too weak. Please use a stronger password.');
+      } else {
+        showNotification(error.message);
       }
-      showNotification(errorMessage);
       btn.disabled = false;
       btn.textContent = 'Create teacher account';
     }
