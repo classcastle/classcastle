@@ -158,6 +158,33 @@
     .win.synced .body { animation: none; }
   }
 
+  /* Mobile grid windows */
+  @media (max-width: 780px) {
+    .grid-windows {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+    .win {
+      border-radius: 4px;
+    }
+    .win::before {
+      height: 15%;
+    }
+    .win .body {
+      inset: 20% 8% 8% 8%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .grid-windows {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4px;
+    }
+    .win::before {
+      height: 12%;
+    }
+  }
+
   /* SECTION: how it works */
   section { padding: 72px 0; border-top: 1px solid var(--line); }
   .section-head { max-width: 46ch; margin-bottom: 48px; }
@@ -182,6 +209,16 @@
   .feature { background: var(--paper); padding: 28px 26px; }
   .feature h3 { font-size: 1.02rem; font-weight: 500; margin-bottom: 8px; }
   .feature p { color: var(--ink-soft); font-size: 0.93rem; line-height: 1.5; }
+
+  /* Mobile features - stacked */
+  @media (max-width: 780px) {
+    .features {
+      grid-template-columns: 1fr;
+    }
+    .features.six-items {
+      grid-template-columns: 1fr;
+    }
+  }
 
   /* FAQ */
   .faq-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; }
@@ -214,6 +251,87 @@
     .faq-list { grid-template-columns: 1fr; }
     nav { padding: 22px 24px; }
     .wrap, .hero, section { padding-left: 24px; padding-right: 24px; }
+    
+    /* Mobile grid windows */
+    .grid-windows {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+    .win {
+      border-radius: 4px;
+    }
+    .win::before {
+      height: 15%;
+    }
+    .win .body {
+      inset: 20% 8% 8% 8%;
+    }
+    
+    /* Mobile CTA band */
+    .cta-band h2 {
+      font-size: clamp(1.5rem, 5vw, 2rem);
+    }
+    
+    /* Mobile footer */
+    footer {
+      flex-direction: column;
+      gap: 12px;
+      text-align: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .grid-windows {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4px;
+    }
+    .win::before {
+      height: 12%;
+    }
+    
+    .hero h1 {
+      font-size: clamp(2rem, 6vw, 2.8rem);
+    }
+    
+    .hero-ctas {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .btn-primary, .btn-secondary {
+      text-align: center;
+    }
+    
+    .os-row {
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .grid-windows {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4px;
+    }
+    .win::before {
+      height: 12%;
+    }
+    
+    .hero h1 {
+      font-size: clamp(2rem, 6vw, 2.8rem);
+    }
+    
+    .hero-ctas {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .btn-primary, .btn-secondary {
+      text-align: center;
+    }
+    
+    .os-row {
+      justify-content: center;
+    }
   }
 </style>
 </head>
@@ -503,7 +621,14 @@
     const { data: { session } } = await SupabaseClient.auth.getSession();
 
     if (session) {
-      window.location.href = '/app.html';
+      // Update all "Open teacher app" links to go to app.html
+      const heroCta = document.querySelector('.hero .btn-primary');
+      const navCta = document.querySelector('.nav-cta');
+      const ctaBandLink = document.querySelector('.cta-band .btn-primary');
+
+      if (heroCta) heroCta.href = '/app.html';
+      if (navCta) navCta.href = '/app.html';
+      if (ctaBandLink) ctaBandLink.href = '/app.html';
     }
   }
 
