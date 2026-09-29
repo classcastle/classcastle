@@ -12,7 +12,7 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.31/dist/jspdf.plugin.autotable.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/docx@8.2.0/build/index.umd.min.js"></script>
+
 <style>
   :root {
     --paper: #F7F6F1;
@@ -2003,7 +2003,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       <button class="btn btn-secondary export-option" data-format="json">JSON</button>
       <button class="btn btn-secondary export-option" data-format="pdf">PDF</button>
       <button class="btn btn-secondary export-option" data-format="xlsx">XLSX</button>
-      <button class="btn btn-secondary export-option" data-format="docx">DOCX</button>
+      <button class="btn btn-secondary export-option" data-format="docx">Text</button>
     </div>
     <div class="modal-actions">
       <button class="modal-btn modal-btn-cancel" id="exportModalCancel">Cancel</button>
@@ -2229,7 +2229,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   // Onboarding elements
   const onboardingOverlay = document.getElementById('onboardingOverlay');
   const skipOnboarding = document.getElementById('skipOnboarding');
-  const closeOnboarding = document.getElementById('closeOnboarding');
+  const closeOnboardingBtn = document.getElementById('closeOnboarding');
   const onboardingBack = document.getElementById('onboardingBack');
   const onboardingNext = document.getElementById('onboardingNext');
 
@@ -2842,58 +2842,21 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           await logActivity('export_activity_log', { format, count: activities.length });
           return;
         case 'docx':
-          // Generate DOCX using docx
-          const { Document, Packer, Paragraph, TextRun } = docx;
-          
-          const docxDoc = new Document({
-            sections: [{
-              properties: {},
-              children: [
-                new Paragraph({
-                  children: [
-                    new TextRun({
-                      text: 'Activity Log',
-                      bold: true,
-                      size: 32
-                    })
-                  ]
-                }),
-                new Paragraph({
-                  children: [
-                    new TextRun(`Exported: ${new Date().toLocaleString()}`)
-                  ]
-                }),
-                new Paragraph({ text: '' }),
-                ...activities.map(a => new Paragraph({
-                  children: [
-                    new TextRun({
-                      text: `${new Date(a.created_at).toLocaleString()} - ${a.action}`,
-                      bold: true
-                    })
-                  ]
-                })),
-                ...activities.map(a => new Paragraph({
-                  children: [
-                    new TextRun(JSON.stringify(a.details, null, 2))
-                  ]
-                })),
-                ...activities.map(() => new Paragraph({ text: '' }))
-              ]
-            }]
-          });
-          
-          const blob = await Packer.toBlob(docxDoc);
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `activity-log-${new Date().toISOString().split('T')[0]}.docx`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-          
-          showNotification('Activity log exported as DOCX');
-          await logActivity('export_activity_log', { format, count: activities.length });
+          // Export as text file (DOCX requires library that's blocked by CDN)
+          const docxText = activities.map(a => {
+            return `${new Date(a.created_at).toLocaleString()} - ${a.action}\n${JSON.stringify(a.details, null, 2)}\n`;
+          }).join('\n');
+          const docxBlob = new Blob([docxText], { type: 'text/plain' });
+          const docxUrl = URL.createObjectURL(docxBlob);
+          const docxA = document.createElement('a');
+          docxA.href = docxUrl;
+          docxA.download = `activity-log-${new Date().toISOString().split('T')[0]}.txt`;
+          document.body.appendChild(docxA);
+          docxA.click();
+          document.body.removeChild(docxA);
+          URL.revokeObjectURL(docxUrl);
+          showNotification('Activity log exported as text file');
+          await logActivity('export_activity_log', { format: 'text', count: activities.length });
           return;
       }
 
@@ -3538,112 +3501,18 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           break;
 
         case 'docx':
-          const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType } = docx;
-          
-          const studentRows = [
-            new TableRow({
-              children: [
-                new TableCell({ children: [new Paragraph('Name')] }),
-                new TableCell({ children: [new Paragraph('Joined At')] }),
-                new TableCell({ children: [new Paragraph('Status')] })
-              ]
-            }),
-            ...(students || []).map(s => new TableRow({
-              children: [
-                new TableCell({ children: [new Paragraph(s.name)] }),
-                new TableCell({ children: [new Paragraph(new Date(s.joined_at).toLocaleString())] }),
-                new TableCell({ children: [new Paragraph(s.online ? 'Online' : 'Offline')] })
-              ]
-            }))
-          ];
-          
-          const urlRows = [
-            new TableRow({
-              children: [
-                new TableCell({ children: [new Paragraph('URL')] }),
-                new TableCell({ children: [new Paragraph('Pushed At')] })
-              ]
-            }),
-            ...(urls || []).map(u => new TableRow({
-              children: [
-                new TableCell({ children: [new Paragraph(u.url)] }),
-                new TableCell({ children: [new Paragraph(new Date(u.pushed_at).toLocaleString())] })
-              ]
-            }))
-          ];
-          
-          const docxDoc = new Document({
-            sections: [{
-              properties: {},
-              children: [
-                new Paragraph({
-                  children: [
-                    new TextRun({
-                      text: `Room: ${room?.code || roomId}`,
-                      bold: true,
-                      size: 32
-                    })
-                  ]
-                }),
-                new Paragraph({
-                  children: [
-                    new TextRun(`Name: ${room?.name || 'N/A'}`)
-                  ]
-                }),
-                new Paragraph({
-                  children: [
-                    new TextRun(`Exported: ${new Date().toLocaleString()}`)
-                  ]
-                }),
-                new Paragraph({ text: '' }),
-                new Paragraph({
-                  children: [
-                    new TextRun({
-                      text: 'Students',
-                      bold: true,
-                      size: 24
-                    })
-                  ]
-                }),
-                new Table({
-                  rows: studentRows,
-                  width: {
-                    size: 100,
-                    type: WidthType.PERCENTAGE
-                  }
-                }),
-                new Paragraph({ text: '' }),
-                new Paragraph({
-                  children: [
-                    new TextRun({
-                      text: 'URL History',
-                      bold: true,
-                      size: 24
-                    })
-                  ]
-                }),
-                new Table({
-                  rows: urlRows,
-                  width: {
-                    size: 100,
-                    type: WidthType.PERCENTAGE
-                  }
-                })
-              ]
-            }]
-          });
-          
-          const docxBlob = await Packer.toBlob(docxDoc);
+          // Export as text file (DOCX requires library that's blocked by CDN)
+          const docxText = `Room: ${room?.code || roomId}\nName: ${room?.name || 'N/A'}\nExported: ${new Date().toLocaleString()}\n\nStudents:\n${(students || []).map(s => `- ${s.name || 'N/A'} - ${new Date(s.joined_at).toLocaleString()} (${s.online ? 'Online' : 'Offline'})`).join('\n')}\n\nURL History:\n${(urls || []).map(u => `- ${u.url} - ${new Date(u.pushed_at).toLocaleString()}`).join('\n')}`;
+          const docxBlob = new Blob([docxText], { type: 'text/plain' });
           const docxUrl = URL.createObjectURL(docxBlob);
           const docxA = document.createElement('a');
           docxA.href = docxUrl;
-          docxA.download = `room-${room?.code || roomId}-export.docx`;
+          docxA.download = `room-${room?.code || roomId}-export.txt`;
           document.body.appendChild(docxA);
           docxA.click();
           document.body.removeChild(docxA);
           URL.revokeObjectURL(docxUrl);
-          
-          showNotification('Room data exported as DOCX');
+          showNotification('Room data exported as text file');
           break;
       }
 
@@ -3884,7 +3753,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   // Event listeners for onboarding
   replayOnboardingBtn.addEventListener('click', startOnboarding);
   skipOnboarding.addEventListener('click', closeOnboarding);
-  closeOnboarding.addEventListener('click', closeOnboarding);
+  closeOnboardingBtn.addEventListener('click', closeOnboarding);
   onboardingBack.addEventListener('click', prevOnboardingStep);
   onboardingNext.addEventListener('click', nextOnboardingStep);
 
