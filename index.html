@@ -158,33 +158,6 @@
     .win.synced .body { animation: none; }
   }
 
-  /* Mobile grid windows */
-  @media (max-width: 780px) {
-    .grid-windows {
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-    }
-    .win {
-      border-radius: 4px;
-    }
-    .win::before {
-      height: 15%;
-    }
-    .win .body {
-      inset: 20% 8% 8% 8%;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .grid-windows {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 4px;
-    }
-    .win::before {
-      height: 12%;
-    }
-  }
-
   /* SECTION: how it works */
   section { padding: 72px 0; border-top: 1px solid var(--line); }
   .section-head { max-width: 46ch; margin-bottom: 48px; }
@@ -278,7 +251,6 @@
       gap: 12px;
       text-align: center;
     }
-  }
 
   @media (max-width: 480px) {
     .grid-windows {
