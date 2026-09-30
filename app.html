@@ -2003,7 +2003,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       <button class="btn btn-secondary export-option" data-format="json">JSON</button>
       <button class="btn btn-secondary export-option" data-format="pdf">PDF</button>
       <button class="btn btn-secondary export-option" data-format="xlsx">XLSX</button>
-      <button class="btn btn-secondary export-option" data-format="docx" disabled style="opacity: 0.5; cursor: not-allowed;">Text (Temporarily Unavailable)</button>
+      <button class="btn btn-secondary export-option" data-format="docx" disabled style="opacity: 0.5; cursor: not-allowed;">DOCX (Temporarily Unavailable)</button>
       <p style="font-size: 0.8rem; color: var(--ink-soft); text-align: center; margin-top: 8px;">We're having some issues with DOCX exports. We're working hard to fix it.</p>
     </div>
     <div class="modal-actions">
@@ -2854,13 +2854,13 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           const docxUrl = URL.createObjectURL(docxBlob);
           const docxA = document.createElement('a');
           docxA.href = docxUrl;
-          docxA.download = `activity-log-${new Date().toISOString().split('T')[0]}.txt`;
+          docxA.download = `activity-log-${new Date().toISOString().split('T')[0]}.docx`;
           document.body.appendChild(docxA);
           docxA.click();
           document.body.removeChild(docxA);
           URL.revokeObjectURL(docxUrl);
-          showNotification('Activity log exported as text file');
-          await logActivity('export_activity_log', { format: 'text', count: activities.length });
+          showNotification('Activity log exported as DOCX');
+          await logActivity('export_activity_log', { format: 'docx', count: activities.length });
           return;
       }
 
@@ -3511,12 +3511,12 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           const docxUrl = URL.createObjectURL(docxBlob);
           const docxA = document.createElement('a');
           docxA.href = docxUrl;
-          docxA.download = `room-${room?.code || roomId}-export.txt`;
+          docxA.download = `room-${room?.code || roomId}-export.docx`;
           document.body.appendChild(docxA);
           docxA.click();
           document.body.removeChild(docxA);
           URL.revokeObjectURL(docxUrl);
-          showNotification('Room data exported as text file');
+          showNotification('Room data exported as DOCX');
           break;
       }
 

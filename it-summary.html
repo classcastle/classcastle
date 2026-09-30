@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Classcastle IT & Privacy Summary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F7F6F1;
+    --ink: #1C1B17;
+    --ink-soft: #6B6A61;
+    --line: #E2E0D6;
+    --green: #2F5233;
+    --green-soft: #E7EDE4;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 11pt;
+    line-height: 1.5;
+    max-width: 8.5in;
+    margin: 0 auto;
+    padding: 0.5in;
+  }
+  @media print {
+    body {
+      max-width: none;
+      padding: 0;
+    }
+  }
+  h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; margin: 0; font-weight: 500; }
+  h1 { font-size: 18pt; margin-bottom: 0.25in; color: var(--green); }
+  h2 { font-size: 13pt; margin-top: 0.3in; margin-bottom: 0.15in; border-bottom: 1px solid var(--line); padding-bottom: 0.05in; }
+  h3 { font-size: 11pt; margin-top: 0.2in; margin-bottom: 0.1in; font-weight: 600; }
+  p { margin: 0 0 0.1in 0; }
+  ul, ol { margin: 0 0 0.1in 0; padding-left: 0.3in; }
+  li { margin-bottom: 0.05in; }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.3in;
+    padding-bottom: 0.15in;
+    border-bottom: 2px solid var(--green);
+  }
+  .header h1 { margin: 0; }
+  .header .meta { font-size: 9pt; color: var(--ink-soft); }
+  .section { margin-bottom: 0.25in; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.1in 0;
+    font-size: 10pt;
+  }
+  th, td {
+    padding: 0.08in 0.1in;
+    text-align: left;
+    border: 1px solid var(--line);
+  }
+  th {
+    background: var(--green-soft);
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    color: var(--green);
+  }
+  code {
+    background: var(--green-soft);
+    padding: 0.05in 0.08in;
+    border-radius: 3px;
+    font-family: 'Monaco', 'Consolas', monospace;
+    font-size: 9pt;
+  }
+  .print-note {
+    font-size: 9pt;
+    color: var(--ink-soft);
+    text-align: center;
+    margin-top: 0.3in;
+    padding-top: 0.15in;
+    border-top: 1px solid var(--line);
+  }
+  @media print {
+    .print-note { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Classcastle IT & Privacy Summary</h1>
+  <div class="meta">For IT administrators and school district buyers</div>
+</div>
+
+<div class="section">
+  <h2>Data Collected</h2>
+  <p><strong>Student data (during active room only):</strong></p>
+  <ul>
+    <li>Name (entered by student when joining — no account or email required)</li>
+    <li>Online status (whether the student is currently connected)</li>
+    <li>Current URL (the page the student is viewing during the room session)</li>
+  </ul>
+  <p><strong>Teacher data:</strong></p>
+  <ul>
+    <li>Email address (for Supabase authentication)</li>
+    <li>Room codes and room settings</li>
+    <li>Activity logs (room creation, student joins, URL navigation)</li>
+  </ul>
+  <p><strong>Data retention:</strong> Student data is only kept while a room is active. When a room is closed, student records are deleted. Teacher data persists for account management and analytics.</p>
+</div>
+
+<div class="section">
+  <h2>Extension Permissions</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 30%">Permission</th>
+        <th>Why we need it</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>storage</code></td>
+        <td>Stores the student's room session (room ID, student ID) so they stay joined even if the browser restarts or the extension is paused in the background.</td>
+      </tr>
+      <tr>
+        <td><code>tabs</code></td>
+        <td>Navigates the student's browser to the URL the teacher pushes. Allows reading the current tab URL to sync with the teacher dashboard.</td>
+      </tr>
+      <tr>
+        <td><code>alarms</code></td>
+        <td>Polls for URL changes in the background even when the extension popup is closed, ensuring navigation commands are received reliably.</td>
+      </tr>
+      <tr>
+        <td><code>host_permissions: hduyofdbpspjcuwvackd.supabase.co</code></td>
+        <td>Connects to the Supabase backend to send/receive room messages, join rooms, and sync student status.</td>
+      </tr>
+      <tr>
+        <td><code>externally_connectable: classcastle.org</code></td>
+        <td>Allows the teacher app (classcastle.org) to send messages directly to the extension for real-time communication.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section">
+  <h2>Deployment Steps</h2>
+  <ol>
+    <li><strong>Get the extension ID:</strong> Find Classcastle's ID (acfkgmbemlolnjcnhfokelioeienonoi) and store listing under Admin → Deployment in the teacher app.</li>
+    <li><strong>Force-install through policy:</strong> Add the extension ID to <code>ExtensionInstallForcelist</code> in the Google Admin console for ChromeOS and Chrome, or push it via Intune or GPO for Edge.</li>
+    <li><strong>Allow the connection:</strong> Safelist <code>hduyofdbpspjcuwvackd.supabase.co</code> in your web filter or firewall so room connections aren't blocked on the school network.</li>
+    <li><strong>Verify on a test device:</strong> Confirm the icon appears pinned and can join a test room, then roll out to the rest of the fleet with the same policy.</li>
+  </ol>
+</div>
+
+<div class="section">
+  <h2>Domains to Safelist</h2>
+  <p><strong>Backend API:</strong> <code>hduyofdbpspjcuwvackd.supabase.co</code></p>
+  <p><strong>Teacher app:</strong> <code>classcastle.org</code></p>
+  <p><strong>Chrome Web Store:</strong> <code>chromewebstore.google.com</code> (for extension installation)</p>
+  <p><strong>Note:</strong> The extension uses Supabase as the backend for real-time messaging and room management. Both domains must be accessible for Classcastle to function.</p>
+</div>
+
+<div class="section">
+  <h2>Security & Privacy</h2>
+  <ul>
+    <li>All data encrypted in transit (HTTPS)</li>
+    <li>Teachers only see their own rooms and students</li>
+    <li>Students can only access content the teacher approves via URL navigation</li>
+    <li>No browsing history collection beyond current URL during active room</li>
+    <li>No external code execution — all extension code is local</li>
+    <li>Supabase RLS policies ensure data isolation between teachers</li>
+  </ul>
+</div>
+
+<div class="section">
+  <h2>Support</h2>
+  <p>Full privacy policy: <a href="https://classcastle.org/privacy.html">classcastle.org/privacy.html</a></p>
+  <p>Terms of service: <a href="https://classcastle.org/terms.html">classcastle.org/terms.html</a></p>
+</div>
+
+<div class="print-note">
+  <p>Print this page for IT approval and documentation. Last updated: <span id="date"></span></p>
+</div>
+
+<script>
+  document.getElementById('date').textContent = new Date().toLocaleDateString();
+</script>
+
+</body>
+</html>

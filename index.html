@@ -3,8 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Classcastle — one click, every browser</title>
+<title>Classcastle — One click, every browser. Free classroom navigation tool for teachers.</title>
+<meta name="description" content="Classcastle is a free teacher web app and student browser extension. One click sends every student's browser to the same URL. No student accounts. Works on Chromebooks.">
+<link rel="canonical" href="https://classcastle.org/">
 <link rel="icon" type="image/svg+xml" href="/logo.svg" id="favicon">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://classcastle.org/">
+<meta property="og:title" content="Classcastle — One click, every browser">
+<meta property="og:description" content="Free classroom navigation tool for teachers. One click sends every student's browser to the same URL. No student accounts. Works on Chromebooks.">
+<meta property="og:image" content="https://classcastle.org/og-image.png">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://classcastle.org/">
+<meta name="twitter:title" content="Classcastle — One click, every browser">
+<meta name="twitter:description" content="Free classroom navigation tool for teachers. One click sends every student's browser to the same URL. No student accounts. Works on Chromebooks.">
+<meta name="twitter:image" content="https://classcastle.org/og-image.png">
+
+<!-- JSON-LD Schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Classcastle",
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "Chrome, Edge, ChromeOS, Windows, macOS, Linux",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "description": "Classcastle is a free teacher web app and student browser extension. One click sends every student's browser to the same URL. No student accounts. Works on Chromebooks.",
+  "author": {
+    "@type": "Organization",
+    "name": "Classcastle"
+  },
+  "url": "https://classcastle.org"
+}
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -65,14 +104,78 @@
     display: flex; align-items: center; justify-content: space-between;
     padding: 28px 32px;
     max-width: 1080px; margin: 0 auto;
+    position: sticky;
+    top: 0;
+    background: var(--paper);
+    z-index: 100;
   }
   .wordmark { font-family: 'Fraunces', serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; display: flex; align-items: center; gap: 9px; }
   .logo-mark { width: 24px; height: 24px; display: block; }
   .wordmark .word-accent { color: var(--green); }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+  .nav-links a {
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 0.92rem;
+    font-weight: 500;
+  }
+  .nav-links a:hover {
+    color: var(--green);
+  }
   .nav-cta {
     font-size: 0.9rem; font-weight: 500;
     background: var(--ink); color: var(--paper);
     padding: 10px 18px; border-radius: 8px; text-decoration: none;
+  }
+  .nav-cta:hover {
+    background: var(--green-btn);
+  }
+  .mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+  }
+  .mobile-menu-btn span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--ink);
+    margin: 5px 0;
+  }
+  .mobile-nav {
+    display: none;
+    position: fixed;
+    top: 72px;
+    left: 0;
+    right: 0;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+    padding: 20px 24px;
+    z-index: 99;
+  }
+  .mobile-nav.open {
+    display: block;
+  }
+  .mobile-nav a {
+    display: block;
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 1rem;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .mobile-nav a:last-child {
+    border-bottom: none;
+  }
+  .mobile-nav .nav-cta {
+    display: inline-block;
+    margin-top: 16px;
   }
 
   /* HERO */
@@ -154,6 +257,70 @@
     display: inline-block;
   }
 
+  /* PRICING */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .pricing-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+  }
+  .pricing-card.featured {
+    border-color: var(--green);
+    border-width: 2px;
+  }
+  .pricing-header {
+    margin-bottom: 24px;
+  }
+  .pricing-header h3 {
+    font-size: 1.25rem;
+    margin-bottom: 8px;
+  }
+  .price {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .price-period {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--ink-soft);
+  }
+  .pricing-desc {
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+  }
+  .pricing-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 28px 0;
+    flex-grow: 1;
+  }
+  .pricing-features li {
+    padding: 8px 0;
+    color: var(--ink);
+    font-size: 0.95rem;
+  }
+  .pricing-cta {
+    width: 100%;
+    text-align: center;
+    padding: 14px 20px;
+  }
+  @media (max-width: 780px) {
+    .pricing-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     .win.synced .body { animation: none; }
   }
@@ -182,6 +349,54 @@
   .feature { background: var(--paper); padding: 28px 26px; }
   .feature h3 { font-size: 1.02rem; font-weight: 500; margin-bottom: 8px; }
   .feature p { color: var(--ink-soft); font-size: 0.93rem; line-height: 1.5; }
+
+  /* PERMISSIONS TABLE */
+  .permissions-table {
+    margin-top: 48px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .permissions-table table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .permissions-table th,
+  .permissions-table td {
+    padding: 16px 20px;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+  }
+  .permissions-table th {
+    background: var(--green-soft);
+    font-family: 'Fraunces', serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--green);
+  }
+  .permissions-table td {
+    font-size: 0.92rem;
+  }
+  .permissions-table td:first-child {
+    font-weight: 500;
+    color: var(--ink);
+    width: 30%;
+  }
+  .permissions-table td:last-child {
+    color: var(--ink-soft);
+  }
+  .permissions-table tr:last-child td {
+    border-bottom: none;
+  }
+  @media (max-width: 780px) {
+    .permissions-table {
+      font-size: 0.85rem;
+    }
+    .permissions-table th,
+    .permissions-table td {
+      padding: 12px 16px;
+    }
+  }
 
   /* Mobile features - stacked */
   @media (max-width: 780px) {
@@ -224,6 +439,8 @@
     .faq-list { grid-template-columns: 1fr; }
     nav { padding: 22px 24px; }
     .wrap, .hero, section { padding-left: 24px; padding-right: 24px; }
+    .nav-links { display: none; }
+    .mobile-menu-btn { display: block; }
     
     /* Mobile grid windows */
     .grid-windows {
@@ -284,8 +501,32 @@
 
 <nav>
   <div class="wordmark"><img src="/logo.svg" alt="" class="logo-mark"><span class="word-text">Class<span class="word-accent">castle</span></span></div>
-  <a class="nav-cta" href="/login.html">Open teacher app</a>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#features">Features</a>
+    <a href="#why-teachers">For teachers</a>
+    <a href="#it">For IT</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#security">Privacy</a>
+    <a href="#faq">FAQ</a>
+    <a class="nav-cta" href="/login.html">Open teacher app</a>
+  </div>
+  <button class="mobile-menu-btn" aria-label="Menu">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
 </nav>
+<div class="mobile-nav">
+  <a href="#how">How it works</a>
+  <a href="#features">Features</a>
+  <a href="#why-teachers">For teachers</a>
+  <a href="#it">For IT</a>
+  <a href="#pricing">Pricing</a>
+  <a href="#security">Privacy</a>
+  <a href="#faq">FAQ</a>
+  <a class="nav-cta" href="/login.html">Open teacher app</a>
+</div>
 
 <div class="wrap">
   <div class="hero">
@@ -349,7 +590,7 @@
   </div>
 </section>
 
-<section>
+<section id="features">
   <div class="wrap">
     <div class="section-head">
       <h2>Built for the realities of a classroom</h2>
@@ -371,7 +612,7 @@
   </div>
 </section>
 
-<section>
+<section id="it">
   <div class="wrap">
     <div class="section-head">
       <h2>For IT: rolling it out across a fleet</h2>
@@ -402,7 +643,7 @@
   </div>
 </section>
 
-<section>
+<section id="why-teachers">
   <div class="wrap">
     <div class="section-head">
       <h2>Why teachers love it</h2>
@@ -437,16 +678,58 @@
   </div>
 </section>
 
-<section>
+<section id="pricing">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Pricing</h2>
+      <p>Free for teachers. Optional donations support ongoing development.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card featured">
+        <div class="pricing-header">
+          <h3>Free</h3>
+          <div class="price">$0<span class="price-period">/month</span></div>
+          <p class="pricing-desc">For individual teachers</p>
+        </div>
+        <ul class="pricing-features">
+          <li>✓ Unlimited rooms</li>
+          <li>✓ Unlimited students</li>
+          <li>✓ Real-time navigation</li>
+          <li>✓ Room management</li>
+          <li>✓ Activity logs</li>
+          <li>✓ Export room data</li>
+        </ul>
+        <a class="btn-primary pricing-cta" href="/login.html">Get started free</a>
+      </div>
+      <div class="pricing-card">
+        <div class="pricing-header">
+          <h3>Donate</h3>
+          <div class="price">Support<span class="price-period"> us</span></div>
+          <p class="pricing-desc">Help keep Classcastle free</p>
+        </div>
+        <ul class="pricing-features">
+          <li>✓ Support free education</li>
+          <li>✓ Fund new features</li>
+          <li>✓ Keep servers running</li>
+          <li>✓ Optional recognition</li>
+        </ul>
+        <a class="btn-secondary pricing-cta" href="https://github.com/sponsors/classcastle" target="_blank">Donate</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="security">
   <div class="wrap">
     <div class="section-head">
       <h2>Security & Privacy</h2>
       <p>Built with student privacy and school security in mind.</p>
+      <p style="margin-top: 16px;"><a href="/it-summary.html" target="_blank" style="color: var(--green); text-decoration: underline;">Download IT & privacy summary (PDF-friendly)</a></p>
     </div>
     <div class="features six-items">
       <div class="feature">
         <h3>No student accounts</h3>
-        <p>Students join with a room code only. No email, no signup, no personal data required.</p>
+        <p>Students join with a room code and enter a name — no email, no signup, no accounts needed. The name and online status are only kept while the room is active.</p>
       </div>
       <div class="feature">
         <h3>Teacher controls</h3>
@@ -469,10 +752,42 @@
         <p>All extension code is included locally. No unexpected updates or external code execution.</p>
       </div>
     </div>
+    <div class="permissions-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Permission</th>
+            <th>Why we need it</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>storage</td>
+            <td>Stores the student's room session (room ID, student ID) so they stay joined even if the browser restarts or the extension is paused in the background.</td>
+          </tr>
+          <tr>
+            <td>tabs</td>
+            <td>Navigates the student's browser to the URL the teacher pushes. Allows reading the current tab URL to sync with the teacher dashboard.</td>
+          </tr>
+          <tr>
+            <td>alarms</td>
+            <td>Polls for URL changes in the background even when the extension popup is closed, ensuring navigation commands are received reliably.</td>
+          </tr>
+          <tr>
+            <td>host_permissions: hduyofdbpspjcuwvackd.supabase.co</td>
+            <td>Connects to the Supabase backend to send/receive room messages, join rooms, and sync student status.</td>
+          </tr>
+          <tr>
+            <td>externally_connectable: classcastle.org</td>
+            <td>Allows the teacher app (classcastle.org) to send messages directly to the extension for real-time communication.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </section>
 
-<section>
+<section id="faq">
   <div class="wrap">
     <div class="section-head">
       <h2>Frequently Asked Questions</h2>
@@ -500,7 +815,7 @@
       </div>
       <div class="faq-item">
         <h3>Is student data collected?</h3>
-        <p>We only collect what's needed: student name (for identification), online status, and the current URL for the teacher dashboard. No browsing history or tracking.</p>
+        <p>Students enter a name when joining (no accounts or emails needed). During a live room, we track online status and current URL so you can see who's present and where they are. No browsing history is collected, and this data is only kept while the room is active.</p>
       </div>
     </div>
   </div>
@@ -519,6 +834,7 @@
     <span>Made for classrooms</span>
     <span>• <a href="/terms.html" style="color: var(--ink-soft);">Terms</a></span>
     <span>• <a href="/privacy.html" style="color: var(--ink-soft);">Privacy</a></span>
+    <span>• <a href="mailto:support@classcastle.org" style="color: var(--ink-soft);">Support</a></span>
   </footer>
 </div>
 
@@ -578,6 +894,22 @@
   }
 
   checkSession();
+
+  // Mobile menu toggle
+  const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+  const mobileNav = document.querySelector('.mobile-nav');
+  if (mobileMenuBtn && mobileNav) {
+    mobileMenuBtn.addEventListener('click', () => {
+      mobileNav.classList.toggle('open');
+    });
+
+    // Close mobile menu when clicking a link
+    mobileNav.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileNav.classList.remove('open');
+      });
+    });
+  }
 </script>
 
 </body>
