@@ -4,581 +4,274 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Classcastle — one click, every browser</title>
+<meta name="description" content="Classcastle is a free teacher web app and student browser extension. Press one button and every student's browser opens the same page. Works on Chromebooks, no student accounts.">
+<meta property="og:title" content="Classcastle — one click, every browser">
+<meta property="og:description" content="Send every student's browser to the same page in one click. Free for teachers. Works on Chromebooks.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://classcastle.org/">
+<meta property="og:image" content="https://images.unsplash.com/photo-1758270705290-62b6294dd044?auto=format&fit=crop&w=1200&h=630&q=80">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://classcastle.org/">
 <link rel="icon" type="image/svg+xml" href="/logo.svg" id="favicon">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+{"@type":"SoftwareApplication","name":"Classcastle","url":"https://classcastle.org/","applicationCategory":"EducationalApplication","operatingSystem":"Windows, macOS, ChromeOS, Linux","description":"A teacher web app and student browser extension that sends every student's browser to the same page in one click.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},
+{"@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Is Classcastle free?","acceptedAnswer":{"@type":"Answer","text":"Yes, Classcastle is free for teachers. Create unlimited rooms, invite unlimited students."}},
+{"@type":"Question","name":"What browsers does it work with?","acceptedAnswer":{"@type":"Answer","text":"Chrome, Edge, and any Chromium-based browser. Works on Windows, macOS, ChromeOS, and Linux."}},
+{"@type":"Question","name":"Do students need accounts?","acceptedAnswer":{"@type":"Answer","text":"No. Students only need the extension and the room code. No signup, no login, no email required."}},
+{"@type":"Question","name":"Can students navigate on their own?","acceptedAnswer":{"@type":"Answer","text":"Yes. Classcastle doesn't lock their browser; it just pushes URLs."}},
+{"@type":"Question","name":"What if a student's extension isn't working?","acceptedAnswer":{"@type":"Answer","text":"They still appear in your room list but won't receive navigation commands."}},
+{"@type":"Question","name":"Is student data collected?","acceptedAnswer":{"@type":"Answer","text":"Only student name, online status, and the current URL for the teacher dashboard. No browsing history or tracking."}}]}]}
+</script>
 <style>
-  :root {
-    --paper: #F7F6F1;
-    --ink: #1C1B17;
-    --ink-soft: #6B6A61;
-    --line: #E2E0D6;
-    --green: #2F5233;
-    --green-soft: #E7EDE4;
-    --green-btn: #2F5233;
-    --on-green: #fff;
-    --sky: var(--green);
-    --sky-soft: var(--green-soft);
-    --amber: #D98E2B;
-    --red: #B23A2E;
-    --surface: #fff;
-    color-scheme: light dark;
-    box-sizing: border-box;
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --paper: #151512;
-      --ink: #F1F0E9;
-      --ink-soft: #A8A79D;
-      --line: #34332B;
-      --green: #E7EDE4;
-      --green-soft: #223324;
-      --green-btn: #3E7A47;
-      --on-green: #fff;
-      --sky: var(--green);
-      --sky-soft: var(--green-soft);
-      --amber: #F0B84D;
-      --red: #D2503F;
-      --surface: #1F1E19;
-    }
-  }
-  * { box-sizing: inherit; }
-  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
-  html, body { margin: 0; padding: 0; }
-  body {
-    background: var(--paper);
-    color: var(--ink);
-    font-family: 'Inter', system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased;
-  }
-  h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; margin: 0; font-weight: 500; }
-  p { margin: 0; }
-  a { color: inherit; }
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 32px; }
+:root{
+  --bg:#FCFCFA; --surface:#fff; --ink:#18221C; --soft:#5E675F; --line:#D9DDD3;
+  --brand:#1F5C3A; --brand-ink:#fff; --tint:#E4F1E6; --board:#17352A; --chalk:#F4D35E;
+  color-scheme:light dark; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#0F1511;--surface:#18211B;--ink:#EEF2EA;--soft:#9EAA9F;--line:#2A362D;--brand:#4DAA72;--tint:#1A2B20;--board:#1C4030}
+}
+:root[data-theme="dark"]{--bg:#0F1511;--surface:#18211B;--ink:#EEF2EA;--soft:#9EAA9F;--line:#2A362D;--brand:#4DAA72;--tint:#1A2B20;--board:#1C4030}
+*{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font:400 1.02rem/1.6 'Instrument Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:'Young Serif',Georgia,serif;font-weight:400;margin:0;line-height:1.15}
+p{margin:0}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--brand);outline-offset:3px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+nav{display:flex;align-items:center;justify-content:space-between;max-width:1080px;margin:0 auto;padding:22px 28px}
+.wordmark{display:flex;align-items:center;gap:10px;font:400 1.3rem 'Young Serif',serif}
+.logo-mark{width:26px;height:26px;display:block}
+.word-accent{color:var(--brand)}
+.nav-cta{font-weight:600;font-size:.92rem;text-decoration:none;padding:8px 2px;border-bottom:2px solid var(--ink)}
+.btn-primary{background:var(--brand);color:var(--brand-ink);text-decoration:none;font-weight:600;padding:14px 24px;border-radius:6px;display:inline-block;box-shadow:3px 3px 0 var(--ink);transition:transform .12s,box-shadow .12s}
+.btn-primary:hover{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.btn-secondary{font-weight:600;text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:2px}
 
-  /* NAV */
-  nav {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 28px 32px;
-    max-width: 1080px; margin: 0 auto;
-  }
-  .wordmark { font-family: 'Fraunces', serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; display: flex; align-items: center; gap: 9px; }
-  .logo-mark { width: 24px; height: 24px; display: block; }
-  .wordmark .word-accent { color: var(--green); }
-  .nav-cta {
-    font-size: 0.9rem; font-weight: 500;
-    background: var(--ink); color: var(--paper);
-    padding: 10px 18px; border-radius: 8px; text-decoration: none;
-  }
+.hero{display:grid;grid-template-columns:1.05fr 1fr;gap:64px;align-items:center;padding:36px 0 96px}
+.photo{position:relative;aspect-ratio:4/5;background:var(--tint);border-radius:6px;box-shadow:12px 12px 0 var(--brand)}
+.photo img{width:100%;height:100%;object-fit:cover;display:block;border-radius:6px}
+.live{position:absolute;left:-16px;bottom:28px;width:min(78%,300px);background:var(--chalk);color:#18221C;border:2px solid #18221C;border-radius:4px;padding:12px 14px;transform:rotate(-2.5deg)}
+.live-top{display:flex;justify-content:space-between;font-size:.8rem;font-weight:600}
+.pulse{display:none}
+.tiles{display:grid;grid-template-columns:repeat(15,1fr);gap:3px;margin:9px 0}
+.tile{aspect-ratio:1;background:rgba(24,34,28,.15)}
+.tile.on{background:#18221C}
+.live-url{font-size:.88rem;font-weight:600}
+.live-url span{font-weight:400}
+.hero h1{font-size:clamp(2.2rem,4.2vw,3.3rem);max-width:14ch}
+.lede{margin-top:20px;font-size:1.08rem;color:var(--soft);max-width:44ch}
+.hero-ctas{margin-top:30px;display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+.free-note{margin-top:16px;font-size:.9rem;font-weight:500}
+.os-row{margin-top:6px;font-size:.88rem;color:var(--soft)}
 
-  /* HERO */
-  .hero {
-    display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px;
-    align-items: center;
-    padding: 40px 0 80px;
-  }
-  .hero h1 {
-    font-size: clamp(2.4rem, 4.2vw, 3.4rem);
-    line-height: 1.08;
-    letter-spacing: -0.015em;
-    max-width: 11.5ch;
-  }
-  .hero p.lede {
-    margin-top: 22px;
-    font-size: 1.08rem;
-    line-height: 1.6;
-    color: var(--ink-soft);
-    max-width: 42ch;
-  }
-  .hero-ctas { margin-top: 32px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
-  .btn-primary {
-    background: var(--green-btn); color: var(--on-green);
-    padding: 13px 22px; border-radius: 8px;
-    font-weight: 500; font-size: 0.98rem; text-decoration: none;
-    display: inline-block;
-  }
-  .btn-secondary {
-    color: var(--ink); text-decoration: none; font-weight: 500; font-size: 0.98rem;
-    border-bottom: 1px solid var(--line); padding-bottom: 2px;
-  }
-  .free-note { margin-top: 14px; font-size: 0.85rem; color: var(--ink-soft); }
+section{padding:76px 0;border-top:1px solid var(--line)}
+.section-head{max-width:50ch;margin-bottom:36px}
+.section-head h2{font-size:clamp(1.7rem,2.8vw,2.2rem)}
+.section-head p{margin-top:10px;color:var(--soft)}
+.steps,.it-steps{display:grid;gap:36px;counter-reset:s}
+.steps{grid-template-columns:repeat(3,1fr)}
+.it-steps{grid-template-columns:1fr;gap:0;max-width:760px}
+.step{counter-increment:s}
+.step::before{content:counter(s) ".";display:block;font:400 2.4rem 'Young Serif',serif;color:var(--brand);margin-bottom:6px;line-height:1}
+.step h3{font-size:1.2rem;margin-bottom:8px}
+.step p{color:var(--soft)}
+.it-steps .step{display:grid;grid-template-columns:48px 1fr;column-gap:12px;padding:20px 0;border-top:1px solid var(--line)}
+.it-steps .step::before{font-size:1.6rem;grid-row:span 2}
+.it-steps .step h3{font-size:1.05rem;margin:0 0 4px}
 
-  .os-row { margin-top: 22px; display: flex; gap: 24px; flex-wrap: wrap; }
-  .os-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-  .os-icon { width: 22px; height: 22px; color: var(--ink-soft); display: block; }
-  .os-label { font-size: 0.75rem; color: var(--ink-soft); }
+/* feature lists: plain ruled rows, no cards */
+.features{display:grid;grid-template-columns:1fr 1fr;gap:0 56px}
+.feature{padding:22px 0;border-top:1px solid var(--line)}
+.feature h3{font:600 1.02rem 'Instrument Sans',sans-serif;margin-bottom:5px}
+.feature p{color:var(--soft);font-size:.96rem;line-height:1.55}
+.faq-list{display:grid;grid-template-columns:1fr 1fr;gap:0 56px;align-items:start}
+details{border-top:1px solid var(--line)}
+summary{cursor:pointer;list-style:none;padding:18px 0;font-weight:600;display:flex;justify-content:space-between;gap:12px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:'+';color:var(--brand);font-size:1.3rem;line-height:1}
+details[open] summary::after{content:'−'}
+details p{color:var(--soft);padding-bottom:18px;font-size:.96rem}
 
-  /* VISUAL: grid of student windows */
-  .rig { position: relative; }
-  .grid-windows {
-    display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
-  }
-  .win {
-    aspect-ratio: 4/3; background: var(--surface); border: 1px solid var(--line);
-    border-radius: 6px; position: relative; overflow: hidden;
-  }
-  .win::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 18%;
-    background: #F0EEE6; border-bottom: 1px solid var(--line);
-  }
-  .win::after {
-    content: ''; position: absolute; left: 8%; top: 5%; width: 5px; height: 5px;
-    border-radius: 50%; background: #C9C6B8;
-    box-shadow: 10px 0 0 #C9C6B8, 20px 0 0 #C9C6B8;
-  }
-  .win .body {
-    position: absolute; inset: 22% 10% 10% 10%;
-    border-radius: 3px; background: var(--line);
-    opacity: 0.6;
-    transition: background 0.6s ease, opacity 0.6s ease;
-  }
-  .win.synced .body {
-    background: var(--green-soft);
-    opacity: 1;
-  }
-  .win.synced .body::after {
-    content: '⌂ microbit.org';
-    position: absolute; top: 6px; left: 6px;
-    font-size: 6px; color: var(--green); font-family: 'Inter', sans-serif; font-weight: 600;
-  }
-  .rig-caption {
-    margin-top: 16px; font-size: 0.85rem; color: var(--ink-soft);
-    display: flex; align-items: center; gap: 8px;
-  }
-  .dot-live {
-    width: 7px; height: 7px; border-radius: 50%; background: var(--green);
-    display: inline-block;
-  }
+.cta-wrap{margin-top:40px}
+.cta-band{position:relative;background:var(--board);color:#fff;padding:64px 48px 60px;border-radius:0 0 6px 6px;margin-top:16px}
+.cta-band::before{content:'';position:absolute;left:0;right:0;top:-16px;height:16px;background:linear-gradient(90deg,var(--board) 50%,transparent 50%) 0 0/32px 100%}
+.cta-band h2{font-size:clamp(1.8rem,3.2vw,2.5rem);max-width:18ch}
+.cta-band .btn-primary{background:var(--chalk);color:#18221C;box-shadow:3px 3px 0 #000}
+.cta-band .btn-secondary{color:#fff}
+footer{padding:26px 0 44px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--soft);font-size:.85rem}
+footer a{color:var(--soft)}
 
-  @media (prefers-reduced-motion: no-preference) {
-    .win.synced .body { animation: none; }
-  }
-
-  /* SECTION: how it works */
-  section { padding: 72px 0; border-top: 1px solid var(--line); }
-  .section-head { max-width: 46ch; margin-bottom: 48px; }
-  .section-head h2 { font-size: clamp(1.6rem, 2.6vw, 2.1rem); letter-spacing: -0.01em; }
-  .section-head p { margin-top: 12px; color: var(--ink-soft); font-size: 1.02rem; line-height: 1.55; }
-
-  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
-  .it-steps { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px 48px; }
-  .step .num {
-    font-family: 'Fraunces', serif; font-size: 0.95rem; color: var(--green);
-    margin-bottom: 14px; font-weight: 600;
-  }
-  .step h3 { font-size: 1.15rem; margin-bottom: 10px; font-weight: 500; }
-  .step p { color: var(--ink-soft); line-height: 1.55; font-size: 0.97rem; }
-
-  /* FEATURES */
-  .features {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
-    background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
-  }
-  .features.six-items { grid-template-columns: repeat(3, 1fr); }
-  .feature { background: var(--paper); padding: 28px 26px; }
-  .feature h3 { font-size: 1.02rem; font-weight: 500; margin-bottom: 8px; }
-  .feature p { color: var(--ink-soft); font-size: 0.93rem; line-height: 1.5; }
-
-  /* Mobile features - stacked */
-  @media (max-width: 780px) {
-    .features {
-      grid-template-columns: 1fr;
-    }
-    .features.six-items {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  /* FAQ */
-  .faq-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; }
-  .faq-item { padding: 24px; background: var(--paper); border: 1px solid var(--line); border-radius: 10px; }
-  .faq-item h3 { font-size: 1.02rem; font-weight: 500; margin-bottom: 8px; }
-  .faq-item p { color: var(--ink-soft); font-size: 0.93rem; line-height: 1.5; }
-
-  /* CTA band */
-  .cta-band {
-    text-align: left;
-    padding: 64px 0 80px;
-  }
-  .cta-band h2 {
-    font-size: clamp(1.8rem, 3vw, 2.4rem);
-    max-width: 16ch; letter-spacing: -0.01em;
-  }
-  .cta-band .hero-ctas { margin-top: 28px; }
-
-  footer {
-    border-top: 1px solid var(--line);
-    padding: 28px 0 40px;
-    display: flex; justify-content: space-between; align-items: center;
-    color: var(--ink-soft); font-size: 0.85rem;
-  }
-
-  @media (max-width: 780px) {
-    .hero { grid-template-columns: 1fr; }
-    .steps, .it-steps { grid-template-columns: 1fr; gap: 32px; }
-    .features { grid-template-columns: 1fr; }
-    .faq-list { grid-template-columns: 1fr; }
-    nav { padding: 22px 24px; }
-    .wrap, .hero, section { padding-left: 24px; padding-right: 24px; }
-    
-    /* Mobile grid windows */
-    .grid-windows {
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-    }
-    .win {
-      border-radius: 4px;
-    }
-    .win::before {
-      height: 15%;
-    }
-    .win .body {
-      inset: 20% 8% 8% 8%;
-    }
-    
-    /* Mobile CTA band */
-    .cta-band h2 {
-      font-size: clamp(1.5rem, 5vw, 2rem);
-    }
-    
-    /* Mobile footer */
-    footer {
-      flex-direction: column;
-      gap: 12px;
-      text-align: center;
-    }
-
-  @media (max-width: 480px) {
-    .grid-windows {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 4px;
-    }
-    .win::before {
-      height: 12%;
-    }
-    
-    .hero h1 {
-      font-size: clamp(2rem, 6vw, 2.8rem);
-    }
-    
-    .hero-ctas {
-      flex-direction: column;
-      align-items: stretch;
-    }
-    
-    .btn-primary, .btn-secondary {
-      text-align: center;
-    }
-    
-    .os-row {
-      justify-content: center;
-    }
-  }
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media (max-width:820px){
+  .wrap,nav{padding-left:20px;padding-right:20px}
+  .hero{grid-template-columns:1fr;gap:40px;padding-bottom:64px}
+  .hero-copy{order:-1}
+  .photo{aspect-ratio:4/3.4;box-shadow:8px 8px 0 var(--brand);margin-right:8px}
+  .live{left:-8px}
+  .steps,.features,.faq-list{grid-template-columns:1fr}
+  section{padding:52px 0}
+  .cta-band{padding:44px 24px}
+  .hero-ctas{flex-direction:column;align-items:stretch;text-align:center}
+}
 </style>
 </head>
 <body>
 
-<nav>
-  <div class="wordmark"><img src="/logo.svg" alt="" class="logo-mark"><span class="word-text">Class<span class="word-accent">castle</span></span></div>
+<nav aria-label="Main">
+  <div class="wordmark"><img src="/logo.svg" alt="" class="logo-mark"><span>Class<span class="word-accent">castle</span></span></div>
   <a class="nav-cta" href="/login.html">Open teacher app</a>
 </nav>
 
+<main>
 <div class="wrap">
   <div class="hero">
-    <div>
-      <h1>One click, and thirty screens land in the same place.</h1>
-      <p class="lede">Classcastle is a teacher web app paired with a lightweight browser extension for students. You run the room from any browser; they join with a code. When it's time for the task, you press one button, and every student's browser opens the same page — no reading URLs off the whiteboard, no lost kids.</p>
-      <div class="hero-ctas">
-        <a class="btn-primary" href="/login.html">Open the teacher app</a>
-        <a class="btn-secondary" href="https://chromewebstore.google.com/detail/classcastle/acfkgmbemlolnjcnhfokelioeienonoi" target="_blank">Get the student extension</a>
-      </div>
-      <p class="free-note">Free for teachers. Works on Chromebooks. No student accounts needed.</p>
-      <div class="os-row">
-        <div class="os-item">
-          <svg class="os-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M0 0h11.377v11.372H0Zm12.623 0H24v11.372H12.623ZM0 12.623h11.377V24H0Zm12.623 0H24V24H12.623"/></svg>
-          <span class="os-label">Windows</span>
-        </div>
-        <div class="os-item">
-          <svg class="os-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></svg>
-          <span class="os-label">macOS</span>
-        </div>
-        <div class="os-item">
-          <svg class="os-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M12 0C8.21 0 4.831 1.757 2.632 4.501l3.953 6.848A5.454 5.454 0 0112 6.545h10.691A12 12 0 0012 0zM1.931 5.47A11.943 11.943 0 000 12c0 6.012 4.42 10.991 10.189 11.864l3.953-6.847a5.45 5.45 0 01-6.865-2.29zm13.342 2.166a5.446 5.446 0 011.45 7.09l.002.001h-.002l-5.344 9.257c.206.01.413.016.621.016 6.627 0 12-5.373 12-12 0-1.54-.29-3.011-.818-4.364zM12 16.364a4.364 4.364 0 110-8.728 4.364 4.364 0 010 8.728Z"/></svg>
-          <span class="os-label">ChromeOS</span>
-        </div>
-        <div class="os-item">
-          <svg class="os-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M8.996 4.497c.104-.076.1-.168.186-.158s.022.102-.098.207c-.12.104-.308.243-.46.323-.291.152-.631.336-.993.336s-.647-.167-.853-.33c-.102-.082-.186-.162-.248-.221-.11-.086-.096-.207-.052-.204.075.01.087.109.134.153.064.06.144.137.241.214.195.154.454.304.778.304s.702-.19.932-.32c.13-.073.297-.204.433-.304M7.34 3.781c.055-.02.123-.031.174-.003.011.006.024.021.02.034-.012.038-.074.032-.11.05-.032.017-.057.052-.093.054-.034 0-.086-.012-.09-.046-.007-.044.058-.072.1-.089m.581-.003c.05-.028.119-.018.173.003.041.017.106.045.1.09-.004.033-.057.046-.09.045-.036-.002-.062-.037-.093-.053-.036-.019-.098-.013-.11-.051-.004-.013.008-.028.02-.034"/><path fill="currentColor" fill-rule="evenodd" d="M8.446.019c2.521.003 2.38 2.66 2.364 4.093-.01.939.509 1.574 1.04 2.244.474.56 1.095 1.38 1.45 2.32.29.765.402 1.613.115 2.465a.8.8 0 0 1 .254.152l.001.002c.207.175.271.447.329.698.058.252.112.488.224.615.344.382.494.667.48.922-.015.254-.203.43-.435.57-.465.28-1.164.491-1.586 1.002-.443.527-.99.83-1.505.871a1.25 1.25 0 0 1-1.256-.716v-.001a1 1 0 0 1-.078-.21c-.67.038-1.252-.165-1.718-.128-.687.038-1.116.204-1.506.206-.151.331-.445.547-.808.63-.5.114-1.126 0-1.743-.324-.577-.306-1.31-.278-1.85-.39-.27-.057-.51-.157-.626-.384-.116-.226-.095-.538.07-.988.051-.16.012-.398-.026-.648a2.5 2.5 0 0 1-.037-.369c0-.133.022-.265.087-.386v-.002c.14-.266.368-.377.577-.451s.397-.125.53-.258c.143-.15.27-.374.443-.56q.036-.037.073-.07c-.081-.538.007-1.105.192-1.662.393-1.18 1.223-2.314 1.811-3.014.502-.713.65-1.287.701-2.016.042-.997-.705-3.974 2.112-4.2q.168-.015.321-.013m2.596 10.866-.03.016c-.223.121-.348.337-.427.656-.08.32-.107.733-.13 1.206v.001c-.023.37-.192.824-.31 1.267s-.176.862-.036 1.128v.002c.226.452.608.636 1.051.601s.947-.304 1.36-.795c.474-.576 1.218-.796 1.638-1.05.21-.126.324-.242.333-.4.009-.157-.097-.403-.425-.767-.17-.192-.217-.462-.274-.71-.056-.247-.122-.468-.26-.585l-.001-.001c-.18-.157-.356-.17-.565-.164q-.069.001-.14.005c-.239.275-.805.612-1.197.508-.359-.09-.562-.508-.587-.918m-7.204.03H3.83c-.189.002-.314.09-.44.225-.149.158-.276.382-.445.56v.002h-.002c-.183.184-.414.239-.61.31-.195.069-.353.143-.46.35v.002c-.085.155-.066.378-.029.624.038.245.096.507.018.746v.002l-.001.002c-.157.427-.155.678-.082.822.074.143.235.22.48.272.493.103 1.26.069 1.906.41.583.305 1.168.404 1.598.305.431-.098.712-.369.75-.867v-.002c.029-.292-.195-.673-.485-1.052-.29-.38-.633-.752-.795-1.09v-.002l-.61-1.11c-.21-.286-.43-.462-.68-.5a1 1 0 0 0-.106-.008M9.584 4.85c-.14.2-.386.37-.695.467-.147.048-.302.17-.495.28a1.3 1.3 0 0 1-.74.19.97.97 0 0 1-.582-.227c-.14-.113-.25-.237-.394-.322a3 3 0 0 1-.192-.126c-.063 1.179-.85 2.658-1.226 3.511a5.4 5.4 0 0 0-.43 1.917c-.68-.906-.184-2.066.081-2.568.297-.55.343-.701.27-.649-.266.436-.685 1.13-.848 1.844-.085.372-.1.749.01 1.097.11.349.345.67.766.931.573.351.963.703 1.193 1.015s.302.584.23.777a.4.4 0 0 1-.212.22.7.7 0 0 1-.307.056l.184.235c.094.124.186.249.266.375 1.179.805 2.567.496 3.568-.218.1-.342.197-.664.212-.903.024-.474.05-.896.136-1.245s.244-.634.53-.791a1 1 0 0 1 .138-.061q.005-.045.013-.087c.082-.546.569-.572 1.18-.303.588.266.81.499.71.814h.13c.122-.398-.133-.69-.822-1.025l-.137-.06a2.35 2.35 0 0 0-.012-1.113c-.188-.79-.704-1.49-1.098-1.838-.072-.003-.065.06.081.203.363.333 1.156 1.532.727 2.644a1.2 1.2 0 0 0-.342-.043c-.164-.907-.543-1.66-.735-2.014-.359-.668-.918-2.036-1.158-2.983M7.72 3.503a1 1 0 0 0-.312.053c-.268.093-.447.286-.559.391-.022.021-.05.04-.119.091s-.172.126-.321.238q-.198.151-.13.38c.046.15.192.325.459.476.166.098.28.23.41.334a1 1 0 0 0 .215.133.9.9 0 0 0 .298.066c.282.017.49-.068.673-.173s.34-.233.518-.29c.365-.115.627-.345.709-.564a.37.37 0 0 0-.01-.309c-.048-.096-.148-.187-.318-.257h-.001c-.354-.151-.507-.162-.705-.29-.321-.207-.587-.28-.807-.279m-.89-1.122h-.025a.4.4 0 0 0-.278.135.76.76 0 0 0-.191.334 1.2 1.2 0 0 0-.051.445v.001c.01.162.041.299.102.436.05.116.109.204.183.274l.089-.065.117-.09-.023-.018a.4.4 0 0 1-.11-.161.7.7 0 0 1-.054-.22v-.01a.7.7 0 0 1 .014-.234.4.4 0 0 1 .08-.179q.056-.069.126-.073h.013a.18.18 0 0 1 .123.05c.045.04.08.09.11.162a.7.7 0 0 1 .054.22v.01a.7.7 0 0 1-.002.17 1.1 1.1 0 0 1 .317-.143 1.3 1.3 0 0 0 .002-.194V3.23a1.2 1.2 0 0 0-.102-.437.8.8 0 0 0-.227-.31.4.4 0 0 0-.268-.102m1.95-.155a.63.63 0 0 0-.394.14.9.9 0 0 0-.287.376 1.2 1.2 0 0 0-.1.51v.015q0 .079.01.152c.114.027.278.074.406.138a1 1 0 0 1-.011-.172.8.8 0 0 1 .058-.278.5.5 0 0 1 .139-.2.26.26 0 0 1 .182-.069.26.26 0 0 1 .178.081c.055.054.094.12.124.21.029.086.042.17.04.27l-.002.012a.8.8 0 0 1-.057.277c-.024.059-.089.106-.122.145.046.016.09.03.146.052a5 5 0 0 1 .248.102 1.2 1.2 0 0 0 .244-.763 1.2 1.2 0 0 0-.11-.495.9.9 0 0 0-.294-.37.64.64 0 0 0-.39-.133z"/></svg>
-          <span class="os-label">Linux</span>
-        </div>
+    <div class="photo">
+      <img src="https://images.unsplash.com/photo-1758270705290-62b6294dd044?auto=format&fit=crop&w=1000&h=1250&q=80" alt="Students gathered around a laptop, pointing at the screen and laughing" width="1000" height="1250" fetchpriority="high">
+      <div class="live" aria-hidden="true">
+        <div class="live-top"><span>Room is live</span><span id="count">0 of 30 joined</span></div>
+        <div class="tiles" id="tiles"></div>
+        <div class="live-url"><span>Sent to all:</span> microbit.org</div>
       </div>
     </div>
-    <div class="rig">
-      <div class="grid-windows" id="winGrid"></div>
-      <p class="rig-caption"><span class="dot-live"></span> 30 students, one command: go to microbit.org</p>
+    <div class="hero-copy">
+      <h1>One click, and thirty screens land in the same place.</h1>
+      <p class="lede">Classcastle is a teacher web app paired with a lightweight browser extension for students. You run the room from any browser; they join with a code. When it's time for the task, you press one button, and every student's browser opens the same page. No reading URLs off the whiteboard, no lost kids.</p>
+      <div class="hero-ctas">
+        <a class="btn-primary" href="/login.html">Open the teacher app</a>
+        <a class="btn-secondary" href="https://chromewebstore.google.com/detail/classcastle/acfkgmbemlolnjcnhfokelioeienonoi" target="_blank" rel="noopener">Get the student extension</a>
+      </div>
+      <p class="free-note">Free for teachers. Works on Chromebooks. No student accounts needed.</p>
+      <p class="os-row">Runs on Windows, macOS, ChromeOS and Linux</p>
     </div>
   </div>
 </div>
 
 <section id="how">
   <div class="wrap">
-    <div class="section-head">
-      <h2>How a lesson runs</h2>
-      <p>Set up once, then it disappears into the background of your teaching.</p>
-    </div>
+    <div class="section-head"><h2>How a lesson runs</h2><p>Set up once, then it disappears into the background of your teaching.</p></div>
     <div class="steps">
-      <div class="step">
-        <div class="num">01</div>
-        <h3>You open a room in the teacher app</h3>
-        <p>No install for you — it runs in any browser. Start a room and you get a short code to put on the board.</p>
-      </div>
-      <div class="step">
-        <div class="num">02</div>
-        <h3>Students join with the extension</h3>
-        <p>A small add-on for Chrome or Edge, installed once. Students type in your room code and light up green in your teacher view.</p>
-      </div>
-      <div class="step">
-        <div class="num">03</div>
-        <h3>You press go, everyone arrives</h3>
-        <p>Type the page once — microbit.org, a quiz, a shared doc — and every joined browser navigates there together, instantly.</p>
-      </div>
+      <div class="step"><h3>You open a room in the teacher app</h3><p>No install for you. It runs in any browser. Start a room and you get a short code to put on the board.</p></div>
+      <div class="step"><h3>Students join with the extension</h3><p>A small add-on for Chrome or Edge, installed once. Students type in your room code and light up green in your teacher view.</p></div>
+      <div class="step"><h3>You press go, everyone arrives</h3><p>Type the page once (microbit.org, a quiz, a shared doc) and every joined browser navigates there together, instantly.</p></div>
     </div>
   </div>
 </section>
 
 <section>
   <div class="wrap">
-    <div class="section-head">
-      <h2>Built for the realities of a classroom</h2>
-    </div>
+    <div class="section-head"><h2>Built for the realities of a classroom</h2></div>
     <div class="features">
-      <div class="feature">
-        <h3>Lightweight by design</h3>
-        <p>No heavy install, no login walls. It runs quietly and doesn't slow down ageing school machines.</p>
-      </div>
-      <div class="feature">
-        <h3>One room, full visibility</h3>
-        <p>See who's joined and where their browser currently is, at a glance, from your own screen.</p>
-      </div>
-      <div class="feature">
-        <h3>Works with what you already use</h3>
-        <p>Send students to any URL — a site, a form, a game, a shared document. If it's a webpage, Classcastle can send them there.</p>
-      </div>
+      <div class="feature"><h3>Lightweight by design</h3><p>No heavy install, no login walls. It runs quietly and doesn't slow down ageing school machines.</p></div>
+      <div class="feature"><h3>One room, full visibility</h3><p>See who's joined and where their browser currently is, at a glance, from your own screen.</p></div>
+      <div class="feature"><h3>Works with what you already use</h3><p>Send students to any URL: a site, a form, a game, a shared document. If it's a webpage, Classcastle can send them there.</p></div>
     </div>
   </div>
 </section>
 
 <section>
   <div class="wrap">
-    <div class="section-head">
-      <h2>For IT: rolling it out across a fleet</h2>
-      <p>You don't need every student clicking install one by one. Push the extension centrally and it's ready before the first lesson.</p>
-    </div>
+    <div class="section-head"><h2>For IT: rolling it out across a fleet</h2><p>You don't need every student clicking install one by one. Push the extension centrally and it's ready before the first lesson.</p></div>
     <div class="it-steps">
-      <div class="step">
-        <div class="num">01</div>
-        <h3>Get the extension ID</h3>
-        <p>Find Classcastle's ID and store listing under Admin → Deployment in the teacher app. You'll use this ID in your policy.</p>
-      </div>
-      <div class="step">
-        <div class="num">02</div>
-        <h3>Force-install through policy</h3>
-        <p>Add it to ExtensionInstallForcelist in the Google Admin console for ChromeOS and Chrome, or push it via Intune or GPO for Edge. No end-user action required.</p>
-      </div>
-      <div class="step">
-        <div class="num">03</div>
-        <h3>Allow the connection</h3>
-        <p>Safelist Classcastle's domain in your web filter or firewall so room connections aren't blocked on the school network.</p>
-      </div>
-      <div class="step">
-        <div class="num">04</div>
-        <h3>Verify on a test device</h3>
-        <p>Confirm the icon appears pinned and can join a test room, then roll out to the rest of the fleet with the same policy.</p>
-      </div>
+      <div class="step"><h3>Get the extension ID</h3><p>Find Classcastle's ID and store listing under Admin → Deployment in the teacher app. You'll use this ID in your policy.</p></div>
+      <div class="step"><h3>Force-install through policy</h3><p>Add it to ExtensionInstallForcelist in the Google Admin console for ChromeOS and Chrome, or push it via Intune or GPO for Edge. No end-user action required.</p></div>
+      <div class="step"><h3>Allow the connection</h3><p>Safelist Classcastle's domain in your web filter or firewall so room connections aren't blocked on the school network.</p></div>
+      <div class="step"><h3>Verify on a test device</h3><p>Confirm the icon appears pinned and can join a test room, then roll out to the rest of the fleet with the same policy.</p></div>
     </div>
   </div>
 </section>
 
 <section>
   <div class="wrap">
-    <div class="section-head">
-      <h2>Why teachers love it</h2>
-      <p>Built by educators who understand the chaos of a computer lab.</p>
-    </div>
-    <div class="features six-items">
-      <div class="feature">
-        <h3>Save instructional time</h3>
-        <p>No more walking around helping students type URLs. One click and everyone is where they need to be.</p>
-      </div>
-      <div class="feature">
-        <h3>Instant control</h3>
-        <p>Navigate 30 students to a new page in under 2 seconds. Close the tab when you're done.</p>
-      </div>
-      <div class="feature">
-        <h3>Student focus</h3>
-        <p>Reduce off-task behavior by keeping everyone on the same resource throughout the lesson.</p>
-      </div>
-      <div class="feature">
-        <h3>Room management</h3>
-        <p>Kick students, close rooms, and regenerate codes with simple controls. Full visibility of who's online.</p>
-      </div>
-      <div class="feature">
-        <h3>Works reliably</h3>
-        <p>Once joined, the extension keeps working smoothly even if the browser pauses it in the background. Reliable performance every time.</p>
-      </div>
-      <div class="feature">
-        <h3>Privacy-first</h3>
-        <p>No tracking, no history collection beyond what you need for the lesson. Students leave no trace when they disconnect.</p>
-      </div>
+    <div class="section-head"><h2>Why teachers love it</h2><p>Built by educators who understand the chaos of a computer lab.</p></div>
+    <div class="features">
+      <div class="feature"><h3>Save instructional time</h3><p>No more walking around helping students type URLs. One click and everyone is where they need to be.</p></div>
+      <div class="feature"><h3>Instant control</h3><p>Navigate 30 students to a new page in under 2 seconds. Close the tab when you're done.</p></div>
+      <div class="feature"><h3>Student focus</h3><p>Reduce off-task behavior by keeping everyone on the same resource throughout the lesson.</p></div>
+      <div class="feature"><h3>Room management</h3><p>Kick students, close rooms, and regenerate codes with simple controls. Full visibility of who's online.</p></div>
+      <div class="feature"><h3>Works reliably</h3><p>Once joined, the extension keeps working smoothly even if the browser pauses it in the background.</p></div>
+      <div class="feature"><h3>Privacy-first</h3><p>No tracking, no history collection beyond what you need for the lesson. Students leave no trace when they disconnect.</p></div>
     </div>
   </div>
 </section>
 
 <section>
   <div class="wrap">
-    <div class="section-head">
-      <h2>Security & Privacy</h2>
-      <p>Built with student privacy and school security in mind.</p>
-    </div>
-    <div class="features six-items">
-      <div class="feature">
-        <h3>No student accounts</h3>
-        <p>Students join with a room code only. No email, no signup, no personal data required.</p>
-      </div>
-      <div class="feature">
-        <h3>Teacher controls</h3>
-        <p>Only teachers can navigate browsers. Students cannot push URLs to others or control the room.</p>
-      </div>
-      <div class="feature">
-        <h3>Leave anytime</h3>
-        <p>Students can leave the room at any time. Teachers can kick students when needed.</p>
-      </div>
-      <div class="feature">
-        <h3>Secure by default</h3>
-        <p>All data encrypted in transit. Our backend ensures teachers only see their own rooms, and students only access content you approve.</p>
-      </div>
-      <div class="feature">
-        <h3>Minimal permissions</h3>
-        <p>Extension only requests what it needs: storage for session, tabs for navigation, and reliability features.</p>
-      </div>
-      <div class="feature">
-        <h3>No external code</h3>
-        <p>All extension code is included locally. No unexpected updates or external code execution.</p>
-      </div>
+    <div class="section-head"><h2>Security &amp; Privacy</h2><p>Built with student privacy and school security in mind.</p></div>
+    <div class="features">
+      <div class="feature"><h3>No student accounts</h3><p>Students join with a room code only. No email, no signup, no personal data required.</p></div>
+      <div class="feature"><h3>Teacher controls</h3><p>Only teachers can navigate browsers. Students cannot push URLs to others or control the room.</p></div>
+      <div class="feature"><h3>Leave anytime</h3><p>Students can leave the room at any time. Teachers can kick students when needed.</p></div>
+      <div class="feature"><h3>Secure by default</h3><p>All data encrypted in transit. Our backend ensures teachers only see their own rooms, and students only access content you approve.</p></div>
+      <div class="feature"><h3>Minimal permissions</h3><p>Extension only requests what it needs: storage for session, tabs for navigation, and reliability features.</p></div>
+      <div class="feature"><h3>No external code</h3><p>All extension code is included locally. No unexpected updates or external code execution.</p></div>
     </div>
   </div>
 </section>
 
 <section>
   <div class="wrap">
-    <div class="section-head">
-      <h2>Frequently Asked Questions</h2>
-    </div>
+    <div class="section-head"><h2>Frequently asked questions</h2></div>
     <div class="faq-list">
-      <div class="faq-item">
-        <h3>Is Classcastle free?</h3>
-        <p>Yes, Classcastle is free for teachers. Create unlimited rooms, invite unlimited students.</p>
-      </div>
-      <div class="faq-item">
-        <h3>What browsers does it work with?</h3>
-        <p>Chrome, Edge, and any Chromium-based browser. Works on Windows, macOS, ChromeOS, and Linux.</p>
-      </div>
-      <div class="faq-item">
-        <h3>Do students need accounts?</h3>
-        <p>No. Students only need the extension and the room code. No signup, no login, no email required.</p>
-      </div>
-      <div class="faq-item">
-        <h3>Can students navigate on their own?</h3>
-        <p>Yes. Classcastle doesn't lock their browser — it just pushes URLs. Students can still navigate independently if needed.</p>
-      </div>
-      <div class="faq-item">
-        <h3>What if a student's extension isn't working?</h3>
-        <p>Students without the extension simply won't receive navigation commands. They'll still appear in your room list but won't sync.</p>
-      </div>
-      <div class="faq-item">
-        <h3>Is student data collected?</h3>
-        <p>We only collect what's needed: student name (for identification), online status, and the current URL for the teacher dashboard. No browsing history or tracking.</p>
-      </div>
+      <details><summary>Is Classcastle free?</summary><p>Yes, Classcastle is free for teachers. Create unlimited rooms, invite unlimited students.</p></details>
+      <details><summary>What browsers does it work with?</summary><p>Chrome, Edge, and any Chromium-based browser. Works on Windows, macOS, ChromeOS, and Linux.</p></details>
+      <details><summary>Do students need accounts?</summary><p>No. Students only need the extension and the room code. No signup, no login, no email required.</p></details>
+      <details><summary>Can students navigate on their own?</summary><p>Yes. Classcastle doesn't lock their browser; it just pushes URLs. Students can still navigate independently if needed.</p></details>
+      <details><summary>What if a student's extension isn't working?</summary><p>Students without the extension simply won't receive navigation commands. They'll still appear in your room list but won't sync.</p></details>
+      <details><summary>Is student data collected?</summary><p>We only collect what's needed: student name (for identification), online status, and the current URL for the teacher dashboard. No browsing history or tracking.</p></details>
     </div>
   </div>
 </section>
 
-<div class="wrap">
+<div class="wrap cta-wrap">
   <div class="cta-band">
     <h2>Stop saying "did everyone find the page?"</h2>
     <div class="hero-ctas">
       <a class="btn-primary" href="/login.html">Open the teacher app</a>
-      <a class="btn-secondary" href="https://chromewebstore.google.com/detail/classcastle/acfkgmbemlolnjcnhfokelioeienonoi" target="_blank">Get the student extension</a>
+      <a class="btn-secondary" href="https://chromewebstore.google.com/detail/classcastle/acfkgmbemlolnjcnhfokelioeienonoi" target="_blank" rel="noopener">Get the student extension</a>
     </div>
   </div>
+</div>
+</main>
+
+<div class="wrap">
   <footer>
-    <span>Classcastle</span>
-    <span>Made for classrooms</span>
-    <span>• <a href="/terms.html" style="color: var(--ink-soft);">Terms</a></span>
-    <span>• <a href="/privacy.html" style="color: var(--ink-soft);">Privacy</a></span>
+    <span>Classcastle · Made for classrooms</span>
+    <span><a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a> · Photo: <a href="https://unsplash.com/photos/diverse-group-of-students-gathered-around-laptop-kp7qkHTgSKc" target="_blank" rel="noopener">Vitaly Gariev / Unsplash</a></span>
   </footer>
 </div>
 
 <script>
-  // Switch favicon based on theme
-  function updateFavicon() {
-    const favicon = document.getElementById('favicon');
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    favicon.href = isDark ? '/logo-dark.svg' : '/logo.svg';
+  function updateFavicon(){
+    document.getElementById('favicon').href = matchMedia('(prefers-color-scheme: dark)').matches ? '/logo-dark.svg' : '/logo.svg';
   }
-
-  // Update favicon on load and when theme changes
   updateFavicon();
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
 
-  // Build the 5x6 grid of student windows, decorative only.
-  const grid = document.getElementById('winGrid');
-  const total = 30;
-  for (let i = 0; i < total; i++) {
-    const w = document.createElement('div');
-    w.className = 'win';
-    w.innerHTML = '<div class="body"></div>';
-    grid.appendChild(w);
+  // Decorative "room live" panel: 30 students join, one by one.
+  const tilesEl = document.getElementById('tiles'), countEl = document.getElementById('count');
+  for (let i = 0; i < 30; i++) { const t = document.createElement('div'); t.className = 'tile'; tilesEl.appendChild(t); }
+  const tiles = tilesEl.children;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function setOn(n){ for (let i = 0; i < 30; i++) tiles[i].classList.toggle('on', i < n); countEl.textContent = n + ' of 30 joined'; }
+  if (reduced) setOn(30);
+  else { let n = 0; setTimeout(function tick(){ setOn(++n); if (n < 30) setTimeout(tick, 70); }, 700); }
+
+  async function checkSession(){
+    const client = supabase.createClient('https://hduyofdbpspjcuwvackd.supabase.co','sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK');
+    const { data: { session } } = await client.auth.getSession();
+    if (session) document.querySelectorAll('.nav-cta, .hero .btn-primary, .cta-band .btn-primary').forEach(a => a.href = '/app.html');
   }
-
-  // One orchestrated reveal: windows sync a beat after load, respecting reduced motion.
-  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const windows = grid.querySelectorAll('.win');
-  if (prefersReduced) {
-    windows.forEach(w => w.classList.add('synced'));
-  } else {
-    setTimeout(() => {
-      windows.forEach((w, i) => {
-        setTimeout(() => w.classList.add('synced'), i * 22);
-      });
-    }, 500);
-  }
-
-  // Check if user is already logged in and redirect to app.html
-  async function checkSession() {
-    const SUPABASE_URL = 'https://hduyofdbpspjcuwvackd.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK';
-    const SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    const { data: { session } } = await SupabaseClient.auth.getSession();
-
-    if (session) {
-      // Update all "Open teacher app" links to go to app.html
-      const heroCta = document.querySelector('.hero .btn-primary');
-      const navCta = document.querySelector('.nav-cta');
-      const ctaBandLink = document.querySelector('.cta-band .btn-primary');
-
-      if (heroCta) heroCta.href = '/app.html';
-      if (navCta) navCta.href = '/app.html';
-      if (ctaBandLink) ctaBandLink.href = '/app.html';
-    }
-  }
-
   checkSession();
 </script>
-
 </body>
 </html>
