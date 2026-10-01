@@ -7,27 +7,27 @@
 <link rel="icon" type="image/svg+xml" href="/logo.svg" id="favicon">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
-    --paper: #F7F6F1;
-    --ink: #1C1B17;
-    --ink-soft: #6B6A61;
-    --line: #E2E0D6;
-    --green: #2F5233;
-    --green-soft: #E7EDE4;
-    --green-btn: #2F5233;
-    --on-green: #fff;
-    --sky: var(--green);
-    --sky-soft: var(--green-soft);
-    --green-light: #f0f4f1;
-    --amber: #D98E2B;
+    --bg: #FCFCFA;
+    --surface: #fff;
+    --ink: #18221C;
+    --soft: #5E675F;
+    --line: #D9DDD3;
+    --brand: #1F5C3A;
+    --tint: #E4F1E6;
+    --board: #17352A;
+    --chalk: #F4D35E;
     --red: #B23A2E;
+    --amber: #D98E2B;
+    --sky: var(--brand);
+    --sky-soft: var(--tint);
+    --brand-light: #f0f4f1;
     --red-light: #f5e0e0;
     --blue: #3B82F6;
     --blue-light: #E0E7FF;
-    --surface: #fff;
     color-scheme: light dark;
     box-sizing: border-box;
     padding-top: env(safe-area-inset-top, 0px);
@@ -35,36 +35,55 @@
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --paper: #151512;
-      --ink: #F1F0E9;
-      --ink-soft: #A8A79D;
-      --line: #34332B;
-      --green: #E7EDE4;
-      --green-soft: #223324;
-      --green-btn: #3E7A47;
-      --on-green: #fff;
-      --sky: var(--green);
-      --sky-soft: var(--green-soft);
-      --green-light: #1a2519;
-      --amber: #F0B84D;
+      --bg: #0F1511;
+      --surface: #18211B;
+      --ink: #EEF2EA;
+      --soft: #9EAA9F;
+      --line: #2A362D;
+      --brand: #4DAA72;
+      --tint: #1A2B20;
+      --board: #1C4030;
+      --chalk: #F4D35E;
       --red: #D2503F;
+      --amber: #F0B84D;
+      --sky: var(--brand);
+      --sky-soft: var(--tint);
+      --brand-light: #1a2519;
       --red-light: #3d1a18;
       --blue: #60A5FA;
       --blue-light: #1E3A5F;
-      --surface: #1F1E19;
     }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F1511;
+    --surface: #18211B;
+    --ink: #EEF2EA;
+    --soft: #9EAA9F;
+    --line: #2A362D;
+    --brand: #4DAA72;
+    --tint: #1A2B20;
+    --board: #1C4030;
+    --chalk: #F4D35E;
+    --red: #D2503F;
+    --amber: #F0B84D;
+    --sky: var(--brand);
+    --sky-soft: var(--tint);
+    --brand-light: #1a2519;
+    --red-light: #3d1a18;
+    --blue: #60A5FA;
+    --blue-light: #1E3A5F;
   }
   * { box-sizing: inherit; }
   html { scroll-padding-top: env(safe-area-inset-top, 0px); }
   html, body { margin: 0; padding: 0; }
   body {
-    background: var(--paper);
+    background: var(--bg);
     color: var(--ink);
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Instrument Sans', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
   }
-  h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; margin: 0; font-weight: 600; }
+  h1, h2, h3 { font-family: 'Young Serif', Georgia, serif; margin: 0; font-weight: 400; }
   p { margin: 0; }
   a { color: inherit; }
 
@@ -74,19 +93,19 @@
     max-width: 1200px; margin: 0 auto;
     transition: display 0.2s ease;
   }
-  .wordmark { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 600; letter-spacing: -0.01em; display: flex; align-items: center; gap: 10px; }
+  .wordmark { font-family: 'Young Serif', serif; font-size: 1.3rem; font-weight: 600; letter-spacing: -0.01em; display: flex; align-items: center; gap: 10px; }
   .logo-mark { width: 28px; height: 28px; display: block; }
-  .wordmark .word-accent { color: var(--green); }
+  .wordmark .word-accent { color: var(--brand); }
   .nav-link {
-    font-size: 0.9rem; font-weight: 500; color: var(--ink-soft);
+    font-size: 0.9rem; font-weight: 400; color: var(--soft);
     text-decoration: none;
     padding: 8px 16px;
-    border-radius: 8px;
+    border-radius: 6px;
     transition: all 0.2s ease;
   }
   .nav-link:hover {
-    background: var(--green-soft);
-    color: var(--green);
+    background: var(--tint);
+    color: var(--brand);
   }
 
   .wrap { max-width: 1200px; margin: 0 auto; padding: 0 40px 40px; }
@@ -100,7 +119,7 @@
   }
 
   .banner {
-    background: linear-gradient(135deg, var(--green) 0%, #3a633f 50%, #2F5233 100%);
+    background: linear-gradient(135deg, var(--brand) 0%, #3a633f 50%, #1F5C3A 100%);
     padding: 56px 64px;
     border-radius: 24px;
     margin-bottom: 32px;
@@ -138,13 +157,13 @@
   .banner-text {
     color: rgba(255, 255, 255, 0.95);
     font-size: 1.25rem;
-    font-weight: 500;
+    font-weight: 400;
     margin-bottom: 20px;
     letter-spacing: 0.02em;
   }
 
   .room-code-huge {
-    font-family: 'Fraunces', serif;
+    font-family: 'Young Serif', serif;
     font-size: 6.5rem;
     font-weight: 700;
     letter-spacing: 0.06em;
@@ -173,7 +192,7 @@
     padding: 18px 56px;
     border: none;
     border-radius: 16px;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Instrument Sans', sans-serif;
     font-size: 1.15rem;
     font-weight: 600;
     cursor: pointer;
@@ -188,7 +207,7 @@
 
   .btn-primary {
     background: var(--surface);
-    color: var(--green);
+    color: var(--brand);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
   }
   .btn-primary:hover {
@@ -234,7 +253,7 @@
   }
 
   .students-area {
-    background: linear-gradient(180deg, var(--green-soft) 0%, var(--green-light) 100%);
+    background: linear-gradient(180deg, var(--tint) 0%, var(--brand-light) 100%);
     border-radius: 20px;
     padding: 40px;
     min-height: 360px;
@@ -257,7 +276,7 @@
   .student-count {
     font-size: 0.95rem;
     font-weight: 600;
-    color: var(--green);
+    color: var(--brand);
     background: rgba(255, 255, 255, 0.9);
     padding: 8px 16px;
     border-radius: 24px;
@@ -295,7 +314,7 @@
   .student-avatar {
     width: 72px;
     height: 72px;
-    background: linear-gradient(135deg, var(--green-soft) 0%, var(--green) 100%);
+    background: linear-gradient(135deg, var(--tint) 0%, var(--brand) 100%);
     border-radius: 50%;
     margin: 0 auto 16px;
     display: flex;
@@ -324,7 +343,7 @@
   }
 
   .student-badge.online .student-status {
-    background: var(--green);
+    background: var(--brand);
     box-shadow: 0 0 8px rgba(47, 82, 51, 0.4);
   }
 
@@ -361,7 +380,7 @@
   .teacher-avatar {
     width: 96px;
     height: 96px;
-    background: linear-gradient(135deg, var(--green-soft) 0%, var(--green) 100%);
+    background: linear-gradient(135deg, var(--tint) 0%, var(--brand) 100%);
     border-radius: 50%;
     margin: 0 auto 20px;
     display: flex;
@@ -382,8 +401,8 @@
 
   .teacher-label {
     font-size: 0.9rem;
-    color: var(--ink-soft);
-    font-weight: 500;
+    color: var(--soft);
+    font-weight: 400;
   }
 
   .members-strip {
@@ -417,7 +436,7 @@
     align-items: center;
     gap: 14px;
     padding: 14px;
-    background: var(--paper);
+    background: var(--bg);
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -438,7 +457,7 @@
   .member-avatar-small {
     width: 40px;
     height: 40px;
-    background: linear-gradient(135deg, var(--green-soft) 0%, var(--green) 100%);
+    background: linear-gradient(135deg, var(--tint) 0%, var(--brand) 100%);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -466,7 +485,7 @@
   }
 
   .member-item.online .member-status {
-    background: var(--green);
+    background: var(--brand);
     box-shadow: 0 0 8px rgba(47, 82, 51, 0.4);
   }
 
@@ -512,7 +531,7 @@
   .control-label svg {
     width: 20px;
     height: 20px;
-    color: var(--green);
+    color: var(--brand);
   }
 
   .url-input {
@@ -520,16 +539,16 @@
     padding: 18px 24px;
     border: 2px solid var(--line);
     border-radius: 12px;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Instrument Sans', sans-serif;
     font-size: 1.05rem;
-    font-weight: 500;
-    background: var(--paper);
+    font-weight: 400;
+    background: var(--bg);
     color: var(--ink);
     outline: none;
     transition: all 0.2s ease;
   }
   .url-input:focus {
-    border-color: var(--green);
+    border-color: var(--brand);
     background: var(--surface);
     box-shadow: 0 0 0 3px rgba(47, 82, 51, 0.1);
   }
@@ -545,13 +564,13 @@
   }
 
   .btn-secondary {
-    background: var(--paper);
+    background: var(--bg);
     color: var(--ink);
     border: 2px solid var(--line);
   }
   .btn-secondary:hover {
-    background: var(--ink-soft);
-    border-color: var(--ink-soft);
+    background: var(--soft);
+    border-color: var(--soft);
   }
 
   .btn-danger {
@@ -578,7 +597,7 @@
     max-height: 200px;
     overflow-y: auto;
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: 6px;
     padding: 8px;
   }
 
@@ -586,7 +605,7 @@
     padding: 8px 12px;
     border-radius: 6px;
     margin-bottom: 4px;
-    background: var(--paper);
+    background: var(--bg);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -606,7 +625,7 @@
   }
 
   .url-history-time {
-    color: var(--ink-soft);
+    color: var(--soft);
     font-size: 0.75rem;
     margin-left: 12px;
   }
@@ -628,14 +647,14 @@
     border: 1px solid var(--line);
     border-radius: 6px;
     font-size: 0.85rem;
-    background: var(--paper);
+    background: var(--bg);
     color: var(--ink);
     outline: none;
     width: 200px;
   }
 
   .search-input:focus {
-    border-color: var(--green);
+    border-color: var(--brand);
   }
 
   .sort-select {
@@ -643,7 +662,7 @@
     border: 1px solid var(--line);
     border-radius: 6px;
     font-size: 0.85rem;
-    background: var(--paper);
+    background: var(--bg);
     color: var(--ink);
     outline: none;
   }
@@ -651,7 +670,7 @@
   .empty-state {
     text-align: center;
     padding: 64px 32px;
-    color: var(--ink-soft);
+    color: var(--soft);
     grid-column: 1 / -1;
   }
   .empty-state h3 {
@@ -674,7 +693,7 @@
     bottom: 32px;
     right: 32px;
     background: var(--ink);
-    color: var(--paper);
+    color: var(--bg);
     padding: 18px 24px;
     border-radius: 12px;
     font-size: 0.95rem;
@@ -709,7 +728,7 @@
   }
 
   .modal {
-    background: var(--paper);
+    background: var(--bg);
     border-radius: 16px;
     padding: 24px;
     max-width: 400px;
@@ -737,7 +756,7 @@
 
   .modal p {
     font-size: 0.95rem;
-    color: var(--ink-soft);
+    color: var(--soft);
     margin-bottom: 20px;
     line-height: 1.5;
   }
@@ -751,17 +770,17 @@
   .modal-btn {
     padding: 10px 20px;
     border: none;
-    border-radius: 8px;
-    font-family: 'Inter', sans-serif;
+    border-radius: 6px;
+    font-family: 'Instrument Sans', sans-serif;
     font-size: 0.9rem;
-    font-weight: 500;
+    font-weight: 400;
     cursor: pointer;
     transition: all 0.15s ease;
   }
 
   .modal-btn-cancel {
     border: 1.5px solid var(--line);
-    background: var(--paper);
+    background: var(--bg);
     color: var(--ink);
   }
 
@@ -770,7 +789,7 @@
   }
 
   .modal-btn-confirm {
-    background: var(--green-btn);
+    background: var(--brand);
     color: var(--on-green);
   }
 
@@ -783,7 +802,7 @@
     display: inline-block;
     width: 16px;
     height: 16px;
-    border: 2px solid var(--paper);
+    border: 2px solid var(--bg);
     border-top-color: transparent;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
@@ -1642,24 +1661,24 @@
   deleteRoomBtn.addEventListener('click', deleteRoom);
 
   // Poll for students every 3 seconds
-  let studentPollInterval = null;
+  let studentPollInstrument Sansval = null;
 
   function startStudentPolling() {
     // Clear any existing interval
-    if (studentPollInterval) {
-      clearInterval(studentPollInterval);
+    if (studentPollInstrument Sansval) {
+      clearInstrument Sansval(studentPollInstrument Sansval);
     }
 
     // Poll every 3 seconds
-    studentPollInterval = setInterval(() => {
+    studentPollInstrument Sansval = setInstrument Sansval(() => {
       loadStudents();
     }, 3000);
   }
 
   function stopStudentPolling() {
-    if (studentPollInterval) {
-      clearInterval(studentPollInterval);
-      studentPollInterval = null;
+    if (studentPollInstrument Sansval) {
+      clearInstrument Sansval(studentPollInstrument Sansval);
+      studentPollInstrument Sansval = null;
     }
   }
 

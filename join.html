@@ -7,23 +7,25 @@
 <link rel="icon" type="image/svg+xml" href="/logo.svg" id="favicon">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
-    --paper: #F7F6F1;
-    --ink: #1C1B17;
-    --ink-soft: #6B6A61;
-    --line: #E2E0D6;
-    --green: #2F5233;
-    --green-soft: #E7EDE4;
-    --green-btn: #2F5233;
-    --on-green: #fff;
-    --sky: var(--green);
-    --sky-soft: var(--green-soft);
-    --amber: #D98E2B;
-    --red: #B23A2E;
+    --bg: #FCFCFA;
     --surface: #fff;
+    --ink: #18221C;
+    --soft: #5E675F;
+    --line: #D9DDD3;
+    --brand: #1F5C3A;
+    --tint: #E4F1E6;
+    --board: #17352A;
+    --chalk: #F4D35E;
+    --red: #B23A2E;
+    --amber: #D98E2B;
+    --board: #17352A;
+    --chalk: #F4D35E;
+    --sky: var(--brand);
+    --sky-soft: var(--tint);
     color-scheme: light dark;
     box-sizing: border-box;
     padding-top: env(safe-area-inset-top, 0px);
@@ -31,34 +33,49 @@
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --paper: #151512;
-      --ink: #F1F0E9;
-      --ink-soft: #A8A79D;
-      --line: #34332B;
-      --green: #E7EDE4;
-      --green-soft: #223324;
-      --green-btn: #3E7A47;
-      --on-green: #fff;
-      --sky: var(--green);
-      --sky-soft: var(--green-soft);
-      --amber: #F0B84D;
+      --bg: #0F1511;
+      --surface: #18211B;
+      --ink: #EEF2EA;
+      --soft: #9EAA9F;
+      --line: #2A362D;
+      --brand: #4DAA72;
+      --tint: #1A2B20;
+      --board: #1C4030;
+      --chalk: #F4D35E;
       --red: #D2503F;
-      --surface: #1F1E19;
+      --amber: #F0B84D;
+      --sky: var(--brand);
+      --sky-soft: var(--tint);
     }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F1511;
+    --surface: #18211B;
+    --ink: #EEF2EA;
+    --soft: #9EAA9F;
+    --line: #2A362D;
+    --brand: #4DAA72;
+    --tint: #1A2B20;
+    --board: #1C4030;
+    --chalk: #F4D35E;
+    --red: #D2503F;
+    --amber: #F0B84D;
+    --sky: var(--brand);
+    --sky-soft: var(--tint);
   }
   * { box-sizing: inherit; }
   html { scroll-padding-top: env(safe-area-inset-top, 0px); }
   html, body { margin: 0; padding: 0; height: 100%; }
   body {
-    background: var(--paper);
+    background: var(--bg);
     color: var(--ink);
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Instrument Sans', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     display: flex;
     flex-direction: column;
     min-height: 100%;
   }
-  h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; margin: 0; font-weight: 500; }
+  h1, h2, h3 { font-family: 'Young Serif', Georgia, serif; margin: 0; font-weight: 400; }
   p { margin: 0; }
   a { color: inherit; }
 
@@ -68,10 +85,10 @@
     max-width: 1080px; margin: 0 auto; width: 100%;
   }
   nav { padding-top: calc(env(safe-area-inset-top, 0px) + 24px); }
-  .wordmark { font-family: 'Fraunces', serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; }
-  .wordmark span { color: var(--green); }
+  .wordmark { font-family: 'Young Serif', serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; }
+  .wordmark span { color: var(--brand); }
   .nav-link {
-    font-size: 0.88rem; font-weight: 500; color: var(--ink-soft);
+    font-size: 0.88rem; font-weight: 400; color: var(--soft);
     text-decoration: none;
   }
 
@@ -88,13 +105,13 @@
     max-width: 420px;
     background: var(--surface);
     border: 1px solid var(--line);
-    border-radius: 14px;
+    border-radius: 6px;
     padding: 40px 36px 32px;
     text-align: center;
   }
   .card-eyebrow {
     font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
-    color: var(--green);
+    color: var(--brand);
   }
   .card h1 {
     margin-top: 12px;
@@ -103,7 +120,7 @@
   }
   .card p.sub {
     margin-top: 10px;
-    color: var(--ink-soft);
+    color: var(--soft);
     font-size: 0.95rem;
     line-height: 1.5;
   }
@@ -119,8 +136,8 @@
     background: var(--line);
     transition: background 0.2s ease, width 0.2s ease;
   }
-  .step-dot.active { background: var(--green); width: 30px; }
-  .step-dot.done { background: var(--green); }
+  .step-dot.active { background: var(--brand); width: 30px; }
+  .step-dot.done { background: var(--brand); }
 
   .step-pane { margin-top: 24px; }
   .step-pane.hide { display: none; }
@@ -133,18 +150,18 @@
   .code-digit {
     width: 38px; height: 52px;
     border: 1.5px solid var(--line);
-    border-radius: 8px;
+    border-radius: 6px;
     text-align: center;
-    font-family: 'Fraunces', serif;
+    font-family: 'Young Serif', serif;
     font-size: 1.35rem;
-    font-weight: 500;
+    font-weight: 400;
     color: var(--ink);
-    background: var(--paper);
+    background: var(--bg);
     outline: none;
     transition: border-color 0.15s ease, background 0.15s ease;
   }
   .code-digit:focus {
-    border-color: var(--green);
+    border-color: var(--brand);
     background: #fff;
   }
   .code-row.error .code-digit {
@@ -155,10 +172,10 @@
     width: 100%;
     background: none;
     border: none;
-    color: var(--ink-soft);
-    font-family: 'Inter', sans-serif;
+    color: var(--soft);
+    font-family: 'Instrument Sans', sans-serif;
     font-size: 0.85rem;
-    font-weight: 500;
+    font-weight: 400;
     cursor: pointer;
     padding: 6px;
   }
@@ -168,10 +185,10 @@
     margin-top: 16px;
     min-height: 20px;
     font-size: 0.85rem;
-    color: var(--ink-soft);
+    color: var(--soft);
   }
   .status-line.is-error { color: var(--red); }
-  .status-line.is-ok { color: var(--green); }
+  .status-line.is-ok { color: var(--brand); }
 
   .no-access {
     display: none;
@@ -189,12 +206,12 @@
   }
   .no-access p {
     font-size: 0.95rem;
-    color: var(--ink-soft);
+    color: var(--soft);
     margin-bottom: 8px;
   }
   .no-access-detail {
     font-size: 0.85rem;
-    color: var(--ink-softer);
+    color: var(--softer);
   }
 
   .name-field {
@@ -204,34 +221,34 @@
   .name-field label {
     display: block;
     font-size: 0.8rem;
-    font-weight: 500;
-    color: var(--ink-soft);
+    font-weight: 400;
+    color: var(--soft);
     margin-bottom: 6px;
   }
   .name-field input {
     width: 100%;
     padding: 11px 14px;
     border: 1.5px solid var(--line);
-    border-radius: 8px;
-    font-family: 'Inter', sans-serif;
+    border-radius: 6px;
+    font-family: 'Instrument Sans', sans-serif;
     font-size: 0.98rem;
-    background: var(--paper);
+    background: var(--bg);
     color: var(--ink);
     outline: none;
     transition: border-color 0.15s ease, background 0.15s ease;
   }
-  .name-field input:focus { border-color: var(--green); background: #fff; }
+  .name-field input:focus { border-color: var(--brand); background: #fff; }
 
   .btn-join {
     margin-top: 26px;
     width: 100%;
-    background: var(--green);
+    background: var(--brand);
     color: #fff;
     border: none;
     padding: 14px 20px;
-    border-radius: 8px;
-    font-family: 'Inter', sans-serif;
-    font-weight: 500;
+    border-radius: 6px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-weight: 400;
     font-size: 1rem;
     cursor: pointer;
     transition: opacity 0.15s ease, transform 0.1s ease;
@@ -249,8 +266,8 @@
   .joined-state .badge {
     width: 52px; height: 52px;
     border-radius: 50%;
-    background: var(--green-soft);
-    color: var(--green);
+    background: var(--tint);
+    color: var(--brand);
     display: flex; align-items: center; justify-content: center;
     margin: 0 auto 18px;
   }
@@ -260,10 +277,10 @@
   .ext-note {
     margin-top: 22px;
     font-size: 0.82rem;
-    color: var(--ink-soft);
+    color: var(--soft);
     line-height: 1.5;
   }
-  .ext-note a { color: var(--green); font-weight: 500; text-decoration: none; border-bottom: 1px solid var(--green-soft); }
+  .ext-note a { color: var(--brand); font-weight: 400; text-decoration: none; border-bottom: 1px solid var(--tint); }
 
   @keyframes spin {
     to { transform: rotate(360deg); }
@@ -272,7 +289,7 @@
   footer {
     text-align: center;
     padding-bottom: 24px;
-    color: var(--ink-soft);
+    color: var(--soft);
     font-size: 0.8rem;
   }
 
@@ -295,7 +312,7 @@
   }
 
   .modal {
-    background: var(--paper);
+    background: var(--bg);
     border-radius: 16px;
     padding: 24px;
     max-width: 400px;
@@ -323,7 +340,7 @@
 
   .modal p {
     font-size: 0.95rem;
-    color: var(--ink-soft);
+    color: var(--soft);
     margin-bottom: 20px;
     line-height: 1.5;
   }
@@ -337,17 +354,17 @@
   .modal-btn {
     padding: 10px 20px;
     border: none;
-    border-radius: 8px;
-    font-family: 'Inter', sans-serif;
+    border-radius: 6px;
+    font-family: 'Instrument Sans', sans-serif;
     font-size: 0.9rem;
-    font-weight: 500;
+    font-weight: 400;
     cursor: pointer;
     transition: all 0.15s ease;
   }
 
   .modal-btn-cancel {
     border: 1.5px solid var(--line);
-    background: var(--paper);
+    background: var(--bg);
     color: var(--ink);
   }
 
@@ -356,8 +373,8 @@
   }
 
   .modal-btn-confirm {
-    background: var(--green);
-    color: var(--paper);
+    background: var(--brand);
+    color: var(--bg);
   }
 
   .modal-btn-confirm:hover {
@@ -423,7 +440,7 @@
       </div>
       <h1 id="joinedTitle">You're in the room</h1>
       <p class="sub" id="joinedSub">Sit tight — your teacher controls where this browser goes next.</p>
-      <button class="btn-join" id="leaveBtn" style="margin-top:26px; background: var(--paper); color: var(--ink); border: 1.5px solid var(--line);">Leave room</button>
+      <button class="btn-join" id="leaveBtn" style="margin-top:26px; background: var(--bg); color: var(--ink); border: 1.5px solid var(--line);">Leave room</button>
     </div>
 
   </div>
@@ -441,8 +458,8 @@
 
 <footer>
   <span>Classcastle — made for classrooms</span>
-  <span style="margin-left: 16px;"><a href="/terms.html" style="color: var(--ink-soft);">Terms</a></span>
-  <span style="margin-left: 8px;"><a href="/privacy.html" style="color: var(--ink-soft);">Privacy</a></span>
+  <span style="margin-left: 16px;"><a href="/terms.html" style="color: var(--soft);">Terms</a></span>
+  <span style="margin-left: 8px;"><a href="/privacy.html" style="color: var(--soft);">Privacy</a></span>
 </footer>
 
 <script>
@@ -455,7 +472,7 @@
   // Message polling state
   let currentRoomId = null;
   let currentStudentId = null;
-  let messageInterval = null;
+  let messageInstrument Sansval = null;
 
   // LocalStorage keys
   const STORAGE_KEY = 'classcastle_student_session';
@@ -919,10 +936,10 @@
 
   // Start kick checking (polling for if student was removed)
   function startKickCheck() {
-    if (messageInterval) clearInterval(messageInterval);
+    if (messageInstrument Sansval) clearInstrument Sansval(messageInstrument Sansval);
 
     // Poll for kick status every 3 seconds
-    messageInterval = setInterval(async () => {
+    messageInstrument Sansval = setInstrument Sansval(async () => {
       if (!currentRoomId || !currentStudentId) return;
 
       try {
@@ -957,9 +974,9 @@
   }
 
   function stopKickCheck() {
-    if (messageInterval) {
-      clearInterval(messageInterval);
-      messageInterval = null;
+    if (messageInstrument Sansval) {
+      clearInstrument Sansval(messageInstrument Sansval);
+      messageInstrument Sansval = null;
     }
   }
 
