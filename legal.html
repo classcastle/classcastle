@@ -7,48 +7,67 @@
   <link rel="icon" type="image/svg+xml" href="/logo.svg" id="favicon">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --paper: #F7F6F1;
-      --ink: #1C1B17;
-      --ink-soft: #6B6A61;
-      --line: #E2E0D6;
-      --green: #2F5233;
-      --green-soft: #E7EDE4;
-      --green-btn: #2F5233;
-      --on-green: #fff;
-      --sky: var(--green);
-      --sky-soft: var(--green-soft);
-      --amber: #D98E2B;
-      --red: #B23A2E;
+      --bg: #FCFCFA;
       --surface: #fff;
+      --ink: #18221C;
+      --soft: #5E675F;
+      --line: #D9DDD3;
+      --brand: #1F5C3A;
+      --tint: #E4F1E6;
+      --board: #17352A;
+      --chalk: #F4D35E;
+      --red: #B23A2E;
+      --amber: #D98E2B;
+      --sky: var(--brand);
+      --sky-soft: var(--tint);
       color-scheme: light dark;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
     }
     @media (prefers-color-scheme: dark) {
       :root:not([data-theme="light"]) {
-        --paper: #151512;
-        --ink: #F1F0E9;
-        --ink-soft: #A8A79D;
-        --line: #34332B;
-        --green: #E7EDE4;
-        --green-soft: #223324;
-        --green-btn: #3E7A47;
-        --on-green: #fff;
-        --sky: var(--green);
-        --sky-soft: var(--green-soft);
-        --amber: #F0B84D;
+        --bg: #0F1511;
+        --surface: #18211B;
+        --ink: #EEF2EA;
+        --soft: #9EAA9F;
+        --line: #2A362D;
+        --brand: #4DAA72;
+        --tint: #1A2B20;
+        --board: #1C4030;
+        --chalk: #F4D35E;
         --red: #D2503F;
-        --surface: #1F1E19;
+        --amber: #F0B84D;
+        --sky: var(--brand);
+        --sky-soft: var(--tint);
       }
+    }
+    :root[data-theme="dark"] {
+      --bg: #0F1511;
+      --surface: #18211B;
+      --ink: #EEF2EA;
+      --soft: #9EAA9F;
+      --line: #2A362D;
+      --brand: #4DAA72;
+      --tint: #1A2B20;
+      --board: #1C4030;
+      --chalk: #F4D35E;
+      --red: #D2503F;
+      --amber: #F0B84D;
+      --sky: var(--brand);
+      --sky-soft: var(--tint);
     }
     * { box-sizing: inherit; }
     html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+    html { scroll-padding-top: env(safe-area-inset-top, 0px); }
     html, body { margin: 0; padding: 0; }
     body {
-      background: var(--paper);
+      background: var(--bg);
       color: var(--ink);
-      font-family: 'Inter', sans-serif;
+      font-family: 'Instrument Sans', sans-serif;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -64,10 +83,10 @@
     }
 
     .logo {
-      font-family: 'Fraunces', serif;
+      font-family: 'Young Serif', serif;
       font-size: 1.5rem;
       font-weight: 600;
-      color: var(--green);
+      color: var(--brand);
       margin-bottom: 32px;
       display: flex;
       align-items: center;
@@ -80,7 +99,7 @@
     }
 
     h1 {
-      font-family: 'Fraunces', serif;
+      font-family: 'Young Serif', serif;
       font-size: 2rem;
       letter-spacing: -0.015em;
       margin-bottom: 16px;
@@ -88,7 +107,7 @@
     }
 
     p {
-      color: var(--ink-soft);
+      color: var(--soft);
       line-height: 1.6;
       margin-bottom: 16px;
     }
@@ -111,14 +130,14 @@
     }
 
     .option-card:hover {
-      border-color: var(--green);
+      border-color: var(--brand);
       transform: translateY(-2px);
     }
 
     .option-icon {
       width: 48px;
       height: 48px;
-      background: var(--green-soft);
+      background: var(--tint);
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -129,11 +148,11 @@
     .option-icon svg {
       width: 24px;
       height: 24px;
-      color: var(--green);
+      color: var(--brand);
     }
 
     .option-title {
-      font-family: 'Fraunces', serif;
+      font-family: 'Young Serif', serif;
       font-size: 1.1rem;
       font-weight: 600;
       margin-bottom: 8px;
@@ -142,14 +161,14 @@
 
     .option-desc {
       font-size: 0.9rem;
-      color: var(--ink-soft);
+      color: var(--soft);
     }
 
     .btn {
       padding: 12px 24px;
-      border-radius: 8px;
-      font-family: 'Inter', sans-serif;
-      font-weight: 500;
+      border-radius: 6px;
+      font-family: 'Instrument Sans', sans-serif;
+      font-weight: 400;
       font-size: 0.98rem;
       cursor: pointer;
       transition: opacity 0.15s ease;
@@ -159,7 +178,7 @@
     }
 
     .btn-primary {
-      background: var(--green-btn);
+      background: var(--brand);
       color: var(--on-green);
     }
 
@@ -168,7 +187,7 @@
     }
 
     .btn-secondary {
-      background: var(--paper);
+      background: var(--bg);
       color: var(--ink);
       border: 1px solid var(--line);
     }

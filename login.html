@@ -7,23 +7,23 @@
 <link rel="icon" type="image/svg+xml" href="/logo.svg" id="favicon">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
-    --paper: #F7F6F1;
-    --ink: #1C1B17;
-    --ink-soft: #6B6A61;
-    --line: #E2E0D6;
-    --green: #2F5233;
-    --green-soft: #E7EDE4;
-    --green-btn: #2F5233;
-    --on-green: #fff;
-    --sky: var(--green);
-    --sky-soft: var(--green-soft);
-    --amber: #D98E2B;
-    --red: #B23A2E;
+    --bg: #FCFCFA;
     --surface: #fff;
+    --ink: #18221C;
+    --soft: #5E675F;
+    --line: #D9DDD3;
+    --brand: #1F5C3A;
+    --tint: #E4F1E6;
+    --board: #17352A;
+    --chalk: #F4D35E;
+    --red: #B23A2E;
+    --amber: #D98E2B;
+    --sky: var(--brand);
+    --sky-soft: var(--tint);
     color-scheme: light dark;
     box-sizing: border-box;
     padding-top: env(safe-area-inset-top, 0px);
@@ -31,33 +31,48 @@
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --paper: #151512;
-      --ink: #F1F0E9;
-      --ink-soft: #A8A79D;
-      --line: #34332B;
-      --green: #E7EDE4;
-      --green-soft: #223324;
-      --green-btn: #3E7A47;
-      --on-green: #fff;
-      --sky: var(--green);
-      --sky-soft: var(--green-soft);
-      --amber: #F0B84D;
+      --bg: #0F1511;
+      --surface: #18211B;
+      --ink: #EEF2EA;
+      --soft: #9EAA9F;
+      --line: #2A362D;
+      --brand: #4DAA72;
+      --tint: #1A2B20;
+      --board: #1C4030;
+      --chalk: #F4D35E;
       --red: #D2503F;
-      --surface: #1F1E19;
+      --amber: #F0B84D;
+      --sky: var(--brand);
+      --sky-soft: var(--tint);
     }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F1511;
+    --surface: #18211B;
+    --ink: #EEF2EA;
+    --soft: #9EAA9F;
+    --line: #2A362D;
+    --brand: #4DAA72;
+    --tint: #1A2B20;
+    --board: #1C4030;
+    --chalk: #F4D35E;
+    --red: #D2503F;
+    --amber: #F0B84D;
+    --sky: var(--brand);
+    --sky-soft: var(--tint);
   }
   * { box-sizing: inherit; }
   html { scroll-padding-top: env(safe-area-inset-top, 0px); }
   html, body { margin: 0; padding: 0; min-height: 100vh; }
   body {
-    background: var(--paper);
+    background: var(--bg);
     color: var(--ink);
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Instrument Sans', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     display: flex;
     flex-direction: column;
   }
-  h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; margin: 0; font-weight: 500; }
+  h1, h2, h3 { font-family: 'Young Serif', Georgia, serif; margin: 0; font-weight: 400; }
   p { margin: 0; }
   a { color: inherit; }
 
@@ -66,11 +81,11 @@
     padding: 28px 32px;
     max-width: 1080px; margin: 0 auto; width: 100%;
   }
-  .wordmark { font-family: 'Fraunces', serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; display: flex; align-items: center; gap: 9px; }
+  .wordmark { font-family: 'Young Serif', serif; font-size: 1.25rem; font-weight: 400; letter-spacing: -0.01em; display: flex; align-items: center; gap: 9px; }
   .logo-mark { width: 24px; height: 24px; display: block; }
-  .wordmark .word-accent { color: var(--green); }
+  .wordmark .word-accent { color: var(--brand); }
   .nav-link {
-    font-size: 0.88rem; font-weight: 500; color: var(--ink-soft);
+    font-size: 0.88rem; font-weight: 500; color: var(--soft);
     text-decoration: none;
   }
 
@@ -90,7 +105,7 @@
   .card {
     background: var(--surface);
     border: 1px solid var(--line);
-    border-radius: 14px;
+    border-radius: 6px;
     padding: 40px 36px 32px;
   }
 
@@ -106,7 +121,7 @@
   }
 
   .page-subtitle {
-    color: var(--ink-soft);
+    color: var(--soft);
     font-size: 0.95rem;
     line-height: 1.5;
   }
@@ -118,36 +133,37 @@
   .form-label {
     display: block;
     font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--ink-soft);
+    font-weight: 600;
+    color: var(--ink);
     margin-bottom: 8px;
   }
 
   .form-input {
     width: 100%;
     padding: 12px 16px;
-    border: 1.5px solid var(--line);
-    border-radius: 8px;
-    font-family: 'Inter', sans-serif;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-family: 'Instrument Sans', sans-serif;
     font-size: 0.98rem;
-    background: var(--paper);
+    background: var(--surface);
     color: var(--ink);
     outline: none;
-    transition: border-color 0.15s ease, background 0.15s ease;
+    transition: border-color 0.15s ease;
   }
   .form-input:focus {
-    border-color: var(--green);
-    background: var(--surface);
+    border-color: var(--brand);
+    outline: 3px solid var(--brand);
+    outline-offset: 3px;
   }
 
   .btn {
     padding: 12px 24px;
-    border-radius: 8px;
-    font-family: 'Inter', sans-serif;
-    font-weight: 500;
+    border-radius: 6px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-weight: 600;
     font-size: 0.98rem;
     cursor: pointer;
-    transition: opacity 0.15s ease, transform 0.1s ease;
+    transition: transform 0.1s ease;
     border: none;
   }
   .btn:disabled {
@@ -159,17 +175,26 @@
   }
 
   .btn-primary {
-    background: var(--green-btn);
-    color: var(--on-green);
+    background: var(--brand);
+    color: #fff;
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .btn-primary:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--ink);
+  }
+  .btn-primary:active {
+    transform: translate(0, 0);
+    box-shadow: none;
   }
 
   .btn-secondary {
-    background: var(--paper);
+    background: var(--surface);
     color: var(--ink);
-    border: 1.5px solid var(--line);
+    border: 1px solid var(--line);
   }
   .btn-secondary:hover {
-    border-color: var(--green);
+    border-color: var(--brand);
   }
 
   .btn-full {
@@ -179,12 +204,14 @@
   .auth-footer {
     margin-top: 16px;
     text-align: center;
-    color: var(--ink-soft);
+    color: var(--soft);
     font-size: 0.9rem;
   }
   .auth-footer a {
-    color: var(--green);
-    text-decoration: none;
+    color: var(--brand);
+    text-decoration: underline;
+    text-underline-offset: 5px;
+    text-decoration-thickness: 2px;
   }
 
   .notification {
@@ -192,9 +219,9 @@
     bottom: 24px;
     right: 24px;
     background: var(--ink);
-    color: var(--paper);
+    color: var(--bg);
     padding: 16px 20px;
-    border-radius: 8px;
+    border-radius: 6px;
     font-size: 0.92rem;
     opacity: 0;
     transform: translateY(10px);
@@ -211,7 +238,7 @@
     display: inline-block;
     width: 16px;
     height: 16px;
-    border: 2px solid var(--paper);
+    border: 2px solid #fff;
     border-top-color: transparent;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
@@ -248,7 +275,7 @@
         <span class="btn-text">Continue with GitHub</span>
         <span class="loading" style="display: none;"></span>
       </button>
-      <div style="margin: 16px 0; text-align: center; color: var(--ink-soft); font-size: 0.9rem;">or</div>
+      <div style="margin: 16px 0; text-align: center; color: var(--soft); font-size: 0.9rem;">or</div>
       <div class="form-group">
         <label class="form-label" for="loginEmail">Email</label>
         <input type="email" class="form-input" id="loginEmail" placeholder="you@school.edu">
