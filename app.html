@@ -7,7 +7,7 @@
 <link rel="icon" type="image/svg+xml" href="/logo.svg" id="favicon">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -15,19 +15,19 @@
 
 <style>
   :root {
-    --paper: #F7F6F1;
-    --ink: #1C1B17;
-    --ink-soft: #6B6A61;
-    --line: #E2E0D6;
-    --green: #2F5233;
-    --green-soft: #E7EDE4;
-    --green-btn: #2F5233;
-    --on-green: #fff;
-    --sky: var(--green);
-    --sky-soft: var(--green-soft);
-    --amber: #D98E2B;
-    --red: #B23A2E;
+    --bg: #FCFCFA;
     --surface: #fff;
+    --ink: #18221C;
+    --soft: #5E675F;
+    --line: #D9DDD3;
+    --brand: #1F5C3A;
+    --tint: #E4F1E6;
+    --board: #17352A;
+    --chalk: #F4D35E;
+    --red: #B23A2E;
+    --amber: #D98E2B;
+    --sky: var(--brand);
+    --sky-soft: var(--tint);
     color-scheme: light dark;
     box-sizing: border-box;
     padding-top: env(safe-area-inset-top, 0px);
@@ -35,31 +35,46 @@
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --paper: #151512;
-      --ink: #F1F0E9;
-      --ink-soft: #A8A79D;
-      --line: #34332B;
-      --green: #E7EDE4;
-      --green-soft: #223324;
-      --green-btn: #3E7A47;
-      --on-green: #fff;
-      --sky: var(--green);
-      --sky-soft: var(--green-soft);
-      --amber: #F0B84D;
+      --bg: #0F1511;
+      --surface: #18211B;
+      --ink: #EEF2EA;
+      --soft: #9EAA9F;
+      --line: #2A362D;
+      --brand: #4DAA72;
+      --tint: #1A2B20;
+      --board: #1C4030;
+      --chalk: #F4D35E;
       --red: #D2503F;
-      --surface: #1F1E19;
+      --amber: #F0B84D;
+      --sky: var(--brand);
+      --sky-soft: var(--tint);
     }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F1511;
+    --surface: #18211B;
+    --ink: #EEF2EA;
+    --soft: #9EAA9F;
+    --line: #2A362D;
+    --brand: #4DAA72;
+    --tint: #1A2B20;
+    --board: #1C4030;
+    --chalk: #F4D35E;
+    --red: #D2503F;
+    --amber: #F0B84D;
+    --sky: var(--brand);
+    --sky-soft: var(--tint);
   }
   * { box-sizing: inherit; }
   html { scroll-padding-top: env(safe-area-inset-top, 0px); }
   html, body { margin: 0; padding: 0; }
   body {
-    background: var(--paper);
+    background: var(--bg);
     color: var(--ink);
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Instrument Sans', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; margin: 0; font-weight: 500; }
+  h1, h2, h3 { font-family: 'Young Serif', Georgia, serif; margin: 0; font-weight: 400; }
   p { margin: 0; }
   a { color: inherit; }
 
@@ -96,7 +111,7 @@
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
-    color: var(--ink-soft);
+    color: var(--soft);
     padding: 4px;
   }
 
@@ -108,7 +123,7 @@
     z-index: 50;
     background: var(--surface);
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: 6px;
     padding: 12px;
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -155,7 +170,7 @@
     }
   }
 
-  .wordmark { font-family: 'Fraunces', serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; display: flex; align-items: center; gap: 9px; }
+  .wordmark { font-family: 'Young Serif', serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; display: flex; align-items: center; gap: 9px; }
   .logo-mark { width: 24px; height: 24px; display: block; }
   .wordmark .word-accent { color: var(--green); }
 
@@ -170,17 +185,17 @@
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
     transition: background 0.15s ease;
     margin-bottom: 4px;
     font-size: 0.95rem;
-    font-weight: 500;
-    color: var(--ink-soft);
+    font-weight: 400;
+    color: var(--soft);
     text-decoration: none;
   }
   .nav-item:hover {
-    background: var(--paper);
+    background: var(--bg);
     color: var(--ink);
   }
   .nav-item.active {
@@ -202,20 +217,20 @@
     align-items: center;
     gap: 12px;
     padding: 12px;
-    background: var(--paper);
-    border-radius: 8px;
+    background: var(--bg);
+    border-radius: 6px;
   }
 
   .user-avatar {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: var(--green-btn);
+    background: var(--brand);
     color: var(--on-green);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Fraunces', serif;
+    font-family: 'Young Serif', serif;
     font-weight: 600;
     font-size: 1rem;
   }
@@ -227,7 +242,7 @@
 
   .user-name {
     font-size: 0.9rem;
-    font-weight: 500;
+    font-weight: 400;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -235,7 +250,7 @@
 
   .user-email {
     font-size: 0.8rem;
-    color: var(--ink-soft);
+    color: var(--soft);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -244,7 +259,7 @@
   .btn-logout {
     background: none;
     border: none;
-    color: var(--ink-soft);
+    color: var(--soft);
     font-size: 0.85rem;
     cursor: pointer;
     padding: 4px 8px;
@@ -288,14 +303,14 @@
   }
 
   .page-subtitle {
-    color: var(--ink-soft);
+    color: var(--soft);
     font-size: 1rem;
   }
 
   .card {
     background: var(--surface);
     border: 1px solid var(--line);
-    border-radius: 12px;
+    border-radius: 6px;
     padding: 32px;
     margin-bottom: 24px;
   }
@@ -312,8 +327,8 @@
   .form-label {
     display: block;
     font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--ink-soft);
+    font-weight: 400;
+    color: var(--soft);
     margin-bottom: 8px;
   }
 
@@ -321,10 +336,10 @@
     width: 100%;
     padding: 12px 16px;
     border: 1.5px solid var(--line);
-    border-radius: 8px;
-    font-family: 'Inter', sans-serif;
+    border-radius: 6px;
+    font-family: 'Instrument Sans', sans-serif;
     font-size: 0.98rem;
-    background: var(--paper);
+    background: var(--bg);
     color: var(--ink);
     outline: none;
     transition: border-color 0.15s ease, background 0.15s ease;
@@ -336,9 +351,9 @@
 
   .btn {
     padding: 12px 24px;
-    border-radius: 8px;
-    font-family: 'Inter', sans-serif;
-    font-weight: 500;
+    border-radius: 6px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-weight: 400;
     font-size: 0.98rem;
     cursor: pointer;
     transition: opacity 0.15s ease, transform 0.1s ease;
@@ -358,7 +373,7 @@
     display: inline-block;
     width: 16px;
     height: 16px;
-    border: 2px solid var(--paper);
+    border: 2px solid var(--bg);
     border-top-color: transparent;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
@@ -369,12 +384,12 @@
   }
 
   .btn-primary {
-    background: var(--green-btn);
+    background: var(--brand);
     color: var(--on-green);
   }
 
   .btn-secondary {
-    background: var(--paper);
+    background: var(--bg);
     color: var(--ink);
     border: 1.5px solid var(--line);
   }
@@ -406,7 +421,7 @@
   }
 
   .code-big {
-    font-family: 'Fraunces', serif;
+    font-family: 'Young Serif', serif;
     font-size: 2.2rem;
     font-weight: 600;
     letter-spacing: 0.05em;
@@ -423,10 +438,10 @@
     flex: 1;
     padding: 12px 16px;
     border: 1.5px solid var(--line);
-    border-radius: 8px;
-    font-family: 'Inter', sans-serif;
+    border-radius: 6px;
+    font-family: 'Instrument Sans', sans-serif;
     font-size: 0.98rem;
-    background: var(--paper);
+    background: var(--bg);
     color: var(--ink);
     outline: none;
     transition: border-color 0.15s ease, background 0.15s ease;
@@ -450,7 +465,7 @@
 
   .student-count {
     font-size: 0.85rem;
-    color: var(--ink-soft);
+    color: var(--soft);
   }
 
   .student-grid {
@@ -461,7 +476,7 @@
 
   .student-card {
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: 6px;
     padding: 16px;
     display: flex;
     align-items: center;
@@ -481,13 +496,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Fraunces', serif;
+    font-family: 'Young Serif', serif;
     font-size: 1.1rem;
     font-weight: 600;
-    color: var(--ink-soft);
+    color: var(--soft);
   }
   .student-card.online .student-avatar {
-    background: var(--green-btn);
+    background: var(--brand);
     color: var(--on-green);
   }
 
@@ -498,7 +513,7 @@
 
   .student-name {
     font-size: 0.95rem;
-    font-weight: 500;
+    font-weight: 400;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -506,7 +521,7 @@
 
   .student-url {
     font-size: 0.8rem;
-    color: var(--ink-soft);
+    color: var(--soft);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -525,7 +540,7 @@
   .empty-state {
     text-align: center;
     padding: 48px 24px;
-    color: var(--ink-soft);
+    color: var(--soft);
   }
   .empty-state h3 {
     font-size: 1.1rem;
@@ -539,7 +554,7 @@
   .loading-state {
     text-align: center;
     padding: 48px 24px;
-    color: var(--ink-soft);
+    color: var(--soft);
   }
   .loading-state .loading-spinner {
     width: 32px;
@@ -564,7 +579,7 @@
   .room-card {
     background: var(--surface);
     border: 1px solid var(--line);
-    border-radius: 12px;
+    border-radius: 6px;
     padding: 24px;
     cursor: pointer;
     transition: border-color 0.15s ease, transform 0.15s ease;
@@ -582,7 +597,7 @@
   }
 
   .room-card-code {
-    font-family: 'Fraunces', serif;
+    font-family: 'Young Serif', serif;
     font-size: 1.8rem;
     font-weight: 600;
     color: var(--green);
@@ -595,11 +610,11 @@
     border-radius: 4px;
     background: var(--green-soft);
     color: var(--green);
-    font-weight: 500;
+    font-weight: 400;
   }
 
   .room-card-info {
-    color: var(--ink-soft);
+    color: var(--soft);
     font-size: 0.9rem;
     line-height: 1.5;
   }
@@ -607,7 +622,7 @@
   .room-card-students {
     margin-top: 12px;
     font-size: 0.85rem;
-    color: var(--ink-soft);
+    color: var(--soft);
   }
 
   .room-card-actions {
@@ -620,9 +635,9 @@
     flex: 1;
     padding: 8px 12px;
     border-radius: 6px;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Instrument Sans', sans-serif;
     font-size: 0.85rem;
-    font-weight: 500;
+    font-weight: 400;
     cursor: pointer;
     transition: all 0.15s ease;
     border: none;
@@ -643,7 +658,7 @@
 
   .deployment-step {
     border: 1px solid var(--line);
-    border-radius: 8px;
+    border-radius: 6px;
     padding: 24px;
   }
 
@@ -653,14 +668,14 @@
   }
 
   .deployment-step p {
-    color: var(--ink-soft);
+    color: var(--soft);
     line-height: 1.5;
     font-size: 0.95rem;
   }
 
   .code-block {
     background: var(--ink);
-    color: var(--paper);
+    color: var(--bg);
     padding: 16px;
     border-radius: 6px;
     font-family: 'Monaco', 'Consolas', monospace;
@@ -683,9 +698,9 @@
     bottom: 24px;
     right: 24px;
     background: var(--ink);
-    color: var(--paper);
+    color: var(--bg);
     padding: 16px 20px;
-    border-radius: 8px;
+    border-radius: 6px;
     font-size: 0.92rem;
     opacity: 0;
     transform: translateY(10px);
@@ -745,7 +760,7 @@
 
   .modal p {
     font-size: 0.95rem;
-    color: var(--ink-soft);
+    color: var(--soft);
     margin-bottom: 20px;
     line-height: 1.5;
   }
@@ -759,24 +774,24 @@
   .modal-btn {
     padding: 10px 20px;
     border: none;
-    border-radius: 8px;
-    font-family: 'Inter', sans-serif;
+    border-radius: 6px;
+    font-family: 'Instrument Sans', sans-serif;
     font-size: 0.9rem;
-    font-weight: 500;
+    font-weight: 400;
     cursor: pointer;
     transition: all 0.15s ease;
   }
 
   .modal-btn-primary {
     background: var(--ink);
-    color: var(--paper);
+    color: var(--bg);
   }
   .modal-btn-primary:hover {
     background: #1a1a1a;
   }
 
   .modal-btn-secondary {
-    background: var(--paper);
+    background: var(--bg);
     color: var(--ink);
     border: 1px solid var(--line);
   }
@@ -792,17 +807,17 @@
   }
 
   .analytics-card {
-    background: var(--paper);
+    background: var(--bg);
     border: 1px solid var(--line);
-    border-radius: 12px;
+    border-radius: 6px;
     padding: 20px;
   }
 
   .analytics-card h3 {
     font-size: 0.9rem;
-    color: var(--ink-soft);
+    color: var(--soft);
     margin-bottom: 8px;
-    font-weight: 500;
+    font-weight: 400;
   }
 
   .analytics-value {
@@ -826,7 +841,7 @@
   .activity-icon {
     width: 36px;
     height: 36px;
-    border-radius: 8px;
+    border-radius: 6px;
     background: var(--sky-soft);
     display: flex;
     align-items: center;
@@ -846,19 +861,19 @@
 
   .activity-action {
     font-size: 0.95rem;
-    font-weight: 500;
+    font-weight: 400;
     color: var(--ink);
     margin-bottom: 4px;
   }
 
   .activity-details {
     font-size: 0.85rem;
-    color: var(--ink-soft);
+    color: var(--soft);
   }
 
   .activity-time {
     font-size: 0.8rem;
-    color: var(--ink-soft);
+    color: var(--soft);
     margin-top: 4px;
   }
 
@@ -868,7 +883,7 @@
     padding: 4px 8px;
     border-radius: 6px;
     font-size: 0.8rem;
-    font-weight: 500;
+    font-weight: 400;
     background: var(--sky-soft);
     color: var(--sky);
     margin-right: 4px;
@@ -915,7 +930,7 @@
     padding: 8px 16px;
     font-size: 0.75rem;
     font-weight: 600;
-    color: var(--ink-soft);
+    color: var(--soft);
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
@@ -973,10 +988,10 @@
     padding: 8px 16px;
     border: none;
     background: none;
-    color: var(--ink-soft);
+    color: var(--soft);
     cursor: pointer;
     font-size: 0.9rem;
-    font-weight: 500;
+    font-weight: 400;
     transition: color 0.15s ease;
   }
 
@@ -1002,7 +1017,7 @@
 
   .modal-btn-cancel {
     border: 1.5px solid var(--line);
-    background: var(--paper);
+    background: var(--bg);
     color: var(--ink);
   }
 
@@ -1011,7 +1026,7 @@
   }
 
   .modal-btn-confirm {
-    background: var(--green-btn);
+    background: var(--brand);
     color: var(--on-green);
   }
 
@@ -1024,7 +1039,7 @@
     display: inline-block;
     width: 16px;
     height: 16px;
-    border: 2px solid var(--paper);
+    border: 2px solid var(--bg);
     border-top-color: transparent;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
@@ -1088,7 +1103,7 @@
   }
 
   .onboarding-title {
-    font-family: 'Fraunces', serif;
+    font-family: 'Young Serif', serif;
     font-size: 1.4rem;
     color: var(--ink);
   }
@@ -1096,7 +1111,7 @@
   .onboarding-close {
     background: none;
     border: none;
-    color: var(--ink-soft);
+    color: var(--soft);
     font-size: 1.5rem;
     cursor: pointer;
     padding: 8px;
@@ -1118,7 +1133,7 @@
   .onboarding-skip {
     background: none;
     border: none;
-    color: var(--ink-soft);
+    color: var(--soft);
     font-size: 0.9rem;
     cursor: pointer;
     padding: 8px 16px;
@@ -1158,7 +1173,7 @@
   }
 
   .onboarding-step-number {
-    font-family: 'Fraunces', serif;
+    font-family: 'Young Serif', serif;
     font-size: 1.1rem;
     color: var(--green);
     margin-bottom: 12px;
@@ -1166,23 +1181,23 @@
   }
 
   .onboarding-step-title {
-    font-family: 'Fraunces', serif;
+    font-family: 'Young Serif', serif;
     font-size: 1.6rem;
     margin-bottom: 16px;
     color: var(--ink);
   }
 
   .onboarding-step-text {
-    color: var(--ink-soft);
+    color: var(--soft);
     line-height: 1.6;
     font-size: 1rem;
     margin-bottom: 24px;
   }
 
   .onboarding-visual {
-    background: var(--paper);
+    background: var(--bg);
     border: 1px solid var(--line);
-    border-radius: 12px;
+    border-radius: 6px;
     padding: 24px;
     margin-bottom: 24px;
     display: flex;
@@ -1246,7 +1261,7 @@
     padding: 8px 12px;
     border-radius: 4px;
     font-size: 0.85rem;
-    font-weight: 500;
+    font-weight: 400;
     animation: urlGlow 2s ease-in-out infinite;
   }
 
@@ -1258,7 +1273,7 @@
   .visual-room-card {
     background: var(--surface);
     border: 1.5px solid var(--line);
-    border-radius: 12px;
+    border-radius: 6px;
     padding: 20px;
     width: 200px;
     animation: cardFloat 3s ease-in-out infinite;
@@ -1299,7 +1314,7 @@
   .visual-student-dot {
     width: 24px;
     height: 24px;
-    background: var(--green-btn);
+    background: var(--brand);
     border-radius: 50%;
     animation: dotPulse 2s ease-in-out infinite;
   }
@@ -1325,7 +1340,7 @@
   .visual-extension-popup {
     background: var(--surface);
     border: 1.5px solid var(--line);
-    border-radius: 12px;
+    border-radius: 6px;
     padding: 16px;
     width: 220px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
@@ -1353,12 +1368,12 @@
 
   .visual-input-label {
     font-size: 0.75rem;
-    color: var(--ink-soft);
-    font-weight: 500;
+    color: var(--soft);
+    font-weight: 400;
   }
 
   .visual-input {
-    background: var(--paper);
+    background: var(--bg);
     border: 1.5px solid var(--line);
     border-radius: 6px;
     padding: 8px 10px;
@@ -1367,13 +1382,13 @@
   }
 
   .visual-join-btn {
-    background: var(--green-btn);
+    background: var(--brand);
     color: var(--on-green);
     padding: 8px;
     border-radius: 6px;
     text-align: center;
     font-size: 0.85rem;
-    font-weight: 500;
+    font-weight: 400;
   }
 
   .visual-student {
@@ -1407,7 +1422,7 @@
     padding: 4px 8px;
     border-radius: 4px;
     font-size: 0.75rem;
-    font-weight: 500;
+    font-weight: 400;
   }
 
   .visual-extension {
@@ -1421,7 +1436,7 @@
     width: 50px;
     height: 50px;
     background: var(--green-soft);
-    border-radius: 8px;
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1481,13 +1496,13 @@
   }
 
   .onboarding-back {
-    background: var(--paper);
+    background: var(--bg);
     color: var(--ink);
     border: 1.5px solid var(--line);
     padding: 10px 20px;
-    border-radius: 8px;
-    font-family: 'Inter', sans-serif;
-    font-weight: 500;
+    border-radius: 6px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-weight: 400;
     font-size: 0.9rem;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -1498,13 +1513,13 @@
   }
 
   .onboarding-next {
-    background: var(--green-btn);
+    background: var(--brand);
     color: var(--on-green);
     border: none;
     padding: 10px 24px;
-    border-radius: 8px;
-    font-family: 'Inter', sans-serif;
-    font-weight: 500;
+    border-radius: 6px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-weight: 400;
     font-size: 0.9rem;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -1545,7 +1560,7 @@
   }
 
   .feature-text {
-    color: var(--ink-soft);
+    color: var(--soft);
     font-size: 0.95rem;
   }
 
@@ -1689,7 +1704,7 @@
       </div>
 
       <div class="bulk-actions" id="bulkActions" style="display: none;">
-        <span style="display: flex; align-items: center; color: var(--ink-soft); font-size: 0.9rem;">
+        <span style="display: flex; align-items: center; color: var(--soft); font-size: 0.9rem;">
           <span id="selectedCount">0</span> selected
         </span>
         <button class="btn btn-secondary" id="bulkArchiveBtn">Archive</button>
@@ -1885,7 +1900,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           <div class="analytics-card" style="border: 2px solid var(--sky);">
             <h3 style="color: var(--sky);">Free</h3>
             <p class="analytics-value" style="font-size: 2.5rem;">£0</p>
-            <p style="color: var(--ink-soft); margin-top: 8px;">Forever free for individual teachers</p>
+            <p style="color: var(--soft); margin-top: 8px;">Forever free for individual teachers</p>
             <ul style="list-style: none; padding: 0; margin-top: 16px; text-align: left;">
               <li style="padding: 8px 0; border-bottom: 1px solid var(--line);">✓ Unlimited rooms</li>
               <li style="padding: 8px 0; border-bottom: 1px solid var(--line);">✓ Unlimited students</li>
@@ -1900,7 +1915,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       <div class="card">
         <h2 class="section-title" style="margin-bottom: 16px;">Support Free Education</h2>
-        <p style="color: var(--ink-soft); margin-bottom: 16px;">We work hard to keep Classcastle free for individual teachers. If you find it valuable, consider donating to support our work.</p>
+        <p style="color: var(--soft); margin-bottom: 16px;">We work hard to keep Classcastle free for individual teachers. If you find it valuable, consider donating to support our work.</p>
         <a href="https://donate.stripe.com/00wcN5cKpfD77KmeJz00000" target="_blank" class="btn btn-primary">Donate</a>
       </div>
     </div>
@@ -1929,13 +1944,13 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       <div class="card">
         <h2 class="section-title" style="margin-bottom: 16px;">Help & Onboarding</h2>
-        <p style="color: var(--ink-soft); margin-bottom: 16px;">Want to see the onboarding tutorial again or need a refresher on how to use Classcastle?</p>
+        <p style="color: var(--soft); margin-bottom: 16px;">Want to see the onboarding tutorial again or need a refresher on how to use Classcastle?</p>
         <button class="btn btn-secondary" id="replayOnboardingBtn">Replay Onboarding</button>
       </div>
 
       <div class="card">
         <h2 class="section-title" style="margin-bottom: 16px;">Danger Zone</h2>
-        <p style="color: var(--ink-soft); margin-bottom: 16px;">To delete your teacher account, please contact our support team. We'll help you securely remove your data.</p>
+        <p style="color: var(--soft); margin-bottom: 16px;">To delete your teacher account, please contact our support team. We'll help you securely remove your data.</p>
         <a href="mailto:support@classcastle.org?subject=Delete%20My%20Account" class="btn btn-secondary" style="color: #fff; background: var(--red); border-color: var(--red);">Contact Support to Delete Account</a>
       </div>
     </div>
@@ -1951,9 +1966,9 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       <div class="card">
         <h2 class="section-title" style="margin-bottom: 24px;">What is Classcastle?</h2>
-        <p style="color: var(--ink-soft); margin-bottom: 16px;">Classcastle is a free classroom management tool that helps teachers guide students to the same webpage instantly. Watch the video below to learn more about how it works:</p>
+        <p style="color: var(--soft); margin-bottom: 16px;">Classcastle is a free classroom management tool that helps teachers guide students to the same webpage instantly. Watch the video below to learn more about how it works:</p>
 
-        <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; margin: 24px 0; background: #000;">
+        <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 6px; margin: 24px 0; background: #000;">
           <iframe 
             src="https://www.youtube.com/embed/Bzb4_y3rUW4" 
             title="About Classcastle"
@@ -1963,8 +1978,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           </iframe>
         </div>
 
-        <p style="color: var(--ink-soft); margin-bottom: 16px;">Classcastle makes it easy for teachers to manage their classroom by:</p>
-        <ul style="color: var(--ink-soft); line-height: 1.8; margin-left: 20px;">
+        <p style="color: var(--soft); margin-bottom: 16px;">Classcastle makes it easy for teachers to manage their classroom by:</p>
+        <ul style="color: var(--soft); line-height: 1.8; margin-left: 20px;">
           <li>Sending all students to the same URL instantly</li>
           <li>Creating and managing multiple rooms</li>
           <li>Tracking student attendance and engagement</li>
@@ -1975,7 +1990,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       <div class="card">
         <h2 class="section-title" style="margin-bottom: 16px;">Contact Us</h2>
-        <p style="color: var(--ink-soft); margin-bottom: 16px;">Have questions or feedback? We'd love to hear from you.</p>
+        <p style="color: var(--soft); margin-bottom: 16px;">Have questions or feedback? We'd love to hear from you.</p>
         <a href="mailto:support@classcastle.org" class="btn btn-primary">Contact Support</a>
       </div>
     </div>
@@ -2004,7 +2019,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       <button class="btn btn-secondary export-option" data-format="pdf">PDF</button>
       <button class="btn btn-secondary export-option" data-format="xlsx">XLSX</button>
       <button class="btn btn-secondary export-option" data-format="docx" disabled style="opacity: 0.5; cursor: not-allowed;">Text (Temporarily Unavailable)</button>
-      <p style="font-size: 0.8rem; color: var(--ink-soft); text-align: center; margin-top: 8px;">We're having some issues with DOCX exports. We're working hard to fix it.</p>
+      <p style="font-size: 0.8rem; color: var(--soft); text-align: center; margin-top: 8px;">We're having some issues with DOCX exports. We're working hard to fix it.</p>
     </div>
     <div class="modal-actions">
       <button class="modal-btn modal-btn-cancel" id="exportModalCancel">Cancel</button>
@@ -2295,7 +2310,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       input.type = 'text';
       input.value = defaultValue;
       input.placeholder = placeholder;
-      input.style.cssText = 'width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 1rem; margin-top: 16px; background: var(--paper); color: var(--ink);';
+      input.style.cssText = 'width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 6px; font-size: 1rem; margin-top: 16px; background: var(--bg); color: var(--ink);';
 
       // Replace message with message + input
       const originalMessage = modalMessage.textContent;
@@ -3305,7 +3320,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       archivedRooms.textContent = archivedRoomsCount || 0;
 
       if (sortedUrls.length === 0) {
-        topUrlsList.innerHTML = '<p style="color: var(--ink-soft);">No URL data yet</p>';
+        topUrlsList.innerHTML = '<p style="color: var(--soft);">No URL data yet</p>';
       } else {
         topUrlsList.innerHTML = sortedUrls.map(([url, count]) => `
           <div class="activity-item">

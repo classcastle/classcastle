@@ -14,9 +14,9 @@
     body {
       width: 320px;
       min-height: 400px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #F7F6F1;
-      color: #1C1B17;
+      font-family: system-ui, sans-serif;
+      background: #FCFCFA;
+      color: #18221C;
     }
 
     .container {
@@ -29,7 +29,7 @@
       gap: 12px;
       margin-bottom: 24px;
       padding-bottom: 16px;
-      border-bottom: 1px solid #E2E0D6;
+      border-bottom: 1px solid #D9DDD3;
     }
 
     .logo {
@@ -39,13 +39,14 @@
 
     .header h1 {
       font-size: 1.1rem;
-      font-weight: 600;
+      font-weight: 400;
+      font-family: Georgia, serif;
     }
 
     .status {
-      background: #E7EDE4;
+      background: #E4F1E6;
       padding: 20px;
-      border-radius: 12px;
+      border-radius: 6px;
       margin-bottom: 20px;
       display: none;
       text-align: center;
@@ -70,7 +71,7 @@
     .status-icon {
       width: 48px;
       height: 48px;
-      background: #2F5233;
+      background: #1F5C3A;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -86,14 +87,15 @@
 
     .status h2 {
       font-size: 1.1rem;
-      font-weight: 600;
+      font-weight: 400;
       margin-bottom: 4px;
-      color: #2F5233;
+      color: #1F5C3A;
+      font-family: Georgia, serif;
     }
 
     .status p {
       font-size: 0.85rem;
-      color: #6B6A61;
+      color: #5E675F;
     }
 
     .status button {
@@ -115,15 +117,15 @@
     .form-group label {
       display: block;
       font-size: 0.85rem;
-      font-weight: 500;
+      font-weight: 600;
       margin-bottom: 6px;
-      color: #6B6A61;
+      color: #18221C;
     }
 
     .form-group input {
       width: 100%;
       padding: 10px 12px;
-      border: 1.5px solid #E2E0D6;
+      border: 1px solid #D9DDD3;
       border-radius: 6px;
       font-size: 0.9rem;
       outline: none;
@@ -131,7 +133,9 @@
     }
 
     .form-group input:focus {
-      border-color: #2F5233;
+      border-color: #1F5C3A;
+      outline: 3px solid #1F5C3A;
+      outline-offset: 3px;
     }
 
     .btn {
@@ -140,34 +144,42 @@
       border: none;
       border-radius: 6px;
       font-size: 0.9rem;
-      font-weight: 500;
+      font-weight: 600;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: transform 0.1s ease;
     }
 
     .btn-primary {
-      background: #2F5233;
+      background: #1F5C3A;
       color: white;
+      box-shadow: 3px 3px 0 #18221C;
     }
 
     .btn-primary:hover {
-      background: #254128;
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0 #18221C;
+    }
+
+    .btn-primary:active {
+      transform: translate(0, 0);
+      box-shadow: none;
     }
 
     .btn-primary:disabled {
-      background: #6B6A61;
+      background: #5E675F;
       cursor: not-allowed;
+      box-shadow: none;
     }
 
     .btn-secondary {
       background: white;
-      color: #1C1B17;
-      border: 1.5px solid #E2E0D6;
+      color: #18221C;
+      border: 1px solid #D9DDD3;
       margin-top: 8px;
     }
 
     .btn-secondary:hover {
-      background: #E2E0D6;
+      border-color: #1F5C3A;
     }
 
     .error {
@@ -182,6 +194,67 @@
 
     .error.show {
       display: block;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: #0F1511;
+        color: #EEF2EA;
+      }
+
+      .header {
+        border-bottom-color: #2A362D;
+      }
+
+      .status {
+        background: #1A2B20;
+      }
+
+      .status-icon {
+        background: #4DAA72;
+      }
+
+      .status h2 {
+        color: #4DAA72;
+      }
+
+      .status p {
+        color: #9EAA9F;
+      }
+
+      .form-group label {
+        color: #EEF2EA;
+      }
+
+      .form-group input {
+        border-color: #2A362D;
+        background: #18211B;
+        color: #EEF2EA;
+      }
+
+      .form-group input:focus {
+        border-color: #4DAA72;
+        outline-color: #4DAA72;
+      }
+
+      .btn-primary {
+        background: #4DAA72;
+        box-shadow: 3px 3px 0 #EEF2EA;
+      }
+
+      .btn-primary:hover {
+        box-shadow: 1px 1px 0 #EEF2EA;
+      }
+
+      .btn-secondary {
+        background: #18211B;
+        color: #EEF2EA;
+        border-color: #2A362D;
+      }
+
+      .btn-secondary:hover {
+        border-color: #4DAA72;
+      }
     }
 
     .loading {
