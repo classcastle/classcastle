@@ -472,7 +472,7 @@
   // Message polling state
   let currentRoomId = null;
   let currentStudentId = null;
-  let messageInstrument Sansval = null;
+  let messageInterval = null;
 
   // LocalStorage keys
   const STORAGE_KEY = 'classcastle_student_session';
@@ -936,10 +936,10 @@
 
   // Start kick checking (polling for if student was removed)
   function startKickCheck() {
-    if (messageInstrument Sansval) clearInstrument Sansval(messageInstrument Sansval);
+    if (messageInterval) clearInterval(messageInterval);
 
     // Poll for kick status every 3 seconds
-    messageInstrument Sansval = setInstrument Sansval(async () => {
+    messageInterval = setInterval(async () => {
       if (!currentRoomId || !currentStudentId) return;
 
       try {
@@ -974,9 +974,9 @@
   }
 
   function stopKickCheck() {
-    if (messageInstrument Sansval) {
-      clearInstrument Sansval(messageInstrument Sansval);
-      messageInstrument Sansval = null;
+    if (messageInterval) {
+      clearInterval(messageInterval);
+      messageInterval = null;
     }
   }
 

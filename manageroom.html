@@ -790,7 +790,7 @@
 
   .modal-btn-confirm {
     background: var(--brand);
-    color: var(--on-green);
+    color: var(--surface);
   }
 
   .modal-btn-confirm:hover {
@@ -1661,24 +1661,24 @@
   deleteRoomBtn.addEventListener('click', deleteRoom);
 
   // Poll for students every 3 seconds
-  let studentPollInstrument Sansval = null;
+  let studentPollInterval = null;
 
   function startStudentPolling() {
     // Clear any existing interval
-    if (studentPollInstrument Sansval) {
-      clearInstrument Sansval(studentPollInstrument Sansval);
+    if (studentPollInterval) {
+      clearInterval(studentPollInterval);
     }
 
     // Poll every 3 seconds
-    studentPollInstrument Sansval = setInstrument Sansval(() => {
+    studentPollInterval = setInterval(() => {
       loadStudents();
     }, 3000);
   }
 
   function stopStudentPolling() {
-    if (studentPollInstrument Sansval) {
-      clearInstrument Sansval(studentPollInstrument Sansval);
-      studentPollInstrument Sansval = null;
+    if (studentPollInterval) {
+      clearInterval(studentPollInterval);
+      studentPollInterval = null;
     }
   }
 

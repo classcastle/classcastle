@@ -172,7 +172,7 @@
 
   .wordmark { font-family: 'Young Serif', serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; display: flex; align-items: center; gap: 9px; }
   .logo-mark { width: 24px; height: 24px; display: block; }
-  .wordmark .word-accent { color: var(--green); }
+  .wordmark .word-accent { color: var(--brand); }
 
   .sidebar-nav {
     flex: 1;
@@ -199,8 +199,8 @@
     color: var(--ink);
   }
   .nav-item.active {
-    background: var(--green-soft);
-    color: var(--green);
+    background: var(--tint);
+    color: var(--brand);
   }
   .nav-item svg {
     width: 20px;
@@ -226,7 +226,7 @@
     height: 36px;
     border-radius: 50%;
     background: var(--brand);
-    color: var(--on-green);
+    color: var(--surface);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -345,7 +345,7 @@
     transition: border-color 0.15s ease, background 0.15s ease;
   }
   .form-input:focus {
-    border-color: var(--green);
+    border-color: var(--brand);
     background: var(--surface);
   }
 
@@ -385,7 +385,7 @@
 
   .btn-primary {
     background: var(--brand);
-    color: var(--on-green);
+    color: var(--surface);
   }
 
   .btn-secondary {
@@ -425,7 +425,7 @@
     font-size: 2.2rem;
     font-weight: 600;
     letter-spacing: 0.05em;
-    color: var(--green);
+    color: var(--brand);
   }
 
   .control-bar {
@@ -447,7 +447,7 @@
     transition: border-color 0.15s ease, background 0.15s ease;
   }
   .url-input:focus {
-    border-color: var(--green);
+    border-color: var(--brand);
     background: var(--surface);
   }
 
@@ -484,8 +484,8 @@
     transition: border-color 0.15s ease;
   }
   .student-card.online {
-    border-color: var(--green);
-    background: var(--green-soft);
+    border-color: var(--brand);
+    background: var(--tint);
   }
 
   .student-avatar {
@@ -503,7 +503,7 @@
   }
   .student-card.online .student-avatar {
     background: var(--brand);
-    color: var(--on-green);
+    color: var(--surface);
   }
 
   .student-info {
@@ -534,7 +534,7 @@
     background: var(--line);
   }
   .student-card.online .status-dot {
-    background: var(--green);
+    background: var(--brand);
   }
 
   .empty-state {
@@ -560,7 +560,7 @@
     width: 32px;
     height: 32px;
     border: 3px solid var(--line);
-    border-top-color: var(--green);
+    border-top-color: var(--brand);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
     margin: 0 auto 16px;
@@ -585,7 +585,7 @@
     transition: border-color 0.15s ease, transform 0.15s ease;
   }
   .room-card:hover {
-    border-color: var(--green);
+    border-color: var(--brand);
     transform: translateY(-2px);
   }
 
@@ -600,7 +600,7 @@
     font-family: 'Young Serif', serif;
     font-size: 1.8rem;
     font-weight: 600;
-    color: var(--green);
+    color: var(--brand);
     letter-spacing: 0.05em;
   }
 
@@ -608,8 +608,8 @@
     font-size: 0.8rem;
     padding: 4px 8px;
     border-radius: 4px;
-    background: var(--green-soft);
-    color: var(--green);
+    background: var(--tint);
+    color: var(--brand);
     font-weight: 400;
   }
 
@@ -686,8 +686,8 @@
 
   .extension-id {
     font-family: 'Monaco', 'Consolas', monospace;
-    background: var(--green-soft);
-    color: var(--green);
+    background: var(--tint);
+    color: var(--brand);
     padding: 4px 8px;
     border-radius: 4px;
     font-size: 0.9rem;
@@ -1027,7 +1027,7 @@
 
   .modal-btn-confirm {
     background: var(--brand);
-    color: var(--on-green);
+    color: var(--surface);
   }
 
   .modal-btn-confirm:hover {
@@ -1175,7 +1175,7 @@
   .onboarding-step-number {
     font-family: 'Young Serif', serif;
     font-size: 1.1rem;
-    color: var(--green);
+    color: var(--brand);
     margin-bottom: 12px;
     font-weight: 600;
   }
@@ -1209,7 +1209,7 @@
   .onboarding-visual-icon {
     width: 80px;
     height: 80px;
-    color: var(--green);
+    color: var(--brand);
   }
 
   .onboarding-visual-animation {
@@ -1234,7 +1234,7 @@
     left: 0;
     right: 0;
     height: 8px;
-    background: var(--green-soft);
+    background: var(--tint);
     border-bottom: 1px solid var(--line);
   }
 
@@ -1246,7 +1246,7 @@
   .visual-arrow {
     width: 30px;
     height: 30px;
-    color: var(--green);
+    color: var(--brand);
     animation: arrowPulse 1.5s ease-in-out infinite;
   }
 
@@ -1256,8 +1256,8 @@
   }
 
   .visual-url {
-    background: var(--green-soft);
-    color: var(--green);
+    background: var(--tint);
+    color: var(--brand);
     padding: 8px 12px;
     border-radius: 4px;
     font-size: 0.85rem;
@@ -1298,8 +1298,8 @@
   }
 
   .visual-room-code {
-    background: var(--green-soft);
-    color: var(--green);
+    background: var(--tint);
+    color: var(--brand);
     padding: 4px 10px;
     border-radius: 6px;
     font-size: 0.85rem;
@@ -1383,7 +1383,7 @@
 
   .visual-join-btn {
     background: var(--brand);
-    color: var(--on-green);
+    color: var(--surface);
     padding: 8px;
     border-radius: 6px;
     text-align: center;
@@ -1406,7 +1406,7 @@
   .visual-avatar {
     width: 32px;
     height: 32px;
-    background: var(--green);
+    background: var(--brand);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -1417,8 +1417,8 @@
   }
 
   .visual-badge {
-    background: var(--green-soft);
-    color: var(--green);
+    background: var(--tint);
+    color: var(--brand);
     padding: 4px 8px;
     border-radius: 4px;
     font-size: 0.75rem;
@@ -1435,7 +1435,7 @@
   .visual-puzzle {
     width: 50px;
     height: 50px;
-    background: var(--green-soft);
+    background: var(--tint);
     border-radius: 6px;
     display: flex;
     align-items: center;
@@ -1451,7 +1451,7 @@
   .visual-check {
     width: 40px;
     height: 40px;
-    background: var(--green);
+    background: var(--brand);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -1487,7 +1487,7 @@
   }
 
   .progress-dot.active {
-    background: var(--green);
+    background: var(--brand);
   }
 
   .onboarding-buttons {
@@ -1514,7 +1514,7 @@
 
   .onboarding-next {
     background: var(--brand);
-    color: var(--on-green);
+    color: var(--surface);
     border: none;
     padding: 10px 24px;
     border-radius: 6px;
@@ -1555,7 +1555,7 @@
   .feature-icon {
     width: 24px;
     height: 24px;
-    color: var(--green);
+    color: var(--brand);
     flex-shrink: 0;
   }
 
@@ -1701,6 +1701,7 @@
           <option value="name_asc">Name A-Z</option>
           <option value="name_desc">Name Z-A</option>
         </select>
+        <button class="btn btn-secondary" id="selectAllBtn">Select All</button>
       </div>
 
       <div class="bulk-actions" id="bulkActions" style="display: none;">
@@ -2209,6 +2210,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   const roomSearch = document.getElementById('roomSearch');
   const roomFilter = document.getElementById('roomFilter');
   const roomSort = document.getElementById('roomSort');
+  const selectAllBtn = document.getElementById('selectAllBtn');
   const bulkActions = document.getElementById('bulkActions');
   const selectedCount = document.getElementById('selectedCount');
   const bulkArchiveBtn = document.getElementById('bulkArchiveBtn');
@@ -2511,8 +2513,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     // Add click handlers for room cards (navigation)
     document.querySelectorAll('.room-card').forEach(card => {
       card.addEventListener('click', (e) => {
-        // Don't navigate if clicking on any button
-        if (e.target.closest('.room-card-btn')) {
+        // Don't navigate if clicking on any button or checkbox
+        if (e.target.closest('.room-card-btn') || e.target.classList.contains('room-checkbox')) {
           return;
         }
         const roomId = card.dataset.roomId;
@@ -3548,6 +3550,23 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   roomSearch.addEventListener('input', renderRooms);
   roomFilter.addEventListener('change', renderRooms);
   roomSort.addEventListener('change', renderRooms);
+
+  // Select all button
+  selectAllBtn.addEventListener('click', () => {
+    const filtered = getFilteredRooms();
+    const allSelected = filtered.length > 0 && filtered.every(room => selectedRooms.has(room.id));
+
+    if (allSelected) {
+      // Deselect all
+      filtered.forEach(room => selectedRooms.delete(room.id));
+    } else {
+      // Select all
+      filtered.forEach(room => selectedRooms.add(room.id));
+    }
+
+    updateBulkActions();
+    renderRooms();
+  });
 
   // Bulk actions
   bulkArchiveBtn.addEventListener('click', bulkArchive);
