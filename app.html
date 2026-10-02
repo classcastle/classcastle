@@ -641,14 +641,57 @@
     cursor: pointer;
     transition: all 0.15s ease;
     border: none;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  .room-card-btn:hover {
+    background: var(--line);
   }
 
+  .room-card-btn-manage {
+    background: var(--brand);
+    color: var(--surface);
+  }
+  .room-card-btn-manage:hover {
+    opacity: 0.9;
+  }
+  .room-card-btn-archive {
+    background: var(--brand);
+    color: var(--surface);
+  }
+  .room-card-btn-archive:hover {
+    opacity: 0.9;
+  }
+  .room-card-btn-restore {
+    background: var(--brand);
+    color: var(--surface);
+  }
+  .room-card-btn-restore:hover {
+    opacity: 0.9;
+  }
+  .room-card-btn-export {
+    background: var(--brand);
+    color: var(--surface);
+  }
+  .room-card-btn-export:hover {
+    opacity: 0.9;
+  }
   .room-card-btn-delete {
     background: var(--red);
     color: #fff;
   }
   .room-card-btn-delete:hover {
     background: #8B2E28;
+  }
+
+  .btn-delete {
+    background: var(--red);
+    color: #fff;
+    border-color: var(--red);
+  }
+  .btn-delete:hover {
+    background: #8B2E28;
+    border-color: #8B2E28;
   }
 
   .deployment-info {
@@ -1709,7 +1752,7 @@
           <span id="selectedCount">0</span> selected
         </span>
         <button class="btn btn-secondary" id="bulkArchiveBtn">Archive</button>
-        <button class="btn btn-secondary" id="bulkDeleteBtn" style="color: #fff; background: var(--red); border-color: var(--red);">Delete</button>
+        <button class="btn btn-secondary btn-delete" id="bulkDeleteBtn">Delete</button>
         <button class="btn btn-secondary" id="bulkCloseBtn">Close</button>
         <button class="btn btn-secondary" id="bulkCancelBtn">Cancel</button>
       </div>
@@ -1952,7 +1995,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       <div class="card">
         <h2 class="section-title" style="margin-bottom: 16px;">Danger Zone</h2>
         <p style="color: var(--soft); margin-bottom: 16px;">To delete your teacher account, please contact our support team. We'll help you securely remove your data.</p>
-        <a href="mailto:support@classcastle.org?subject=Delete%20My%20Account" class="btn btn-secondary" style="color: #fff; background: var(--red); border-color: var(--red);">Contact Support to Delete Account</a>
+        <a href="mailto:support@classcastle.org?subject=Delete%20My%20Account" class="btn btn-secondary btn-delete">Contact Support to Delete Account</a>
       </div>
     </div>
 
@@ -2494,7 +2537,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           ` : `
             <button class="room-card-btn room-card-btn-archive" data-room-id="${room.id}">Archive</button>
           `}
-          <button class="room-card-btn room-card-btn-delete" data-room-id="${room.id}" style="color: #fff; background: var(--red); border-color: var(--red);">Delete</button>
+          <button class="room-card-btn room-card-btn-delete" data-room-id="${room.id}">Delete</button>
           <button class="room-card-btn room-card-btn-export" data-room-id="${room.id}">Export</button>
         </div>
       </div>
@@ -3061,7 +3104,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         </div>
         <div class="room-card-actions">
           <button class="btn btn-secondary" onclick="createFromTemplate('${template.id}')">Use Template</button>
-          <button class="btn btn-secondary" onclick="deleteTemplate('${template.id}')" style="color: #fff; background: var(--red); border-color: var(--red);">Delete</button>
+          <button class="btn btn-secondary btn-delete" onclick="deleteTemplate('${template.id}')">Delete</button>
         </div>
       </div>
     `).join('');
@@ -3196,7 +3239,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         </div>
         <div class="room-card-actions">
           <button class="btn btn-secondary" onclick="copyShortcut('${shortcut.url}')">Copy URL</button>
-          <button class="btn btn-secondary" onclick="deleteShortcut('${shortcut.id}')" style="color: #fff; background: var(--red); border-color: var(--red);">Delete</button>
+          <button class="btn btn-secondary btn-delete" onclick="deleteShortcut('${shortcut.id}')">Delete</button>
         </div>
       </div>
     `).join('');
