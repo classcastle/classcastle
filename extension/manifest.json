@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Classcastle",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Classroom management tool for teachers to navigate student browsers",
   "permissions": [
     "storage",
