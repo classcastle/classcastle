@@ -2072,11 +2072,12 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 </div>
 
 <div class="modal-overlay" id="donateModalOverlay">
-  <div class="modal" id="donateModal" style="max-width: 500px;">
+  <div class="modal" id="donateModal" style="max-width: 800px;">
     <h2 id="donateModalTitle">Support Classcastle</h2>
     <p id="donateModalMessage" style="color: var(--soft); line-height: 1.6; margin-bottom: 24px;">We work hard to keep Classcastle free for individual teachers. If you find it valuable, consider donating to support our work.</p>
-    <iframe id="donateFrame" src="" style="width: 100%; height: 400px; border: none; border-radius: 8px; background: var(--bg);"></iframe>
+    <iframe id="donateFrame" src="" style="width: 100%; height: 450px; border: none; border-radius: 8px; background: var(--bg);"></iframe>
     <div class="modal-actions">
+      <button class="modal-btn modal-btn-secondary" id="donateOpenNewTab">Open in new tab</button>
       <button class="modal-btn modal-btn-cancel" id="donateModalCancel">Close</button>
     </div>
   </div>
@@ -2255,6 +2256,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   const donateModal = document.getElementById('donateModal');
   const donateModalCancel = document.getElementById('donateModalCancel');
   const donateFrame = document.getElementById('donateFrame');
+  const donateOpenNewTab = document.getElementById('donateOpenNewTab');
 
   // Pages
   const dashboardPage = document.getElementById('dashboardPage');
@@ -3893,6 +3895,12 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   });
 
   donateModalCancel.addEventListener('click', () => {
+    donateModalOverlay.classList.remove('show');
+    donateFrame.src = '';
+  });
+
+  donateOpenNewTab.addEventListener('click', () => {
+    window.open('https://donate.stripe.com/00wcN5cKpfD77KmeJz00000', '_blank');
     donateModalOverlay.classList.remove('show');
     donateFrame.src = '';
   });
