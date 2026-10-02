@@ -2768,15 +2768,18 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     }
   }
 
-  async function deleteRoom(roomId) {
+  async function deleteRoom(roomId, skipConfirm = false) {
     if (!currentUser) return;
-    const confirmed = await showConfirm({
-      title: 'Delete Room',
-      message: 'Are you sure you want to delete this room? This will remove all student data and cannot be undone.',
-      confirmText: 'Delete',
-      cancelText: 'Cancel'
-    });
-    if (!confirmed) return;
+
+    if (!skipConfirm) {
+      const confirmed = await showConfirm({
+        title: 'Delete Room',
+        message: 'Are you sure you want to delete this room? This will remove all student data and cannot be undone.',
+        confirmText: 'Delete',
+        cancelText: 'Cancel'
+      });
+      if (!confirmed) return;
+    }
 
     try {
       const { error } = await SupabaseClient
@@ -2982,7 +2985,15 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   }
 
   // Archive room
-  async function archiveRoom(roomId) {
+  async function archiveRoom(roomId, skipConfirm = false) {
+    if (!skipConfirm) {
+      const confirmed = await showConfirm({
+        title: 'Archive Room',
+        message: 'Are you sure you want to archive this room?'
+      });
+      if (!confirmed) return;
+    }
+
     try {
       const { error } = await SupabaseClient
         .from('rooms')
@@ -2999,7 +3010,15 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   }
 
   // Restore room
-  async function restoreRoom(roomId) {
+  async function restoreRoom(roomId, skipConfirm = false) {
+    if (!skipConfirm) {
+      const confirmed = await showConfirm({
+        title: 'Restore Room',
+        message: 'Are you sure you want to restore this room?'
+      });
+      if (!confirmed) return;
+    }
+
     try {
       const { error } = await SupabaseClient
         .from('rooms')
@@ -3033,7 +3052,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     if (!confirmed) return;
 
     for (const roomId of selectedRooms) {
-      await archiveRoom(roomId);
+      await archiveRoom(roomId, true);
     }
     await logActivity('bulk_archive_rooms', { count: selectedRooms.size, room_ids: Array.from(selectedRooms) });
     selectedRooms.clear();
@@ -3048,7 +3067,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     if (!confirmed) return;
 
     for (const roomId of selectedRooms) {
-      await deleteRoom(roomId);
+      await deleteRoom(roomId, true);
     }
     await logActivity('bulk_delete_rooms', { count: selectedRooms.size, room_ids: Array.from(selectedRooms) });
     selectedRooms.clear();
