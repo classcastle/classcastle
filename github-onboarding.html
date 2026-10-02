@@ -906,6 +906,26 @@
     const { data: { session } } = await SupabaseClient.auth.getSession();
     if (session && session.user) {
       currentUser = session.user;
+      
+      // Check if user already completed onboarding (has full_name in metadata)
+      if (session.user.user_metadata && session.user.user_metadata.full_name) {
+        // User already exists and completed onboarding, redirect to app
+        window.location.href = '/app.html';
+        return;
+      }
+      
+      // Check if user has any rooms (they might have signed up via email but not completed GitHub onboarding)
+      const { data: rooms, error } = await SupabaseClient
+        .from('rooms')
+        .select('id')
+        .eq('teacher_id', session.user.id);
+      
+      if (rooms && rooms.length > 0 && !error) {
+        // User already has rooms, redirect to signup with alert
+        window.location.href = '/signup.html?error=account_exists';
+        return;
+      }
+      
       // Pre-fill name from GitHub user metadata if available
       if (session.user.user_metadata && session.user.user_metadata.full_name) {
         userName.value = session.user.user_metadata.full_name;

@@ -1023,6 +1023,12 @@
   const githubSignupBtnText = githubSignupBtn.querySelector('.btn-text');
   const githubSignupBtnLoading = githubSignupBtn.querySelector('.loading');
 
+  // Check for error in URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('error') === 'account_exists') {
+    showNotification('This account already exists. Please log in instead.', 5000);
+  }
+
   // Onboarding elements
   const onboardingOverlay = document.getElementById('onboardingOverlay');
   const skipOnboarding = document.getElementById('skipOnboarding');
