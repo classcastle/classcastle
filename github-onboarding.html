@@ -1021,22 +1021,10 @@
     if (session && session.user) {
       currentUser = session.user;
       
-      // Check if user has any rooms (they might have signed up via email or completed onboarding)
-      const { data: rooms, error } = await SupabaseClient
-        .from('rooms')
-        .select('id')
-        .eq('teacher_id', session.user.id);
-      
-      if (rooms && rooms.length > 0 && !error) {
-        // User already has rooms, they've completed onboarding - redirect to app
-        window.location.href = '/app.html';
-        return;
-      }
-      
-      // Check if user has explicitly completed onboarding flag
+      // Check if user has already completed onboarding
       if (session.user.user_metadata && session.user.user_metadata.onboarding_completed) {
-        // User completed onboarding but has no rooms, redirect to app
-        window.location.href = '/app.html';
+        // User already exists and completed onboarding, redirect to signup with alert
+        window.location.href = '/signup.html?error=account_exists';
         return;
       }
       
@@ -1113,13 +1101,16 @@
 
     console.log('Current user:', currentUser);
 
-    // Update user metadata with name
+    // Update user metadata with name and mark onboarding as completed
     const name = userName.value.trim();
     if (name) {
       try {
         console.log('Updating user with name:', name);
         await SupabaseClient.auth.updateUser({
-          data: { full_name: name }
+          data: { 
+            full_name: name,
+            onboarding_completed: true
+          }
         });
         console.log('User updated successfully');
       } catch (error) {
@@ -1147,7 +1138,7 @@
     startOnboardingBtnLoading.style.display = 'inline-block';
 
     try {
-      // Update user metadata
+      // Update user metadata with name (but don't mark onboarding as completed yet)
       await SupabaseClient.auth.updateUser({
         data: { full_name: name }
       });
