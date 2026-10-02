@@ -962,9 +962,11 @@
   }
 
   function nextStep() {
+    console.log('nextStep called, currentStep:', currentStep, 'totalSteps:', totalSteps);
     if (currentStep < totalSteps) {
       showStep(currentStep + 1);
     } else {
+      console.log('Calling completeOnboarding');
       completeOnboarding();
     }
   }
@@ -986,19 +988,30 @@
   }
 
   async function completeOnboarding() {
+    console.log('completeOnboarding called');
     if (!currentUser) {
       showNotification('Please sign in first');
       return;
     }
 
+    console.log('Current user:', currentUser);
+
     // Update user metadata with name
     const name = userName.value.trim();
     if (name) {
-      await SupabaseClient.auth.updateUser({
-        data: { full_name: name }
-      });
+      try {
+        console.log('Updating user with name:', name);
+        await SupabaseClient.auth.updateUser({
+          data: { full_name: name }
+        });
+        console.log('User updated successfully');
+      } catch (error) {
+        console.error('Error updating user:', error);
+        // Continue with redirect even if update fails
+      }
     }
 
+    console.log('Redirecting to app.html');
     // Redirect to app
     window.location.href = '/app.html';
   }
@@ -1043,7 +1056,10 @@
   skipOnboarding.addEventListener('click', skipOnboardingFlow);
   closeOnboarding.addEventListener('click', closeOnboardingFlow);
   onboardingBack.addEventListener('click', prevStep);
-  onboardingNext.addEventListener('click', nextStep);
+  onboardingNext.addEventListener('click', () => {
+    console.log('onboardingNext clicked');
+    nextStep();
+  });
 
   checkSession();
 </script>
