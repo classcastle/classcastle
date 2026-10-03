@@ -2048,7 +2048,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       </div>
 
       <!-- Tab Navigation -->
-      <div class="card" style="padding: 0;">
+      <div class="card" style="padding: 0;" id="pollTabsNav">
         <div style="display: flex; border-bottom: 1px solid var(--line);">
           <button class="tab-btn active" data-tab="polls" style="flex: 1; padding: 16px; border: none; background: none; cursor: pointer; font-weight: 600; border-bottom: 2px solid var(--brand); color: var(--brand);">
             My Polls
@@ -3931,12 +3931,20 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         document.getElementById('pollUsageSection').style.display = 'none';
         document.getElementById('pollsTab').style.display = 'none';
         document.getElementById('responsesTab').style.display = 'none';
+        document.getElementById('createPollBtn').style.display = 'none';
+        document.getElementById('pollTabsNav').style.display = 'none';
+        const pollsPageHeader = document.querySelector('#pollsPage .page-header');
+        if (pollsPageHeader) pollsPageHeader.style.display = 'none';
         return;
       }
 
       document.getElementById('unlockSection').style.display = 'none';
       document.getElementById('pollUsageSection').style.display = 'block';
       document.getElementById('pollsTab').style.display = 'block';
+      document.getElementById('createPollBtn').style.display = 'inline-block';
+      document.getElementById('pollTabsNav').style.display = 'block';
+      const pollsPageHeader = document.querySelector('#pollsPage .page-header');
+      if (pollsPageHeader) pollsPageHeader.style.display = 'flex';
 
       const { data, error } = await SupabaseClient
         .from('polls')
