@@ -1999,7 +1999,23 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         <button class="btn btn-primary" id="createPollBtn">Create New Poll</button>
       </div>
 
-      <div class="card" style="margin-bottom: 16px;">
+      <!-- Unlock Section -->
+      <div class="card" id="unlockSection" style="display: none; border: 2px solid var(--brand);">
+        <div style="text-align: center; padding: 32px;">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="1.5" style="margin-bottom: 16px;">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          <h2 style="font-size: 1.5rem; margin-bottom: 12px;">Unlock Quick Polls</h2>
+          <p style="color: var(--soft); margin-bottom: 24px; max-width: 400px; margin-left: auto; margin-right: auto;">
+            Unlock this feature to create polls for your classroom. Great for quick assessments, feedback collection, and student engagement.
+          </p>
+          <button class="btn btn-primary" id="unlockPollsBtn" style="padding: 16px 32px; font-size: 1.1rem;">Unlock Quick Polls</button>
+          <p style="font-size: 0.8rem; color: var(--soft); margin-top: 16px;">Free for teachers - no credit card required</p>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom: 16px;" id="pollUsageSection" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
           <span style="font-size: 0.9rem; font-weight: 500;">Active Polls</span>
           <span id="pollUsageText" style="font-size: 0.85rem; color: var(--soft);">0 of 15 used</span>
@@ -3880,8 +3896,26 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   }
 
   // Quick Polls
+  let pollsUnlocked = false;
+
   async function loadPolls() {
     try {
+      // Check if polls feature is unlocked
+      const { data: user } = await SupabaseClient.auth.getUser();
+      pollsUnlocked = user.user_metadata?.polls_unlocked || false;
+
+      if (!pollsUnlocked) {
+        document.getElementById('unlockSection').style.display = 'block';
+        document.getElementById('pollUsageSection').style.display = 'none';
+        document.getElementById('pollsTab').style.display = 'none';
+        document.getElementById('responsesTab').style.display = 'none';
+        return;
+      }
+
+      document.getElementById('unlockSection').style.display = 'none';
+      document.getElementById('pollUsageSection').style.display = 'block';
+      document.getElementById('pollsTab').style.display = 'block';
+
       const { data, error } = await SupabaseClient
         .from('polls')
         .select('*, poll_responses(count)')
@@ -4096,6 +4130,22 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     document.getElementById('schoolResults').style.display = 'none';
   }
 
+  async function unlockPolls() {
+    try {
+      const { error } = await SupabaseClient.auth.updateUser({
+        data: { polls_unlocked: true }
+      });
+
+      if (error) throw error;
+      showNotification('Quick Polls unlocked!');
+      pollsUnlocked = true;
+      loadPolls();
+    } catch (error) {
+      console.error('Error unlocking polls:', error);
+      showNotification('Error unlocking polls. Please try again.');
+    }
+  }
+
   function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
@@ -4112,14 +4162,19 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     document.getElementById('pollUsageText').textContent = `${activePolls} of ${maxActivePolls} used`;
     document.getElementById('pollUsageBar').style.width = `${usagePercentage}%`;
 
-    // Disable create button if at limit
+    // Hide create button when locked
     const createBtn = document.getElementById('createPollBtn');
-    if (activePolls >= maxActivePolls) {
-      createBtn.disabled = true;
-      createBtn.textContent = 'Limit Reached (Close a poll to create more)';
+    if (!pollsUnlocked) {
+      createBtn.style.display = 'none';
     } else {
-      createBtn.disabled = false;
-      createBtn.textContent = 'Create New Poll';
+      createBtn.style.display = 'inline-block';
+      if (activePolls >= maxActivePolls) {
+        createBtn.disabled = true;
+        createBtn.textContent = 'Limit Reached (Close a poll to create more)';
+      } else {
+        createBtn.disabled = false;
+        createBtn.textContent = 'Create New Poll';
+      }
     }
 
     if (polls.length === 0) {
@@ -4673,6 +4728,9 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   const searchSchoolsBtn = document.getElementById('searchSchoolsBtn');
   const schoolSearchInput = document.getElementById('schoolSearchInput');
   const clearSchoolBtn = document.getElementById('clearSchoolBtn');
+  const unlockPollsBtn = document.getElementById('unlockPollsBtn');
+
+  if (unlockPollsBtn) unlockPollsBtn.addEventListener('click', unlockPolls);
 
   if (searchSchoolsBtn) searchSchoolsBtn.addEventListener('click', searchSchools);
   if (schoolSearchInput) {
