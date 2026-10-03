@@ -2401,12 +2401,20 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       modalConfirm.textContent = confirmText;
       modalCancel.textContent = cancelText;
 
+      // Hide cancel button if cancelText is empty
+      if (!cancelText) {
+        modalCancel.style.display = 'none';
+      } else {
+        modalCancel.style.display = 'inline-block';
+      }
+
       modalOverlay.classList.add('show');
 
       const handleConfirm = () => {
         modalOverlay.classList.remove('show');
         modalConfirm.removeEventListener('click', handleConfirm);
         modalCancel.removeEventListener('click', handleCancel);
+        modalCancel.style.display = 'inline-block'; // Reset for next use
         resolve(true);
       };
 
@@ -2414,6 +2422,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         modalOverlay.classList.remove('show');
         modalConfirm.removeEventListener('click', handleConfirm);
         modalCancel.removeEventListener('click', handleCancel);
+        modalCancel.style.display = 'inline-block'; // Reset for next use
         resolve(false);
       };
 
@@ -4122,12 +4131,29 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
     // Check for error in URL parameters
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('error') === 'identity_not_found') {
-      showNotification('GitHub account not linked. Please link it in Settings after signing in.');
+    const error = urlParams.get('error');
+    const errorCode = urlParams.get('error_code');
+    const errorDescription = urlParams.get('error_description');
+
+    if (error || errorCode) {
+      let message = errorDescription || 'An error occurred during authentication.';
+
+      // Handle specific error codes
+      if (errorCode === 'user_banned') {
+        message = errorDescription || 'Your account has been banned. Please contact support for more information.';
+      } else if (error === 'identity_not_found') {
+        message = 'This GitHub account is not linked to a Classcastle account. Please sign up first, then link your GitHub account in Settings.';
+      } else if (error === 'access_denied') {
+        message = errorDescription || 'You do not have permission to access this resource.';
+      }
+
+      showNotification(message, 5000);
       // Clean URL
       window.history.replaceState({}, document.title, window.location.pathname);
       // Redirect to login
-      window.location.href = '/login.html';
+      setTimeout(() => {
+        window.location.href = '/login.html';
+      }, 5000);
       return;
     }
 

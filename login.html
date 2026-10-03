@@ -456,11 +456,27 @@
 
     // Check for error in URL parameters
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('error') === 'identity_not_found') {
-      showAlert(
-        'GitHub Account Not Linked',
-        'This GitHub account is not linked to a Classcastle account. Please sign up first, then link your GitHub account in Settings.'
-      );
+    const error = urlParams.get('error');
+    const errorCode = urlParams.get('error_code');
+    const errorDescription = urlParams.get('error_description');
+
+    if (error || errorCode) {
+      let title = 'Authentication Error';
+      let message = errorDescription || 'An error occurred during authentication.';
+
+      // Handle specific error codes
+      if (errorCode === 'user_banned') {
+        title = 'Account Banned';
+        message = errorDescription || 'Your account has been banned. Please contact support for more information.';
+      } else if (error === 'identity_not_found') {
+        title = 'GitHub Account Not Linked';
+        message = 'This GitHub account is not linked to a Classcastle account. Please sign up first, then link your GitHub account in Settings.';
+      } else if (error === 'access_denied') {
+        title = 'Access Denied';
+        message = errorDescription || 'You do not have permission to access this resource.';
+      }
+
+      showAlert(title, message);
       // Clean URL
       window.history.replaceState({}, document.title, window.location.pathname);
       return;
