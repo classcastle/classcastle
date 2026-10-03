@@ -1096,6 +1096,54 @@
     display: none !important;
   }
 
+  /* Linked Accounts */
+  .identity-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    background: var(--bg);
+  }
+
+  .identity-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .identity-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .identity-provider {
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .identity-email {
+    font-size: 0.85rem;
+    color: var(--soft);
+  }
+
+  .btn-unlink {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    background: var(--bg);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .btn-unlink:hover {
+    background: var(--line);
+  }
+
   /* Onboarding Modal */
   .onboarding-overlay {
     position: fixed;
@@ -1987,6 +2035,25 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       </div>
 
       <div class="card">
+        <h2 class="section-title" style="margin-bottom: 16px;">Linked Accounts</h2>
+        <p style="color: var(--soft); margin-bottom: 16px;">Link your GitHub account to enable easier sign-in in the future.</p>
+        <div id="linkedAccounts" style="margin-bottom: 16px;">
+          <div class="loading-state" id="identitiesLoading">
+            <div class="loading-spinner"></div>
+            <p>Loading linked accounts...</p>
+          </div>
+          <div id="identitiesList" style="display: none;"></div>
+        </div>
+        <button class="btn btn-secondary" id="linkGithubBtn" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+          <span class="btn-text">Link GitHub Account</span>
+          <span class="loading" style="display: none;"></span>
+        </button>
+      </div>
+
+      <div class="card">
         <h2 class="section-title" style="margin-bottom: 16px;">Help & Onboarding</h2>
         <p style="color: var(--soft); margin-bottom: 16px;">Want to see the onboarding tutorial again or need a refresher on how to use Classcastle?</p>
         <button class="btn btn-secondary" id="replayOnboardingBtn">Replay Onboarding</button>
@@ -2305,6 +2372,11 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   const settingsEmail = document.getElementById('settingsEmail');
   const saveSettingsBtn = document.getElementById('saveSettingsBtn');
   const replayOnboardingBtn = document.getElementById('replayOnboardingBtn');
+  const linkGithubBtn = document.getElementById('linkGithubBtn');
+  const linkGithubBtnText = linkGithubBtn.querySelector('.btn-text');
+  const linkGithubBtnLoading = linkGithubBtn.querySelector('.loading');
+  const identitiesLoading = document.getElementById('identitiesLoading');
+  const identitiesList = document.getElementById('identitiesList');
 
   // Onboarding elements
   const onboardingOverlay = document.getElementById('onboardingOverlay');
@@ -2853,6 +2925,127 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     } catch (error) {
       console.error('Error saving settings:', error);
       showNotification('Error saving settings');
+    }
+  }
+
+  // Load user identities (linked accounts)
+  async function loadIdentities() {
+    if (!currentUser) return;
+
+    try {
+      const { data: identities, error } = await SupabaseClient.auth.getUserIdentities();
+
+      if (error) throw error;
+
+      identitiesLoading.style.display = 'none';
+      identitiesList.style.display = 'block';
+      identitiesList.innerHTML = '';
+
+      if (!identities || identities.length === 0) {
+        identitiesList.innerHTML = '<p style="color: var(--soft); font-size: 0.9rem;">No linked accounts</p>';
+        linkGithubBtn.style.display = 'flex';
+        return;
+      }
+
+      identities.forEach(identity => {
+        const item = document.createElement('div');
+        item.className = 'identity-item';
+
+        const providerName = identity.provider.charAt(0).toUpperCase() + identity.provider.slice(1);
+        const providerIcon = identity.provider === 'github'
+          ? '<svg class="identity-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>'
+          : '<svg class="identity-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>';
+
+        const info = document.createElement('div');
+        info.className = 'identity-info';
+        info.innerHTML = `
+          ${providerIcon}
+          <div>
+            <div class="identity-provider">${providerName}</div>
+            <div class="identity-email">${identity.identity_data?.email || 'No email'}</div>
+          </div>
+        `;
+
+        // Only show unlink button if there are multiple identities
+        const hasMultipleIdentities = identities.length > 1;
+        if (hasMultipleIdentities) {
+          const unlinkBtn = document.createElement('button');
+          unlinkBtn.className = 'btn-unlink';
+          unlinkBtn.textContent = 'Unlink';
+          unlinkBtn.onclick = () => unlinkIdentity(identity);
+          item.appendChild(info);
+          item.appendChild(unlinkBtn);
+        } else {
+          item.appendChild(info);
+        }
+
+        identitiesList.appendChild(item);
+      });
+
+      // Hide link button if GitHub is already linked
+      const hasGithub = identities.some(i => i.provider === 'github');
+      linkGithubBtn.style.display = hasGithub ? 'none' : 'flex';
+
+    } catch (error) {
+      console.error('Error loading identities:', error);
+      identitiesLoading.style.display = 'none';
+      identitiesList.innerHTML = '<p style="color: var(--red); font-size: 0.9rem;">Error loading linked accounts</p>';
+    }
+  }
+
+  // Link GitHub account
+  async function linkGithub() {
+    if (!currentUser) return;
+
+    // Show loading state
+    linkGithubBtn.disabled = true;
+    linkGithubBtnText.style.display = 'none';
+    linkGithubBtnLoading.style.display = 'inline-block';
+
+    try {
+      const { data, error } = await SupabaseClient.auth.linkIdentity({
+        provider: 'github',
+        options: {
+          redirectTo: window.location.origin + '/app.html'
+        }
+      });
+
+      if (error) throw error;
+
+      // OAuth will redirect, so we don't need to do anything else
+    } catch (error) {
+      console.error('Error linking GitHub:', error);
+      showNotification(error.message || 'Error linking GitHub account');
+      // Reset button state
+      linkGithubBtn.disabled = false;
+      linkGithubBtnText.style.display = 'inline';
+      linkGithubBtnLoading.style.display = 'none';
+    }
+  }
+
+  // Unlink identity
+  async function unlinkIdentity(identity) {
+    if (!currentUser) return;
+
+    const confirmed = await showConfirm({
+      title: 'Unlink Account',
+      message: `Are you sure you want to unlink your ${identity.provider} account? You'll need to use another sign-in method.`,
+      confirmText: 'Unlink',
+      cancelText: 'Cancel'
+    });
+
+    if (!confirmed) return;
+
+    try {
+      const { error } = await SupabaseClient.auth.unlinkIdentity(identity);
+
+      if (error) throw error;
+
+      showNotification('Account unlinked successfully');
+      loadIdentities(); // Reload the list
+    } catch (error) {
+      console.error('Error unlinking identity:', error);
+      showNotification(error.message || 'Error unlinking account');
     }
   }
 
@@ -3774,6 +3967,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       if (page === 'shortcuts') loadShortcuts();
       if (page === 'analytics') loadAnalytics();
       if (page === 'activity') loadActivityLog();
+      if (page === 'settings') loadIdentities();
 
       // Close sidebar on mobile
       if (window.innerWidth <= 780) {
@@ -3831,6 +4025,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   });
 
   saveSettingsBtn.addEventListener('click', saveSettings);
+  linkGithubBtn.addEventListener('click', linkGithub);
 
   // Onboarding functionality
   let currentOnboardingStep = 1;
@@ -3923,6 +4118,17 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   async function checkSession() {
     const { data: { session } } = await SupabaseClient.auth.getSession();
 
+    // Check for error in URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('error') === 'identity_not_found') {
+      showNotification('GitHub account not linked. Please link it in Settings after signing in.');
+      // Clean URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+      // Redirect to login
+      window.location.href = '/login.html';
+      return;
+    }
+
     if (session) {
       currentUser = session.user;
       updateUserInfo();
@@ -3933,6 +4139,15 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       subscribeToStudents();
       await loadTemplates();
       await loadShortcuts();
+
+      // Check if user just linked GitHub account
+      if (urlParams.get('github_linked') === 'true') {
+        showNotification('GitHub account linked successfully!');
+        // Clean URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+        // Load identities to show the newly linked account
+        loadIdentities();
+      }
     } else {
       window.location.href = '/login.html';
     }

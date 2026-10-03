@@ -234,6 +234,92 @@
     transform: translateY(0);
   }
 
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-overlay.show {
+    display: flex;
+  }
+
+  .modal {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    animation: modalSlideIn 0.2s ease-out;
+  }
+
+  @keyframes modalSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .modal h2 {
+    font-size: 1.4rem;
+    margin-bottom: 12px;
+    color: var(--ink);
+  }
+
+  .modal p {
+    font-size: 0.95rem;
+    color: var(--soft);
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+  }
+
+  .modal-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .modal-btn-primary {
+    background: var(--ink);
+    color: var(--bg);
+  }
+  .modal-btn-primary:hover {
+    background: #1a1a1a;
+  }
+
+  .modal-btn-secondary {
+    background: var(--bg);
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+  .modal-btn-secondary:hover {
+    background: var(--line);
+  }
+
   .loading {
     display: inline-block;
     width: 16px;
@@ -300,6 +386,17 @@
 
 <div class="notification" id="notification"></div>
 
+<!-- Alert Modal -->
+<div class="modal-overlay" id="alertModalOverlay">
+  <div class="modal" id="alertModal">
+    <h2 id="alertModalTitle">Alert</h2>
+    <p id="alertModalMessage">Message goes here</p>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-primary" id="alertModalConfirm">OK</button>
+    </div>
+  </div>
+</div>
+
 <script>
   // Supabase configuration
   const SUPABASE_URL = 'https://hduyofdbpspjcuwvackd.supabase.co';
@@ -328,6 +425,23 @@
   const githubLoginBtnText = githubLoginBtn.querySelector('.btn-text');
   const githubLoginBtnLoading = githubLoginBtn.querySelector('.loading');
 
+  // Alert modal elements
+  const alertModalOverlay = document.getElementById('alertModalOverlay');
+  const alertModal = document.getElementById('alertModal');
+  const alertModalTitle = document.getElementById('alertModalTitle');
+  const alertModalMessage = document.getElementById('alertModalMessage');
+  const alertModalConfirm = document.getElementById('alertModalConfirm');
+
+  function showAlert(title, message) {
+    alertModalTitle.textContent = title;
+    alertModalMessage.textContent = message;
+    alertModalOverlay.classList.add('show');
+  }
+
+  alertModalConfirm.addEventListener('click', () => {
+    alertModalOverlay.classList.remove('show');
+  });
+
   function showNotification(message, duration = 3000) {
     notification.textContent = message;
     notification.classList.add('show');
@@ -339,7 +453,19 @@
   // Check if already logged in
   async function checkSession() {
     const { data: { session } } = await SupabaseClient.auth.getSession();
-    
+
+    // Check for error in URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('error') === 'identity_not_found') {
+      showAlert(
+        'GitHub Account Not Linked',
+        'This GitHub account is not linked to a Classcastle account. Please sign up first, then link your GitHub account in Settings.'
+      );
+      // Clean URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+      return;
+    }
+
     if (session) {
       showNotification('You are already logged in!');
       setTimeout(() => {
@@ -393,7 +519,7 @@
       const { data, error } = await SupabaseClient.auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: window.location.origin + '/app.html'
+          redirectTo: window.location.origin + '/login.html'
         }
       });
 
