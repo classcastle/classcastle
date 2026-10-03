@@ -1,41 +1,31 @@
--- Supabase Auth Hook: Prevent GitHub OAuth from creating new users
--- This function runs BEFORE a user is created in auth.users
--- It will reject GitHub OAuth signups (which create new users)
--- while allowing email/password signups and linkIdentity operations
+-- Remove the broken trigger and function
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP FUNCTION IF EXISTS public.prevent_github_signup();
 
--- Step 1: Create the function in public schema with SECURITY DEFINER
-CREATE OR REPLACE FUNCTION public.prevent_github_signup()
-RETURNS TRIGGER
+-- Before User Created hook: reject OAuth (GitHub) signups
+CREATE OR REPLACE FUNCTION public.hook_block_github_signup(event jsonb)
+RETURNS jsonb
 LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public
 AS $$
+DECLARE
+  provider text;
 BEGIN
-  -- Only block GitHub OAuth signups (which create new users)
-  -- linkIdentity adds an identity to existing users and doesn't trigger this hook
-  IF NEW.email IS NULL THEN
-    -- This is likely an OAuth signup (email/password always has email)
-    -- Check if provider is github by looking at the newly created user's identities
-    -- Since identities are created after the user, we check the provider in the metadata
-    IF NEW.raw_user_meta_data->>'provider' = 'github' THEN
-      -- Reject the signup
-      RAISE EXCEPTION 'No Classcastle account found for this GitHub account. Please sign up at signup.html first, then link GitHub in Settings.'
-        USING ERRCODE = 'auth_github_signup_not_allowed';
-    END IF;
+  provider := event->'user'->'app_metadata'->>'provider';
+
+  IF provider = 'github' THEN
+    RETURN jsonb_build_object(
+      'error', jsonb_build_object(
+        'http_code', 403,
+        'message', 'No Classcastle account found for this GitHub account. Please sign up with email first, then link GitHub in Settings.'
+      )
+    );
   END IF;
 
-  -- Allow all other signups (email/password, etc.)
-  RETURN NEW;
+  RETURN '{}'::jsonb;  -- allow everything else (email/password, etc.)
 END;
 $$;
 
--- Step 2: Create the trigger on auth.users
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-CREATE TRIGGER on_auth_user_created
-  BEFORE INSERT ON auth.users
-  FOR EACH ROW
-  EXECUTE FUNCTION public.prevent_github_signup();
-
--- Step 3: Grant necessary permissions
-GRANT EXECUTE ON FUNCTION public.prevent_github_signup() TO postgres;
-GRANT EXECUTE ON FUNCTION public.prevent_github_signup() TO service_role;
+-- Only the auth service should be able to run it
+GRANT USAGE ON SCHEMA public TO supabase_auth_admin;
+GRANT EXECUTE ON FUNCTION public.hook_block_github_signup(jsonb) TO supabase_auth_admin;
+REVOKE EXECUTE ON FUNCTION public.hook_block_github_signup(jsonb) FROM authenticated, anon, public;
