@@ -464,12 +464,8 @@
       // Try to get the current user to check ban status
       const { data: { user }, error } = await SupabaseClient.auth.getUser();
 
-      if (error) {
-        console.error('Error fetching user:', error);
-        return null;
-      }
-
-      if (!user) {
+      // If there's no session (user was banned and signed out), we can't fetch details
+      if (error || !user) {
         return null;
       }
 
