@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Classcastle — Quick Poll</title>
+<link rel="icon" type="image/svg+xml" href="/logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --bg: #FCFCFA;
+    --surface: #fff;
+    --ink: #18221C;
+    --soft: #5E675F;
+    --line: #D9DDD3;
+    --brand: #1F5C3A;
+    --tint: #E4F1E6;
+    color-scheme: light dark;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0F1511;
+      --surface: #18211B;
+      --ink: #EEF2EA;
+      --soft: #9EAA9F;
+      --line: #2A362D;
+      --brand: #4DAA72;
+      --tint: #1A2B20;
+    }
+  }
+  * { box-sizing: inherit }
+  html, body { margin: 0; padding: 0 }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font: 400 1.02rem/1.6 'Instrument Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  h1, h2, h3 { font-family: 'Young Serif', Georgia, serif; font-weight: 400; margin: 0 }
+  .container {
+    max-width: 500px;
+    width: 100%;
+  }
+  .card {
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 32px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 24px;
+    font: 400 1.3rem 'Young Serif', serif;
+  }
+  .logo img { width: 32px; height: 32px }
+  .logo span { color: var(--brand) }
+  .question {
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+    line-height: 1.3;
+  }
+  .form-group { margin-bottom: 16px }
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+  input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 1rem;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  input[type="text"]:focus {
+    outline: 2px solid var(--brand);
+    outline-offset: -2px;
+  }
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .option-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    border: 2px solid var(--line);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .option-label:hover {
+    border-color: var(--brand);
+    background: var(--tint);
+  }
+  .option-label input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--brand);
+  }
+  .btn {
+    width: 100%;
+    padding: 14px 24px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.12s;
+  }
+  .btn-primary {
+    background: var(--brand);
+    color: #fff;
+  }
+  .btn-primary:hover { transform: scale(0.98) }
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .error {
+    color: #B23A2E;
+    font-size: 0.9rem;
+    margin-top: 8px;
+  }
+  .success {
+    text-align: center;
+    padding: 40px 32px;
+  }
+  .success h2 {
+    font-size: 1.5rem;
+    color: var(--brand);
+    margin-bottom: 12px;
+  }
+  .success p {
+    color: var(--soft);
+  }
+  .loading {
+    text-align: center;
+    padding: 40px 32px;
+  }
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--line);
+    border-top-color: var(--brand);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 16px;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg) }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <img src="/logo.svg" alt="">
+      Class<span>castle</span>
+    </div>
+
+    <div class="card" id="pollCard">
+      <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+        <p>Loading poll...</p>
+      </div>
+
+      <div id="pollContent" style="display: none;">
+        <h1 class="question" id="question"></h1>
+
+        <div class="form-group">
+          <label for="studentName">Your name</label>
+          <input type="text" id="studentName" placeholder="Enter your name">
+        </div>
+
+        <div class="form-group">
+          <label>Select an option</label>
+          <div class="options" id="options"></div>
+        </div>
+
+        <button class="btn btn-primary" id="submitBtn">Submit Response</button>
+        <div class="error" id="error"></div>
+      </div>
+
+      <div class="success" id="success" style="display: none;">
+        <h2>Response Submitted!</h2>
+        <p>Thank you for participating.</p>
+      </div>
+
+      <div class="error" id="pollError" style="display: none; text-align: center;">
+        <p id="pollErrorText"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://hduyofdbpspjcuwvackd.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK';
+    const SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const pollId = urlParams.get('id');
+
+    if (!pollId) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('pollError').style.display = 'block';
+      document.getElementById('pollErrorText').textContent = 'No poll ID provided. Please check the link.';
+    } else {
+      loadPoll();
+    }
+
+    async function loadPoll() {
+      try {
+        const { data: poll, error } = await SupabaseClient
+          .from('polls')
+          .select('*')
+          .eq('id', pollId)
+          .single();
+
+        if (error) throw error;
+
+        if (!poll) {
+          throw new Error('Poll not found');
+        }
+
+        if (!poll.active) {
+          throw new Error('This poll is closed');
+        }
+
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('pollContent').style.display = 'block';
+        document.getElementById('question').textContent = poll.question;
+
+        const optionsContainer = document.getElementById('options');
+        poll.options.forEach((option, index) => {
+          const label = document.createElement('label');
+          label.className = 'option-label';
+          label.innerHTML = `
+            <input type="radio" name="pollOption" value="${option}">
+            <span>${option}</span>
+          `;
+          optionsContainer.appendChild(label);
+        });
+      } catch (error) {
+        console.error('Error loading poll:', error);
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('pollError').style.display = 'block';
+        document.getElementById('pollErrorText').textContent = error.message || 'Error loading poll';
+      }
+    }
+
+    document.getElementById('submitBtn').addEventListener('click', async () => {
+      const name = document.getElementById('studentName').value.trim();
+      const selectedOption = document.querySelector('input[name="pollOption"]:checked');
+      const errorEl = document.getElementById('error');
+
+      errorEl.textContent = '';
+
+      if (!name) {
+        errorEl.textContent = 'Please enter your name';
+        return;
+      }
+
+      if (!selectedOption) {
+        errorEl.textContent = 'Please select an option';
+        return;
+      }
+
+      document.getElementById('submitBtn').disabled = true;
+      document.getElementById('submitBtn').textContent = 'Submitting...';
+
+      try {
+        const { error } = await SupabaseClient
+          .from('poll_responses')
+          .insert({
+            poll_id: pollId,
+            student_name: name,
+            selected_option: selectedOption.value
+          });
+
+        if (error) throw error;
+
+        document.getElementById('pollContent').style.display = 'none';
+        document.getElementById('success').style.display = 'block';
+      } catch (error) {
+        console.error('Error submitting response:', error);
+        errorEl.textContent = 'Error submitting response. Please try again.';
+        document.getElementById('submitBtn').disabled = false;
+        document.getElementById('submitBtn').textContent = 'Submit Response';
+      }
+    });
+  </script>
+</body>
+</html>

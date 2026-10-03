@@ -1710,6 +1710,10 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         Activity Log
       </a>
+      <a class="nav-item" data-page="polls" href="#">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Quick Polls
+      </a>
       <div class="nav-divider"></div>
       <div class="nav-section nav-section-admin">
         <a class="nav-item nav-item-parent" data-parent="admin" href="#">
@@ -1969,6 +1973,74 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
             <div class="loading-spinner"></div>
             <p>Loading activity log...</p>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Polls Page -->
+    <div class="page" id="pollsPage">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Quick Polls</h1>
+          <p class="page-subtitle">Create polls and share with students</p>
+        </div>
+        <button class="btn btn-primary" id="createPollBtn">Create New Poll</button>
+      </div>
+
+      <div class="card">
+        <div id="pollsList">
+          <div class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Loading polls...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Poll Details Modal -->
+    <div class="modal-overlay" id="pollModalOverlay" style="display: none;">
+      <div class="modal" id="pollModal" style="max-width: 600px;">
+        <h2 id="pollModalTitle">Create Poll</h2>
+        <div id="pollModalContent">
+          <div class="form-group">
+            <label class="form-label">Question</label>
+            <input type="text" class="form-input" id="pollQuestion" placeholder="e.g., What's your favorite programming language?">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Options</label>
+            <div id="pollOptions">
+              <input type="text" class="form-input poll-option" placeholder="Option 1" style="margin-bottom: 8px;">
+              <input type="text" class="form-input poll-option" placeholder="Option 2" style="margin-bottom: 8px;">
+            </div>
+            <button class="btn btn-secondary" id="addOptionBtn" style="margin-top: 8px;">+ Add Option</button>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="modal-btn modal-btn-cancel" id="cancelPollBtn">Cancel</button>
+          <button class="modal-btn modal-btn-confirm" id="savePollBtn">Create Poll</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Poll Results Modal -->
+    <div class="modal-overlay" id="pollResultsModalOverlay" style="display: none;">
+      <div class="modal" id="pollResultsModal" style="max-width: 700px;">
+        <h2 id="pollResultsTitle">Poll Results</h2>
+        <div id="pollResultsContent">
+          <div id="pollResultsData"></div>
+          <div id="pollShareSection" style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--line);">
+            <h3 style="font-size: 1rem; margin-bottom: 12px;">Share Poll</h3>
+            <div class="form-group">
+              <label class="form-label">Poll URL</label>
+              <div style="display: flex; gap: 8px;">
+                <input type="text" class="form-input" id="pollShareUrl" readonly>
+                <button class="btn btn-secondary" id="copyPollUrlBtn">Copy</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="modal-btn modal-btn-cancel" id="closeResultsBtn">Close</button>
         </div>
       </div>
     </div>
@@ -2292,6 +2364,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   let templates = [];
   let shortcuts = [];
   let activities = [];
+  let polls = [];
   let selectedRooms = new Set();
   let roomSubscription = null;
   let studentSubscription = null;
@@ -2581,7 +2654,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
     // Handle admin submenu - only close when explicitly navigating to dashboard
     // Don't auto-close when just toggling the submenu
-    if (pageId === 'dashboardPage' || pageId === 'analyticsPage' || pageId === 'activityPage') {
+    if (pageId === 'dashboardPage' || pageId === 'analyticsPage' || pageId === 'activityPage' || pageId === 'pollsPage') {
       const adminSection = document.querySelector('.nav-section-admin');
       if (adminSection) adminSection.classList.remove('open');
     }
@@ -3729,6 +3802,239 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       .join(' ');
   }
 
+  // Quick Polls
+  async function loadPolls() {
+    try {
+      const { data, error } = await SupabaseClient
+        .from('polls')
+        .select('*, poll_responses(count)')
+        .eq('teacher_id', currentUser.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      polls = data || [];
+      renderPolls();
+    } catch (error) {
+      console.error('Error loading polls:', error);
+      document.getElementById('pollsList').innerHTML = '<p>Error loading polls</p>';
+    }
+  }
+
+  function renderPolls() {
+    const pollsList = document.getElementById('pollsList');
+    if (polls.length === 0) {
+      pollsList.innerHTML = `
+        <div class="empty-state">
+          <h3>No polls yet</h3>
+          <p>Create your first poll to get started.</p>
+        </div>
+      `;
+      return;
+    }
+
+    pollsList.innerHTML = polls.map(poll => {
+      const responseCount = poll.poll_responses?.[0]?.count || 0;
+      const time = new Date(poll.created_at).toLocaleString();
+      const statusBadge = poll.active
+        ? '<span style="background: var(--tint); color: var(--brand); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">Active</span>'
+        : '<span style="background: var(--line); color: var(--soft); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">Closed</span>';
+
+      return `
+        <div class="card" style="margin-bottom: 12px; padding: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;">
+            <div style="flex: 1;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <strong>${poll.question}</strong>
+                ${statusBadge}
+              </div>
+              <div style="color: var(--soft); font-size: 0.85rem; margin-bottom: 12px;">
+                ${responseCount} response${responseCount !== 1 ? 's' : ''} • ${time}
+              </div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button class="btn btn-secondary" onclick="viewPollResults('${poll.id}')" style="font-size: 0.85rem; padding: 6px 12px;">View Results</button>
+                <button class="btn btn-secondary" onclick="sharePoll('${poll.id}')" style="font-size: 0.85rem; padding: 6px 12px;">Share URL</button>
+                <button class="btn btn-secondary" onclick="togglePollStatus('${poll.id}', ${poll.active})" style="font-size: 0.85rem; padding: 6px 12px;">${poll.active ? 'Close' : 'Open'}</button>
+                <button class="btn btn-secondary" onclick="deletePoll('${poll.id}')" style="font-size: 0.85rem; padding: 6px 12px; color: var(--red);">Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function createPoll() {
+    const question = document.getElementById('pollQuestion').value.trim();
+    const optionInputs = document.querySelectorAll('.poll-option');
+    const options = Array.from(optionInputs)
+      .map(input => input.value.trim())
+      .filter(opt => opt !== '');
+
+    if (!question) {
+      showNotification('Please enter a question');
+      return;
+    }
+
+    if (options.length < 2) {
+      showNotification('Please add at least 2 options');
+      return;
+    }
+
+    try {
+      const { error } = await SupabaseClient
+        .from('polls')
+        .insert({
+          teacher_id: currentUser.id,
+          question,
+          options
+        });
+
+      if (error) throw error;
+      showNotification('Poll created successfully');
+      closePollModal();
+      loadPolls();
+    } catch (error) {
+      console.error('Error creating poll:', error);
+      showNotification('Error creating poll');
+    }
+  }
+
+  async function viewPollResults(pollId) {
+    try {
+      const { data: poll, error: pollError } = await SupabaseClient
+        .from('polls')
+        .select('*')
+        .eq('id', pollId)
+        .single();
+
+      if (pollError) throw pollError;
+
+      const { data: responses, error: responsesError } = await SupabaseClient
+        .from('poll_responses')
+        .select('*')
+        .eq('poll_id', pollId);
+
+      if (responsesError) throw responsesError;
+
+      // Calculate results
+      const optionCounts = {};
+      poll.options.forEach(opt => optionCounts[opt] = 0);
+      responses.forEach(r => {
+        if (optionCounts[r.selected_option] !== undefined) {
+          optionCounts[r.selected_option]++;
+        }
+      });
+
+      const total = responses.length;
+      const resultsHtml = poll.options.map(option => {
+        const count = optionCounts[option] || 0;
+        const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
+        return `
+          <div style="margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+              <span>${option}</span>
+              <span>${count} (${percentage}%)</span>
+            </div>
+            <div style="background: var(--line); height: 8px; border-radius: 4px; overflow: hidden;">
+              <div style="background: var(--brand); height: 100%; width: ${percentage}%;"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('pollResultsTitle').textContent = poll.question;
+      document.getElementById('pollResultsData').innerHTML = `
+        <div style="margin-bottom: 16px;">
+          <strong>Total responses:</strong> ${total}
+        </div>
+        ${resultsHtml}
+        <div style="margin-top: 16px;">
+          <h4 style="font-size: 0.9rem; margin-bottom: 8px;">Recent responses:</h4>
+          <div style="max-height: 200px; overflow-y: auto;">
+            ${responses.slice(-10).reverse().map(r => `
+              <div style="padding: 8px 0; border-bottom: 1px solid var(--line);">
+                <strong>${r.student_name}</strong> • ${r.selected_option}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      document.getElementById('pollShareUrl').value = `https://classcastle.org/poll.html?id=${pollId}`;
+      document.getElementById('pollResultsModalOverlay').style.display = 'flex';
+    } catch (error) {
+      console.error('Error loading poll results:', error);
+      showNotification('Error loading poll results');
+    }
+  }
+
+  function sharePoll(pollId) {
+    const url = `https://classcastle.org/poll.html?id=${pollId}`;
+    navigator.clipboard.writeText(url).then(() => {
+      showNotification('Poll URL copied to clipboard');
+    }).catch(() => {
+      showNotification('Failed to copy URL');
+    });
+  }
+
+  async function togglePollStatus(pollId, currentStatus) {
+    try {
+      const { error } = await SupabaseClient
+        .from('polls')
+        .update({ active: !currentStatus })
+        .eq('id', pollId);
+
+      if (error) throw error;
+      showNotification(`Poll ${!currentStatus ? 'opened' : 'closed'}`);
+      loadPolls();
+    } catch (error) {
+      console.error('Error toggling poll status:', error);
+      showNotification('Error updating poll');
+    }
+  }
+
+  async function deletePoll(pollId) {
+    if (!confirm('Are you sure you want to delete this poll?')) return;
+
+    try {
+      const { error } = await SupabaseClient
+        .from('polls')
+        .delete()
+        .eq('id', pollId);
+
+      if (error) throw error;
+      showNotification('Poll deleted');
+      loadPolls();
+    } catch (error) {
+      console.error('Error deleting poll:', error);
+      showNotification('Error deleting poll');
+    }
+  }
+
+  function openPollModal() {
+    document.getElementById('pollQuestion').value = '';
+    document.getElementById('pollOptions').innerHTML = `
+      <input type="text" class="form-input poll-option" placeholder="Option 1" style="margin-bottom: 8px;">
+      <input type="text" class="form-input poll-option" placeholder="Option 2" style="margin-bottom: 8px;">
+    `;
+    document.getElementById('pollModalOverlay').style.display = 'flex';
+  }
+
+  function closePollModal() {
+    document.getElementById('pollModalOverlay').style.display = 'none';
+  }
+
+  function addPollOption() {
+    const optionsContainer = document.getElementById('pollOptions');
+    const optionCount = optionsContainer.querySelectorAll('.poll-option').length + 1;
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'form-input poll-option';
+    input.placeholder = `Option ${optionCount}`;
+    input.style.marginBottom = '8px';
+    optionsContainer.appendChild(input);
+  }
+
   async function clearActivityLog() {
     const confirmed = await showConfirm({
       title: 'Clear Activity Log',
@@ -3957,6 +4263,30 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   clearActivityBtn.addEventListener('click', clearActivityLog);
   exportActivityBtn.addEventListener('click', exportActivityLog);
 
+  // Quick Polls
+  const createPollBtn = document.getElementById('createPollBtn');
+  const pollModalOverlay = document.getElementById('pollModalOverlay');
+  const cancelPollBtn = document.getElementById('cancelPollBtn');
+  const savePollBtn = document.getElementById('savePollBtn');
+  const addOptionBtn = document.getElementById('addOptionBtn');
+  const pollResultsModalOverlay = document.getElementById('pollResultsModalOverlay');
+  const closeResultsBtn = document.getElementById('closeResultsBtn');
+  const copyPollUrlBtn = document.getElementById('copyPollUrlBtn');
+
+  if (createPollBtn) createPollBtn.addEventListener('click', openPollModal);
+  if (cancelPollBtn) cancelPollBtn.addEventListener('click', closePollModal);
+  if (savePollBtn) savePollBtn.addEventListener('click', createPoll);
+  if (addOptionBtn) addOptionBtn.addEventListener('click', addPollOption);
+  if (closeResultsBtn) closeResultsBtn.addEventListener('click', () => {
+    document.getElementById('pollResultsModalOverlay').style.display = 'none';
+  });
+  if (copyPollUrlBtn) copyPollUrlBtn.addEventListener('click', () => {
+    const url = document.getElementById('pollShareUrl').value;
+    navigator.clipboard.writeText(url).then(() => {
+      showNotification('URL copied to clipboard');
+    });
+  });
+
   // Admin submenu toggle
   const adminParent = document.querySelector('.nav-item-parent[data-parent="admin"]');
   const adminSection = document.querySelector('.nav-section-admin');
@@ -4018,6 +4348,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       if (page === 'shortcuts') loadShortcuts();
       if (page === 'analytics') loadAnalytics();
       if (page === 'activity') loadActivityLog();
+      if (page === 'polls') loadPolls();
       if (page === 'settings') loadIdentities();
 
       // Close sidebar on mobile
