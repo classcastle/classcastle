@@ -2933,13 +2933,15 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     if (!currentUser) return;
 
     try {
-      const { data: identities, error } = await SupabaseClient.auth.getUserIdentities();
+      const { data, error } = await SupabaseClient.auth.getUserIdentities();
 
       if (error) throw error;
 
       identitiesLoading.style.display = 'none';
       identitiesList.style.display = 'block';
       identitiesList.innerHTML = '';
+
+      const identities = data?.identities || [];
 
       if (!identities || identities.length === 0) {
         identitiesList.innerHTML = '<p style="color: var(--soft); font-size: 0.9rem;">No linked accounts</p>';
@@ -4155,7 +4157,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
   // Initialize
   checkSession();
-  checkSkipOnboardingParam();
 
   // Listen for auth changes
   SupabaseClient.auth.onAuthStateChange((event, session) => {
