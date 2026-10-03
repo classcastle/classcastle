@@ -499,6 +499,21 @@
     }
 
     if (session) {
+      // Check if this is a new user from GitHub OAuth (no name metadata means they just signed up)
+      const isNewUser = !session.user.user_metadata?.name && !session.user.user_metadata?.full_name;
+
+      if (isNewUser) {
+        // Sign out the new user and show error
+        await SupabaseClient.auth.signOut();
+        showAlert(
+          'Please Sign Up with Email',
+          'GitHub sign-in is only available for existing accounts. Please sign up with your email address first, then you can link your GitHub account in Settings.'
+        );
+        // Clean URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
+      }
+
       showNotification('You are already logged in!');
       setTimeout(() => {
         window.location.href = '/app.html';
@@ -542,11 +557,30 @@
   }
 
   async function handleGitHubLogin() {
-    // Show error modal - GitHub signup is not allowed
-    showAlert(
-      'GitHub Sign In Not Available',
-      'Please sign up with your email address first. After creating an account, you can link your GitHub account in Settings.'
-    );
+    // Show loading state
+    githubLoginBtn.disabled = true;
+    githubLoginBtnText.style.display = 'none';
+    githubLoginBtnLoading.style.display = 'inline-block';
+
+    try {
+      const { data, error } = await SupabaseClient.auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+          redirectTo: window.location.origin + '/login.html',
+          skipBrowserRedirect: false
+        }
+      });
+
+      if (error) throw error;
+
+      // OAuth will redirect, so we don't need to do anything else
+    } catch (error) {
+      showNotification(error.message);
+      // Reset button state
+      githubLoginBtn.disabled = false;
+      githubLoginBtnText.style.display = 'inline';
+      githubLoginBtnLoading.style.display = 'none';
+    }
   }
 
   loginBtn.addEventListener('click', handleLogin);
