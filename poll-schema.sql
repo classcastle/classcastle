@@ -85,4 +85,4 @@ CREATE POLICY "Teachers can delete responses to their polls"
       WHERE polls.id = poll_responses.poll_id
       AND polls.teacher_id = auth.uid()
     )
-  );
+);
