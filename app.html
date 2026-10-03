@@ -2013,8 +2013,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           </p>
 
           <div style="max-width: 400px; margin: 0 auto; text-align: left;">
-            <label style="font-size: 0.9rem; font-weight: 500; display: block; margin-bottom: 8px;">Search UK City</label>
-            <input type="text" class="form-input" id="unlockSchoolSearch" placeholder="e.g., Manchester" style="width: 100%; margin-bottom: 12px;">
+            <label style="font-size: 0.9rem; font-weight: 500; display: block; margin-bottom: 8px;">Search for your school</label>
+            <input type="text" class="form-input" id="unlockSchoolSearch" placeholder="e.g., Manchester Grammar School" style="width: 100%; margin-bottom: 12px;">
             <button class="btn btn-primary" id="unlockSearchBtn" style="width: 100%;">Search Schools</button>
             <div id="unlockSchoolStatus" style="margin-top: 12px; font-size: 0.85rem; color: var(--soft);"></div>
             <div id="unlockSchoolResults" style="margin-top: 12px; max-height: 200px; overflow-y: auto; display: none;">
@@ -2022,7 +2022,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
                 <thead>
                   <tr>
                     <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--line);">School Name</th>
-                    <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--line);">Postcode</th>
+                    <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--line);">Location</th>
                   </tr>
                 </thead>
                 <tbody id="unlockSchoolResultsBody"></tbody>
@@ -2100,7 +2100,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           </div>
           <div class="form-group">
             <label class="form-label">Target School (optional)</label>
-            <input type="text" class="form-input" id="schoolSearchInput" placeholder="Search UK city (e.g., Manchester)">
+            <input type="text" class="form-input" id="schoolSearchInput" placeholder="Search for your school (e.g., Manchester Grammar School)">
             <button class="btn btn-secondary" id="searchSchoolsBtn" style="margin-top: 8px;">Search Schools</button>
             <div id="schoolSearchStatus" style="margin-top: 8px; font-size: 0.85rem; color: var(--soft);"></div>
             <div id="schoolResults" style="margin-top: 12px; max-height: 200px; overflow-y: auto; display: none;">
@@ -2108,7 +2108,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
                 <thead>
                   <tr>
                     <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--line);">School Name</th>
-                    <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--line);">Postcode</th>
+                    <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--line);">Location</th>
                   </tr>
                 </thead>
                 <tbody id="schoolResultsBody"></tbody>
@@ -4058,13 +4058,13 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   let selectedSchool = null;
 
   async function searchSchools() {
-    const city = document.getElementById('schoolSearchInput').value.trim();
+    const searchTerm = document.getElementById('schoolSearchInput').value.trim();
     const status = document.getElementById('schoolSearchStatus');
     const resultsDiv = document.getElementById('schoolResults');
     const resultsBody = document.getElementById('schoolResultsBody');
 
-    if (!city) {
-      status.textContent = 'Please enter a city name';
+    if (!searchTerm) {
+      status.textContent = 'Please enter a school name';
       status.style.color = 'var(--red)';
       return;
     }
@@ -4074,8 +4074,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     resultsDiv.style.display = 'none';
 
     try {
-      // Use Nominatim API to search for schools
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=school+in+${encodeURIComponent(city)}&addressdetails=1&limit=20`, {
+      // Use Nominatim API to search for schools by name
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchTerm)}+school&addressdetails=1&limit=20`, {
         headers: {
           'User-Agent': 'Classcastle'
         }
@@ -4088,23 +4088,24 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       const data = await response.json();
 
       if (!data || data.length === 0) {
-        status.textContent = `No schools found in ${city}. Try a different city name.`;
+        status.textContent = `No schools found for "${searchTerm}". Try a different name.`;
         status.style.color = 'var(--amber)';
         return;
       }
 
       const schools = data
-        .filter(item => item.address && (item.address.road || item.address.city || item.address.town))
+        .filter(item => item.type === 'school' || item.class === 'amenity' || item.display_name.toLowerCase().includes('school'))
         .map(item => ({
           id: item.place_id,
           name: item.display_name.split(',')[0] || 'Unknown School',
+          location: item.address.city || item.address.town || item.address.village || item.address.county || 'Unknown',
           postcode: item.address.postcode || 'Not available',
           lat: parseFloat(item.lat),
           lon: parseFloat(item.lon)
         }));
 
       if (schools.length === 0) {
-        status.textContent = 'No schools with valid addresses found';
+        status.textContent = 'No schools found. Try a different search term.';
         status.style.color = 'var(--amber)';
         return;
       }
@@ -4112,7 +4113,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       resultsBody.innerHTML = schools.map(school => `
         <tr style="cursor: pointer; border-bottom: 1px solid var(--line);" data-school-id="${school.id}">
           <td style="padding: 8px;">${escapeHtml(school.name)}</td>
-          <td style="padding: 8px;">${escapeHtml(school.postcode)}</td>
+          <td style="padding: 8px;">${escapeHtml(school.location)}</td>
         </tr>
       `).join('');
 
@@ -4175,13 +4176,13 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   }
 
   async function searchSchoolsForUnlock() {
-    const city = document.getElementById('unlockSchoolSearch').value.trim();
+    const searchTerm = document.getElementById('unlockSchoolSearch').value.trim();
     const status = document.getElementById('unlockSchoolStatus');
     const resultsDiv = document.getElementById('unlockSchoolResults');
     const resultsBody = document.getElementById('unlockSchoolResultsBody');
 
-    if (!city) {
-      status.textContent = 'Please enter a city name';
+    if (!searchTerm) {
+      status.textContent = 'Please enter a school name';
       status.style.color = 'var(--red)';
       return;
     }
@@ -4192,8 +4193,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     document.getElementById('unlockSelectedSchool').style.display = 'none';
 
     try {
-      // Use Nominatim API to search for schools
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=school+in+${encodeURIComponent(city)}&addressdetails=1&limit=20`, {
+      // Use Nominatim API to search for schools by name
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchTerm)}+school&addressdetails=1&limit=20`, {
         headers: {
           'User-Agent': 'Classcastle'
         }
@@ -4206,23 +4207,24 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       const data = await response.json();
 
       if (!data || data.length === 0) {
-        status.textContent = `No schools found in ${city}. Try a different city name.`;
+        status.textContent = `No schools found for "${searchTerm}". Try a different name.`;
         status.style.color = 'var(--amber)';
         return;
       }
 
       const schools = data
-        .filter(item => item.address && (item.address.road || item.address.city || item.address.town))
+        .filter(item => item.type === 'school' || item.class === 'amenity' || item.display_name.toLowerCase().includes('school'))
         .map(item => ({
           id: item.place_id,
           name: item.display_name.split(',')[0] || 'Unknown School',
+          location: item.address.city || item.address.town || item.address.village || item.address.county || 'Unknown',
           postcode: item.address.postcode || 'Not available',
           lat: parseFloat(item.lat),
           lon: parseFloat(item.lon)
         }));
 
       if (schools.length === 0) {
-        status.textContent = 'No schools with valid addresses found';
+        status.textContent = 'No schools found. Try a different search term.';
         status.style.color = 'var(--amber)';
         return;
       }
@@ -4230,7 +4232,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       resultsBody.innerHTML = schools.map(school => `
         <tr style="cursor: pointer; border-bottom: 1px solid var(--line);" data-school-id="${school.id}">
           <td style="padding: 8px;">${escapeHtml(school.name)}</td>
-          <td style="padding: 8px;">${escapeHtml(school.postcode)}</td>
+          <td style="padding: 8px;">${escapeHtml(school.location)}</td>
         </tr>
       `).join('');
 
