@@ -2013,11 +2013,14 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           </p>
 
           <div style="max-width: 400px; margin: 0 auto; text-align: left;">
-            <label style="font-size: 0.9rem; font-weight: 500; display: block; margin-bottom: 8px;">Search for your school</label>
-            <input type="text" class="form-input" id="unlockSchoolSearch" placeholder="e.g., Manchester Grammar School" style="width: 100%; margin-bottom: 12px;">
-            <button class="btn btn-primary" id="unlockSearchBtn" style="width: 100%;">Search Schools</button>
+            <div id="unlockSearchForm">
+              <label style="font-size: 0.9rem; font-weight: 500; display: block; margin-bottom: 8px;">Search for your school</label>
+              <input type="text" class="form-input" id="unlockSchoolSearch" placeholder="e.g., Manchester Grammar School or M1 7DW" style="width: 100%; margin-bottom: 12px;">
+              <button class="btn btn-primary" id="unlockSearchBtn" style="width: 100%;">Search Schools</button>
+            </div>
             <div id="unlockSchoolStatus" style="margin-top: 12px; font-size: 0.85rem; color: var(--soft);"></div>
             <div id="unlockSchoolResults" style="margin-top: 12px; max-height: 200px; overflow-y: auto; display: none;">
+              <button class="btn btn-secondary" id="unlockSearchAgainBtn" style="margin-bottom: 8px; font-size: 0.85rem; padding: 6px 12px;">Search Again</button>
               <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
                 <thead>
                   <tr>
@@ -2100,7 +2103,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           </div>
           <div class="form-group">
             <label class="form-label">Target School (optional)</label>
-            <input type="text" class="form-input" id="schoolSearchInput" placeholder="Search for your school (e.g., Manchester Grammar School)">
+            <input type="text" class="form-input" id="schoolSearchInput" placeholder="Search for your school or postcode (e.g., Manchester Grammar School or M1 7DW)">
             <button class="btn btn-secondary" id="searchSchoolsBtn" style="margin-top: 8px;">Search Schools</button>
             <div id="schoolSearchStatus" style="margin-top: 8px; font-size: 0.85rem; color: var(--soft);"></div>
             <div id="schoolResults" style="margin-top: 12px; max-height: 200px; overflow-y: auto; display: none;">
@@ -4064,7 +4067,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     const resultsBody = document.getElementById('schoolResultsBody');
 
     if (!searchTerm) {
-      status.textContent = 'Please enter a school name';
+      status.textContent = 'Please enter a school name or postcode';
       status.style.color = 'var(--red)';
       return;
     }
@@ -4074,8 +4077,19 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     resultsDiv.style.display = 'none';
 
     try {
-      // Use Nominatim API to search for schools by name
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchTerm)}+school&addressdetails=1&limit=20`, {
+      // Check if input is a UK postcode
+      const isPostcode = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i.test(searchTerm);
+
+      // Build query - for postcode search, use the postcode directly
+      let query;
+      if (isPostcode) {
+        query = searchTerm;
+      } else {
+        query = `${encodeURIComponent(searchTerm)}+school`;
+      }
+
+      // Use Nominatim API to search
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&addressdetails=1&limit=20&countrycodes=gb`, {
         headers: {
           'User-Agent': 'Classcastle'
         }
@@ -4088,13 +4102,18 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       const data = await response.json();
 
       if (!data || data.length === 0) {
-        status.textContent = `No schools found for "${searchTerm}". Try a different name.`;
+        status.textContent = `No schools found for "${searchTerm}". Try a different name or postcode.`;
         status.style.color = 'var(--amber)';
         return;
       }
 
+      // Filter for UK schools only
       const schools = data
-        .filter(item => item.type === 'school' || item.class === 'amenity' || item.display_name.toLowerCase().includes('school'))
+        .filter(item => {
+          const isUK = item.address && (item.address.country_code === 'gb' || item.address.country === 'United Kingdom');
+          const isSchool = item.type === 'school' || item.class === 'amenity' || item.display_name.toLowerCase().includes('school');
+          return isUK && isSchool;
+        })
         .map(item => ({
           id: item.place_id,
           name: item.display_name.split(',')[0] || 'Unknown School',
@@ -4105,7 +4124,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         }));
 
       if (schools.length === 0) {
-        status.textContent = 'No schools found. Try a different search term.';
+        status.textContent = 'No UK schools found. Please enter a UK school name or postcode.';
         status.style.color = 'var(--amber)';
         return;
       }
@@ -4118,7 +4137,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       `).join('');
 
       resultsDiv.style.display = 'block';
-      status.textContent = `Found ${schools.length} schools`;
+      status.textContent = `Found ${schools.length} UK schools`;
       status.style.color = 'var(--brand)';
 
       // Add click handlers
@@ -4180,9 +4199,10 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     const status = document.getElementById('unlockSchoolStatus');
     const resultsDiv = document.getElementById('unlockSchoolResults');
     const resultsBody = document.getElementById('unlockSchoolResultsBody');
+    const searchForm = document.getElementById('unlockSearchForm');
 
     if (!searchTerm) {
-      status.textContent = 'Please enter a school name';
+      status.textContent = 'Please enter a school name or postcode';
       status.style.color = 'var(--red)';
       return;
     }
@@ -4193,8 +4213,19 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     document.getElementById('unlockSelectedSchool').style.display = 'none';
 
     try {
-      // Use Nominatim API to search for schools by name
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchTerm)}+school&addressdetails=1&limit=20`, {
+      // Check if input is a UK postcode
+      const isPostcode = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i.test(searchTerm);
+
+      // Build query - for postcode search, use the postcode directly
+      let query;
+      if (isPostcode) {
+        query = searchTerm;
+      } else {
+        query = `${encodeURIComponent(searchTerm)}+school`;
+      }
+
+      // Use Nominatim API to search
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&addressdetails=1&limit=20&countrycodes=gb`, {
         headers: {
           'User-Agent': 'Classcastle'
         }
@@ -4207,13 +4238,18 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       const data = await response.json();
 
       if (!data || data.length === 0) {
-        status.textContent = `No schools found for "${searchTerm}". Try a different name.`;
+        status.textContent = `No schools found for "${searchTerm}". Try a different name or postcode.`;
         status.style.color = 'var(--amber)';
         return;
       }
 
+      // Filter for UK schools only and schools
       const schools = data
-        .filter(item => item.type === 'school' || item.class === 'amenity' || item.display_name.toLowerCase().includes('school'))
+        .filter(item => {
+          const isUK = item.address && (item.address.country_code === 'gb' || item.address.country === 'United Kingdom');
+          const isSchool = item.type === 'school' || item.class === 'amenity' || item.display_name.toLowerCase().includes('school');
+          return isUK && isSchool;
+        })
         .map(item => ({
           id: item.place_id,
           name: item.display_name.split(',')[0] || 'Unknown School',
@@ -4224,7 +4260,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         }));
 
       if (schools.length === 0) {
-        status.textContent = 'No schools found. Try a different search term.';
+        status.textContent = 'No UK schools found. Please enter a UK school name or postcode.';
         status.style.color = 'var(--amber)';
         return;
       }
@@ -4236,8 +4272,10 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         </tr>
       `).join('');
 
+      // Hide search form and show results
+      searchForm.style.display = 'none';
       resultsDiv.style.display = 'block';
-      status.textContent = `Found ${schools.length} schools`;
+      status.textContent = `Found ${schools.length} UK schools`;
       status.style.color = 'var(--brand)';
 
       // Add click handlers
@@ -4255,6 +4293,14 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       status.textContent = `Error: ${error.message}`;
       status.style.color = 'var(--red)';
     }
+  }
+
+  function resetUnlockSearch() {
+    document.getElementById('unlockSearchForm').style.display = 'block';
+    document.getElementById('unlockSchoolResults').style.display = 'none';
+    document.getElementById('unlockSelectedSchool').style.display = 'none';
+    document.getElementById('unlockSchoolStatus').textContent = '';
+    document.getElementById('unlockSchoolSearch').value = '';
   }
 
   function selectSchoolForUnlock(school) {
@@ -4862,6 +4908,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   const unlockSearchBtn = document.getElementById('unlockSearchBtn');
   const unlockSchoolSearch = document.getElementById('unlockSchoolSearch');
   const confirmSchoolBtn = document.getElementById('confirmSchoolBtn');
+  const unlockSearchAgainBtn = document.getElementById('unlockSearchAgainBtn');
 
   if (unlockSearchBtn) unlockSearchBtn.addEventListener('click', searchSchoolsForUnlock);
   if (unlockSchoolSearch) {
@@ -4869,6 +4916,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       if (e.key === 'Enter') searchSchoolsForUnlock();
     });
   }
+  if (unlockSearchAgainBtn) unlockSearchAgainBtn.addEventListener('click', resetUnlockSearch);
   if (confirmSchoolBtn) confirmSchoolBtn.addEventListener('click', unlockPolls);
 
   if (searchSchoolsBtn) searchSchoolsBtn.addEventListener('click', searchSchools);
