@@ -4102,7 +4102,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       const data = await response.json();
 
       if (!data || data.length === 0) {
-        status.textContent = `No schools found for "${searchTerm}". Try a different name or postcode.`;
+        status.textContent = "No schools found. Your school may not be in our database. Contact us at support@classcastle.org and we'll help you get set up.";
         status.style.color = 'var(--amber)';
         return;
       }
@@ -4238,7 +4238,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       const data = await response.json();
 
       if (!data || data.length === 0) {
-        status.textContent = `No schools found for "${searchTerm}". Try a different name or postcode.`;
+        status.textContent = "No schools found. Your school may not be in our database. Contact us at support@classcastle.org and we'll help you get set up.";
         status.style.color = 'var(--amber)';
         return;
       }
