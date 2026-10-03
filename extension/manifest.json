@@ -30,21 +30,9 @@
     "gecko": {
       "id": "classcastle@classcastle.org",
       "data_collection_permissions": {
-        "tabs": {
-          "allowed": true,
-          "required": true,
-          "description": "Required to navigate student browsers to target URLs"
-        },
-        "storage": {
-          "allowed": true,
-          "required": true,
-          "description": "Required to store room and student session data"
-        },
-        "alarms": {
-          "allowed": true,
-          "required": true,
-          "description": "Required for periodic polling for room updates"
-        }
+        "required": [
+          "none"
+        ]
       }
     }
   },
