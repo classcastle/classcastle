@@ -15,7 +15,8 @@
     "matches": ["https://classcastle.org/*"]
   },
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "scripts": ["background.js"]
   },
   "action": {
     "default_popup": "popup.html",
@@ -27,7 +28,21 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "classcastle@classcastle.org"
+      "id": "classcastle@classcastle.org",
+      "data_collection_permissions": {
+        "tabs": {
+          "allowed": true,
+          "description": "Required to navigate student browsers to target URLs"
+        },
+        "storage": {
+          "allowed": true,
+          "description": "Required to store room and student session data"
+        },
+        "alarms": {
+          "allowed": true,
+          "description": "Required for periodic polling for room updates"
+        }
+      }
     }
   },
   "icons": {
