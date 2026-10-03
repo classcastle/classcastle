@@ -473,17 +473,20 @@
         return null;
       }
 
-      // Check user metadata for ban information
-      const banInfo = user.user_metadata?.ban_info;
-      if (banInfo) {
-        return banInfo;
+      // Supabase stores ban info in banned_until field
+      if (user.banned_until) {
+        const bannedUntil = new Date(user.banned_until);
+        const now = new Date();
+        const isBanned = now < bannedUntil;
+
+        return {
+          banned_until: user.banned_until,
+          is_banned: isBanned,
+          email: user.email
+        };
       }
 
-      // If no ban info in metadata, return basic info
-      return {
-        banned_at: user.banned_at,
-        email: user.email
-      };
+      return null;
     } catch (error) {
       console.error('Error fetching ban details:', error);
       return null;
@@ -524,14 +527,23 @@
         const banDetails = await fetchBanDetails();
         if (banDetails) {
           const additionalInfo = [];
-          if (banDetails.banned_at) {
-            additionalInfo.push(`Banned at: ${new Date(banDetails.banned_at).toLocaleString()}`);
-          }
-          if (banDetails.ban_duration) {
-            additionalInfo.push(`Duration: ${banDetails.ban_duration}`);
-          }
-          if (banDetails.ban_reason) {
-            additionalInfo.push(`Reason: ${banDetails.ban_reason}`);
+          if (banDetails.banned_until) {
+            const bannedUntil = new Date(banDetails.banned_until);
+            const now = new Date();
+            const durationMs = bannedUntil - now;
+            const durationDays = Math.ceil(durationMs / (1000 * 60 * 60 * 24));
+            const durationHours = Math.ceil(durationMs / (1000 * 60 * 60));
+            const durationMinutes = Math.ceil(durationMs / (1000 * 60));
+
+            additionalInfo.push(`Banned until: ${bannedUntil.toLocaleString()}`);
+
+            if (durationDays > 0) {
+              additionalInfo.push(`Duration: ${durationDays} day(s)`);
+            } else if (durationHours > 0) {
+              additionalInfo.push(`Duration: ${durationHours} hour(s)`);
+            } else if (durationMinutes > 0) {
+              additionalInfo.push(`Duration: ${durationMinutes} minute(s)`);
+            }
           }
           if (additionalInfo.length > 0) {
             message += '\n\n' + additionalInfo.join('\n');

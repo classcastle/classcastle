@@ -4155,18 +4155,25 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         // Try to fetch additional ban details
         try {
           const { data: { user } } = await SupabaseClient.auth.getUser();
-          if (user?.user_metadata?.ban_info) {
-            const banInfo = user.user_metadata.ban_info;
+          if (user?.banned_until) {
+            const bannedUntil = new Date(user.banned_until);
+            const now = new Date();
+            const durationMs = bannedUntil - now;
+            const durationDays = Math.ceil(durationMs / (1000 * 60 * 60 * 24));
+            const durationHours = Math.ceil(durationMs / (1000 * 60 * 60));
+            const durationMinutes = Math.ceil(durationMs / (1000 * 60));
+
             const additionalInfo = [];
-            if (banInfo.banned_at) {
-              additionalInfo.push(`Banned at: ${new Date(banInfo.banned_at).toLocaleString()}`);
+            additionalInfo.push(`Banned until: ${bannedUntil.toLocaleString()}`);
+
+            if (durationDays > 0) {
+              additionalInfo.push(`Duration: ${durationDays} day(s)`);
+            } else if (durationHours > 0) {
+              additionalInfo.push(`Duration: ${durationHours} hour(s)`);
+            } else if (durationMinutes > 0) {
+              additionalInfo.push(`Duration: ${durationMinutes} minute(s)`);
             }
-            if (banInfo.ban_duration) {
-              additionalInfo.push(`Duration: ${banInfo.ban_duration}`);
-            }
-            if (banInfo.ban_reason) {
-              additionalInfo.push(`Reason: ${banInfo.ban_reason}`);
-            }
+
             if (additionalInfo.length > 0) {
               message += ' | ' + additionalInfo.join(' | ');
             }
