@@ -4140,47 +4140,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       // Handle specific error codes
       if (errorCode === 'user_banned') {
-        // Show all available error information
-        if (errorDescription && errorDescription !== 'User is banned') {
-          message = errorDescription;
-        } else {
-          // Construct detailed message from available params
-          const details = [];
-          if (error) details.push(`Error: ${error}`);
-          if (errorCode) details.push(`Error Code: ${errorCode}`);
-          if (errorDescription) details.push(errorDescription);
-          message = details.length > 0 ? details.join(' - ') : 'Your account has been banned. Please contact support for more information.';
-        }
-
-        // Try to fetch additional ban details
-        try {
-          const { data: { user } } = await SupabaseClient.auth.getUser();
-          if (user?.banned_until) {
-            const bannedUntil = new Date(user.banned_until);
-            const now = new Date();
-            const durationMs = bannedUntil - now;
-            const durationDays = Math.ceil(durationMs / (1000 * 60 * 60 * 24));
-            const durationHours = Math.ceil(durationMs / (1000 * 60 * 60));
-            const durationMinutes = Math.ceil(durationMs / (1000 * 60));
-
-            const additionalInfo = [];
-            additionalInfo.push(`Banned until: ${bannedUntil.toLocaleString()}`);
-
-            if (durationDays > 0) {
-              additionalInfo.push(`Duration: ${durationDays} day(s)`);
-            } else if (durationHours > 0) {
-              additionalInfo.push(`Duration: ${durationHours} hour(s)`);
-            } else if (durationMinutes > 0) {
-              additionalInfo.push(`Duration: ${durationMinutes} minute(s)`);
-            }
-
-            if (additionalInfo.length > 0) {
-              message += ' | ' + additionalInfo.join(' | ');
-            }
-          }
-        } catch (error) {
-          console.error('Error fetching ban details:', error);
-        }
+        // Show the error description from Supabase
+        message = errorDescription || 'Your account has been banned. Please contact support for more information.';
       } else if (error === 'identity_not_found') {
         message = 'This GitHub account is not linked to a Classcastle account. Please sign up first, then link your GitHub account in Settings.';
       } else if (error === 'access_denied') {
@@ -4190,6 +4151,12 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       }
 
       showNotification(message, 5000);
+
+      // If it's a banned user, also show the error code
+      if (errorCode === 'user_banned') {
+        console.log('Error Code:', errorCode);
+        console.log('Error Description:', errorDescription);
+      }
       // Clean URL
       window.history.replaceState({}, document.title, window.location.pathname);
       // Redirect to login
