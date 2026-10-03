@@ -969,6 +969,18 @@
     margin: 8px 16px;
   }
 
+  /* Tab buttons */
+  .tab-btn {
+    transition: all 0.2s;
+  }
+  .tab-btn:hover {
+    color: var(--ink);
+  }
+  .tab-btn.active {
+    color: var(--brand);
+    border-bottom-color: var(--brand);
+  }
+
   .nav-section-label {
     padding: 8px 16px;
     font-size: 0.75rem;
@@ -1990,19 +2002,46 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       <div class="card" style="margin-bottom: 16px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
           <span style="font-size: 0.9rem; font-weight: 500;">Active Polls</span>
-          <span id="pollUsageText" style="font-size: 0.85rem; color: var(--soft);">0 of 2 used</span>
+          <span id="pollUsageText" style="font-size: 0.85rem; color: var(--soft);">0 of 15 used</span>
         </div>
         <div style="background: var(--line); height: 8px; border-radius: 4px; overflow: hidden;">
           <div id="pollUsageBar" style="background: var(--brand); height: 100%; width: 0%; transition: width 0.3s;"></div>
         </div>
-        <p style="font-size: 0.8rem; color: var(--soft); margin-top: 8px;">Free plan: 2 active polls. Close polls to create new ones.</p>
+        <p style="font-size: 0.8rem; color: var(--soft); margin-top: 8px;">Free plan: 15 active polls. Close polls to create new ones.</p>
       </div>
 
-      <div class="card">
-        <div id="pollsList">
-          <div class="loading-state">
-            <div class="loading-spinner"></div>
-            <p>Loading polls...</p>
+      <!-- Tab Navigation -->
+      <div class="card" style="padding: 0;">
+        <div style="display: flex; border-bottom: 1px solid var(--line);">
+          <button class="tab-btn active" data-tab="polls" style="flex: 1; padding: 16px; border: none; background: none; cursor: pointer; font-weight: 600; border-bottom: 2px solid var(--brand); color: var(--brand);">
+            My Polls
+          </button>
+          <button class="tab-btn" data-tab="responses" style="flex: 1; padding: 16px; border: none; background: none; cursor: pointer; font-weight: 500; border-bottom: 2px solid transparent; color: var(--soft);">
+            Responses
+          </button>
+        </div>
+
+        <!-- My Polls Tab -->
+        <div id="pollsTab" style="padding: 16px;">
+          <div id="pollsList">
+            <div class="loading-state">
+              <div class="loading-spinner"></div>
+              <p>Loading polls...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Responses Tab -->
+        <div id="responsesTab" style="padding: 16px; display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="font-size: 1rem; margin: 0;">All Responses</h3>
+            <button class="btn btn-secondary" id="exportResponsesBtn" style="font-size: 0.85rem; padding: 6px 12px;">Export XLSX</button>
+          </div>
+          <div id="responsesList">
+            <div class="loading-state">
+              <div class="loading-spinner"></div>
+              <p>Loading responses...</p>
+            </div>
           </div>
         </div>
       </div>
@@ -3837,10 +3876,101 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     }
   }
 
+  async function loadResponses() {
+    try {
+      const { data, error } = await SupabaseClient
+        .from('poll_responses')
+        .select(`
+          *,
+          polls (question, options, custom_id)
+        `)
+        .order('submitted_at', { ascending: false })
+        .limit(100);
+
+      if (error) throw error;
+      renderResponses(data || []);
+    } catch (error) {
+      console.error('Error loading responses:', error);
+      document.getElementById('responsesList').innerHTML = '<p>Error loading responses</p>';
+    }
+  }
+
+  function renderResponses(responses) {
+    const responsesList = document.getElementById('responsesList');
+    if (responses.length === 0) {
+      responsesList.innerHTML = `
+        <div class="empty-state">
+          <h3>No responses yet</h3>
+          <p>Student responses will appear here when they submit polls.</p>
+        </div>
+      `;
+      return;
+    }
+
+    responsesList.innerHTML = responses.map(response => {
+      const time = new Date(response.submitted_at).toLocaleString();
+      const poll = response.polls;
+      const pollLabel = poll
+        ? (poll.custom_id ? `/${poll.custom_id}` : poll.question.substring(0, 30) + '...')
+        : 'Unknown poll';
+
+      return `
+        <div class="card" style="margin-bottom: 12px; padding: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;">
+            <div style="flex: 1;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <strong>${response.student_name}</strong>
+                <span style="color: var(--soft); font-size: 0.85rem;">• ${pollLabel}</span>
+              </div>
+              <div style="color: var(--ink); margin-bottom: 4px;">${response.selected_option}</div>
+              <div style="color: var(--soft); font-size: 0.85rem;">${time}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function exportResponses() {
+    try {
+      const { data: responses, error } = await SupabaseClient
+        .from('poll_responses')
+        .select(`
+          *,
+          polls (question, custom_id)
+        `)
+        .order('submitted_at', { ascending: false });
+
+      if (error) throw error;
+
+      if (!responses || responses.length === 0) {
+        showNotification('No responses to export');
+        return;
+      }
+
+      // Create XLSX workbook
+      const ws = XLSX.utils.json_to_sheet(responses.map(r => ({
+        'Student Name': r.student_name,
+        'Selected Option': r.selected_option,
+        'Poll Question': r.polls?.question || 'N/A',
+        'Poll ID': r.polls?.custom_id || r.poll_id,
+        'Submitted At': new Date(r.submitted_at).toLocaleString()
+      })));
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Poll Responses');
+      XLSX.writeFile(wb, `poll-responses-${new Date().toISOString().split('T')[0]}.xlsx`);
+      showNotification('Responses exported as XLSX');
+    } catch (error) {
+      console.error('Error exporting responses:', error);
+      showNotification('Error exporting responses');
+    }
+  }
+
   function renderPolls() {
     const pollsList = document.getElementById('pollsList');
     const activePolls = polls.filter(p => p.active).length;
-    const maxActivePolls = 2;
+    const maxActivePolls = 15;
     const usagePercentage = Math.min((activePolls / maxActivePolls) * 100, 100);
 
     // Update usage bar
@@ -3905,8 +4035,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   async function createPoll() {
     // Check active poll limit
     const activePolls = polls.filter(p => p.active).length;
-    if (activePolls >= 2) {
-      showNotification('You have reached the limit of 2 active polls. Close a poll to create a new one.');
+    if (activePolls >= 15) {
+      showNotification('You have reached the limit of 15 active polls. Close a poll to create a new one.');
       return;
     }
 
@@ -4349,6 +4479,31 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   const closeResultsBtn = document.getElementById('closeResultsBtn');
   const copyPollUrlBtn = document.getElementById('copyPollUrlBtn');
   const pollCustomId = document.getElementById('pollCustomId');
+  const exportResponsesBtn = document.getElementById('exportResponsesBtn');
+
+  // Tab switching
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tab = btn.dataset.tab;
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('active');
+        b.style.borderBottomColor = 'transparent';
+        b.style.color = 'var(--soft)';
+      });
+      btn.classList.add('active');
+      btn.style.borderBottomColor = 'var(--brand)';
+      btn.style.color = 'var(--brand)';
+
+      document.getElementById('pollsTab').style.display = tab === 'polls' ? 'block' : 'none';
+      document.getElementById('responsesTab').style.display = tab === 'responses' ? 'block' : 'none';
+
+      if (tab === 'responses') {
+        loadResponses();
+      } else if (tab === 'polls') {
+        loadPolls();
+      }
+    });
+  });
 
   if (createPollBtn) createPollBtn.addEventListener('click', openPollModal);
   if (cancelPollBtn) cancelPollBtn.addEventListener('click', closePollModal);
@@ -4363,6 +4518,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       showNotification('URL copied to clipboard');
     });
   });
+  if (exportResponsesBtn) exportResponsesBtn.addEventListener('click', exportResponses);
 
   // Update custom ID preview
   if (pollCustomId) {
