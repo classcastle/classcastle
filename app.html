@@ -1987,6 +1987,17 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         <button class="btn btn-primary" id="createPollBtn">Create New Poll</button>
       </div>
 
+      <div class="card" style="margin-bottom: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-size: 0.9rem; font-weight: 500;">Active Polls</span>
+          <span id="pollUsageText" style="font-size: 0.85rem; color: var(--soft);">0 of 2 used</span>
+        </div>
+        <div style="background: var(--line); height: 8px; border-radius: 4px; overflow: hidden;">
+          <div id="pollUsageBar" style="background: var(--brand); height: 100%; width: 0%; transition: width 0.3s;"></div>
+        </div>
+        <p style="font-size: 0.8rem; color: var(--soft); margin-top: 8px;">Free plan: 2 active polls. Close polls to create new ones.</p>
+      </div>
+
       <div class="card">
         <div id="pollsList">
           <div class="loading-state">
@@ -3828,6 +3839,24 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
   function renderPolls() {
     const pollsList = document.getElementById('pollsList');
+    const activePolls = polls.filter(p => p.active).length;
+    const maxActivePolls = 2;
+    const usagePercentage = Math.min((activePolls / maxActivePolls) * 100, 100);
+
+    // Update usage bar
+    document.getElementById('pollUsageText').textContent = `${activePolls} of ${maxActivePolls} used`;
+    document.getElementById('pollUsageBar').style.width = `${usagePercentage}%`;
+
+    // Disable create button if at limit
+    const createBtn = document.getElementById('createPollBtn');
+    if (activePolls >= maxActivePolls) {
+      createBtn.disabled = true;
+      createBtn.textContent = 'Limit Reached (Close a poll to create more)';
+    } else {
+      createBtn.disabled = false;
+      createBtn.textContent = 'Create New Poll';
+    }
+
     if (polls.length === 0) {
       pollsList.innerHTML = `
         <div class="empty-state">
@@ -3874,6 +3903,13 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   }
 
   async function createPoll() {
+    // Check active poll limit
+    const activePolls = polls.filter(p => p.active).length;
+    if (activePolls >= 2) {
+      showNotification('You have reached the limit of 2 active polls. Close a poll to create a new one.');
+      return;
+    }
+
     const customId = document.getElementById('pollCustomId').value.trim();
     const question = document.getElementById('pollQuestion').value.trim();
     const optionInputs = document.querySelectorAll('.poll-option');
@@ -3925,7 +3961,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       showNotification('Poll created successfully');
       closePollModal();
-      loadPolls();
+      await loadPolls(); // This will update the usage bar
     } catch (error) {
       console.error('Error creating poll:', error);
       showNotification('Error creating poll');
@@ -4024,7 +4060,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       if (error) throw error;
       showNotification(`Poll ${!currentStatus ? 'opened' : 'closed'}`);
-      loadPolls();
+      await loadPolls(); // This will update the usage bar
     } catch (error) {
       console.error('Error toggling poll status:', error);
       showNotification('Error updating poll');
@@ -4042,7 +4078,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       if (error) throw error;
       showNotification('Poll deleted');
-      loadPolls();
+      await loadPolls(); // This will update the usage bar
     } catch (error) {
       console.error('Error deleting poll:', error);
       showNotification('Error deleting poll');
