@@ -230,11 +230,31 @@
 
     async function loadPoll() {
       try {
-        const { data: poll, error } = await SupabaseClient
-          .from('polls')
-          .select('*')
-          .eq('id', pollId)
-          .single();
+        // Try to find by custom_id first, then by UUID
+        let poll, error;
+
+        // Check if it looks like a UUID
+        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(pollId);
+
+        if (isUUID) {
+          // Search by UUID
+          const result = await SupabaseClient
+            .from('polls')
+            .select('*')
+            .eq('id', pollId)
+            .single();
+          poll = result.data;
+          error = result.error;
+        } else {
+          // Search by custom_id
+          const result = await SupabaseClient
+            .from('polls')
+            .select('*')
+            .eq('custom_id', pollId)
+            .single();
+          poll = result.data;
+          error = result.error;
+        }
 
         if (error) throw error;
 

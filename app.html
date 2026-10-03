@@ -2003,6 +2003,11 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         <h2 id="pollModalTitle">Create Poll</h2>
         <div id="pollModalContent">
           <div class="form-group">
+            <label class="form-label">Custom ID (optional)</label>
+            <input type="text" class="form-input" id="pollCustomId" placeholder="e.g., math101-quiz (optional)">
+            <p style="font-size: 0.85rem; color: var(--soft); margin-top: 4px;">Leave blank for auto-generated ID</p>
+          </div>
+          <div class="form-group">
             <label class="form-label">Question</label>
             <input type="text" class="form-input" id="pollQuestion" placeholder="e.g., What's your favorite programming language?">
           </div>
@@ -3838,6 +3843,9 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       const statusBadge = poll.active
         ? '<span style="background: var(--tint); color: var(--brand); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">Active</span>'
         : '<span style="background: var(--line); color: var(--soft); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">Closed</span>';
+      const customIdDisplay = poll.custom_id
+        ? `<span style="color: var(--brand); font-size: 0.85rem; font-family: monospace;">/${poll.custom_id}</span>`
+        : '';
 
       return `
         <div class="card" style="margin-bottom: 12px; padding: 16px;">
@@ -3846,13 +3854,14 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
               <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
                 <strong>${poll.question}</strong>
                 ${statusBadge}
+                ${customIdDisplay}
               </div>
               <div style="color: var(--soft); font-size: 0.85rem; margin-bottom: 12px;">
                 ${responseCount} response${responseCount !== 1 ? 's' : ''} • ${time}
               </div>
               <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <button class="btn btn-secondary" onclick="viewPollResults('${poll.id}')" style="font-size: 0.85rem; padding: 6px 12px;">View Results</button>
-                <button class="btn btn-secondary" onclick="sharePoll('${poll.id}')" style="font-size: 0.85rem; padding: 6px 12px;">Share URL</button>
+                <button class="btn btn-secondary" onclick="viewPollResults('${poll.id}', '${poll.custom_id || ''}')" style="font-size: 0.85rem; padding: 6px 12px;">View Results</button>
+                <button class="btn btn-secondary" onclick="sharePoll('${poll.id}', '${poll.custom_id || ''}')" style="font-size: 0.85rem; padding: 6px 12px;">Share URL</button>
                 <button class="btn btn-secondary" onclick="togglePollStatus('${poll.id}', ${poll.active})" style="font-size: 0.85rem; padding: 6px 12px;">${poll.active ? 'Close' : 'Open'}</button>
                 <button class="btn btn-secondary" onclick="deletePoll('${poll.id}')" style="font-size: 0.85rem; padding: 6px 12px; color: var(--red);">Delete</button>
               </div>
@@ -3864,6 +3873,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   }
 
   async function createPoll() {
+    const customId = document.getElementById('pollCustomId').value.trim();
     const question = document.getElementById('pollQuestion').value.trim();
     const optionInputs = document.querySelectorAll('.poll-option');
     const options = Array.from(optionInputs)
@@ -3880,16 +3890,38 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       return;
     }
 
+    // Validate custom_id if provided
+    if (customId) {
+      if (!/^[a-z0-9-]+$/.test(customId)) {
+        showNotification('Custom ID can only contain lowercase letters, numbers, and hyphens');
+        return;
+      }
+    }
+
     try {
+      const pollData = {
+        teacher_id: currentUser.id,
+        question,
+        options
+      };
+
+      if (customId) {
+        pollData.custom_id = customId;
+      }
+
       const { error } = await SupabaseClient
         .from('polls')
-        .insert({
-          teacher_id: currentUser.id,
-          question,
-          options
-        });
+        .insert(pollData);
 
-      if (error) throw error;
+      if (error) {
+        if (error.code === '23505') {
+          showNotification('This custom ID is already taken. Please choose another.');
+        } else {
+          throw error;
+        }
+        return;
+      }
+
       showNotification('Poll created successfully');
       closePollModal();
       loadPolls();
@@ -3899,7 +3931,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     }
   }
 
-  async function viewPollResults(pollId) {
+  async function viewPollResults(pollId, customId) {
     try {
       const { data: poll, error: pollError } = await SupabaseClient
         .from('polls')
@@ -3960,7 +3992,10 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         </div>
       `;
 
-      document.getElementById('pollShareUrl').value = `https://classcastle.org/poll.html?id=${pollId}`;
+      const shareUrl = customId
+        ? `https://classcastle.org/poll.html?id=${customId}`
+        : `https://classcastle.org/poll.html?id=${pollId}`;
+      document.getElementById('pollShareUrl').value = shareUrl;
       document.getElementById('pollResultsModalOverlay').style.display = 'flex';
     } catch (error) {
       console.error('Error loading poll results:', error);
@@ -3968,8 +4003,10 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     }
   }
 
-  function sharePoll(pollId) {
-    const url = `https://classcastle.org/poll.html?id=${pollId}`;
+  function sharePoll(pollId, customId) {
+    const url = customId
+      ? `https://classcastle.org/poll.html?id=${customId}`
+      : `https://classcastle.org/poll.html?id=${pollId}`;
     navigator.clipboard.writeText(url).then(() => {
       showNotification('Poll URL copied to clipboard');
     }).catch(() => {

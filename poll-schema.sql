@@ -4,6 +4,7 @@
 -- Polls table
 CREATE TABLE IF NOT EXISTS public.polls (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  custom_id TEXT UNIQUE,
   teacher_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   question TEXT NOT NULL,
   options JSONB NOT NULL, -- Array of option strings
@@ -22,6 +23,7 @@ CREATE TABLE IF NOT EXISTS public.poll_responses (
 
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_polls_teacher_id ON public.polls(teacher_id);
+CREATE INDEX IF NOT EXISTS idx_polls_custom_id ON public.polls(custom_id);
 CREATE INDEX IF NOT EXISTS idx_polls_active ON public.polls(active);
 CREATE INDEX IF NOT EXISTS idx_poll_responses_poll_id ON public.poll_responses(poll_id);
 
@@ -46,7 +48,7 @@ CREATE POLICY "Teachers can delete their own polls"
   ON public.polls FOR DELETE
   USING (teacher_id = auth.uid());
 
-CREATE POLICY "Anyone can view active polls for responses"
+CREATE POLICY "Anyone can view active polls by custom_id"
   ON public.polls FOR SELECT
   USING (active = true);
 
