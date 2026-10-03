@@ -15,8 +15,8 @@
     "matches": ["https://classcastle.org/*"]
   },
   "background": {
-    "service_worker": "background.js",
-    "scripts": ["background.js"]
+    "scripts": ["background.js"],
+    "persistent": true
   },
   "action": {
     "default_popup": "popup.html",
@@ -32,14 +32,17 @@
       "data_collection_permissions": {
         "tabs": {
           "allowed": true,
+          "required": true,
           "description": "Required to navigate student browsers to target URLs"
         },
         "storage": {
           "allowed": true,
+          "required": true,
           "description": "Required to store room and student session data"
         },
         "alarms": {
           "allowed": true,
+          "required": true,
           "description": "Required for periodic polling for room updates"
         }
       }
