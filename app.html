@@ -2006,6 +2006,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
             <label class="form-label">Custom ID (optional)</label>
             <input type="text" class="form-input" id="pollCustomId" placeholder="e.g., math101-quiz (optional)">
             <p style="font-size: 0.85rem; color: var(--soft); margin-top: 4px;">Leave blank for auto-generated ID</p>
+            <div id="customIdPreview" style="margin-top: 8px; font-size: 0.85rem; color: var(--brand); font-family: monospace;"></div>
           </div>
           <div class="form-group">
             <label class="form-label">Question</label>
@@ -4050,6 +4051,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
   function openPollModal() {
     document.getElementById('pollQuestion').value = '';
+    document.getElementById('pollCustomId').value = '';
+    document.getElementById('customIdPreview').textContent = '';
     document.getElementById('pollOptions').innerHTML = `
       <input type="text" class="form-input poll-option" placeholder="Option 1" style="margin-bottom: 8px;">
       <input type="text" class="form-input poll-option" placeholder="Option 2" style="margin-bottom: 8px;">
@@ -4309,6 +4312,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   const pollResultsModalOverlay = document.getElementById('pollResultsModalOverlay');
   const closeResultsBtn = document.getElementById('closeResultsBtn');
   const copyPollUrlBtn = document.getElementById('copyPollUrlBtn');
+  const pollCustomId = document.getElementById('pollCustomId');
 
   if (createPollBtn) createPollBtn.addEventListener('click', openPollModal);
   if (cancelPollBtn) cancelPollBtn.addEventListener('click', closePollModal);
@@ -4323,6 +4327,19 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       showNotification('URL copied to clipboard');
     });
   });
+
+  // Update custom ID preview
+  if (pollCustomId) {
+    pollCustomId.addEventListener('input', () => {
+      const customId = pollCustomId.value.trim();
+      const preview = document.getElementById('customIdPreview');
+      if (customId) {
+        preview.textContent = `URL: https://classcastle.org/poll.html?id=${customId}`;
+      } else {
+        preview.textContent = '';
+      }
+    });
+  }
 
   // Admin submenu toggle
   const adminParent = document.querySelector('.nav-item-parent[data-parent="admin"]');
