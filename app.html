@@ -4140,8 +4140,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       // Handle specific error codes
       if (errorCode === 'user_banned') {
-        // Show the error description from Supabase with additional information
-        message = errorDescription || 'Your account has been banned in accordance with our Terms of Service. Please contact support@classcastle.org to find out when your ban expires.';
+        // Always show custom message with contact info
+        message = 'Your account has been banned in accordance with our Terms of Service. Please contact support@classcastle.org to find out when your ban expires.';
       } else if (error === 'identity_not_found') {
         message = 'This GitHub account is not linked to a Classcastle account. Please sign up first, then link your GitHub account in Settings.';
       } else if (error === 'access_denied') {
