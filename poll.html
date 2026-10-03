@@ -219,6 +219,7 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const pollId = urlParams.get('id');
+    let actualPollId = null; // Store the actual UUID for submission
 
     if (!pollId) {
       document.getElementById('loading').style.display = 'none';
@@ -266,6 +267,9 @@
           throw new Error('This poll is closed');
         }
 
+        // Store the actual UUID for submission
+        actualPollId = poll.id;
+
         document.getElementById('loading').style.display = 'none';
         document.getElementById('pollContent').style.display = 'block';
         document.getElementById('question').textContent = poll.question;
@@ -305,6 +309,11 @@
         return;
       }
 
+      if (!actualPollId) {
+        errorEl.textContent = 'Poll not loaded. Please refresh the page.';
+        return;
+      }
+
       document.getElementById('submitBtn').disabled = true;
       document.getElementById('submitBtn').textContent = 'Submitting...';
 
@@ -312,7 +321,7 @@
         const { error } = await SupabaseClient
           .from('poll_responses')
           .insert({
-            poll_id: pollId,
+            poll_id: actualPollId,
             student_name: name,
             selected_option: selectedOption.value
           });
