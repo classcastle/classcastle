@@ -4160,7 +4160,29 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     }
 
     if (session) {
-      currentUser = session.user;
+      // Verify user still exists in auth system
+      try {
+        const { data: { user }, error: userError } = await SupabaseClient.auth.getUser();
+        if (userError || !user) {
+          console.error('User not found in auth system:', userError);
+          await SupabaseClient.auth.signOut();
+          showNotification('Your account has been deleted. Please sign up again.', 5000);
+          setTimeout(() => {
+            window.location.href = '/login.html?error=user_not_found&error_description=Your+account+has+been+deleted';
+          }, 5000);
+          return;
+        }
+        currentUser = user;
+      } catch (error) {
+        console.error('Error verifying user:', error);
+        await SupabaseClient.auth.signOut();
+        showNotification('Your account has been deleted. Please sign up again.', 5000);
+        setTimeout(() => {
+          window.location.href = '/login.html?error=user_not_found&error_description=Your+account+has+been+deleted';
+        }, 5000);
+        return;
+      }
+
       updateUserInfo();
       // Call showPage to ensure dashboard content renders properly
       showPage('dashboardPage');
