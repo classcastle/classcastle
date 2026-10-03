@@ -23,11 +23,14 @@ const SUPABASE_KEY = 'sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK';
 // Initialize extension
 const SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// Use browser namespace (works in both Chrome and Firefox)
+const chrome = browser;
+
 // Check current status
 checkStatus();
 
 // Listen for status updates from background script
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'statusUpdate') {
     if (request.joined) {
       showJoinedState();
@@ -49,7 +52,7 @@ dismissKickedBtn.addEventListener('click', handleDismissKicked);
 // Check current extension status
 function checkStatus() {
   console.log('Checking extension status...');
-  chrome.storage.local.get(['roomId', 'studentId', 'wasKicked'], (result) => {
+  browser.storage.local.get(['roomId', 'studentId', 'wasKicked'], (result) => {
     console.log('Storage result:', result);
     if (result.wasKicked) {
       console.log('User was kicked, showing kicked state');
@@ -104,7 +107,7 @@ function showKickedState() {
 
 // Handle dismiss kicked notification
 function handleDismissKicked() {
-  chrome.storage.local.set({ wasKicked: false }, () => {
+  browser.storage.local.set({ wasKicked: false }, () => {
     showJoinForm();
   });
 }
@@ -158,13 +161,13 @@ async function handleJoin() {
   showWaiting();
 
   // Get extension ID
-  const extensionId = chrome.runtime.id;
+  const extensionId = browser.runtime.id;
 
   // Open join.html on classcastle.org with room code, student name, and extension ID
   const joinUrl = `https://classcastle.org/join.html?code=${encodeURIComponent(roomId)}&name=${encodeURIComponent(studentName)}&from_extension=true&extension_id=${encodeURIComponent(extensionId)}`;
 
   // Create a new tab instead of updating the existing one
-  chrome.tabs.create({ url: joinUrl }, (tab) => {
+  browser.tabs.create({ url: joinUrl }, (tab) => {
     console.log('Opened join.html in tab:', tab.id);
     // Don't close popup, keep it open with loading state
   });
@@ -185,14 +188,14 @@ function handleLeave() {
   }
 
   // Leave room via background script.
-  // Using a callback (not a Promise chain) here, since chrome.runtime.sendMessage
+  // Using a callback (not a Promise chain) here, since browser.runtime.sendMessage
   // returns undefined -- not a Promise -- whenever a callback is supplied.
-  // Errors are surfaced via chrome.runtime.lastError, not a rejected promise.
-  chrome.runtime.sendMessage({ action: 'leaveRoom' }, () => {
-    if (chrome.runtime.lastError) {
-      console.log('Failed to send leave message:', chrome.runtime.lastError.message);
+  // Errors are surfaced via browser.runtime.lastError, not a rejected promise.
+  browser.runtime.sendMessage({ action: 'leaveRoom' }, () => {
+    if (browser.runtime.lastError) {
+      console.log('Failed to send leave message:', browser.runtime.lastError.message);
       // Fallback: clear storage directly
-      chrome.storage.local.remove(['roomId', 'studentId'], resetForm);
+      browser.storage.local.remove(['roomId', 'studentId'], resetForm);
       return;
     }
     resetForm();

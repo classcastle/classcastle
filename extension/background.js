@@ -7,6 +7,9 @@ importScripts('supabase.min.js');
 
 const SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// Use browser namespace (works in both Chrome and Firefox)
+const chrome = browser;
+
 // Constants
 const ALARM_NAME = 'pollForChanges';
 const ALARM_INTERVAL_MINUTES = 0.33; // ~20 seconds
@@ -24,7 +27,7 @@ const STORAGE_KEYS = {
 const KICK_GRACE_PERIOD_MS = 60000; // 1 minute grace period for joins
 
 // Listen for messages from popup and content scripts
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'joinRoom') {
     joinRoom(request.roomId, request.studentId);
   } else if (request.action === 'studentJoined') {
@@ -32,7 +35,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log('Student joined message received:', request);
     joinRoom(request.roomId, request.studentId);
     // Notify popup of status change
-    chrome.runtime.sendMessage({
+    browser.runtime.sendMessage({
       action: 'statusUpdate',
       joined: true
     }).catch(err => {
@@ -42,7 +45,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   } else if (request.action === 'leaveRoom') {
     leaveRoom();
     // Notify popup of status change
-    chrome.runtime.sendMessage({
+    browser.runtime.sendMessage({
       action: 'statusUpdate',
       joined: false
     }).catch(err => {
@@ -74,7 +77,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 // Get storage data
 async function getStorageData() {
   return new Promise((resolve) => {
-    chrome.storage.local.get(Object.values(STORAGE_KEYS), (result) => {
+    browser.storage.local.get(Object.values(STORAGE_KEYS), (result) => {
       resolve({
         roomId: result.roomId || null,
         studentId: result.studentId || null,
@@ -87,7 +90,7 @@ async function getStorageData() {
 // Save storage data
 async function saveStorageData(data) {
   return new Promise((resolve) => {
-    chrome.storage.local.set(data, () => resolve());
+    browser.storage.local.set(data, () => resolve());
   });
 }
 
@@ -120,7 +123,7 @@ async function handleKicked() {
     unsubscribeFromRoom(data.roomId, data.studentId);
   }
 
-  chrome.alarms.clear(ALARM_NAME);
+  browser.alarms.clear(ALARM_NAME);
 
   await saveStorageData({
     roomId: null,
@@ -130,7 +133,7 @@ async function handleKicked() {
     wasKicked: true
   });
 
-  chrome.runtime.sendMessage({
+  browser.runtime.sendMessage({
     action: 'kicked'
   }).catch(err => {
     console.log('Failed to notify popup of kick (popup may be closed):', err);
@@ -146,7 +149,7 @@ async function leaveRoom() {
   }
 
   // Stop alarm
-  chrome.alarms.clear(ALARM_NAME);
+  browser.alarms.clear(ALARM_NAME);
 
   // Clear storage
   await saveStorageData({
@@ -219,7 +222,7 @@ function unsubscribeFromRoom(roomId, studentId) {
 }
 
 // Alarm handler - called every ~20 seconds
-chrome.alarms.onAlarm.addListener(async (alarm) => {
+browser.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name === ALARM_NAME) {
     await handleAlarm();
   }
@@ -297,7 +300,7 @@ async function navigateToUrl(url, studentId) {
 
   try {
     // Always open in a new tab
-    chrome.tabs.create({ url: url }, (tab) => {
+    browser.tabs.create({ url: url }, (tab) => {
       console.log('Opened new tab:', tab.id, 'for URL:', url);
     });
 
@@ -316,13 +319,13 @@ async function navigateToUrl(url, studentId) {
 
 // Start alarm-based polling
 function startAlarm() {
-  chrome.alarms.create(ALARM_NAME, {
+  browser.alarms.create(ALARM_NAME, {
     periodInMinutes: ALARM_INTERVAL_MINUTES
   });
 }
 
 // Initialize - check storage and start alarm if joined
-chrome.storage.local.get(['roomId', 'studentId'], (result) => {
+browser.storage.local.get(['roomId', 'studentId'], (result) => {
   if (result.roomId && result.studentId) {
     console.log('Found existing session, starting alarm');
     startAlarm();
@@ -331,13 +334,13 @@ chrome.storage.local.get(['roomId', 'studentId'], (result) => {
 });
 
 // Listen for external messages from join.html
-chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => {
+browser.runtime.onMessageExternal.addListener((request, sender, sendResponse) => {
   if (sender.url && sender.url.startsWith('https://classcastle.org')) {
     if (request.action === 'studentJoined') {
       console.log('External studentJoined message received:', request);
       joinRoom(request.roomId, request.studentId);
       // Notify popup of status change
-      chrome.runtime.sendMessage({
+      browser.runtime.sendMessage({
         action: 'statusUpdate',
         joined: true
       }).catch(err => {
