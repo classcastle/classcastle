@@ -469,6 +469,7 @@
       // Handle specific error codes
       if (errorCode === 'user_banned') {
         title = 'Account Banned';
+        // Use the full error_description which includes ban details from Supabase
         message = errorDescription || 'Your account has been banned. Please contact support for more information.';
         isCriticalError = true;
       } else if (error === 'identity_not_found') {

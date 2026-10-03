@@ -4140,6 +4140,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       // Handle specific error codes
       if (errorCode === 'user_banned') {
+        // Use the full error_description which includes ban details from Supabase
         message = errorDescription || 'Your account has been banned. Please contact support for more information.';
       } else if (error === 'identity_not_found') {
         message = 'This GitHub account is not linked to a Classcastle account. Please sign up first, then link your GitHub account in Settings.';
