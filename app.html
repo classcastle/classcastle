@@ -4074,18 +4074,11 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     resultsDiv.style.display = 'none';
 
     try {
-      const overpassQuery = `
-        [out:json][timeout:25];
-        area["name"="${city}"]->.boundary;
-        (
-          node["amenity"="school"](area);
-        );
-        out center;
-      `;
-
-      const response = await fetch('https://overpass-api.de/api/interpreter', {
-        method: 'POST',
-        body: overpassQuery
+      // Use Nominatim API to search for schools
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=school+in+${encodeURIComponent(city)}&addressdetails=1&limit=20`, {
+        headers: {
+          'User-Agent': 'Classcastle'
+        }
       });
 
       if (!response.ok) {
@@ -4094,28 +4087,24 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       const data = await response.json();
 
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      if (!data.elements || data.elements.length === 0) {
+      if (!data || data.length === 0) {
         status.textContent = `No schools found in ${city}. Try a different city name.`;
         status.style.color = 'var(--amber)';
         return;
       }
 
-      const schools = data.elements
-        .filter(el => el.tags && (el.tags.name || el.tags['addr:housename']))
-        .map(el => ({
-          id: el.id,
-          name: el.tags.name || el.tags['addr:housename'] || 'Unknown School',
-          postcode: el.tags['addr:postcode'] || 'Not available',
-          lat: el.lat,
-          lon: el.lon
+      const schools = data
+        .filter(item => item.address && (item.address.road || item.address.city || item.address.town))
+        .map(item => ({
+          id: item.place_id,
+          name: item.display_name.split(',')[0] || 'Unknown School',
+          postcode: item.address.postcode || 'Not available',
+          lat: parseFloat(item.lat),
+          lon: parseFloat(item.lon)
         }));
 
       if (schools.length === 0) {
-        status.textContent = 'No schools with names found';
+        status.textContent = 'No schools with valid addresses found';
         status.style.color = 'var(--amber)';
         return;
       }
@@ -4203,18 +4192,11 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     document.getElementById('unlockSelectedSchool').style.display = 'none';
 
     try {
-      const overpassQuery = `
-        [out:json][timeout:25];
-        area["name"="${city}"]->.boundary;
-        (
-          node["amenity"="school"](area);
-        );
-        out center;
-      `;
-
-      const response = await fetch('https://overpass-api.de/api/interpreter', {
-        method: 'POST',
-        body: overpassQuery
+      // Use Nominatim API to search for schools
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=school+in+${encodeURIComponent(city)}&addressdetails=1&limit=20`, {
+        headers: {
+          'User-Agent': 'Classcastle'
+        }
       });
 
       if (!response.ok) {
@@ -4223,28 +4205,24 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       const data = await response.json();
 
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      if (!data.elements || data.elements.length === 0) {
+      if (!data || data.length === 0) {
         status.textContent = `No schools found in ${city}. Try a different city name.`;
         status.style.color = 'var(--amber)';
         return;
       }
 
-      const schools = data.elements
-        .filter(el => el.tags && (el.tags.name || el.tags['addr:housename']))
-        .map(el => ({
-          id: el.id,
-          name: el.tags.name || el.tags['addr:housename'] || 'Unknown School',
-          postcode: el.tags['addr:postcode'] || 'Not available',
-          lat: el.lat,
-          lon: el.lon
+      const schools = data
+        .filter(item => item.address && (item.address.road || item.address.city || item.address.town))
+        .map(item => ({
+          id: item.place_id,
+          name: item.display_name.split(',')[0] || 'Unknown School',
+          postcode: item.address.postcode || 'Not available',
+          lat: parseFloat(item.lat),
+          lon: parseFloat(item.lon)
         }));
 
       if (schools.length === 0) {
-        status.textContent = 'No schools with names found';
+        status.textContent = 'No schools with valid addresses found';
         status.style.color = 'var(--amber)';
         return;
       }
