@@ -4151,6 +4151,29 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           if (errorDescription) details.push(errorDescription);
           message = details.length > 0 ? details.join(' - ') : 'Your account has been banned. Please contact support for more information.';
         }
+
+        // Try to fetch additional ban details
+        try {
+          const { data: { user } } = await SupabaseClient.auth.getUser();
+          if (user?.user_metadata?.ban_info) {
+            const banInfo = user.user_metadata.ban_info;
+            const additionalInfo = [];
+            if (banInfo.banned_at) {
+              additionalInfo.push(`Banned at: ${new Date(banInfo.banned_at).toLocaleString()}`);
+            }
+            if (banInfo.ban_duration) {
+              additionalInfo.push(`Duration: ${banInfo.ban_duration}`);
+            }
+            if (banInfo.ban_reason) {
+              additionalInfo.push(`Reason: ${banInfo.ban_reason}`);
+            }
+            if (additionalInfo.length > 0) {
+              message += ' | ' + additionalInfo.join(' | ');
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching ban details:', error);
+        }
       } else if (error === 'identity_not_found') {
         message = 'This GitHub account is not linked to a Classcastle account. Please sign up first, then link your GitHub account in Settings.';
       } else if (error === 'access_denied') {
