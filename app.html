@@ -2031,7 +2031,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           <label class="form-label">Email</label>
           <input type="email" class="form-input" id="settingsEmail" value="" disabled>
         </div>
-        <button class="btn btn-primary" id="saveSettingsBtn">Save changes</button>
+        <button class="btn btn-secondary" id="changeEmailBtn" style="margin-top: 8px;">Change Email</button>
+        <button class="btn btn-primary" id="saveSettingsBtn" style="margin-top: 8px;">Save Name</button>
       </div>
 
       <div class="card">
@@ -2371,6 +2372,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   const settingsName = document.getElementById('settingsName');
   const settingsEmail = document.getElementById('settingsEmail');
   const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+  const changeEmailBtn = document.getElementById('changeEmailBtn');
   const replayOnboardingBtn = document.getElementById('replayOnboardingBtn');
   const linkGithubBtn = document.getElementById('linkGithubBtn');
   const linkGithubBtnText = linkGithubBtn.querySelector('.btn-text');
@@ -3038,6 +3040,18 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   async function unlinkIdentity(identity) {
     if (!currentUser) return;
 
+    // Check if this is the last identity (email identity)
+    if (identities.length === 1) {
+      showNotification('Cannot unlink your only sign-in method. Please link another account first.');
+      return;
+    }
+
+    // Prevent unlinking email identity - it's the primary identity
+    if (identity.provider === 'email') {
+      showNotification('Email is your primary account and cannot be unlinked. Use the "Change Email" button to update your email address.');
+      return;
+    }
+
     const confirmed = await showConfirm({
       title: 'Unlink Account',
       message: `Are you sure you want to unlink your ${identity.provider} account? You'll need to use another sign-in method.`,
@@ -3057,6 +3071,32 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     } catch (error) {
       console.error('Error unlinking identity:', error);
       showNotification(error.message || 'Error unlinking account');
+    }
+  }
+
+  // Change email
+  async function changeEmail() {
+    if (!currentUser) return;
+
+    const newEmail = prompt('Enter your new email address:');
+    if (!newEmail) return;
+
+    if (!newEmail.includes('@') || !newEmail.includes('.')) {
+      showNotification('Please enter a valid email address');
+      return;
+    }
+
+    try {
+      const { error } = await SupabaseClient.auth.updateUser({
+        email: newEmail
+      });
+
+      if (error) throw error;
+
+      showNotification('Email change initiated. Please check your new email for a confirmation link.');
+    } catch (error) {
+      console.error('Error changing email:', error);
+      showNotification(error.message || 'Error changing email');
     }
   }
 
@@ -4036,6 +4076,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   });
 
   saveSettingsBtn.addEventListener('click', saveSettings);
+  changeEmailBtn.addEventListener('click', changeEmail);
   linkGithubBtn.addEventListener('click', linkGithub);
 
   // Onboarding functionality
