@@ -4140,8 +4140,17 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       // Handle specific error codes
       if (errorCode === 'user_banned') {
-        // Use the full error_description which includes ban details from Supabase
-        message = errorDescription || 'Your account has been banned. Please contact support for more information.';
+        // Show all available error information
+        if (errorDescription && errorDescription !== 'User is banned') {
+          message = errorDescription;
+        } else {
+          // Construct detailed message from available params
+          const details = [];
+          if (error) details.push(`Error: ${error}`);
+          if (errorCode) details.push(`Error Code: ${errorCode}`);
+          if (errorDescription) details.push(errorDescription);
+          message = details.length > 0 ? details.join(' - ') : 'Your account has been banned. Please contact support for more information.';
+        }
       } else if (error === 'identity_not_found') {
         message = 'This GitHub account is not linked to a Classcastle account. Please sign up first, then link your GitHub account in Settings.';
       } else if (error === 'access_denied') {
