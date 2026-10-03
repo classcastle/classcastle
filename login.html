@@ -552,7 +552,12 @@
         window.location.href = '/app.html';
       }, 1000);
     } catch (error) {
-      showNotification(error.message);
+      // Check if user is banned
+      if (error.message?.toLowerCase().includes('banned') || error.status === 403) {
+        showAlert('Account Banned', 'Your account has been banned in accordance with our Terms of Service. Please contact support@classcastle.org to find out when your ban expires.', 'user_banned');
+      } else {
+        showNotification(error.message);
+      }
       // Reset button state
       loginBtn.disabled = false;
       loginBtnText.style.display = 'inline';
