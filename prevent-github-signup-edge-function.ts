@@ -3,9 +3,8 @@
 // This runs server-side and cannot be bypassed by client-side code
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { crypto } from 'https://deno.land/std@0.168.0/crypto/crypto.ts'
 
-// Verify Supabase webhook signature
+// Verify Supabase webhook signature using Web Crypto API
 async function verifySignature(
   payload: string,
   signature: string,
