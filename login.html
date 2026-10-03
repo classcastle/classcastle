@@ -483,6 +483,11 @@
         title = 'Account Deleted';
         message = errorDescription || 'Your account has been deleted. Please sign up again if you\'d like to create a new account.';
         isCriticalError = true;
+      } else if (errorCode === 'auth_github_signup_not_allowed' || errorDescription?.includes('GitHub account')) {
+        // Hook rejected GitHub signup
+        title = 'No Classcastle Account Found';
+        message = 'No Classcastle account found for this GitHub account. Please sign up at signup.html first, then link GitHub in Settings.';
+        isCriticalError = true;
       }
 
       if (isCriticalError) {
@@ -499,21 +504,6 @@
     }
 
     if (session) {
-      // Check if this is a new user from GitHub OAuth (no name metadata means they just signed up)
-      const isNewUser = !session.user.user_metadata?.name && !session.user.user_metadata?.full_name;
-
-      if (isNewUser) {
-        // Sign out the new user and show error
-        await SupabaseClient.auth.signOut();
-        showAlert(
-          'Please Sign Up with Email',
-          'GitHub sign-in is only available for existing accounts. Please sign up with your email address first, then you can link your GitHub account in Settings.'
-        );
-        // Clean URL
-        window.history.replaceState({}, document.title, window.location.pathname);
-        return;
-      }
-
       showNotification('You are already logged in!');
       setTimeout(() => {
         window.location.href = '/app.html';
