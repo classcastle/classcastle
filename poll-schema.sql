@@ -8,6 +8,10 @@ CREATE TABLE IF NOT EXISTS public.polls (
   teacher_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   question TEXT NOT NULL,
   options JSONB NOT NULL, -- Array of option strings
+  school_name TEXT,
+  school_postcode TEXT,
+  school_lat DOUBLE PRECISION,
+  school_lon DOUBLE PRECISION,
   active BOOLEAN DEFAULT true,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

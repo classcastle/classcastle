@@ -2059,6 +2059,27 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
             <div id="customIdPreview" style="margin-top: 8px; font-size: 0.85rem; color: var(--brand); font-family: monospace;"></div>
           </div>
           <div class="form-group">
+            <label class="form-label">Target School (optional)</label>
+            <input type="text" class="form-input" id="schoolSearchInput" placeholder="Search UK city (e.g., Manchester)">
+            <button class="btn btn-secondary" id="searchSchoolsBtn" style="margin-top: 8px;">Search Schools</button>
+            <div id="schoolSearchStatus" style="margin-top: 8px; font-size: 0.85rem; color: var(--soft);"></div>
+            <div id="schoolResults" style="margin-top: 12px; max-height: 200px; overflow-y: auto; display: none;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                <thead>
+                  <tr>
+                    <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--line);">School Name</th>
+                    <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--line);">Postcode</th>
+                  </tr>
+                </thead>
+                <tbody id="schoolResultsBody"></tbody>
+              </table>
+            </div>
+            <div id="selectedSchoolInfo" style="margin-top: 8px; padding: 8px; background: var(--tint); border-radius: 4px; display: none;">
+              <strong id="selectedSchoolName"></strong>
+              <button class="btn btn-secondary" id="clearSchoolBtn" style="margin-left: 8px; font-size: 0.75rem; padding: 4px 8px;">Clear</button>
+            </div>
+          </div>
+          <div class="form-group">
             <label class="form-label">Question</label>
             <input type="text" class="form-input" id="pollQuestion" placeholder="e.g., What's your favorite programming language?">
           </div>
@@ -3967,6 +3988,120 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     }
   }
 
+  let selectedSchool = null;
+
+  async function searchSchools() {
+    const city = document.getElementById('schoolSearchInput').value.trim();
+    const status = document.getElementById('schoolSearchStatus');
+    const resultsDiv = document.getElementById('schoolResults');
+    const resultsBody = document.getElementById('schoolResultsBody');
+
+    if (!city) {
+      status.textContent = 'Please enter a city name';
+      status.style.color = 'var(--red)';
+      return;
+    }
+
+    status.textContent = 'Searching...';
+    status.style.color = 'var(--soft)';
+    resultsDiv.style.display = 'none';
+
+    try {
+      const overpassQuery = `
+        [out:json][timeout:25];
+        area["name"="${city}"]->.boundary;
+        (
+          node["amenity"="school"](area);
+        );
+        out center;
+      `;
+
+      const response = await fetch('https://overpass-api.de/api/interpreter', {
+        method: 'POST',
+        body: overpassQuery
+      });
+
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      if (!data.elements || data.elements.length === 0) {
+        status.textContent = `No schools found in ${city}. Try a different city name.`;
+        status.style.color = 'var(--amber)';
+        return;
+      }
+
+      const schools = data.elements
+        .filter(el => el.tags && (el.tags.name || el.tags['addr:housename']))
+        .map(el => ({
+          id: el.id,
+          name: el.tags.name || el.tags['addr:housename'] || 'Unknown School',
+          postcode: el.tags['addr:postcode'] || 'Not available',
+          lat: el.lat,
+          lon: el.lon
+        }));
+
+      if (schools.length === 0) {
+        status.textContent = 'No schools with names found';
+        status.style.color = 'var(--amber)';
+        return;
+      }
+
+      resultsBody.innerHTML = schools.map(school => `
+        <tr style="cursor: pointer; border-bottom: 1px solid var(--line);" data-school-id="${school.id}">
+          <td style="padding: 8px;">${escapeHtml(school.name)}</td>
+          <td style="padding: 8px;">${escapeHtml(school.postcode)}</td>
+        </tr>
+      `).join('');
+
+      resultsDiv.style.display = 'block';
+      status.textContent = `Found ${schools.length} schools`;
+      status.style.color = 'var(--brand)';
+
+      // Add click handlers
+      resultsBody.querySelectorAll('tr[data-school-id]').forEach(row => {
+        row.addEventListener('click', () => {
+          const schoolId = row.dataset.schoolId;
+          const school = schools.find(s => s.id == schoolId);
+          if (school) {
+            selectSchool(school);
+          }
+        });
+      });
+    } catch (error) {
+      console.error('Error searching schools:', error);
+      status.textContent = `Error: ${error.message}`;
+      status.style.color = 'var(--red)';
+    }
+  }
+
+  function selectSchool(school) {
+    selectedSchool = school;
+    document.getElementById('selectedSchoolName').textContent = school.name;
+    document.getElementById('selectedSchoolInfo').style.display = 'block';
+    document.getElementById('schoolResults').style.display = 'none';
+  }
+
+  function clearSchool() {
+    selectedSchool = null;
+    document.getElementById('selectedSchoolInfo').style.display = 'none';
+    document.getElementById('schoolSearchInput').value = '';
+    document.getElementById('schoolSearchStatus').textContent = '';
+    document.getElementById('schoolResults').style.display = 'none';
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
   function renderPolls() {
     const pollsList = document.getElementById('pollsList');
     const activePolls = polls.filter(p => p.active).length;
@@ -4074,6 +4209,13 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       if (customId) {
         pollData.custom_id = customId;
+      }
+
+      if (selectedSchool) {
+        pollData.school_name = selectedSchool.name;
+        pollData.school_postcode = selectedSchool.postcode;
+        pollData.school_lat = selectedSchool.lat;
+        pollData.school_lon = selectedSchool.lon;
       }
 
       const { error } = await SupabaseClient
@@ -4224,6 +4366,13 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       <input type="text" class="form-input poll-option" placeholder="Option 2" style="margin-bottom: 8px;">
     `;
     document.getElementById('pollModalOverlay').style.display = 'flex';
+
+    // Clear school selection
+    selectedSchool = null;
+    document.getElementById('selectedSchoolInfo').style.display = 'none';
+    document.getElementById('schoolSearchInput').value = '';
+    document.getElementById('schoolSearchStatus').textContent = '';
+    document.getElementById('schoolResults').style.display = 'none';
   }
 
   function closePollModal() {
@@ -4519,6 +4668,19 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     });
   });
   if (exportResponsesBtn) exportResponsesBtn.addEventListener('click', exportResponses);
+
+  // School search
+  const searchSchoolsBtn = document.getElementById('searchSchoolsBtn');
+  const schoolSearchInput = document.getElementById('schoolSearchInput');
+  const clearSchoolBtn = document.getElementById('clearSchoolBtn');
+
+  if (searchSchoolsBtn) searchSchoolsBtn.addEventListener('click', searchSchools);
+  if (schoolSearchInput) {
+    schoolSearchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') searchSchools();
+    });
+  }
+  if (clearSchoolBtn) clearSchoolBtn.addEventListener('click', clearSchool);
 
   // Update custom ID preview
   if (pollCustomId) {
