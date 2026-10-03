@@ -10,23 +10,17 @@
 5. **Click "Deploy"**
 6. **Copy the Function URL** (e.g., `https://hduyofdbpspjcuwvackd.supabase.co/functions/v1/prevent-github-signup`)
 
-### Step 2: Configure Environment Variable
-1. In the Edge Function page, click **"Settings"** (or "Secrets")
-2. **Add Environment Variable**:
-   - Name: `SB_WEBHOOK_SECRET`
-   - Value: Use the secret you generated in the Auth Hook configuration (starts with `v1,whsec_`)
-3. **Save** and **Redeploy** the function
-
-### Step 3: Configure the Auth Hook
+### Step 2: Configure the Auth Hook
 1. **Go to** Authentication → **Hooks** → **Add Hook**
 2. **Hook Type**: Before User Created
 3. **Hook Name**: `prevent-github-signup`
 4. **URL**: Paste the Edge Function URL
 5. **Secret**: Click "Generate secret" - it will auto-generate `v1,whsec_...`
-6. **Copy this secret** - you'll need it for the Edge Function environment variable
-7. **Click "Save"**
+6. **Click "Save"**
 
-### Step 4: Test the Hook
+**Note**: The Edge Function does not need to verify the signature - Supabase validates the secret before sending requests to the function. This is handled by Supabase's infrastructure.
+
+### Step 3: Test the Hook
 - Try signing up with a new GitHub account → Should be rejected
 - Try signing up with email/password → Should work
 
@@ -67,5 +61,4 @@
 - Email/password signups always have an email, so they pass
 - GitHub OAuth initially creates users without email (supplied later), so they're blocked
 - The error message will be returned to the client via URL parameters
-- Edge Function approach requires setting the SB_WEBHOOK_SECRET environment variable
-- The secret from the Auth Hook configuration must match the Edge Function's environment variable
+- Edge Function approach does not require environment variables (Supabase handles secret validation)

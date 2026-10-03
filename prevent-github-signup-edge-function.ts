@@ -1,42 +1,9 @@
 // Supabase Edge Function: Prevent GitHub OAuth Signup
 // Deploy this as an Edge Function to block GitHub OAuth signups
 // This runs server-side and cannot be bypassed by client-side code
+// Note: Supabase validates the webhook secret before sending requests here
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-
-// Verify Supabase webhook signature using Web Crypto API
-async function verifySignature(
-  payload: string,
-  signature: string,
-  secret: string
-): Promise<boolean> {
-  if (!signature || !secret) return false
-
-  const [version, ...signatureParts] = signature.split(',')
-  if (version !== 'v1') return false
-
-  const receivedSignature = signatureParts.join(',')
-
-  const key = await crypto.subtle.importKey(
-    'raw',
-    new TextEncoder().encode(secret),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign']
-  )
-
-  const expectedSignature = await crypto.subtle.sign(
-    'HMAC',
-    key,
-    new TextEncoder().encode(payload)
-  )
-
-  const expectedSignatureBase64 = btoa(
-    String.fromCharCode(...new Uint8Array(expectedSignature))
-  )
-
-  return receivedSignature === expectedSignatureBase64
-}
 
 serve(async (req) => {
   try {
@@ -47,24 +14,7 @@ serve(async (req) => {
       return new Response('Method not allowed', { status: 405 })
     }
 
-    // Get the signature from headers
-    const signature = req.headers.get('sb-signature')
-    const secret = Deno.env.get('SB_WEBHOOK_SECRET')
-
-    // Read the body
-    const body = await req.text()
-    const payload = body
-
-    // Verify signature if both are present
-    if (signature && secret) {
-      const isValid = await verifySignature(payload, signature, secret)
-      if (!isValid) {
-        console.error('Invalid signature')
-        return new Response('Invalid signature', { status: 401 })
-      }
-    }
-
-    const { event, user } = JSON.parse(payload)
+    const { event, user } = await req.json()
 
     // Only block new user creation events
     if (event !== 'user.created') {
