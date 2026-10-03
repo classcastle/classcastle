@@ -4145,6 +4145,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         message = 'This GitHub account is not linked to a Classcastle account. Please sign up first, then link your GitHub account in Settings.';
       } else if (error === 'access_denied') {
         message = errorDescription || 'You do not have permission to access this resource.';
+      } else if (error === 'user_not_found' || errorCode === 'user_not_found') {
+        message = 'Your account has been deleted. Please sign up again if you\'d like to create a new account.';
       }
 
       showNotification(message, 5000);
@@ -4162,11 +4164,24 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       updateUserInfo();
       // Call showPage to ensure dashboard content renders properly
       showPage('dashboardPage');
-      await loadRooms();
-      subscribeToRooms();
-      subscribeToStudents();
-      await loadTemplates();
-      await loadShortcuts();
+
+      try {
+        await loadRooms();
+        subscribeToRooms();
+        subscribeToStudents();
+        await loadTemplates();
+        await loadShortcuts();
+      } catch (error) {
+        console.error('Error loading user data:', error);
+        // If user was deleted, sign them out and redirect
+        if (error.message?.includes('not found') || error.message?.includes('deleted') || error.code === 'PGRST116') {
+          await SupabaseClient.auth.signOut();
+          showNotification('Your account has been deleted. Please sign up again.', 5000);
+          setTimeout(() => {
+            window.location.href = '/login.html?error=user_not_found&error_description=Your+account+has+been+deleted';
+          }, 5000);
+        }
+      }
 
       // Check if user just linked GitHub account
       if (urlParams.get('github_linked') === 'true') {
@@ -4190,12 +4205,29 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       currentUser = session.user;
       updateUserInfo();
       showPage('dashboardPage');
-      loadRooms();
+      loadRooms().catch(error => {
+        console.error('Error loading rooms after sign in:', error);
+        if (error.message?.includes('not found') || error.message?.includes('deleted')) {
+          SupabaseClient.auth.signOut();
+          showNotification('Your account has been deleted. Please sign up again.', 5000);
+          setTimeout(() => {
+            window.location.href = '/login.html?error=user_not_found&error_description=Your+account+has+been+deleted';
+          }, 5000);
+        }
+      });
     } else if (event === 'SIGNED_OUT') {
       currentUser = null;
       rooms = [];
       updateUserInfo();
       window.location.href = '/login.html';
+    } else if (event === 'USER_DELETED') {
+      currentUser = null;
+      rooms = [];
+      updateUserInfo();
+      showNotification('Your account has been deleted. Please sign up again.', 5000);
+      setTimeout(() => {
+        window.location.href = '/login.html?error=user_not_found&error_description=Your+account+has+been+deleted';
+      }, 5000);
     }
   });
 </script>

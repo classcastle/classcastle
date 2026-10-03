@@ -474,6 +474,9 @@
       } else if (error === 'access_denied') {
         title = 'Access Denied';
         message = errorDescription || 'You do not have permission to access this resource.';
+      } else if (error === 'user_not_found' || errorCode === 'user_not_found') {
+        title = 'Account Deleted';
+        message = errorDescription || 'Your account has been deleted. Please sign up again if you\'d like to create a new account.';
       }
 
       showAlert(title, message);
