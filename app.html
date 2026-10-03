@@ -4140,8 +4140,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       // Handle specific error codes
       if (errorCode === 'user_banned') {
-        // Show the error description from Supabase
-        message = errorDescription || 'Your account has been banned. Please contact support for more information.';
+        // Show the error description from Supabase with additional information
+        message = errorDescription || 'Your account has been banned in accordance with our Terms of Service. Please contact support@classcastle.org to find out when your ban expires.';
       } else if (error === 'identity_not_found') {
         message = 'This GitHub account is not linked to a Classcastle account. Please sign up first, then link your GitHub account in Settings.';
       } else if (error === 'access_denied') {
@@ -4151,12 +4151,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       }
 
       showNotification(message, 5000);
-
-      // If it's a banned user, also show the error code
-      if (errorCode === 'user_banned') {
-        console.log('Error Code:', errorCode);
-        console.log('Error Description:', errorDescription);
-      }
       // Clean URL
       window.history.replaceState({}, document.title, window.location.pathname);
       // Redirect to login

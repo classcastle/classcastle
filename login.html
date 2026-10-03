@@ -479,8 +479,8 @@
       // Handle specific error codes
       if (errorCode === 'user_banned') {
         title = 'Account Banned';
-        // Show the error description from Supabase
-        message = errorDescription || 'Your account has been banned. Please contact support for more information.';
+        // Show the error description from Supabase with additional information
+        message = errorDescription || 'Your account has been banned in accordance with our Terms of Service. Please contact support@classcastle.org to find out when your ban expires.';
         showAlert(title, message, errorCode);
         // Clean URL
         window.history.replaceState({}, document.title, window.location.pathname);
