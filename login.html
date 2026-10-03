@@ -542,29 +542,11 @@
   }
 
   async function handleGitHubLogin() {
-    // Show loading state
-    githubLoginBtn.disabled = true;
-    githubLoginBtnText.style.display = 'none';
-    githubLoginBtnLoading.style.display = 'inline-block';
-
-    try {
-      const { data, error } = await SupabaseClient.auth.signInWithOAuth({
-        provider: 'github',
-        options: {
-          redirectTo: window.location.origin + '/login.html'
-        }
-      });
-
-      if (error) throw error;
-
-      // OAuth will redirect, so we don't need to do anything else
-    } catch (error) {
-      showNotification(error.message);
-      // Reset button state
-      githubLoginBtn.disabled = false;
-      githubLoginBtnText.style.display = 'inline';
-      githubLoginBtnLoading.style.display = 'none';
-    }
+    // Show error modal - GitHub signup is not allowed
+    showAlert(
+      'GitHub Sign In Not Available',
+      'Please sign up with your email address first. After creating an account, you can link your GitHub account in Settings.'
+    );
   }
 
   loginBtn.addEventListener('click', handleLogin);
