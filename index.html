@@ -131,10 +131,23 @@ footer a{color:var(--soft)}
   <div class="wordmark"><img src="/logo.svg" alt="" class="logo-mark"><span>Class<span class="word-accent">castle</span></span></div>
   <div style="display:flex;gap:16px;align-items:center;">
     <a class="nav-cta" href="/login.html">Open teacher app</a>
-    <a href="/desktopapp.html" style="display:flex;align-items:center;gap:6px;padding:8px 16px;background:var(--ink);color:var(--bg);text-decoration:none;font-size:.85rem;font-weight:600;border-radius:6px;">
+    <a href="/desktopapp.html" style="display:flex;align-items:center;gap:7px;padding:8px 16px;background:var(--ink);color:var(--bg);text-decoration:none;font-size:.85rem;font-weight:600;border-radius:6px;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
       Download Desktop App
     </a>
+    <div style="position:relative;display:none;" id="userDropdown">
+      <button style="display:flex;align-items:center;gap:8px;padding:6px 12px;background:var(--bg);border:1px solid var(--line);border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:500;" id="userDropdownBtn">
+        <span id="userInitial" style="width:24px;height:24px;background:var(--brand);color:var(--surface);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;">?</span>
+        <span id="userName">Loading...</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div style="position:absolute;top:100%;right:0;margin-top:4px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:8px 0;min-width:180px;box-shadow:0 4px 12px rgba(0,0,0,0.15);display:none;z-index:100;" id="userDropdownMenu">
+        <a href="/app.html" style="display:block;padding:8px 16px;text-decoration:none;color:var(--ink);font-size:.9rem;">Dashboard</a>
+        <a href="/app.html#settings" style="display:block;padding:8px 16px;text-decoration:none;color:var(--ink);font-size:.9rem;">Settings</a>
+        <div style="border-top:1px solid var(--line);margin:4px 0;"></div>
+        <button onclick="handleLogout()" style="display:block;width:100%;padding:8px 16px;text-align:left;background:none;border:none;cursor:pointer;color:var(--red);font-size:.9rem;">Sign out</button>
+      </div>
+    </div>
   </div>
 </nav>
 
@@ -275,9 +288,35 @@ footer a{color:var(--soft)}
   async function checkSession(){
     const client = supabase.createClient('https://hduyofdbpspjcuwvackd.supabase.co','sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK');
     const { data: { session } } = await client.auth.getSession();
-    if (session) document.querySelectorAll('.nav-cta, .hero .btn-primary, .cta-band .btn-primary').forEach(a => a.href = '/app.html');
+    if (session) {
+      document.querySelectorAll('.nav-cta, .hero .btn-primary, .cta-band .btn-primary').forEach(a => a.href = '/app.html');
+      const userDropdown = document.getElementById('userDropdown');
+      const userInitial = document.getElementById('userInitial');
+      const userName = document.getElementById('userName');
+      userDropdown.style.display = 'block';
+      const name = session.user.user_metadata?.name || session.user.email || 'User';
+      userName.textContent = name.split(' ')[0];
+      userInitial.textContent = name.charAt(0).toUpperCase();
+    }
   }
   checkSession();
+
+  // Dropdown toggle
+  const userDropdownBtn = document.getElementById('userDropdownBtn');
+  const userDropdownMenu = document.getElementById('userDropdownMenu');
+  userDropdownBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    userDropdownMenu.style.display = userDropdownMenu.style.display === 'block' ? 'none' : 'block';
+  });
+  document.addEventListener('click', () => {
+    userDropdownMenu.style.display = 'none';
+  });
+
+  async function handleLogout(){
+    const client = supabase.createClient('https://hduyofdbpspjcuwvackd.supabase.co','sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK');
+    await client.auth.signOut();
+    window.location.href = '/login.html';
+  }
 </script>
 </body>
 </html>
