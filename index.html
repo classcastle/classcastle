@@ -285,47 +285,36 @@ footer a{color:var(--soft)}
   if (reduced) setOn(30);
   else { let n = 0; setTimeout(function tick(){ setOn(++n); if (n < 30) setTimeout(tick, 70); }, 700); }
 
-  async function checkSession(){
-    const client = supabase.createClient('https://hduyofdbpspjcuwvackd.supabase.co','sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK');
-    const { data: { session } } = await client.auth.getSession();
-    if (session) {
-      document.querySelectorAll('.nav-cta, .hero .btn-primary, .cta-band .btn-primary').forEach(a => a.href = '/app.html');
-      const userDropdown = document.getElementById('userDropdown');
-      const userInitial = document.getElementById('userInitial');
-      const userName = document.getElementById('userName');
-      userDropdown.style.display = 'block';
-      const name = session.user.user_metadata?.name || session.user.email || 'User';
-      userName.textContent = name.split(' ')[0];
-      userInitial.textContent = name.charAt(0).toUpperCase();
-    }
-  }
-  checkSession();
-
-  // Dropdown toggle with animation
-  const userDropdownBtn = document.getElementById('userDropdownBtn');
-  const userDropdownMenu = document.getElementById('userDropdownMenu');
   let isOpen = false;
 
-  userDropdownBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    isOpen = !isOpen;
-    if (isOpen) {
-      userDropdownMenu.style.display = 'block';
-      requestAnimationFrame(() => {
-        userDropdownMenu.style.opacity = '1';
-        userDropdownMenu.style.transform = 'translateY(0)';
-      });
-    } else {
-      userDropdownMenu.style.opacity = '0';
-      userDropdownMenu.style.transform = 'translateY(-8px)';
-      setTimeout(() => {
-        if (!isOpen) userDropdownMenu.style.display = 'none';
-      }, 200);
-    }
-  });
+  function setupDropdown() {
+    const userDropdownBtn = document.getElementById('userDropdownBtn');
+    const userDropdownMenu = document.getElementById('userDropdownMenu');
+
+    if (!userDropdownBtn || !userDropdownMenu) return;
+
+    userDropdownBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      isOpen = !isOpen;
+      if (isOpen) {
+        userDropdownMenu.style.display = 'block';
+        requestAnimationFrame(() => {
+          userDropdownMenu.style.opacity = '1';
+          userDropdownMenu.style.transform = 'translateY(0)';
+        });
+      } else {
+        userDropdownMenu.style.opacity = '0';
+        userDropdownMenu.style.transform = 'translateY(-8px)';
+        setTimeout(() => {
+          if (!isOpen) userDropdownMenu.style.display = 'none';
+        }, 200);
+      }
+    });
+  }
 
   document.addEventListener('click', () => {
-    if (isOpen) {
+    const userDropdownMenu = document.getElementById('userDropdownMenu');
+    if (isOpen && userDropdownMenu) {
       isOpen = false;
       userDropdownMenu.style.opacity = '0';
       userDropdownMenu.style.transform = 'translateY(-8px)';
@@ -334,6 +323,21 @@ footer a{color:var(--soft)}
       }, 200);
     }
   });
+
+  async function checkSession(){
+    const client = supabase.createClient('https://hduyofdbpspjcuwvackd.supabase.co','sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK');
+    const { data: { session } } = await client.auth.getSession();
+    if (session) {
+      document.querySelectorAll('.nav-cta, .hero .btn-primary, .cta-band .btn-primary').forEach(a => a.href = '/app.html');
+      const userDropdown = document.getElementById('userDropdown');
+      const userInitial = document.getElementById('userInitial');
+      userDropdown.style.display = 'block';
+      const name = session.user.user_metadata?.name || session.user.email || 'User';
+      userInitial.textContent = name.charAt(0).toUpperCase();
+      setupDropdown();
+    }
+  }
+  checkSession();
 
   async function handleLogout(){
     const client = supabase.createClient('https://hduyofdbpspjcuwvackd.supabase.co','sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK');
