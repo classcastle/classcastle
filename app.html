@@ -1727,6 +1727,10 @@
         Quick Polls
         <span style="background: var(--brand); color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px; font-weight: 600;">BETA</span>
       </a>
+      <a class="nav-item" href="/resources.html" target="_blank">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        Resources Hub
+      </a>
       <div class="nav-divider"></div>
       <div class="nav-section nav-section-admin">
         <a class="nav-item nav-item-parent" data-parent="admin" href="#">
@@ -2928,7 +2932,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       studentSubscription = null;
     }
     updateUserInfo();
-    window.location.href = '/login.html';
+    window.location.href = '/signedout.html';
   }
 
   // Room functions
@@ -4976,8 +4980,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       const page = item.dataset.page;
       const href = item.getAttribute('href');
 
-      // Handle external links (Legal, Support)
-      if (href && href !== '#' && href.startsWith('http') || href && href !== '#' && href.startsWith('mailto:')) {
+      // Handle external links (Legal, Support, Resources)
+      if (href && href !== '#' && (href.startsWith('http') || href.startsWith('mailto:') || href.startsWith('/'))) {
         if (item.target === '_blank') {
           window.open(href, '_blank');
         } else {

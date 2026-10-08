@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Teacher Resources — Classcastle</title>
+<meta name="description" content="Quick links to AQA exam papers, revision resources, and educational tools for teachers.">
+<link rel="icon" type="image/svg+xml" href="/logo.svg" id="favicon">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FCFCFA; --surface:#fff; --ink:#18221C; --soft:#5E675F; --line:#D9DDD3;
+  --brand:#1F5C3A; --brand-ink:#fff; --tint:#E4F1E6; --board:#17352A; --chalk:#F4D35E;
+  color-scheme:light dark; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#0F1511;--surface:#18211B;--ink:#EEF2EA;--soft:#9EAA9F;--line:#2A362D;--brand:#4DAA72;--brand-ink:#0F1511;--tint:#1A2B20;--board:#1C4030}
+}
+:root[data-theme="dark"]{--bg:#0F1511;--surface:#18211B;--ink:#EEF2EA;--soft:#9EAA9F;--line:#2A362D;--brand:#4DAA72;--brand-ink:#0F1511;--tint:#1A2B20;--board:#1C4030}
+*{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font:400 1.02rem/1.6 'Instrument Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:'Young Serif',Georgia,serif;font-weight:400;margin:0;line-height:1.15}
+p{margin:0}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--brand);outline-offset:3px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+nav{display:flex;align-items:center;justify-content:space-between;max-width:1080px;margin:0 auto;padding:22px 28px}
+.wordmark{display:flex;align-items:center;gap:10px;font:400 1.3rem 'Young Serif',serif}
+.logo-mark{width:26px;height:26px;display:block}
+.word-accent{color:var(--brand)}
+.nav-cta{font-weight:600;font-size:.92rem;text-decoration:none;padding:8px 2px;border-bottom:2px solid var(--ink)}
+.btn-primary{background:var(--brand);color:var(--brand-ink);text-decoration:none;font-weight:600;padding:14px 24px;border-radius:6px;display:inline-block;box-shadow:3px 3px 0 var(--ink);transition:transform .12s,box-shadow .12s}
+.btn-primary:hover{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.btn-secondary{font-weight:600;text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:2px}
+.page-header{padding:60px 0 40px}
+.page-header h1{font-size:clamp(2rem,4vw,3rem);margin-bottom:12px}
+.page-header p{color:var(--soft);font-size:1.1rem;max-width:50ch}
+section{padding:48px 0;border-top:1px solid var(--line)}
+.section-head{margin-bottom:32px}
+.section-head h2{font-size:clamp(1.5rem,2.5vw,1.9rem);margin-bottom:8px}
+.section-head p{color:var(--soft);font-size:.95rem}
+.resource-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.resource-card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:24px;transition:border-color .15s ease,transform .15s ease;text-decoration:none;color:inherit;display:block}
+.resource-card:hover{border-color:var(--brand);transform:translateY(-3px)}
+.resource-icon{width:48px;height:48px;background:var(--tint);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;color:var(--brand)}
+.resource-card h3{font-size:1.1rem;margin-bottom:8px;font-weight:600}
+.resource-card p{color:var(--soft);font-size:.9rem;line-height:1.5}
+.resource-tag{display:inline-block;padding:4px 10px;background:var(--bg);border-radius:4px;font-size:.75rem;font-weight:500;color:var(--soft);margin-top:12px}
+.link-list{display:grid;gap:12px}
+.link-item{display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--surface);border:1px solid var(--line);border-radius:6px;text-decoration:none;color:inherit;transition:border-color .15s ease}
+.link-item:hover{border-color:var(--brand)}
+.link-icon{width:32px;height:32px;background:var(--tint);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--brand);flex-shrink:0}
+.link-text{flex:1}
+.link-title{font-weight:600;font-size:.95rem;margin-bottom:2px}
+.link-desc{color:var(--soft);font-size:.85rem}
+.link-arrow{color:var(--soft)}
+@media (max-width:820px){
+  .wrap,nav{padding-left:20px;padding-right:20px}
+  .resource-grid{grid-template-columns:1fr}
+  .page-header{padding:40px 0 32px}
+}
+</style>
+</head>
+<body>
+<nav aria-label="Main">
+<div class="wordmark"><img src="/logo.svg" alt="" class="logo-mark"><span>Class<span class="word-accent">castle</span></span></div>
+<a class="nav-cta" href="/app.html">Open teacher app</a>
+</nav>
+<main>
+<div class="wrap">
+<div class="page-header">
+<h1>Teacher Resources Hub</h1>
+<p>Quick links to exam papers, revision materials, and educational tools. Send your students to the right resources in one click.</p>
+</div>
+</div>
+
+<section>
+<div class="wrap">
+<div class="section-head">
+<h2>AQA Exam Papers</h2>
+<p>Past papers and mark schemes from AQA</p>
+</div>
+<div class="link-list">
+<a href="https://www.aqa.org.uk/find-past-papers-and-mark-schemes" target="_blank" rel="noopener" class="link-item">
+<div class="link-icon">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+</div>
+<div class="link-text">
+<div class="link-title">AQA Past Papers Search</div>
+<div class="link-desc">Search all subjects and qualifications</div>
+</div>
+<svg class="link-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+</a>
+<a href="https://www.aqa.org.uk/find-past-papers-and-mark-schemes?subject=GCSE" target="_blank" rel="noopener" class="link-item">
+<div class="link-icon">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+</div>
+<div class="link-text">
+<div class="link-title">GCSE Past Papers</div>
+<div class="link-desc">All GCSE subjects and levels</div>
+</div>
+<svg class="link-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+</a>
+<a href="https://www.aqa.org.uk/find-past-papers-and-mark-schemes?subject=A-level" target="_blank" rel="noopener" class="link-item">
+<div class="link-icon">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+</div>
+<div class="link-text">
+<div class="link-title">A-Level Past Papers</div>
+<div class="link-desc">All A-Level subjects</div>
+</div>
+<svg class="link-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+</a>
+</div>
+</div>
+</section>
+
+<section>
+<div class="wrap">
+<div class="section-head">
+<h2>Other Exam Boards</h2>
+<p>Past papers from Edexcel, OCR, and more</p>
+</div>
+<div class="link-list">
+<a href="https://qualifications.pearson.com/en/support/past-papers.html" target="_blank" rel="noopener" class="link-item">
+<div class="link-icon">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+</div>
+<div class="link-text">
+<div class="link-title">Pearson Edexcel Past Papers</div>
+<div class="link-desc">GCSE and A-Level papers</div>
+</div>
+<svg class="link-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+</a>
+<a href="https://www.ocr.org.uk/qualifications/past-paper-finder/" target="_blank" rel="noopener" class="link-item">
+<div class="link-icon">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+</div>
+<div class="link-text">
+<div class="link-title">OCR Past Papers</div>
+<div class="link-desc">GCSE, A-Level, and vocational</div>
+</div>
+<svg class="link-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+</a>
+<a href="https://www.wjec.co.uk/home/past-papers/" target="_blank" rel="noopener" class="link-item">
+<div class="link-icon">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+</div>
+<div class="link-text">
+<div class="link-title">WJEC / Eduqas Past Papers</div>
+<div class="link-desc">Welsh and English qualifications</div>
+</div>
+<svg class="link-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+</a>
+</div>
+</div>
+</section>
+
+<section>
+<div class="wrap">
+<div class="section-head">
+<h2>Revision Websites</h2>
+<p>Free revision resources for students</p>
+</div>
+<div class="resource-grid">
+<a href="https://www.bbc.co.uk/bitesize" target="_blank" rel="noopener" class="resource-card">
+<div class="resource-icon">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+</div>
+<h3>BBC Bitesize</h3>
+<p>Free revision resources for GCSE and National curriculum subjects</p>
+<span class="resource-tag">GCSE</span>
+</a>
+<a href="https://www.physicsandmathstutor.com/" target="_blank" rel="noopener" class="resource-card">
+<div class="resource-icon">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+</div>
+<h3>Physics & Maths Tutor</h3>
+<p>Past papers, notes, and revision for science and maths</p>
+<span class="resource-tag">Science & Maths</span>
+</a>
+<a href="https://www.savemyexams.co.uk/" target="_blank" rel="noopener" class="resource-card">
+<div class="resource-icon">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+</div>
+<h3>Save My Exams</h3>
+<p>Revision notes, past papers, and topic questions</p>
+<span class="resource-tag">All Subjects</span>
+</a>
+<a href="https://www.mathsgenie.co.uk/" target="_blank" rel="noopener" class="resource-card">
+<div class="resource-icon">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+</div>
+<h3>Maths Genie</h3>
+<p>Free GCSE and A-Level maths resources and videos</p>
+<span class="resource-tag">Maths</span>
+</a>
+<a href="https://www.corbettmaths.com/" target="_blank" rel="noopener" class="resource-card">
+<div class="resource-icon">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+</div>
+<h3>Corbett Maths</h3>
+<p>Worksheets, videos, and practice questions for maths</p>
+<span class="resource-tag">Maths</span>
+</a>
+<a href="https://revisely.co.uk/" target="_blank" rel="noopener" class="resource-card">
+<div class="resource-icon">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+</div>
+<h3>Revisely</h3>
+<p>Past papers, flashcards, and revision notes</p>
+<span class="resource-tag">GCSE & A-Level</span>
+</a>
+</div>
+</div>
+</section>
+
+<section>
+<div class="wrap">
+<div class="section-head">
+<h2>Subject-Specific Resources</h2>
+<p>Specialized tools and materials by subject</p>
+</div>
+<div class="resource-grid">
+<a href="https://www.khanacademy.org/" target="_blank" rel="noopener" class="resource-card">
+<div class="resource-icon">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+</div>
+<h3>Khan Academy</h3>
+<p>Free courses in maths, science, and more</p>
+<span class="resource-tag">STEM</span>
+</a>
+<a href="https://www.sparknotes.com/" target="_blank" rel="noopener" class="resource-card">
+<div class="resource-icon">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+</div>
+<h3>SparkNotes</h3>
+<p>Study guides for literature and poetry</p>
+<span class="resource-tag">English</span>
+</a>
+<a href="https://www.senecalearning.com/" target="_blank" rel="noopener" class="resource-card">
+<div class="resource-icon">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+</div>
+<h3>Seneca Learning</h3>
+<p>Free homework and revision platform</p>
+<span class="resource-tag">All Subjects</span>
+</a>
+<a href="https://www.geographyalltheway.com/" target="_blank" rel="noopener" class="resource-card">
+<div class="resource-icon">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+</div>
+<h3>Geography All The Way</h3>
+<p>IB, GCSE, and A-Level geography resources</p>
+<span class="resource-tag">Geography</span>
+</a>
+<a href="https://www.historylearningsite.co.uk/" target="_blank" rel="noopener" class="resource-card">
+<div class="resource-icon">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+</div>
+<h3>History Learning Site</h3>
+<p>Comprehensive history topics and notes</p>
+<span class="resource-tag">History</span>
+</a>
+<a href="https://www.codesters.com/" target="_blank" rel="noopener" class="resource-card">
+<div class="resource-icon">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+</div>
+<h3>Codesters</h3>
+<p>Interactive coding lessons for students</p>
+<span class="resource-tag">Computing</span>
+</a>
+</div>
+</div>
+</section>
+
+<section>
+<div class="wrap">
+<div class="section-head">
+<h2>Teacher Tools</h2>
+<p>Resources for lesson planning and assessment</p>
+</div>
+<div class="resource-grid">
+<a href="https://www.twinkl.co.uk/" target="_blank" rel="noopener" class="resource-card">
+<div class="resource-icon">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+</div>
+<h3>Twinkl</h3>
+<p>Teaching resources, worksheets, and lesson plans</p>
+<span class="resource-tag">Planning</span>
+</a>
+<a href="https://www.tes.com/teaching-resources" target="_blank" rel="noopener" class="resource-card">
+<div class="resource-icon">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+</div>
+<h3>TES Resources</h3>
+<p>Community-created teaching materials</p>
+<span class="resource-tag">Planning</span>
+</a>
+<a href="https://quizlet.com/gb" target="_blank" rel="noopener" class="resource-card">
+<div class="resource-icon">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h10"/><path d="M7 12h10"/><path d="M7 17h10"/></svg>
+</div>
+<h3>Quizlet</h3>
+<p>Create flashcards and study sets</p>
+<span class="resource-tag">Assessment</span>
+</a>
+<a href="https://wwwkahoot.com/" target="_blank" rel="noopener" class="resource-card">
+<div class="resource-icon">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+</div>
+<h3>Kahoot!</h3>
+<p>Interactive quizzes and games for learning</p>
+<span class="resource-tag">Engagement</span>
+</a>
+</div>
+</div>
+</section>
+
+<div class="wrap" style="padding: 40px 0 60px;">
+<p style="color:var(--soft);font-size:.9rem;text-align:center;">Know a great resource that should be here? <a href="mailto:support@classcastle.org" style="color:var(--brand);text-decoration:underline;">Let us know</a>.</p>
+</div>
+</main>
+<script>
+function updateFavicon(){
+document.getElementById('favicon').href = matchMedia('(prefers-color-scheme: dark)').matches ? '/logo-dark.svg' : '/logo.svg';
+}
+updateFavicon();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
+</script>
+</body>
+</html>
