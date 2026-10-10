@@ -111,6 +111,13 @@ summary::after{content:'+';color:var(--brand);font-size:1.3rem;line-height:1}
 details[open] summary::after{content:'−'}
 details p{color:var(--soft);padding-bottom:18px;font-size:.96rem}
 
+.video-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:24px}
+.video-item{display:flex;flex-direction:column;gap:12px}
+.video-wrapper{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:8px;background:var(--line)}
+.video-wrapper iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none}
+.video-item h3{font-size:1.1rem;margin-bottom:4px}
+.video-item p{color:var(--soft);font-size:.95rem}
+
 .cta-wrap{margin-top:40px}
 .cta-band{position:relative;background:var(--board);color:#fff;padding:64px 48px 60px;border-radius:0 0 6px 6px;margin-top:16px}
 .cta-band::before{content:'';position:absolute;left:0;right:0;top:-16px;height:16px;background:linear-gradient(90deg,var(--board) 50%,transparent 50%) 0 0/32px 100%}
@@ -128,6 +135,7 @@ footer a{color:var(--soft)}
   .photo{aspect-ratio:4/3.4;box-shadow:8px 8px 0 var(--brand);margin-right:8px}
   .live{left:-8px}
   .steps,.features,.faq-list{grid-template-columns:1fr}
+  .video-grid{grid-template-columns:1fr}
   section{padding:52px 0}
   .cta-band{padding:44px 24px}
   .hero-ctas{flex-direction:column;align-items:stretch;text-align:center}
@@ -239,6 +247,28 @@ footer a{color:var(--soft)}
       <div class="step"><h3>You open a room in the teacher app</h3><p>No install for you. It runs in any browser. Start a room and you get a short code to put on the board.</p></div>
       <div class="step"><h3>Students join with the extension</h3><p>A small add-on for Chrome, Edge, or Firefox, installed once. Students type in your room code and light up green in your teacher view.</p></div>
       <div class="step"><h3>You press go, everyone arrives</h3><p>Type the page once (microbit.org, a quiz, a shared doc) and every joined browser navigates there together, instantly.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head"><h2>See it in action</h2><p>Watch how Classcastle transforms classroom management.</p></div>
+    <div class="video-grid">
+      <div class="video-item">
+        <div class="video-wrapper">
+          <iframe width="560" height="315" src="https://www.youtube.com/embed/Bzb4_y3rUW4" title="Classcastle Overview" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <h3>Getting Started with Classcastle</h3>
+        <p>A quick overview of how to set up and use Classcastle in your classroom.</p>
+      </div>
+      <div class="video-item">
+        <div class="video-wrapper">
+          <iframe width="560" height="315" src="https://www.youtube.com/embed/KrNZoKGV0O8" title="Classcastle Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <h3>Advanced Features Tutorial</h3>
+        <p>Learn about templates, shortcuts, and analytics to maximize your classroom efficiency.</p>
+      </div>
     </div>
   </div>
 </section>
