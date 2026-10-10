@@ -94,24 +94,23 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 32px;
+    padding: 0;
   }
 
   .auth-container {
     width: 100%;
-    max-width: 900px;
+    height: 100%;
+    max-width: none;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 48px;
-    align-items: center;
+    gap: 0;
+    align-items: stretch;
   }
 
   .auth-image {
-    aspect-ratio: 4/5;
+    aspect-ratio: auto;
     background: var(--tint);
-    border-radius: 8px;
     overflow: hidden;
-    box-shadow: 8px 8px 0 var(--brand);
   }
 
   .auth-image img {
@@ -121,7 +120,10 @@
   }
 
   .auth-form {
-    max-width: 420px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
   }
 
   .card {
@@ -129,6 +131,8 @@
     border: 1px solid var(--line);
     border-radius: 6px;
     padding: 40px 36px 32px;
+    width: 100%;
+    max-width: 420px;
   }
 
   .page-header {
@@ -361,10 +365,12 @@
     main { padding: 24px; }
     .auth-container {
       grid-template-columns: 1fr;
-      gap: 32px;
     }
     .auth-image {
       display: none;
+    }
+    .auth-form {
+      padding: 24px;
     }
   }
 </style>
