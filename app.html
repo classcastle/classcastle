@@ -3979,18 +3979,28 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   }
 
   // Quick Polls
+  let pollsLockDismissed = false;
 
   async function loadPolls() {
     try {
-      // Show lock message and hide other sections
-      document.getElementById('pollsLockMessage').style.display = 'block';
-      document.getElementById('pollUsageSection').style.display = 'none';
-      document.getElementById('pollsTab').style.display = 'none';
-      document.getElementById('createPollBtn').style.display = 'none';
-      document.getElementById('pollTabsNav').style.display = 'none';
+      // Only show lock message if not dismissed
+      if (!pollsLockDismissed) {
+        document.getElementById('pollsLockMessage').style.display = 'block';
+        document.getElementById('pollUsageSection').style.display = 'none';
+        document.getElementById('pollsTab').style.display = 'none';
+        document.getElementById('createPollBtn').style.display = 'none';
+        document.getElementById('pollTabsNav').style.display = 'none';
+        const pollsPageHeader = document.querySelector('#pollsPage .page-header');
+        if (pollsPageHeader) pollsPageHeader.style.display = 'none';
+        return;
+      }
+
+      document.getElementById('pollUsageSection').style.display = 'block';
+      document.getElementById('pollsTab').style.display = 'block';
+      document.getElementById('createPollBtn').style.display = 'inline-block';
+      document.getElementById('pollTabsNav').style.display = 'block';
       const pollsPageHeader = document.querySelector('#pollsPage .page-header');
-      if (pollsPageHeader) pollsPageHeader.style.display = 'none';
-      return;
+      if (pollsPageHeader) pollsPageHeader.style.display = 'flex';
     } catch (error) {
       console.error('Error loading polls:', error);
     }
@@ -4355,7 +4365,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       showNotification('Poll created successfully');
       closePollModal();
-      await loadPolls(); // This will update the usage bar
+      await loadPollsContent(); // This will update the usage bar
     } catch (error) {
       console.error('Error creating poll:', error);
       showNotification('Error creating poll');
@@ -4454,7 +4464,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       if (error) throw error;
       showNotification(`Poll ${!currentStatus ? 'opened' : 'closed'}`);
-      await loadPolls(); // This will update the usage bar
+      await loadPollsContent(); // This will update the usage bar
     } catch (error) {
       console.error('Error toggling poll status:', error);
       showNotification('Error updating poll');
@@ -4472,7 +4482,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       if (error) throw error;
       showNotification('Poll deleted');
-      await loadPolls(); // This will update the usage bar
+      await loadPollsContent(); // This will update the usage bar
     } catch (error) {
       console.error('Error deleting poll:', error);
       showNotification('Error deleting poll');
@@ -4783,8 +4793,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       if (tab === 'responses') {
         loadResponses();
-      } else if (tab === 'polls') {
-        loadPolls();
       }
     });
   });
@@ -4995,6 +5003,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     confirmDismissBtn.addEventListener('click', () => {
       dismissConfirmModal.style.display = 'none';
       document.getElementById('pollsLockMessage').style.display = 'none';
+      pollsLockDismissed = true;
       // Show polls content
       document.getElementById('pollUsageSection').style.display = 'block';
       document.getElementById('pollsTab').style.display = 'block';
