@@ -47,11 +47,8 @@ h1,h2,h3{font-family:'Instrument Sans',system-ui,sans-serif;font-weight:400;marg
 p{margin:0}
 a{color:inherit}
 :focus-visible{outline:3px solid var(--brand);outline-offset:3px}
-.banner{background:var(--chalk);color:#18221C;padding:12px 0;text-align:center;font-size:.9rem;font-weight:500;position:relative}
+.banner{background:var(--chalk);color:#18221C;padding:16px 0;text-align:center;font-size:.9rem;font-weight:500}
 .banner p{margin:0}
-.banner-close{position:absolute;right:20px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#18221C;font-size:1.2rem;padding:4px 8px;opacity:0.6;transition:opacity 0.15s ease}
-.banner-close:hover{opacity:1}
-.banner.hidden{display:none}
 .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
 nav{display:flex;align-items:center;justify-content:space-between;max-width:1080px;margin:0 auto;padding:22px 28px}
 .wordmark{display:flex;align-items:center;gap:10px;font:400 1.3rem 'Instrument Sans',system-ui,sans-serif}
@@ -137,9 +134,8 @@ footer a{color:var(--soft)}
 </head>
 <body>
 
-<div class="banner" id="revampBanner">
-  <p>Classcastle is getting a revamp — you'll notice some changes soon</p>
-  <button class="banner-close" id="closeBanner" aria-label="Close banner">×</button>
+<div class="banner">
+  <p><strong>Classcastle is getting a revamp!</strong> We're improving the experience with a new design, faster performance, and better features. You'll notice some changes over the coming weeks.</p>
 </div>
 
 <nav aria-label="Main">
@@ -322,15 +318,6 @@ footer a{color:var(--soft)}
   }
   updateFavicon();
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
-
-  // Banner close functionality
-  const closeBanner = document.getElementById('closeBanner');
-  const revampBanner = document.getElementById('revampBanner');
-  if (closeBanner && revampBanner) {
-    closeBanner.addEventListener('click', () => {
-      revampBanner.classList.add('hidden');
-    });
-  }
 
   // Decorative "room live" panel: 30 students join, one by one.
   const tilesEl = document.getElementById('tiles'), countEl = document.getElementById('count');
