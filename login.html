@@ -77,19 +77,23 @@
   p { margin: 0; }
   a { color: inherit; }
 
-  nav {
-    display: flex; align-items: center; justify-content: space-between;
-    max-width: 1080px; margin: 0 auto; padding: 22px 28px;
+  .image-nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 22px 28px;
+    z-index: 10;
   }
-  .wordmark { font-family: 'Instrument Sans', system-ui, sans-serif; font-size: 1.25rem; font-weight: 400; letter-spacing: -0.01em; display: flex; align-items: center; gap: 9px; }
-  .logo-mark { width: 24px; height: 24px; display: block; }
-  .wordmark .word-accent { color: var(--brand); }
-  .nav-cta{font-weight:600;font-size:.92rem;text-decoration:none;padding:8px 2px;border-bottom:2px solid var(--ink)}
-  #userDropdownMenu a,#userDropdownMenu button{transition:background 0.15s ease}
-  #userDropdownMenu a:hover,#userDropdownMenu button:hover{background:var(--bg)}
-  #userDropdownBtn:hover{transform:scale(1.05);transition:transform 0.2s ease}
-  #userDropdownMenu a svg,#userDropdownMenu button svg{color:var(--soft);transition:color 0.15s ease}
-  #userDropdownMenu a:hover svg,#userDropdownMenu button:hover svg{color:var(--ink)}
+  .image-nav .wordmark { font-family: 'Instrument Sans', system-ui, sans-serif; font-size: 1.25rem; font-weight: 400; letter-spacing: -0.01em; display: flex; align-items: center; gap: 9px; }
+  .image-nav .logo-mark { width: 24px; height: 24px; display: block; }
+  .image-nav .wordmark .word-accent { color: var(--brand); }
+  .image-nav .nav-cta{font-weight:600;font-size:.92rem;text-decoration:none;padding:8px 2px;border-bottom:2px solid var(--ink)}
 
   main {
     flex: 1;
@@ -118,12 +122,27 @@
     aspect-ratio: auto;
     background: var(--tint);
     overflow: hidden;
+    position: relative;
   }
 
   .auth-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+
+  .image-nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 22px 28px;
+    z-index: 10;
   }
 
   .auth-form {
@@ -384,21 +403,20 @@
 </head>
 <body>
 
-<nav aria-label="Main">
-  <div class="wordmark"><img src="/logo.svg" alt="" class="logo-mark"><span>Class<span class="word-accent">castle</span></span></div>
-  <div style="display:flex;gap:16px;align-items:center;">
-    <a class="nav-cta" href="/signup.html">Create account</a>
-    <a href="/desktopapp.html" style="display:flex;align-items:center;gap:7px;padding:8px 16px;background:var(--ink);color:var(--bg);text-decoration:none;font-size:.85rem;font-weight:600;border-radius:6px;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
-      Download Desktop App
-    </a>
-  </div>
-</nav>
-
 <main>
   <div class="auth-container">
     <div class="auth-image">
       <img src="https://images.unsplash.com/photo-1758270705290-62b6294dd044?auto=format&fit=crop&w=800&h=1000&q=80" alt="Students in classroom" width="800" height="1000">
+      <nav aria-label="Main" class="image-nav">
+        <div class="wordmark"><img src="/logo.svg" alt="" class="logo-mark"><span>Class<span class="word-accent">castle</span></span></div>
+        <div style="display:flex;gap:16px;align-items:center;">
+          <a class="nav-cta" href="/signup.html">Create account</a>
+          <a href="/desktopapp.html" style="display:flex;align-items:center;gap:7px;padding:8px 16px;background:var(--ink);color:var(--bg);text-decoration:none;font-size:.85rem;font-weight:600;border-radius:6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+            Download Desktop App
+          </a>
+        </div>
+      </nav>
     </div>
     <div class="auth-form">
       <div class="card">
