@@ -128,13 +128,26 @@ footer a{color:var(--soft)}
 section{padding:52px 0}
 .cta-band{padding:44px 24px}
 .hero-ctas,.waitlist-form{flex-direction:column;align-items:stretch}
+.mobile-menu-btn{display:flex !important;background:none;border:none;cursor:pointer;padding:8px;color:var(--ink)}
+.nav-links{display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);flex-direction:column;padding:16px;border-bottom:1px solid var(--line);box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+.nav-links.active{display:flex}
+.nav-links a{width:100%;text-align:center;padding:12px}
 }
 </style>
 </head>
 <body>
 <nav aria-label="Main">
 <div class="wordmark"><img src="/logo.svg" alt="" class="logo-mark"><span>Class<span class="word-accent">castle</span></span></div>
+<button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu" style="display:none;">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <line x1="3" y1="12" x2="21" y2="12"/>
+    <line x1="3" y1="6" x2="21" y2="6"/>
+    <line x1="3" y1="18" x2="21" y2="18"/>
+  </svg>
+</button>
+<div class="nav-links" style="display:flex;gap:16px;align-items:center;">
 <a class="nav-cta" href="https://classcastle.org/">Open teacher web app</a>
+</div>
 </nav>
 <main>
 <div class="wrap">
@@ -229,6 +242,16 @@ document.getElementById('favicon').href = matchMedia('(prefers-color-scheme: dar
 }
 updateFavicon();
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
+
+// Mobile menu toggle
+const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+const navLinks = document.querySelector('.nav-links');
+
+if (mobileMenuBtn && navLinks) {
+  mobileMenuBtn.addEventListener('click', () => {
+    navLinks.classList.toggle('active');
+  });
+}
 </script>
 </body>
 </html>

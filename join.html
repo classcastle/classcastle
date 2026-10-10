@@ -100,6 +100,13 @@
     padding: 32px 24px calc(48px + env(safe-area-inset-bottom, 0px));
   }
 
+  @media (max-width: 780px) {
+    nav { padding: calc(env(safe-area-inset-top, 0px) + 16px) 20px 0; }
+    main { padding: 24px 20px calc(32px + env(safe-area-inset-bottom, 0px)); }
+    .card { padding: 32px 24px 24px; }
+    .card h1 { font-size: 1.5rem; }
+  }
+
   .card {
     width: 100%;
     max-width: 420px;
