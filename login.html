@@ -95,6 +95,22 @@
   .image-nav .wordmark .word-accent { color: #fff; }
   .image-nav .nav-cta{font-weight:600;font-size:.92rem;text-decoration:none;padding:8px 2px;border-bottom:2px solid #fff;color:#fff}
 
+  .image-credit {
+    position: absolute;
+    bottom: 12px;
+    left: 22px;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    z-index: 10;
+  }
+  .image-credit a {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: underline;
+  }
+  .image-credit a:hover {
+    color: #fff;
+  }
+
   main {
     flex: 1;
     display: flex;
@@ -413,6 +429,9 @@
           <a class="nav-cta" href="/signup.html">Create account</a>
         </div>
       </nav>
+      <div class="image-credit">
+        Photo by <a href="https://unsplash.com/@kellysikkema?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText" target="_blank" rel="noopener noreferrer">Kelly Sikkema</a> on <a href="https://unsplash.com/?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText" target="_blank" rel="noopener noreferrer">Unsplash</a>
+      </div>
     </div>
     <div class="auth-form">
       <div class="card">
