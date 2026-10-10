@@ -2004,48 +2004,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         <button class="btn btn-primary" id="createPollBtn">Create New Poll</button>
       </div>
 
-      <!-- Unlock Section -->
-      <div class="card" id="unlockSection" style="display: none; border: 2px solid var(--brand);">
-        <div style="text-align: center; padding: 32px;">
-          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="1.5" style="margin-bottom: 16px;">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-          </svg>
-          <h2 style="font-size: 1.5rem; margin-bottom: 12px;">Select Your School</h2>
-          <p style="color: var(--soft); margin-bottom: 24px; max-width: 400px; margin-left: auto; margin-right: auto;">
-            Find and select your school to unlock Quick Polls for your classroom.
-          </p>
-
-          <div style="max-width: 400px; margin: 0 auto; text-align: left;">
-            <div id="unlockSearchForm">
-              <label style="font-size: 0.9rem; font-weight: 500; display: block; margin-bottom: 8px;">Search for your school</label>
-              <input type="text" class="form-input" id="unlockSchoolSearch" placeholder="e.g., Manchester Grammar School or M1 7DW" style="width: 100%; margin-bottom: 12px;">
-              <button class="btn btn-primary" id="unlockSearchBtn" style="width: 100%;">Search Schools</button>
-            </div>
-            <div id="unlockSchoolStatus" style="margin-top: 12px; font-size: 0.85rem; color: var(--soft);"></div>
-            <div id="unlockSchoolResults" style="margin-top: 12px; max-height: 200px; overflow-y: auto; display: none;">
-              <button class="btn btn-secondary" id="unlockSearchAgainBtn" style="margin-bottom: 8px; font-size: 0.85rem; padding: 6px 12px;">Search Again</button>
-              <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
-                <thead>
-                  <tr>
-                    <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--line);">School Name</th>
-                    <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--line);">Location</th>
-                  </tr>
-                </thead>
-                <tbody id="unlockSchoolResultsBody"></tbody>
-              </table>
-            </div>
-            <div id="unlockSelectedSchool" style="margin-top: 16px; padding: 12px; background: var(--tint); border-radius: 4px; display: none;">
-              <strong id="unlockSelectedSchoolName"></strong>
-              <button class="btn btn-primary" id="confirmSchoolBtn" style="margin-top: 12px; width: 100%;">Confirm & Unlock</button>
-            </div>
-            <p style="font-size: 0.8rem; color: var(--soft); margin-top: 24px; text-align: center;">
-              Teaching outside the UK? <a href="mailto:support@classcastle.org" style="color: var(--brand);">Contact us</a> and we'll help you get set up.
-            </p>
-          </div>
-        </div>
-      </div>
-
       <div class="card" style="margin-bottom: 16px; display: none;" id="pollUsageSection">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
           <span style="font-size: 0.9rem; font-weight: 500;">Active Polls</span>
@@ -3927,8 +3885,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   }
 
   // Quick Polls
-  let pollsUnlocked = false;
-  let unlockSelectedSchool = null;
+  let pollsUnlocked = true;
 
   async function loadPolls() {
     try {
@@ -3936,19 +3893,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       const { data: user } = await SupabaseClient.auth.getUser();
       pollsUnlocked = user.user_metadata?.polls_unlocked || false;
 
-      if (!pollsUnlocked) {
-        document.getElementById('unlockSection').style.display = 'block';
-        document.getElementById('pollUsageSection').style.display = 'none';
-        document.getElementById('pollsTab').style.display = 'none';
-        document.getElementById('responsesTab').style.display = 'none';
-        document.getElementById('createPollBtn').style.display = 'none';
-        document.getElementById('pollTabsNav').style.display = 'none';
-        const pollsPageHeader = document.querySelector('#pollsPage .page-header');
-        if (pollsPageHeader) pollsPageHeader.style.display = 'none';
-        return;
-      }
-
-      document.getElementById('unlockSection').style.display = 'none';
       document.getElementById('pollUsageSection').style.display = 'block';
       document.getElementById('pollsTab').style.display = 'block';
       document.getElementById('createPollBtn').style.display = 'inline-block';
@@ -4174,144 +4118,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     document.getElementById('schoolSearchInput').value = '';
     document.getElementById('schoolSearchStatus').textContent = '';
     document.getElementById('schoolResults').style.display = 'none';
-  }
-
-  async function unlockPolls() {
-    try {
-      const { error } = await SupabaseClient.auth.updateUser({
-        data: {
-          polls_unlocked: true,
-          school_name: unlockSelectedSchool.name,
-          school_postcode: unlockSelectedSchool.postcode,
-          school_lat: unlockSelectedSchool.lat,
-          school_lon: unlockSelectedSchool.lon
-        }
-      });
-
-      if (error) throw error;
-      showNotification('Quick Polls unlocked!');
-      pollsUnlocked = true;
-      loadPolls();
-    } catch (error) {
-      console.error('Error unlocking polls:', error);
-      showNotification('Error unlocking polls. Please try again.');
-    }
-  }
-
-  async function searchSchoolsForUnlock() {
-    const searchTerm = document.getElementById('unlockSchoolSearch').value.trim();
-    const status = document.getElementById('unlockSchoolStatus');
-    const resultsDiv = document.getElementById('unlockSchoolResults');
-    const resultsBody = document.getElementById('unlockSchoolResultsBody');
-    const searchForm = document.getElementById('unlockSearchForm');
-
-    if (!searchTerm) {
-      status.textContent = 'Please enter a school name or postcode';
-      status.style.color = 'var(--red)';
-      return;
-    }
-
-    status.textContent = 'Searching...';
-    status.style.color = 'var(--soft)';
-    resultsDiv.style.display = 'none';
-    document.getElementById('unlockSelectedSchool').style.display = 'none';
-
-    try {
-      // Check if input is a UK postcode
-      const isPostcode = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i.test(searchTerm);
-
-      // Build query - for postcode search, use the postcode directly
-      let query;
-      if (isPostcode) {
-        query = searchTerm;
-      } else {
-        query = `${encodeURIComponent(searchTerm)}+school`;
-      }
-
-      // Use Nominatim API to search
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&addressdetails=1&limit=20&countrycodes=gb`, {
-        headers: {
-          'User-Agent': 'Classcastle'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`API request failed: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (!data || data.length === 0) {
-        status.textContent = "No schools found. Your school may not be in our database. Contact us at support@classcastle.org and we'll help you get set up.";
-        status.style.color = 'var(--amber)';
-        return;
-      }
-
-      // Filter for UK schools only and schools
-      const schools = data
-        .filter(item => {
-          const isUK = item.address && (item.address.country_code === 'gb' || item.address.country === 'United Kingdom');
-          const isSchool = item.type === 'school' || item.class === 'amenity' || item.display_name.toLowerCase().includes('school');
-          return isUK && isSchool;
-        })
-        .map(item => ({
-          id: item.place_id,
-          name: item.display_name.split(',')[0] || 'Unknown School',
-          location: item.address.city || item.address.town || item.address.village || item.address.county || 'Unknown',
-          postcode: item.address.postcode || 'Not available',
-          lat: parseFloat(item.lat),
-          lon: parseFloat(item.lon)
-        }));
-
-      if (schools.length === 0) {
-        status.textContent = "No UK schools found. Your school may not be in our database. Contact us at support@classcastle.org and we'll help you get set up.";
-        status.style.color = 'var(--amber)';
-        return;
-      }
-
-      resultsBody.innerHTML = schools.map(school => `
-        <tr style="cursor: pointer; border-bottom: 1px solid var(--line);" data-school-id="${school.id}">
-          <td style="padding: 8px;">${escapeHtml(school.name)}</td>
-          <td style="padding: 8px;">${escapeHtml(school.location)}</td>
-        </tr>
-      `).join('');
-
-      // Hide search form and show results
-      searchForm.style.display = 'none';
-      resultsDiv.style.display = 'block';
-      status.textContent = `Found ${schools.length} UK schools`;
-      status.style.color = 'var(--brand)';
-
-      // Add click handlers
-      resultsBody.querySelectorAll('tr[data-school-id]').forEach(row => {
-        row.addEventListener('click', () => {
-          const schoolId = row.dataset.schoolId;
-          const school = schools.find(s => s.id == schoolId);
-          if (school) {
-            selectSchoolForUnlock(school);
-          }
-        });
-      });
-    } catch (error) {
-      console.error('Error searching schools:', error);
-      status.textContent = `Error: ${error.message}`;
-      status.style.color = 'var(--red)';
-    }
-  }
-
-  function resetUnlockSearch() {
-    document.getElementById('unlockSearchForm').style.display = 'block';
-    document.getElementById('unlockSchoolResults').style.display = 'none';
-    document.getElementById('unlockSelectedSchool').style.display = 'none';
-    document.getElementById('unlockSchoolStatus').textContent = '';
-    document.getElementById('unlockSchoolSearch').value = '';
-  }
-
-  function selectSchoolForUnlock(school) {
-    unlockSelectedSchool = school;
-    document.getElementById('unlockSelectedSchoolName').textContent = school.name;
-    document.getElementById('unlockSelectedSchool').style.display = 'block';
-    document.getElementById('unlockSchoolResults').style.display = 'none';
   }
 
   function escapeHtml(text) {
@@ -4909,19 +4715,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   const searchSchoolsBtn = document.getElementById('searchSchoolsBtn');
   const schoolSearchInput = document.getElementById('schoolSearchInput');
   const clearSchoolBtn = document.getElementById('clearSchoolBtn');
-  const unlockSearchBtn = document.getElementById('unlockSearchBtn');
-  const unlockSchoolSearch = document.getElementById('unlockSchoolSearch');
-  const confirmSchoolBtn = document.getElementById('confirmSchoolBtn');
-  const unlockSearchAgainBtn = document.getElementById('unlockSearchAgainBtn');
-
-  if (unlockSearchBtn) unlockSearchBtn.addEventListener('click', searchSchoolsForUnlock);
-  if (unlockSchoolSearch) {
-    unlockSchoolSearch.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') searchSchoolsForUnlock();
-    });
-  }
-  if (unlockSearchAgainBtn) unlockSearchAgainBtn.addEventListener('click', resetUnlockSearch);
-  if (confirmSchoolBtn) confirmSchoolBtn.addEventListener('click', unlockPolls);
 
   if (searchSchoolsBtn) searchSchoolsBtn.addEventListener('click', searchSchools);
   if (schoolSearchInput) {
