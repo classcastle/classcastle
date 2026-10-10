@@ -3885,14 +3885,9 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   }
 
   // Quick Polls
-  let pollsUnlocked = true;
 
   async function loadPolls() {
     try {
-      // Check if polls feature is unlocked
-      const { data: user } = await SupabaseClient.auth.getUser();
-      pollsUnlocked = user.user_metadata?.polls_unlocked || false;
-
       document.getElementById('pollUsageSection').style.display = 'block';
       document.getElementById('pollsTab').style.display = 'block';
       document.getElementById('createPollBtn').style.display = 'inline-block';
@@ -4136,19 +4131,14 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     document.getElementById('pollUsageText').textContent = `${activePolls} of ${maxActivePolls} used`;
     document.getElementById('pollUsageBar').style.width = `${usagePercentage}%`;
 
-    // Hide create button when locked
+    // Update create button state
     const createBtn = document.getElementById('createPollBtn');
-    if (!pollsUnlocked) {
-      createBtn.style.display = 'none';
+    if (activePolls >= maxActivePolls) {
+      createBtn.disabled = true;
+      createBtn.textContent = 'Limit Reached (Close a poll to create more)';
     } else {
-      createBtn.style.display = 'inline-block';
-      if (activePolls >= maxActivePolls) {
-        createBtn.disabled = true;
-        createBtn.textContent = 'Limit Reached (Close a poll to create more)';
-      } else {
-        createBtn.disabled = false;
-        createBtn.textContent = 'Create New Poll';
-      }
+      createBtn.disabled = false;
+      createBtn.textContent = 'Create New Poll';
     }
 
     if (polls.length === 0) {
