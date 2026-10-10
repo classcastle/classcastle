@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Continue to Classcastle Desktop App</title>
+<meta name="description" content="Continue to Classcastle Desktop App by agreeing to the privacy policy.">
+<link rel="icon" type="image/svg+xml" href="/logo.svg" id="favicon">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FCFCFA;
+  --surface: #fff;
+  --ink: #18221C;
+  --soft: #5E675F;
+  --line: #D9DDD3;
+  --brand: #1F5C3A;
+  --tint: #E4F1E6;
+  --board: #17352A;
+  --chalk: #F4D35E;
+  --red: #B23A2E;
+  color-scheme: light dark;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F1511;
+    --surface: #18211B;
+    --ink: #EEF2EA;
+    --soft: #9EAA9F;
+    --line: #2A362D;
+    --brand: #4DAA72;
+    --tint: #1A2B20;
+    --board: #1C4030;
+    --chalk: #F4D35E;
+    --red: #D2503F;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F1511;
+  --surface: #18211B;
+  --ink: #EEF2EA;
+  --soft: #9EAA9F;
+  --line: #2A362D;
+  --brand: #4DAA72;
+  --tint: #1A2B20;
+  --board: #1C4030;
+  --chalk: #F4D35E;
+  --red: #D2503F;
+}
+* { box-sizing: inherit; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+html, body { margin: 0; padding: 0; min-height: 100vh; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Instrument Sans', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
+}
+h1, h2, h3 { font-family: 'Instrument Sans', system-ui, sans-serif; margin: 0; font-weight: 500; }
+p { margin: 0; }
+a { color: inherit; }
+
+nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 24px;
+  max-width: 1080px; margin: 0 auto; width: 100%;
+}
+.wordmark { font-family: 'Instrument Sans', system-ui, sans-serif; font-size: 1.1rem; font-weight: 500; letter-spacing: -0.01em; display: flex; align-items: center; gap: 8px; }
+.logo-mark { width: 20px; height: 20px; display: block; }
+.wordmark .word-accent { color: var(--brand); }
+.nav-link {
+  font-size: 0.85rem; font-weight: 500; color: var(--soft);
+  text-decoration: none;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 420px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 24px 20px;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.page-title {
+  font-size: 1.3rem;
+  letter-spacing: -0.01em;
+  margin-bottom: 6px;
+}
+
+.page-subtitle {
+  color: var(--soft);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.app-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+
+.app-logo {
+  width: 48px;
+  height: 48px;
+  background: var(--tint);
+  border: 1px solid var(--brand);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-details h3 {
+  font-size: 0.95rem;
+  margin-bottom: 2px;
+}
+
+.app-details p {
+  color: var(--soft);
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+}
+
+.access-section {
+  margin-bottom: 16px;
+}
+
+.access-section h3 {
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.access-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.access-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--soft);
+  font-size: 0.85rem;
+}
+
+.access-list li:last-child {
+  border-bottom: none;
+}
+
+.access-list li strong {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.warning-box {
+  background: var(--tint);
+  border: 1px solid var(--brand);
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 16px;
+  display: flex;
+  gap: 10px;
+}
+
+.warning-icon {
+  flex-shrink: 0;
+  color: var(--brand);
+}
+
+.warning-content h3 {
+  margin: 0 0 4px 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.warning-content p {
+  margin: 0;
+  color: var(--soft);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.privacy-section {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: var(--bg);
+  border-radius: 6px;
+  border: 1px solid var(--line);
+}
+
+.privacy-section h3 {
+  margin: 0 0 6px 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.privacy-section p {
+  margin: 0;
+  color: var(--soft);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.privacy-section a {
+  color: var(--brand);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.checkbox-input {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  cursor: pointer;
+  accent-color: var(--brand);
+}
+
+.checkbox-label {
+  font-size: 0.85rem;
+  color: var(--ink);
+  line-height: 1.4;
+}
+
+.checkbox-label a {
+  color: var(--brand);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-family: 'Instrument Sans', sans-serif;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.btn:not(:disabled):active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background: var(--brand);
+  color: #fff;
+  box-shadow: 2px 2px 0 var(--ink);
+}
+.btn-primary:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+.btn-primary:active {
+  transform: translate(0, 0);
+  box-shadow: none;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+.notification {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--ink);
+  color: var(--bg);
+  padding: 16px 20px;
+  border-radius: 6px;
+  font-size: 0.92rem;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+  z-index: 1000;
+}
+.notification.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.loading {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #fff;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 780px) {
+  nav { padding: 22px 24px; }
+  main { padding: 24px; }
+  .app-info {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wordmark"><img src="/logo.svg" alt="" class="logo-mark"><span class="word-text">Class<span class="word-accent">castle</span></span></div>
+  <a class="nav-link" href="/">Back to home</a>
+</nav>
+
+<main>
+  <div class="auth-container">
+    <div class="card">
+      <div class="page-header">
+        <h1 class="page-title">Continue to Classcastle Desktop App</h1>
+        <p class="page-subtitle">Review and agree to continue</p>
+      </div>
+
+      <div class="app-info">
+        <div class="app-logo">
+          <img src="/logo.svg" alt="Classcastle" width="40" height="40">
+        </div>
+        <div class="app-details">
+          <h3>Classcastle Desktop App</h3>
+          <p>by Classcastle</p>
+          <span style="display: inline-flex; align-items: center; gap: 4px; background: var(--tint); color: var(--brand); font-size: 0.7rem; font-weight: 500; padding: 3px 8px; border-radius: 4px; border: 1px solid var(--brand); white-space: nowrap; margin-top: 4px;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Verified
+          </span>
+        </div>
+      </div>
+
+      <div class="warning-box">
+        <div class="warning-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" x2="12" y1="8" y2="12"/>
+            <line x1="12" x2="12.01" y1="16" y2="16"/>
+          </svg>
+        </div>
+        <div class="warning-content">
+          <h3>Personal information</h3>
+          <p>This app will access your display name to connect you to your teacher's classroom.</p>
+        </div>
+      </div>
+
+      <div class="access-section">
+        <h3>Classcastle Desktop App will be able to:</h3>
+        <ul class="access-list">
+          <li><strong>Identify you</strong> - your display name</li>
+          <li><strong>Sync with your teacher</strong> - receive navigation commands in real-time</li>
+        </ul>
+      </div>
+
+      <div class="privacy-section">
+        <h3>Privacy Policy</h3>
+        <p>By continuing, you agree to Classcastle's <a href="/privacy.html" target="_blank">Privacy Policy</a>. Your data is only used to connect you to your teacher's room and is never shared with third parties.</p>
+      </div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="privacyAgreement" class="checkbox-input">
+        <label for="privacyAgreement" class="checkbox-label">
+          I have read and agree to the <a href="/privacy.html" target="_blank">Privacy Policy</a>
+        </label>
+      </div>
+
+      <button class="btn btn-primary btn-full" id="continueBtn" disabled>
+        <span class="btn-text">Continue to Classcastle Desktop App</span>
+        <span class="loading" style="display: none;"></span>
+      </button>
+    </div>
+  </div>
+</main>
+
+<div class="notification" id="notification"></div>
+
+<script>
+  const notification = document.getElementById('notification');
+  const privacyAgreement = document.getElementById('privacyAgreement');
+  const continueBtn = document.getElementById('continueBtn');
+  const continueBtnText = continueBtn.querySelector('.btn-text');
+  const continueBtnLoading = continueBtn.querySelector('.loading');
+
+  function showNotification(message, duration = 3000) {
+    notification.textContent = message;
+    notification.classList.add('show');
+    setTimeout(() => {
+      notification.classList.remove('show');
+    }, duration);
+  }
+
+  // Enable/disable continue button based on privacy agreement
+  privacyAgreement.addEventListener('change', () => {
+    continueBtn.disabled = !privacyAgreement.checked;
+  });
+
+  // Continue button handler
+  continueBtn.addEventListener('click', () => {
+    if (!privacyAgreement.checked) {
+      showNotification('Please agree to the Privacy Policy to continue');
+      return;
+    }
+
+    // Show loading state
+    continueBtn.disabled = true;
+    continueBtnText.style.display = 'none';
+    continueBtnLoading.style.display = 'inline-block';
+
+    // Simulate authorization processing
+    setTimeout(() => {
+      // Replace card content with success message
+      const card = document.querySelector('.card');
+      card.innerHTML = `
+        <div style="text-align: center; padding: 40px 20px;">
+          <div style="width: 64px; height: 64px; background: var(--tint); border: 2px solid var(--brand); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <h2 style="font-size: 1.3rem; margin-bottom: 8px;">Opened in Classcastle</h2>
+          <p style="color: var(--soft); font-size: 0.9rem; margin-bottom: 24px;">You can now continue using the desktop app.</p>
+          <a href="/desktopapp.html" class="btn btn-primary" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;">
+            Continue to Desktop App
+          </a>
+        </div>
+      `;
+    }, 1000);
+  });
+</script>
+
+</body>
+</html>
