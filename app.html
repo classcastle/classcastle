@@ -1691,6 +1691,10 @@
       grid-template-columns: 1fr;
     }
   }
+
+  #pollsLockMenuBtn:hover {
+    opacity: 0.7 !important;
+  }
 </style>
 </head>
 <body>
@@ -2005,7 +2009,22 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       </div>
 
       <!-- Lock Message -->
-      <div class="card" id="pollsLockMessage" style="border: 2px solid var(--chalk);">
+      <div class="card" id="pollsLockMessage" style="border: 2px solid var(--chalk); position: relative;">
+        <button id="pollsLockMenuBtn" style="position: absolute; top: 12px; right: 12px; background: none; border: none; cursor: pointer; padding: 8px; border-radius: 4px; display: flex; align-items: center; justify-content: center; opacity: 0.3; transition: opacity 0.2s;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="1"/>
+            <circle cx="12" cy="5" r="1"/>
+            <circle cx="12" cy="19" r="1"/>
+          </svg>
+        </button>
+        <div id="pollsLockMenu" style="position: absolute; top: 40px; right: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 100; display: none; min-width: 150px;">
+          <button id="dismissLockBtn" style="width: 100%; text-align: left; padding: 8px 12px; background: none; border: none; cursor: pointer; font-size: 0.85rem; color: var(--ink); display: flex; align-items: center; gap: 8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="18 15 12 9 6 15"/>
+            </svg>
+            Dismiss message
+          </button>
+        </div>
         <div style="text-align: center; padding: 32px;">
           <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--chalk)" stroke-width="1.5" style="margin-bottom: 16px;">
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
@@ -4868,6 +4887,32 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   saveSettingsBtn.addEventListener('click', saveSettings);
   changeEmailBtn.addEventListener('click', changeEmail);
   linkGithubBtn.addEventListener('click', linkGithub);
+
+  // Quick Polls lock menu
+  const pollsLockMenuBtn = document.getElementById('pollsLockMenuBtn');
+  const pollsLockMenu = document.getElementById('pollsLockMenu');
+  const dismissLockBtn = document.getElementById('dismissLockBtn');
+
+  if (pollsLockMenuBtn) {
+    pollsLockMenuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      pollsLockMenu.style.display = pollsLockMenu.style.display === 'none' ? 'block' : 'none';
+    });
+  }
+
+  if (dismissLockBtn) {
+    dismissLockBtn.addEventListener('click', () => {
+      document.getElementById('pollsLockMessage').style.display = 'none';
+      pollsLockMenu.style.display = 'none';
+    });
+  }
+
+  // Close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (pollsLockMenu && pollsLockMenuBtn && !pollsLockMenuBtn.contains(e.target) && !pollsLockMenu.contains(e.target)) {
+      pollsLockMenu.style.display = 'none';
+    }
+  });
 
   // Onboarding functionality
   let currentOnboardingStep = 1;
