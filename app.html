@@ -2004,6 +2004,22 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         <button class="btn btn-primary" id="createPollBtn">Create New Poll</button>
       </div>
 
+      <!-- Lock Message -->
+      <div class="card" id="pollsLockMessage" style="border: 2px solid var(--chalk);">
+        <div style="text-align: center; padding: 32px;">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--chalk)" stroke-width="1.5" style="margin-bottom: 16px;">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+          <h2 style="font-size: 1.5rem; margin-bottom: 12px;">Quick Polls is temporarily unavailable</h2>
+          <p style="color: var(--soft); margin-bottom: 24px; max-width: 400px; margin-left: auto; margin-right: auto;">
+            We're working on revamping Quick Polls as part of our redesign. Stay tuned for an improved experience coming soon!
+          </p>
+          <p style="font-size: 0.85rem; color: var(--soft);">
+            <a href="/resources.html" style="color: var(--brand);">Explore our Resources Hub</a> in the meantime.
+          </p>
+        </div>
+      </div>
+
       <div class="card" style="margin-bottom: 16px; display: none;" id="pollUsageSection">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
           <span style="font-size: 0.9rem; font-weight: 500;">Active Polls</span>
@@ -3888,12 +3904,15 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
   async function loadPolls() {
     try {
-      document.getElementById('pollUsageSection').style.display = 'block';
-      document.getElementById('pollsTab').style.display = 'block';
-      document.getElementById('createPollBtn').style.display = 'inline-block';
-      document.getElementById('pollTabsNav').style.display = 'block';
+      // Show lock message and hide other sections
+      document.getElementById('pollsLockMessage').style.display = 'block';
+      document.getElementById('pollUsageSection').style.display = 'none';
+      document.getElementById('pollsTab').style.display = 'none';
+      document.getElementById('createPollBtn').style.display = 'none';
+      document.getElementById('pollTabsNav').style.display = 'none';
       const pollsPageHeader = document.querySelector('#pollsPage .page-header');
-      if (pollsPageHeader) pollsPageHeader.style.display = 'flex';
+      if (pollsPageHeader) pollsPageHeader.style.display = 'none';
+      return;
 
       const { data, error } = await SupabaseClient
         .from('polls')
