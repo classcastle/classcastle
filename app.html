@@ -3932,7 +3932,13 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       const pollsPageHeader = document.querySelector('#pollsPage .page-header');
       if (pollsPageHeader) pollsPageHeader.style.display = 'none';
       return;
+    } catch (error) {
+      console.error('Error loading polls:', error);
+    }
+  }
 
+  async function loadPollsContent() {
+    try {
       const { data, error } = await SupabaseClient
         .from('polls')
         .select('*, poll_responses(count)')
@@ -4904,6 +4910,15 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     dismissLockBtn.addEventListener('click', () => {
       document.getElementById('pollsLockMessage').style.display = 'none';
       pollsLockMenu.style.display = 'none';
+      // Show polls content
+      document.getElementById('pollUsageSection').style.display = 'block';
+      document.getElementById('pollsTab').style.display = 'block';
+      document.getElementById('createPollBtn').style.display = 'inline-block';
+      document.getElementById('pollTabsNav').style.display = 'block';
+      const pollsPageHeader = document.querySelector('#pollsPage .page-header');
+      if (pollsPageHeader) pollsPageHeader.style.display = 'flex';
+      // Load polls data
+      loadPollsContent();
     });
   }
 
