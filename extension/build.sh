@@ -9,7 +9,8 @@ cd "$(dirname "$0")"
 
 echo "Building Classcastle extension..."
 
-# Create build directories
+# Clean build directories
+rm -rf build/chrome build/firefox
 mkdir -p build/firefox build/chrome
 
 # Copy manifests
