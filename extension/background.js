@@ -7,54 +7,7 @@ const isManifestV3 = api.runtime.getManifest().manifest_version === 3;
 // Supabase configuration
 const SUPABASE_URL = 'https://hduyofdbpspjcuwvackd.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK';
-
-// Supabase client (will be loaded dynamically)
-let SupabaseClient = null;
-
-// Initialize Supabase client
-async function initSupabase() {
-  if (SupabaseClient) return SupabaseClient;
-  
-  try {
-    // Try loading from local file (Chrome service worker)
-    if (isManifestV3) {
-      importScripts('supabase.min.js');
-      if (typeof supabase !== 'undefined') {
-        SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        console.log('Supabase loaded from local file (manifest v3)');
-      } else {
-        console.log('supabase not defined after importScripts (manifest v3)');
-      }
-    } else {
-      // Firefox manifest v2 - importScripts doesn't work in event pages
-      // Load Supabase from CDN using fetch and eval
-      console.log('Loading Supabase from CDN for Firefox');
-      try {
-        const response = await fetch('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js');
-        const scriptText = await response.text();
-        // Use Function constructor to eval the script
-        const loadSupabase = new Function(scriptText + '; return supabase;');
-        const supabase = loadSupabase();
-        if (typeof supabase !== 'undefined') {
-          SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-          console.log('Supabase loaded from CDN (manifest v2)');
-        } else {
-          console.log('supabase not defined after CDN load (manifest v2)');
-        }
-      } catch (cdnError) {
-        console.log('Failed to load Supabase from CDN:', cdnError);
-      }
-    }
-  } catch (e) {
-    console.log('Supabase initialization failed:', e);
-  }
-  
-  if (!SupabaseClient) {
-    console.log('Supabase not available, will rely on polling only');
-  }
-  
-  return SupabaseClient;
-}
+const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNsYXNzY2FzdGxlIiwicm9sZSI6ImFub24iLCJleHAiOjE5MzY2OTc5ODF9.' + SUPABASE_KEY;
 
 // Constants
 const ALARM_NAME = 'pollForChanges';
@@ -75,6 +28,85 @@ const STORAGE_KEYS = {
 // Constants
 const KICK_GRACE_PERIOD_MS = 60000; // 1 minute grace period for joins
 const JOIN_TIMEOUT_MS = 120000; // 2 minutes for join to complete
+
+// Direct Supabase REST API calls (no library needed, bypasses CSP)
+async function supabaseGet(table, filters = {}) {
+  const url = new URL(`${SUPABASE_URL}/rest/v1/${table}`);
+  url.searchParams.append('apikey', SUPABASE_API_KEY);
+  
+  for (const [key, value] of Object.entries(filters)) {
+    url.searchParams.append(key, `eq.${value}`);
+  }
+  
+  const response = await fetch(url, {
+    headers: {
+      'apikey': SUPABASE_API_KEY,
+      'Authorization': `Bearer ${SUPABASE_API_KEY}`
+    }
+  });
+  
+  const data = await response.json();
+  return Array.isArray(data) ? data[0] : data;
+}
+
+async function supabaseInsert(table, data) {
+  const url = new URL(`${SUPABASE_URL}/rest/v1/${table}`);
+  url.searchParams.append('apikey', SUPABASE_API_KEY);
+  
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_API_KEY,
+      'Authorization': `Bearer ${SUPABASE_API_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
+    },
+    body: JSON.stringify(data)
+  });
+  
+  return response.json();
+}
+
+async function supabaseUpdate(table, data, filters = {}) {
+  const url = new URL(`${SUPABASE_URL}/rest/v1/${table}`);
+  url.searchParams.append('apikey', SUPABASE_API_KEY);
+  
+  for (const [key, value] of Object.entries(filters)) {
+    url.searchParams.append(key, `eq.${value}`);
+  }
+  
+  const response = await fetch(url, {
+    method: 'PATCH',
+    headers: {
+      'apikey': SUPABASE_API_KEY,
+      'Authorization': `Bearer ${SUPABASE_API_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
+    },
+    body: JSON.stringify(data)
+  });
+  
+  return response.json();
+}
+
+async function supabaseDelete(table, filters = {}) {
+  const url = new URL(`${SUPABASE_URL}/rest/v1/${table}`);
+  url.searchParams.append('apikey', SUPABASE_API_KEY);
+  
+  for (const [key, value] of Object.entries(filters)) {
+    url.searchParams.append(key, `eq.${value}`);
+  }
+  
+  const response = await fetch(url, {
+    method: 'DELETE',
+    headers: {
+      'apikey': SUPABASE_API_KEY,
+      'Authorization': `Bearer ${SUPABASE_API_KEY}`
+    }
+  });
+  
+  return response.ok;
+}
 
 // Listen for messages from popup and content scripts
 api.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -209,8 +241,8 @@ async function joinRoom(roomId, studentId, studentName) {
   // Start alarm-based polling
   startAlarm();
 
-  // Subscribe to room updates (best-effort fast path)
-  await subscribeToRoom(roomId, studentId);
+  // Mark as joined (no realtime subscription with REST API)
+  await saveStorageData({ joinedAt: Date.now() });
   
   console.log('joinRoom completed successfully');
 }
@@ -274,79 +306,16 @@ async function leaveRoom() {
 }
 
 // Subscribe to room updates (best-effort fast path)
-let subscription = null;
-
+// Note: With REST API, we can't do realtime subscriptions, so we rely entirely on polling
 async function subscribeToRoom(roomId, studentId) {
   if (!roomId || !studentId) return;
 
-  console.log('Subscribing to room:', roomId, 'student:', studentId);
-
-  await initSupabase();
-  if (!SupabaseClient) {
-    console.log('Supabase not available, will rely on polling only');
-    // Mark as joined anyway since we can still poll
-    await saveStorageData({ joinedAt: Date.now() });
-    return;
-  }
-
-  // Unsubscribe from existing subscription
-  if (subscription) {
-    subscription.unsubscribe();
-    subscription = null;
-  }
-
-  // Subscribe to room updates
-  subscription = SupabaseClient
-    .channel(`student:${studentId}`)
-    .on('postgres_changes', {
-      event: 'UPDATE',
-      schema: 'public',
-      table: 'rooms',
-      filter: `id=eq.${roomId}`
-    }, (payload) => {
-      console.log('Room update received via subscription:', payload);
-      // Check if target_url changed
-      if (payload.new && payload.new.target_url) {
-        if (!payload.old || payload.new.target_url !== payload.old.target_url) {
-          console.log('Target URL changed via subscription to:', payload.new.target_url);
-          saveStorageData({ currentTargetUrl: payload.new.target_url });
-          navigateToUrl(payload.new.target_url, studentId);
-        }
-      }
-    })
-    .on('postgres_changes', {
-      event: 'DELETE',
-      schema: 'public',
-      table: 'students',
-      filter: `id=eq.${studentId}`
-    }, (payload) => {
-      // Teacher removed this student's row -- treat as a kick
-      console.log('Student row deleted (kicked):', payload);
-      handleKicked();
-    })
-    .subscribe((status) => {
-      console.log('Subscription status:', status);
-      if (status === 'SUBSCRIBED') {
-        console.log('Successfully subscribed to room updates');
-        // Mark as fully joined when subscription confirms
-        saveStorageData({
-          joinedAt: Date.now()
-        });
-      } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
-        console.error('Subscription failed, will retry on next alarm');
-        // Still mark as joined so polling works
-        saveStorageData({
-          joinedAt: Date.now()
-        });
-      }
-    });
+  console.log('Subscribing to room (polling only):', roomId, 'student:', studentId);
+  // Mark as joined
+  await saveStorageData({ joinedAt: Date.now() });
 }
 
 async function unsubscribeFromRoom(roomId, studentId) {
-  if (subscription) {
-    subscription.unsubscribe();
-    subscription = null;
-  }
   console.log('Unsubscribed from room');
 }
 
@@ -376,19 +345,12 @@ async function handleAlarm() {
   const timeSinceJoin = data.joinedAt ? Date.now() - data.joinedAt : Infinity;
   if (timeSinceJoin > KICK_GRACE_PERIOD_MS) {
     try {
-      await initSupabase();
-      if (SupabaseClient) {
-        const { data: student, error: studentError } = await SupabaseClient
-          .from('students')
-          .select('id')
-          .eq('id', data.studentId)
-          .single();
+      const student = await supabaseGet('students', { id: data.studentId });
 
-        if (studentError || !student) {
-          console.log('Student row missing, treating as kicked');
-          await handleKicked();
-          return;
-        }
+      if (!student) {
+        console.log('Student row missing, treating as kicked');
+        await handleKicked();
+        return;
       }
     } catch (error) {
       console.error('Error checking kick status:', error);
@@ -399,27 +361,20 @@ async function handleAlarm() {
 
   // Poll for URL changes
   try {
-    await initSupabase();
-    if (SupabaseClient) {
-      const { data: room } = await SupabaseClient
-        .from('rooms')
-        .select('target_url')
-        .eq('id', data.roomId)
-        .single();
+    const room = await supabaseGet('rooms', { id: data.roomId });
 
-      console.log('Poll for URL changes - room data:', room);
-      console.log('Current target_url in storage:', data.currentTargetUrl);
-      console.log('Room target_url from DB:', room?.target_url);
+    console.log('Poll for URL changes - room data:', room);
+    console.log('Current target_url in storage:', data.currentTargetUrl);
+    console.log('Room target_url from DB:', room?.target_url);
 
-      if (room && room.target_url && room.target_url !== data.currentTargetUrl) {
-        console.log('Poll detected URL change:', room.target_url);
-        await saveStorageData({ currentTargetUrl: room.target_url });
-        navigateToUrl(room.target_url, data.studentId);
-      } else if (room && room.target_url && room.target_url === data.currentTargetUrl) {
-        console.log('URL already set to:', room.target_url);
-      } else {
-        console.log('No target_url set in room yet');
-      }
+    if (room && room.target_url && room.target_url !== data.currentTargetUrl) {
+      console.log('Poll detected URL change:', room.target_url);
+      await saveStorageData({ currentTargetUrl: room.target_url });
+      navigateToUrl(room.target_url, data.studentId);
+    } else if (room && room.target_url && room.target_url === data.currentTargetUrl) {
+      console.log('URL already set to:', room.target_url);
+    } else {
+      console.log('No target_url set in room yet');
     }
   } catch (error) {
     console.error('Error polling for URL changes:', error);
@@ -427,16 +382,10 @@ async function handleAlarm() {
 
   // Update online status and last_seen
   try {
-    await initSupabase();
-    if (SupabaseClient) {
-      await SupabaseClient
-        .from('students')
-        .update({
-          online: true,
-          last_seen: new Date().toISOString()
-        })
-        .eq('id', data.studentId);
-    }
+    await supabaseUpdate('students', {
+      online: true,
+      last_seen: new Date().toISOString()
+    }, { id: data.studentId });
   } catch (error) {
     console.error('Error updating online status:', error);
   }
@@ -464,16 +413,10 @@ async function navigateToUrl(url, studentId) {
           console.log('Reusing existing tab:', data.tabId);
           await api.tabs.update(data.tabId, { url: url });
           // Update student's current_url in the database
-          await initSupabase();
-          if (SupabaseClient) {
-            await SupabaseClient
-              .from('students')
-              .update({
-                current_url: url,
-                last_seen: new Date().toISOString()
-              })
-              .eq('id', studentId);
-          }
+          await supabaseUpdate('students', {
+            current_url: url,
+            last_seen: new Date().toISOString()
+          }, { id: studentId });
           return;
         }
       } catch (e) {
@@ -488,16 +431,10 @@ async function navigateToUrl(url, studentId) {
     await saveStorageData({ tabId: tab.id });
 
     // Update student's current_url in the database
-    await initSupabase();
-    if (SupabaseClient) {
-      await SupabaseClient
-        .from('students')
-        .update({
-          current_url: url,
-          last_seen: new Date().toISOString()
-        })
-        .eq('id', studentId);
-    }
+    await supabaseUpdate('students', {
+      current_url: url,
+      last_seen: new Date().toISOString()
+    }, { id: studentId });
   } catch (error) {
     console.error('Error navigating to URL:', error);
   }
