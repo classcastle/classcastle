@@ -155,52 +155,8 @@ api.storage.onChanged.addListener((changes, area) => {
   
   console.log('Storage changed:', changes);
   
-  // Check for kicked state
-  if (changes.wasKicked && changes.wasKicked.newValue === true) {
-    render('kicked');
-    return;
-  }
-  
-  // Check for joined state - check if roomId and studentId are now set
-  const roomIdChanged = changes.roomId;
-  const studentIdChanged = changes.studentId;
-  const studentNameChanged = changes.studentName;
-  
-  if (roomIdChanged || studentIdChanged) {
-    const newRoomId = roomIdChanged ? roomIdChanged.newValue : undefined;
-    const newStudentId = studentIdChanged ? studentIdChanged.newValue : undefined;
-    const newStudentName = studentNameChanged ? studentNameChanged.newValue : undefined;
-    
-    // Get current values if not in changes
-    api.storage.local.get(['roomId', 'studentId', 'studentName'], (result) => {
-      const currentRoomId = newRoomId !== undefined ? newRoomId : result.roomId;
-      const currentStudentId = newStudentId !== undefined ? newStudentId : result.studentId;
-      const currentStudentName = newStudentName !== undefined ? newStudentName : result.studentName;
-      
-      console.log('Current state after change:', { currentRoomId, currentStudentId, currentStudentName });
-      
-      if (currentRoomId && currentStudentId) {
-        console.log('Transitioning to joined state');
-        render('joined', {
-          roomCode: currentRoomId.substring(0, 6),
-          studentName: currentStudentName || ''
-        });
-      } else if (!currentRoomId && !currentStudentId) {
-        console.log('Transitioning to idle state');
-        render('idle');
-      }
-    });
-    return;
-  }
-  
-  // Check for joining state
-  if (changes.joiningSince) {
-    if (changes.joiningSince.newValue) {
-      render('joining');
-    } else if (!changes.joiningSince.newValue && currentState === 'joining') {
-      render('idle');
-    }
-  }
+  // Just reinitialize from storage to get the current state
+  initializeState();
 });
 
 // Listen for status updates from background script
