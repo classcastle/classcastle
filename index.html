@@ -358,6 +358,28 @@ footer a{color:var(--soft)}
 </div>
 
 <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const navLinks = document.querySelector('.nav-links');
+
+    if (mobileMenuBtn && navLinks) {
+      mobileMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        navLinks.classList.toggle('active');
+      });
+    }
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (navLinks && navLinks.classList.contains('active')) {
+        if (!mobileMenuBtn.contains(e.target) && !navLinks.contains(e.target)) {
+          navLinks.classList.remove('active');
+        }
+      }
+    });
+  });
+
   function updateFavicon(){
     document.getElementById('favicon').href = matchMedia('(prefers-color-scheme: dark)').matches ? '/logo-dark.svg' : '/logo.svg';
   }
@@ -401,16 +423,6 @@ footer a{color:var(--soft)}
           }
         }, 200);
       }
-    });
-  }
-
-  // Mobile menu toggle
-  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-  const navLinks = document.querySelector('.nav-links');
-
-  if (mobileMenuBtn && navLinks) {
-    mobileMenuBtn.addEventListener('click', () => {
-      navLinks.classList.toggle('active');
     });
   }
 

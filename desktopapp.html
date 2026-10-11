@@ -244,15 +244,25 @@ document.getElementById('favicon').href = matchMedia('(prefers-color-scheme: dar
 updateFavicon();
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
 
-// Mobile menu toggle
-const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-const navLinks = document.querySelector('.nav-links');
+document.addEventListener('DOMContentLoaded', function() {
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  const navLinks = document.querySelector('.nav-links');
 
-if (mobileMenuBtn && navLinks) {
-  mobileMenuBtn.addEventListener('click', () => {
-    navLinks.classList.toggle('active');
+  if (mobileMenuBtn && navLinks) {
+    mobileMenuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navLinks.classList.toggle('active');
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    if (navLinks && navLinks.classList.contains('active')) {
+      if (!mobileMenuBtn.contains(e.target) && !navLinks.contains(e.target)) {
+        navLinks.classList.remove('active');
+      }
+    }
   });
-}
+});
 </script>
 </body>
 </html>
