@@ -76,74 +76,68 @@ api.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log('Background received message:', request.action, request);
     
     if (request.action === 'joinRoom') {
-      joinRoom(request.roomId, request.studentId, request.studentName).then(() => {
-        sendResponse({ success: true });
-      }).catch(err => {
-        console.error('joinRoom error:', err);
-        sendResponse({ success: false, error: err.message });
-      });
-      return true; // async response
+      return joinRoom(request.roomId, request.studentId, request.studentName)
+        .then(() => ({ success: true }))
+        .catch(err => {
+          console.error('joinRoom error:', err);
+          return { success: false, error: err.message };
+        });
     } else if (request.action === 'studentJoined') {
       // Student joined via join.html content script, start subscription
       console.log('Student joined message received:', request);
-      joinRoom(request.roomId, request.studentId, request.studentName).then(() => {
-        // Notify popup of status change
-        api.runtime.sendMessage({
-          action: 'statusUpdate',
-          joined: true
-        }).catch(err => {
-          console.log('Failed to notify popup (popup may be closed):', err);
+      return joinRoom(request.roomId, request.studentId, request.studentName)
+        .then(() => {
+          // Notify popup of status change
+          api.runtime.sendMessage({
+            action: 'statusUpdate',
+            joined: true
+          }).catch(err => {
+            console.log('Failed to notify popup (popup may be closed):', err);
+          });
+          return { success: true };
+        })
+        .catch(err => {
+          console.error('studentJoined error:', err);
+          return { success: false, error: err.message };
         });
-        sendResponse({ success: true });
-      }).catch(err => {
-        console.error('studentJoined error:', err);
-        sendResponse({ success: false, error: err.message });
-      });
-      return true; // async response
     } else if (request.action === 'leaveRoom') {
-      leaveRoom().then(() => {
-        // Notify popup of status change
-        api.runtime.sendMessage({
-          action: 'statusUpdate',
-          joined: false
-        }).catch(err => {
-          console.log('Failed to notify popup (popup may be closed):', err);
+      return leaveRoom()
+        .then(() => {
+          // Notify popup of status change
+          api.runtime.sendMessage({
+            action: 'statusUpdate',
+            joined: false
+          }).catch(err => {
+            console.log('Failed to notify popup (popup may be closed):', err);
+          });
+          return { success: true };
+        })
+        .catch(err => {
+          console.error('leaveRoom error:', err);
+          return { success: false, error: err.message };
         });
-        sendResponse({ success: true });
-      }).catch(err => {
-        console.error('leaveRoom error:', err);
-        sendResponse({ success: false, error: err.message });
-      });
-      return true; // async response
     } else if (request === 'getStatus') {
       // Handle legacy 'getStatus' message (without request.action)
-      getStorageData().then(data => {
-        sendResponse({
-          joined: data.roomId !== null && data.studentId !== null,
-          roomId: data.roomId,
-          studentId: data.studentId,
-          studentName: data.studentName
-        });
-      });
-      return true; // async response
+      return getStorageData().then(data => ({
+        joined: data.roomId !== null && data.studentId !== null,
+        roomId: data.roomId,
+        studentId: data.studentId,
+        studentName: data.studentName
+      }));
     } else if (request.action === 'getStatus') {
-      getStorageData().then(data => {
-        sendResponse({
-          joined: data.roomId !== null && data.studentId !== null,
-          roomId: data.roomId,
-          studentId: data.studentId,
-          studentName: data.studentName
-        });
-      });
-      return true; // async response
+      return getStorageData().then(data => ({
+        joined: data.roomId !== null && data.studentId !== null,
+        roomId: data.roomId,
+        studentId: data.studentId,
+        studentName: data.studentName
+      }));
     }
     
     // Synchronous responses (none currently)
-    return false;
+    return Promise.resolve({ success: false, error: 'Unknown action' });
   } catch (e) {
     console.error('Error in message listener:', e);
-    sendResponse({ success: false, error: e.message });
-    return false;
+    return Promise.resolve({ success: false, error: e.message });
   }
 });
 
@@ -532,14 +526,14 @@ if (isManifestV3) {
               console.error('studentJoined error:', err);
               sendResponse({ success: false, error: err.message });
             });
-            return true; // async response
+            return true; // async response for Chrome
           }
         } else {
           console.log('External message from unauthorized origin:', senderOrigin);
           sendResponse({ success: false, error: 'Unauthorized origin' });
         }
         
-        return false; // synchronous response
+        return false;
       } catch (e) {
         console.error('Error in external message listener:', e);
         sendResponse({ success: false, error: e.message });

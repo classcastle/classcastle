@@ -220,7 +220,7 @@ api.runtime.onMessage.addListener((request, sender, sendResponse) => {
     render('kicked');
   }
   
-  // No async response needed
+  // Return true for async response if needed
   return false;
 });
 
@@ -294,16 +294,7 @@ async function handleLeave() {
   console.log('Leave requested');
   
   try {
-    const response = await new Promise((resolve) => {
-      api.runtime.sendMessage({ action: 'leaveRoom' }, (response) => {
-        if (api.runtime.lastError) {
-          console.log('Failed to send leave message:', api.runtime.lastError.message);
-          resolve({ success: false, error: api.runtime.lastError.message });
-        } else {
-          resolve(response);
-        }
-      });
-    });
+    const response = await api.runtime.sendMessage({ action: 'leaveRoom' });
     
     if (response && response.success) {
       console.log('Leave successful');

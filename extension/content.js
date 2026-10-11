@@ -26,18 +26,28 @@ window.addEventListener('message', (event) => {
   console.log('Content script received message from page:', message);
   console.log('Payload:', message.payload);
   
-  // Forward to background script
+  // Forward to background script using Promise-based API
   if (api && api.runtime) {
     console.log('Sending to background script...');
-    api.runtime.sendMessage(message.payload, (response) => {
-      console.log('Background script response:', response);
-      // Send response back to page
-      window.postMessage({
-        type: 'CLASSCASTELEXTENSION_RESPONSE',
-        id: message.id,
-        response: response
-      }, '*');
-    });
+    api.runtime.sendMessage(message.payload)
+      .then((response) => {
+        console.log('Background script response:', response);
+        // Send response back to page
+        window.postMessage({
+          type: 'CLASSCASTELEXTENSION_RESPONSE',
+          id: message.id,
+          response: response
+        }, '*');
+      })
+      .catch((error) => {
+        console.error('Error sending to background script:', error);
+        // Send error response back to page
+        window.postMessage({
+          type: 'CLASSCASTELEXTENSION_RESPONSE',
+          id: message.id,
+          response: { success: false, error: error.message || 'Unknown error' }
+        }, '*');
+      });
   } else {
     console.error('Extension API not available in content script');
     // Send error response back to page
