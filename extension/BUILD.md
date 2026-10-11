@@ -24,10 +24,10 @@ Pre-built ZIP files are available in the `build/` folder:
 1. Open `chrome://extensions/`
 2. Enable "Developer mode"
 3. Click "Load unpacked"
-4. Unzip `classcastle-chrome.zip` to a temporary folder
-5. Select the unzipped folder
+4. Unzip `classcastle-chrome.zip` to a folder
+5. Select that folder when prompted
 
-**Note:** The ZIP contains the extension files directly (not wrapped in a folder). When you unzip it, the files will be in the folder you select.
+**Note:** Chrome requires the extension files to be in a folder. The ZIP contains the files directly, so create a folder and unzip into it.
 
 ### Loading ZIP in Firefox
 
