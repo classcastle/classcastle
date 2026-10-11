@@ -62,6 +62,15 @@ Pre-built ZIP files are available in the `build/` folder:
 
 ## Rebuilding ZIP Files
 
+### Using the build script (recommended)
+
+```bash
+cd extension
+./build.sh
+```
+
+### Manual build
+
 To rebuild the ZIP files after making changes:
 
 ```bash
