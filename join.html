@@ -495,6 +495,13 @@
     }
   });
 
+  // Wait a bit for content script to be ready
+  setTimeout(() => {
+    if (!window.classcastleContentScriptReady) {
+      console.log('Content script not ready after 1000ms, may not be loaded');
+    }
+  }, 1000);
+
   // Switch favicon based on theme
   function updateFavicon() {
     const favicon = document.getElementById('favicon');

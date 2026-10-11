@@ -4,7 +4,16 @@
 // API compatibility shim for Chrome and Firefox
 const api = globalThis.browser ?? globalThis.chrome;
 
-console.log('Classcastle content script loaded, API:', api.runtime ? 'available' : 'not available');
+console.log('Classcastle content script loaded');
+console.log('API available:', api.runtime ? 'yes' : 'no');
+console.log('Browser:', typeof browser !== 'undefined' ? 'Firefox' : 'Chrome');
+
+// Notify page that content script is ready immediately
+window.postMessage({
+  type: 'CLASSCASTELEXTENSION_READY'
+}, '*');
+
+console.log('Sent CLASSCASTELEXTENSION_READY message');
 
 // Listen for messages from the page
 window.addEventListener('message', (event) => {
@@ -29,10 +38,11 @@ window.addEventListener('message', (event) => {
     });
   } else {
     console.error('Extension API not available in content script');
+    // Send error response back to page
+    window.postMessage({
+      type: 'CLASSCASTELEXTENSION_RESPONSE',
+      id: message.id,
+      response: { success: false, error: 'Extension API not available' }
+    }, '*');
   }
 });
-
-// Notify page that content script is ready
-window.postMessage({
-  type: 'CLASSCASTELEXTENSION_READY'
-}, '*');
