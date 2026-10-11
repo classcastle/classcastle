@@ -19,17 +19,32 @@ async function initSupabase() {
     // Try loading from local file (Chrome service worker)
     if (isManifestV3) {
       importScripts('supabase.min.js');
-      SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      console.log('Supabase loaded from local file (manifest v3)');
+      if (typeof supabase !== 'undefined') {
+        SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        console.log('Supabase loaded from local file (manifest v3)');
+      } else {
+        console.log('supabase not defined after importScripts (manifest v3)');
+      }
     } else {
       // Firefox manifest v2 - try importScripts, may fail
-      importScripts('supabase.min.js');
-      SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      console.log('Supabase loaded from local file (manifest v2)');
+      try {
+        importScripts('supabase.min.js');
+        if (typeof supabase !== 'undefined') {
+          SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+          console.log('Supabase loaded from local file (manifest v2)');
+        } else {
+          console.log('supabase not defined after importScripts (manifest v2)');
+        }
+      } catch (importError) {
+        console.log('importScripts failed in manifest v2:', importError);
+      }
     }
   } catch (e) {
-    console.log('importScripts failed, Supabase may not be available:', e);
-    // For Firefox/event pages where importScripts fails, we'll rely on polling without realtime
+    console.log('Supabase initialization failed:', e);
+  }
+  
+  if (!SupabaseClient) {
+    console.log('Supabase not available, will rely on polling only');
   }
   
   return SupabaseClient;
@@ -57,97 +72,122 @@ const JOIN_TIMEOUT_MS = 120000; // 2 minutes for join to complete
 
 // Listen for messages from popup and content scripts
 api.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log('Background received message:', request.action, request);
-  
-  if (request.action === 'joinRoom') {
-    joinRoom(request.roomId, request.studentId, request.studentName).then(() => {
-      sendResponse({ success: true });
-    }).catch(err => {
-      console.error('joinRoom error:', err);
-      sendResponse({ success: false, error: err.message });
-    });
-    return true; // async response
-  } else if (request.action === 'studentJoined') {
-    // Student joined via join.html content script, start subscription
-    console.log('Student joined message received:', request);
-    joinRoom(request.roomId, request.studentId, request.studentName).then(() => {
-      // Notify popup of status change
-      api.runtime.sendMessage({
-        action: 'statusUpdate',
-        joined: true
+  try {
+    console.log('Background received message:', request.action, request);
+    
+    if (request.action === 'joinRoom') {
+      joinRoom(request.roomId, request.studentId, request.studentName).then(() => {
+        sendResponse({ success: true });
       }).catch(err => {
-        console.log('Failed to notify popup (popup may be closed):', err);
+        console.error('joinRoom error:', err);
+        sendResponse({ success: false, error: err.message });
       });
-      sendResponse({ success: true });
-    }).catch(err => {
-      console.error('studentJoined error:', err);
-      sendResponse({ success: false, error: err.message });
-    });
-    return true; // async response
-  } else if (request.action === 'leaveRoom') {
-    leaveRoom().then(() => {
-      // Notify popup of status change
-      api.runtime.sendMessage({
-        action: 'statusUpdate',
-        joined: false
+      return true; // async response
+    } else if (request.action === 'studentJoined') {
+      // Student joined via join.html content script, start subscription
+      console.log('Student joined message received:', request);
+      joinRoom(request.roomId, request.studentId, request.studentName).then(() => {
+        // Notify popup of status change
+        api.runtime.sendMessage({
+          action: 'statusUpdate',
+          joined: true
+        }).catch(err => {
+          console.log('Failed to notify popup (popup may be closed):', err);
+        });
+        sendResponse({ success: true });
       }).catch(err => {
-        console.log('Failed to notify popup (popup may be closed):', err);
+        console.error('studentJoined error:', err);
+        sendResponse({ success: false, error: err.message });
       });
-      sendResponse({ success: true });
-    }).catch(err => {
-      console.error('leaveRoom error:', err);
-      sendResponse({ success: false, error: err.message });
-    });
-    return true; // async response
-  } else if (request === 'getStatus') {
-    // Handle legacy 'getStatus' message (without request.action)
-    getStorageData().then(data => {
-      sendResponse({
-        joined: data.roomId !== null && data.studentId !== null,
-        roomId: data.roomId,
-        studentId: data.studentId,
-        studentName: data.studentName
+      return true; // async response
+    } else if (request.action === 'leaveRoom') {
+      leaveRoom().then(() => {
+        // Notify popup of status change
+        api.runtime.sendMessage({
+          action: 'statusUpdate',
+          joined: false
+        }).catch(err => {
+          console.log('Failed to notify popup (popup may be closed):', err);
+        });
+        sendResponse({ success: true });
+      }).catch(err => {
+        console.error('leaveRoom error:', err);
+        sendResponse({ success: false, error: err.message });
       });
-    });
-    return true; // async response
-  } else if (request.action === 'getStatus') {
-    getStorageData().then(data => {
-      sendResponse({
-        joined: data.roomId !== null && data.studentId !== null,
-        roomId: data.roomId,
-        studentId: data.studentId,
-        studentName: data.studentName
+      return true; // async response
+    } else if (request === 'getStatus') {
+      // Handle legacy 'getStatus' message (without request.action)
+      getStorageData().then(data => {
+        sendResponse({
+          joined: data.roomId !== null && data.studentId !== null,
+          roomId: data.roomId,
+          studentId: data.studentId,
+          studentName: data.studentName
+        });
       });
-    });
-    return true; // async response
+      return true; // async response
+    } else if (request.action === 'getStatus') {
+      getStorageData().then(data => {
+        sendResponse({
+          joined: data.roomId !== null && data.studentId !== null,
+          roomId: data.roomId,
+          studentId: data.studentId,
+          studentName: data.studentName
+        });
+      });
+      return true; // async response
+    }
+    
+    // Synchronous responses (none currently)
+    return false;
+  } catch (e) {
+    console.error('Error in message listener:', e);
+    sendResponse({ success: false, error: e.message });
+    return false;
   }
-  
-  // Synchronous responses (none currently)
-  return false;
 });
 
 // Get storage data
 async function getStorageData() {
   return new Promise((resolve) => {
-    api.storage.local.get(Object.values(STORAGE_KEYS), (result) => {
-      resolve({
-        roomId: result.roomId || null,
-        studentId: result.studentId || null,
-        studentName: result.studentName || null,
-        currentTargetUrl: result.currentTargetUrl || null,
-        joinedAt: result.joinedAt || null,
-        wasKicked: result.wasKicked || false,
-        joiningSince: result.joiningSince || null,
-        tabId: result.tabId || null
+    try {
+      api.storage.local.get(Object.values(STORAGE_KEYS), (result) => {
+        resolve({
+          roomId: result.roomId || null,
+          studentId: result.studentId || null,
+          studentName: result.studentName || null,
+          currentTargetUrl: result.currentTargetUrl || null,
+          joinedAt: result.joinedAt || null,
+          wasKicked: result.wasKicked || false,
+          joiningSince: result.joiningSince || null,
+          tabId: result.tabId || null
+        });
       });
-    });
+    } catch (e) {
+      console.error('Error getting storage data:', e);
+      resolve({
+        roomId: null,
+        studentId: null,
+        studentName: null,
+        currentTargetUrl: null,
+        joinedAt: null,
+        wasKicked: false,
+        joiningSince: null,
+        tabId: null
+      });
+    }
   });
 }
 
 // Save storage data
 async function saveStorageData(data) {
   return new Promise((resolve) => {
-    api.storage.local.set(data, () => resolve());
+    try {
+      api.storage.local.set(data, () => resolve());
+    } catch (e) {
+      console.error('Error saving storage data:', e);
+      resolve();
+    }
   });
 }
 
@@ -308,8 +348,12 @@ async function unsubscribeFromRoom(roomId, studentId) {
 
 // Alarm handler - called every ~20 seconds
 api.alarms.onAlarm.addListener(async (alarm) => {
-  if (alarm.name === ALARM_NAME) {
-    await handleAlarm();
+  try {
+    if (alarm.name === ALARM_NAME) {
+      await handleAlarm();
+    }
+  } catch (e) {
+    console.error('Error in alarm handler:', e);
   }
 });
 
@@ -449,46 +493,60 @@ function startAlarm() {
 }
 
 // Initialize - check storage and start alarm if joined
-api.storage.local.get(['roomId', 'studentId'], (result) => {
-  if (result.roomId && result.studentId) {
-    console.log('Found existing session, starting alarm');
-    startAlarm();
-    subscribeToRoom(result.roomId, result.studentId);
-  }
-});
+try {
+  api.storage.local.get(['roomId', 'studentId'], (result) => {
+    if (result.roomId && result.studentId) {
+      console.log('Found existing session, starting alarm');
+      startAlarm();
+      subscribeToRoom(result.roomId, result.studentId);
+    }
+  });
+} catch (e) {
+  console.error('Error during initialization:', e);
+}
 
 // Listen for external messages from join.html (Chrome only, via externally_connectable)
 // Firefox uses content script instead
 if (isManifestV3) {
-  api.runtime.onMessageExternal.addListener((request, sender, sendResponse) => {
-    console.log('External message received from:', sender.url, 'action:', request.action);
-    
-    const allowedOrigins = ['https://classcastle.org', 'https://www.classcastle.org'];
-    const senderOrigin = new URL(sender.url).origin;
-    
-    if (allowedOrigins.includes(senderOrigin)) {
-      if (request.action === 'studentJoined') {
-        console.log('External studentJoined message received:', request);
-        joinRoom(request.roomId, request.studentId, request.studentName).then(() => {
-          // Notify popup of status change
-          api.runtime.sendMessage({
-            action: 'statusUpdate',
-            joined: true
-          }).catch(err => {
-            console.log('Failed to notify popup (popup may be closed):', err);
-          });
-          sendResponse({ success: true });
-        }).catch(err => {
-          console.error('studentJoined error:', err);
-          sendResponse({ success: false, error: err.message });
-        });
-        return true; // async response
+  try {
+    api.runtime.onMessageExternal.addListener((request, sender, sendResponse) => {
+      try {
+        console.log('External message received from:', sender.url, 'action:', request.action);
+        
+        const allowedOrigins = ['https://classcastle.org', 'https://www.classcastle.org'];
+        const senderOrigin = new URL(sender.url).origin;
+        
+        if (allowedOrigins.includes(senderOrigin)) {
+          if (request.action === 'studentJoined') {
+            console.log('External studentJoined message received:', request);
+            joinRoom(request.roomId, request.studentId, request.studentName).then(() => {
+              // Notify popup of status change
+              api.runtime.sendMessage({
+                action: 'statusUpdate',
+                joined: true
+              }).catch(err => {
+                console.log('Failed to notify popup (popup may be closed):', err);
+              });
+              sendResponse({ success: true });
+            }).catch(err => {
+              console.error('studentJoined error:', err);
+              sendResponse({ success: false, error: err.message });
+            });
+            return true; // async response
+          }
+        } else {
+          console.log('External message from unauthorized origin:', senderOrigin);
+          sendResponse({ success: false, error: 'Unauthorized origin' });
+        }
+        
+        return false; // synchronous response
+      } catch (e) {
+        console.error('Error in external message listener:', e);
+        sendResponse({ success: false, error: e.message });
+        return false;
       }
-    } else {
-      console.log('External message from unauthorized origin:', senderOrigin);
-      sendResponse({ success: false, error: 'Unauthorized origin' });
-    }
-    
-    return false; // synchronous response
-  });
+    });
+  } catch (e) {
+    console.error('Error setting up external message listener:', e);
+  }
 }
