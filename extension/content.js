@@ -24,9 +24,11 @@ window.addEventListener('message', (event) => {
   if (!message || message.type !== 'CLASSCASTELEXTENSION') return;
   
   console.log('Content script received message from page:', message);
+  console.log('Payload:', message.payload);
   
   // Forward to background script
   if (api && api.runtime) {
+    console.log('Sending to background script...');
     api.runtime.sendMessage(message.payload, (response) => {
       console.log('Background script response:', response);
       // Send response back to page

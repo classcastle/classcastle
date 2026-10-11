@@ -900,21 +900,34 @@
               }
             };
             window.addEventListener('message', handler);
+            
+            // Timeout after 5 seconds
+            setTimeout(() => {
+              window.removeEventListener('message', handler);
+              resolve({ success: false, error: 'Timeout waiting for response' });
+            }, 5000);
           });
           
+          const payload = {
+            action: 'studentJoined',
+            roomId: room.id,
+            studentId: studentData.id,
+            studentName: name
+          };
+          
+          console.log('Sending message to content script:', payload);
           window.postMessage({
             type: 'CLASSCASTELEXTENSION',
             id: messageId,
-            payload: {
-              action: 'studentJoined',
-              roomId: room.id,
-              studentId: studentData.id,
-              studentName: name
-            }
+            payload: payload
           }, '*');
           
           const response = await waitForResponse;
           console.log('Extension notified of join via content script:', response);
+          
+          if (!response || !response.success) {
+            console.error('Failed to notify extension:', response?.error);
+          }
         } 
         // Fall back to externally_connectable (Chrome only)
         else if (typeof chrome !== 'undefined' && chrome.runtime) {
