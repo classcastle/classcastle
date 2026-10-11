@@ -882,7 +882,10 @@
       if (fromExtension) {
         const extensionId = new URLSearchParams(window.location.search).get('extension_id');
         
-        // Try content script first (Firefox)
+        // API compatibility shim
+        const api = typeof browser !== 'undefined' ? browser : chrome;
+        
+        // Try content script first (Firefox and Chrome)
         if (window.classcastleContentScriptReady) {
           console.log('Using content script to notify extension');
           const messageId = Date.now();
@@ -911,7 +914,7 @@
           const response = await waitForResponse;
           console.log('Extension notified of join via content script:', response);
         } 
-        // Fall back to externally_connectable (Chrome)
+        // Fall back to externally_connectable (Chrome only)
         else if (typeof chrome !== 'undefined' && chrome.runtime && extensionId) {
           console.log('Using externally_connectable to notify extension');
           try {
@@ -927,7 +930,7 @@
             console.log('Chrome runtime error:', e);
           }
         } else {
-          console.warn('No way to notify extension: no content script ready and no chrome.runtime available');
+          console.warn('No way to notify extension: no content script ready and no runtime API available');
         }
       }
 
