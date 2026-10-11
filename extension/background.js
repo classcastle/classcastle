@@ -26,17 +26,23 @@ async function initSupabase() {
         console.log('supabase not defined after importScripts (manifest v3)');
       }
     } else {
-      // Firefox manifest v2 - try importScripts, may fail
+      // Firefox manifest v2 - importScripts doesn't work in event pages
+      // Load Supabase from CDN using fetch and eval
+      console.log('Loading Supabase from CDN for Firefox');
       try {
-        importScripts('supabase.min.js');
+        const response = await fetch('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js');
+        const scriptText = await response.text();
+        // Use Function constructor to eval the script
+        const loadSupabase = new Function(scriptText + '; return supabase;');
+        const supabase = loadSupabase();
         if (typeof supabase !== 'undefined') {
           SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-          console.log('Supabase loaded from local file (manifest v2)');
+          console.log('Supabase loaded from CDN (manifest v2)');
         } else {
-          console.log('supabase not defined after importScripts (manifest v2)');
+          console.log('supabase not defined after CDN load (manifest v2)');
         }
-      } catch (importError) {
-        console.log('importScripts failed in manifest v2:', importError);
+      } catch (cdnError) {
+        console.log('Failed to load Supabase from CDN:', cdnError);
       }
     }
   } catch (e) {

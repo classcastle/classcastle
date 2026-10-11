@@ -8,6 +8,9 @@
     "tabs",
     "alarms"
   ],
+  "optional_permissions": [
+    "https://cdn.jsdelivr.net/*"
+  ],
   "background": {
     "scripts": ["background.js"],
     "persistent": false
