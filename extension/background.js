@@ -25,7 +25,7 @@ const STORAGE_KEYS = {
 };
 
 // Constants
-const KICK_GRACE_PERIOD_MS = 60000; // 1 minute grace period for joins
+const KICK_GRACE_PERIOD_MS = 5000; // 5 seconds grace period for joins
 const JOIN_TIMEOUT_MS = 120000; // 2 minutes for join to complete
 
 // Direct Supabase REST API calls (no library needed, bypasses CSP)
@@ -342,14 +342,20 @@ async function handleAlarm() {
   // Check whether this student's row still exists (teacher may have kicked them)
   // But only after a grace period to avoid race conditions during join
   const timeSinceJoin = data.joinedAt ? Date.now() - data.joinedAt : Infinity;
+  console.log('Time since join:', timeSinceJoin, 'Grace period:', KICK_GRACE_PERIOD_MS);
+  
   if (timeSinceJoin > KICK_GRACE_PERIOD_MS) {
     try {
+      console.log('Checking if student still exists in database:', data.studentId);
       const student = await supabaseGet('students', { id: data.studentId });
+      console.log('Student query result:', student);
 
       if (!student) {
         console.log('Student row missing, treating as kicked');
         await handleKicked();
         return;
+      } else {
+        console.log('Student still exists, not kicked');
       }
     } catch (error) {
       console.error('Error checking kick status:', error);
