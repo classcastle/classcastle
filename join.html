@@ -484,6 +484,17 @@
   // LocalStorage keys
   const STORAGE_KEY = 'classcastle_student_session';
 
+  // Track if content script is ready
+  window.classcastleContentScriptReady = false;
+
+  // Listen for content script ready message
+  window.addEventListener('message', (event) => {
+    if (event.data.type === 'CLASSCASTELEXTENSION_READY') {
+      console.log('Content script is ready');
+      window.classcastleContentScriptReady = true;
+    }
+  });
+
   // Switch favicon based on theme
   function updateFavicon() {
     const favicon = document.getElementById('favicon');
@@ -868,14 +879,47 @@
       }));
 
       // Send message to extension background script with actual IDs
-      if (fromExtension && typeof chrome !== 'undefined' && chrome.runtime) {
+      if (fromExtension) {
         const extensionId = new URLSearchParams(window.location.search).get('extension_id');
-        if (extensionId) {
+        
+        // Try content script first (Firefox)
+        if (window.classcastleContentScriptReady) {
+          console.log('Using content script to notify extension');
+          const messageId = Date.now();
+          
+          const waitForResponse = new Promise((resolve) => {
+            const handler = (event) => {
+              if (event.data.type === 'CLASSCASTELEXTENSION_RESPONSE' && event.data.id === messageId) {
+                window.removeEventListener('message', handler);
+                resolve(event.data.response);
+              }
+            };
+            window.addEventListener('message', handler);
+          });
+          
+          window.postMessage({
+            type: 'CLASSCASTELEXTENSION',
+            id: messageId,
+            payload: {
+              action: 'studentJoined',
+              roomId: room.id,
+              studentId: studentData.id,
+              studentName: name
+            }
+          }, '*');
+          
+          const response = await waitForResponse;
+          console.log('Extension notified of join via content script:', response);
+        } 
+        // Fall back to externally_connectable (Chrome)
+        else if (typeof chrome !== 'undefined' && chrome.runtime && extensionId) {
+          console.log('Using externally_connectable to notify extension');
           try {
             chrome.runtime.sendMessage(extensionId, {
               action: 'studentJoined',
               roomId: room.id,
-              studentId: studentData.id
+              studentId: studentData.id,
+              studentName: name
             }, (response) => {
               console.log('Extension notified of join:', response);
             });
@@ -883,7 +927,7 @@
             console.log('Chrome runtime error:', e);
           }
         } else {
-          console.warn('No extension_id in URL, cannot notify extension');
+          console.warn('No way to notify extension: no content script ready and no chrome.runtime available');
         }
       }
 
