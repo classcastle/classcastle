@@ -226,12 +226,24 @@ async function saveStorageData(data) {
 async function joinRoom(roomId, studentId, studentName) {
   console.log('Joining room:', roomId, 'student:', studentId, 'name:', studentName);
 
-  // Save to storage with joining timestamp
+  // Fetch current room target_url to avoid navigating to pre-existing URLs
+  let initialTargetUrl = null;
+  try {
+    const room = await supabaseGet('rooms', { id: roomId });
+    if (room && room.target_url) {
+      initialTargetUrl = room.target_url;
+      console.log('Room has existing target_url, will use as baseline:', initialTargetUrl);
+    }
+  } catch (error) {
+    console.error('Error fetching room for initial target_url:', error);
+  }
+
+  // Save to storage with joining timestamp and initial target_url
   await saveStorageData({
     roomId: roomId,
     studentId: studentId,
     studentName: studentName,
-    currentTargetUrl: null,
+    currentTargetUrl: initialTargetUrl, // Initialize to room's current URL to avoid re-navigating
     joinedAt: null, // Will be set when subscription confirms
     joiningSince: Date.now(),
     tabId: null
