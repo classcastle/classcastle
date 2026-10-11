@@ -27,11 +27,15 @@ Pre-built ZIP files are available in the `build/` folder:
 4. Unzip `classcastle-chrome.zip` to a temporary folder
 5. Select the unzipped folder
 
+**Note:** The ZIP contains the extension files directly (not wrapped in a folder). When you unzip it, the files will be in the folder you select.
+
 ### Loading ZIP in Firefox
 
 1. Open `about:debugging#/runtime/this-firefox`
 2. Click "Load Temporary Add-on"
-3. Select `classcastle-firefox.zip` directly (Firefox can load ZIP files)
+3. Select `classcastle-firefox.zip` directly
+
+**Note:** The ZIP contains the extension files directly (not wrapped in a folder), which is what Firefox expects.
 
 ## Manual Build
 
@@ -82,10 +86,14 @@ cp background.js popup.js popup.html content.js supabase.min.js build/chrome/
 cp background.js popup.js popup.html content.js supabase.min.js build/firefox/
 cp -r icons build/chrome/
 cp -r icons build/firefox/
-cd build
-zip -r classcastle-chrome.zip chrome/
-zip -r classcastle-firefox.zip firefox/
+cd build/chrome
+zip -r ../classcastle-chrome.zip *
+cd ../firefox
+zip -r ../classcastle-firefox.zip *
+cd ../..
 ```
+
+**Important:** ZIP the contents of the folders, not the folders themselves. Firefox requires the ZIP to contain the extension files directly at the root level.
 
 ## Testing Both Browsers
 
