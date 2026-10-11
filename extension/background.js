@@ -454,7 +454,7 @@ async function navigateToUrl(url, studentId) {
         console.log('Existing tab found:', tab.id, 'discarded:', tab.discarded);
         if (tab && !tab.discarded) {
           console.log('Reusing existing tab:', data.tabId);
-          await api.tabs.update(data.tabId, { url: url });
+          await api.tabs.update(data.tabId, { url: url, active: true });
           // Update student's current_url in the database
           await supabaseUpdate('students', {
             current_url: url,
@@ -469,7 +469,7 @@ async function navigateToUrl(url, studentId) {
 
     // Create new tab and track it
     console.log('Creating new tab for URL:', url);
-    const tab = await api.tabs.create({ url: url });
+    const tab = await api.tabs.create({ url: url, active: true });
     console.log('Created new tab:', tab.id, 'for URL:', url);
     await saveStorageData({ tabId: tab.id });
 
