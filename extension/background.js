@@ -298,11 +298,11 @@ async function subscribeToRoom(roomId, studentId) {
       table: 'rooms',
       filter: `id=eq.${roomId}`
     }, (payload) => {
-      console.log('Room update received:', payload);
+      console.log('Room update received via subscription:', payload);
       // Check if target_url changed
       if (payload.new && payload.new.target_url) {
         if (!payload.old || payload.new.target_url !== payload.old.target_url) {
-          console.log('Target URL changed to:', payload.new.target_url);
+          console.log('Target URL changed via subscription to:', payload.new.target_url);
           saveStorageData({ currentTargetUrl: payload.new.target_url });
           navigateToUrl(payload.new.target_url, studentId);
         }
@@ -328,6 +328,10 @@ async function subscribeToRoom(roomId, studentId) {
         });
       } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
         console.error('Subscription failed, will retry on next alarm');
+        // Still mark as joined so polling works
+        saveStorageData({
+          joinedAt: Date.now()
+        });
       }
     });
 }
@@ -397,10 +401,18 @@ async function handleAlarm() {
         .eq('id', data.roomId)
         .single();
 
+      console.log('Poll for URL changes - room data:', room);
+      console.log('Current target_url in storage:', data.currentTargetUrl);
+      console.log('Room target_url from DB:', room?.target_url);
+
       if (room && room.target_url && room.target_url !== data.currentTargetUrl) {
         console.log('Poll detected URL change:', room.target_url);
         await saveStorageData({ currentTargetUrl: room.target_url });
         navigateToUrl(room.target_url, data.studentId);
+      } else if (room && room.target_url && room.target_url === data.currentTargetUrl) {
+        console.log('URL already set to:', room.target_url);
+      } else {
+        console.log('No target_url set in room yet');
       }
     }
   } catch (error) {
@@ -426,17 +438,22 @@ async function handleAlarm() {
 
 // Navigate to a new URL, reusing the tab if possible
 async function navigateToUrl(url, studentId) {
-  if (!url) return;
+  if (!url) {
+    console.log('navigateToUrl called with no URL, skipping');
+    return;
+  }
 
-  console.log('Navigating to URL:', url);
+  console.log('Navigating to URL:', url, 'for student:', studentId);
 
   try {
     const data = await getStorageData();
+    console.log('Current storage data for navigation:', data);
     
     // Try to reuse existing tab
     if (data.tabId) {
       try {
         const tab = await api.tabs.get(data.tabId);
+        console.log('Existing tab found:', tab.id, 'discarded:', tab.discarded);
         if (tab && !tab.discarded) {
           console.log('Reusing existing tab:', data.tabId);
           await api.tabs.update(data.tabId, { url: url });
@@ -459,6 +476,7 @@ async function navigateToUrl(url, studentId) {
     }
 
     // Create new tab and track it
+    console.log('Creating new tab for URL:', url);
     const tab = await api.tabs.create({ url: url });
     console.log('Created new tab:', tab.id, 'for URL:', url);
     await saveStorageData({ tabId: tab.id });
@@ -481,6 +499,7 @@ async function navigateToUrl(url, studentId) {
 
 // Start alarm-based polling
 function startAlarm() {
+  console.log('Starting alarm for polling');
   api.alarms.create(ALARM_NAME, {
     periodInMinutes: ALARM_INTERVAL_MINUTES
   });
