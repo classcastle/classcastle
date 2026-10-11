@@ -636,6 +636,7 @@
 
     // Check if coming from extension with pre-filled data
     if (fromExtension && prefillCode && prefillName) {
+      console.log('Auto-joining with pre-filled data:', prefillCode, prefillName);
       // Pre-fill the form
       const codeStr = prefillCode.toString();
       digits.forEach((digit, i) => {
@@ -654,13 +655,16 @@
 
         if (stepCodeEl && !stepCodeEl.classList.contains('hide')) {
           // We're on step 0, need to go to step 1 first
+          console.log('On step 0, moving to step 1');
           nextBtn.click();
           // Then click join after transition
           setTimeout(() => {
+            console.log('Clicking join button');
             joinBtn.click();
           }, 500);
         } else {
           // Already on step 1, can join directly
+          console.log('Already on step 1, clicking join button');
           joinBtn.click();
         }
       }, 500);
@@ -832,6 +836,7 @@
 
     try {
       // Verify room exists
+      console.log('Verifying room exists for code:', code);
       const { data: room, error: roomError } = await SupabaseClient
         .from('rooms')
         .select('id')
@@ -839,7 +844,10 @@
         .eq('active', true)
         .single();
 
+      console.log('Room query result:', room, 'error:', roomError);
+
       if (roomError || !room) {
+        console.error('Room not found or closed:', roomError);
         statusLine.textContent = 'Room not found or closed. Check the code with your teacher.';
         statusLine.className = 'status-line is-error';
         joinBtn.disabled = false;
@@ -848,6 +856,7 @@
       }
 
       // Create student record
+      console.log('Creating student record for room:', room.id, 'name:', name);
       const { data: studentData, error: studentError } = await SupabaseClient
         .from('students')
         .insert({
@@ -859,7 +868,10 @@
         .select()
         .single();
 
+      console.log('Student record created:', studentData, 'error:', studentError);
+
       if (studentError) {
+        console.error('Error creating student record:', studentError);
         statusLine.textContent = 'Error joining room. Please try again.';
         statusLine.className = 'status-line is-error';
         joinBtn.disabled = false;
@@ -868,6 +880,7 @@
       }
 
       // Success
+      console.log('Join successful, showing joined state');
       joinedTitle.textContent = 'You\u2019re in the room';
       joinedSub.textContent = name + ', you\u2019ve joined room ' + code + '. Sit tight \u2014 your teacher controls where this browser goes next.';
       formState.classList.add('hide');
@@ -884,6 +897,8 @@
         code: code,
         name: name
       }));
+
+      console.log('Saved session to localStorage, checking fromExtension:', fromExtension);
 
       // Send message to extension background script with actual IDs
       if (fromExtension) {
