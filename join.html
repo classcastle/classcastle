@@ -1004,24 +1004,6 @@
     localStorage.removeItem(STORAGE_KEY);
   }
 
-  leaveBtn.addEventListener('click', async () => {
-    const code = currentCode();
-    const name = nameInput.value.trim();
-
-    await leavePreviousRoom();
-
-    digits.forEach(d => d.value = '');
-    nameInput.value = '';
-    joinBtn.disabled = true;
-    joinBtn.textContent = 'Join room';
-    statusLine.textContent = '\u00A0';
-    statusLine.className = 'status-line';
-    stepDots[0].classList.remove('done');
-    joinedState.classList.remove('show');
-    formState.classList.remove('hide');
-    goToStep(0);
-  });
-
   // Start kick checking (polling for if student was removed)
   function startKickCheck() {
     if (messageInterval) clearInterval(messageInterval);
