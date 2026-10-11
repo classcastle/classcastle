@@ -161,17 +161,36 @@ api.storage.onChanged.addListener((changes, area) => {
     return;
   }
   
-  // Check for joined state
-  if (changes.roomId && changes.studentId) {
-    if (changes.roomId.newValue && changes.studentId.newValue) {
-      const studentName = changes.studentName?.newValue || '';
-      render('joined', {
-        roomCode: changes.roomId.newValue.substring(0, 6),
-        studentName: studentName
-      });
-    } else if (!changes.roomId.newValue && !changes.studentId.newValue) {
-      render('idle');
-    }
+  // Check for joined state - check if roomId and studentId are now set
+  const roomIdChanged = changes.roomId;
+  const studentIdChanged = changes.studentId;
+  const studentNameChanged = changes.studentName;
+  
+  if (roomIdChanged || studentIdChanged) {
+    const newRoomId = roomIdChanged ? roomIdChanged.newValue : undefined;
+    const newStudentId = studentIdChanged ? studentIdChanged.newValue : undefined;
+    const newStudentName = studentNameChanged ? studentNameChanged.newValue : undefined;
+    
+    // Get current values if not in changes
+    api.storage.local.get(['roomId', 'studentId', 'studentName'], (result) => {
+      const currentRoomId = newRoomId !== undefined ? newRoomId : result.roomId;
+      const currentStudentId = newStudentId !== undefined ? newStudentId : result.studentId;
+      const currentStudentName = newStudentName !== undefined ? newStudentName : result.studentName;
+      
+      console.log('Current state after change:', { currentRoomId, currentStudentId, currentStudentName });
+      
+      if (currentRoomId && currentStudentId) {
+        console.log('Transitioning to joined state');
+        render('joined', {
+          roomCode: currentRoomId.substring(0, 6),
+          studentName: currentStudentName || ''
+        });
+      } else if (!currentRoomId && !currentStudentId) {
+        console.log('Transitioning to idle state');
+        render('idle');
+      }
+    });
+    return;
   }
   
   // Check for joining state

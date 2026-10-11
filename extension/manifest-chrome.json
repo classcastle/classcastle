@@ -5,15 +5,15 @@
   "description": "Classroom management tool for teachers to navigate student browsers",
   "permissions": [
     "storage",
-    "alarms"
+    "alarms",
+    "tabs"
   ],
   "host_permissions": [
     "https://hduyofdbpspjcuwvackd.supabase.co/*",
     "https://classcastle.org/*"
   ],
   "background": {
-    "service_worker": "background.js",
-    "type": "module"
+    "service_worker": "background.js"
   },
   "action": {
     "default_popup": "popup.html",
