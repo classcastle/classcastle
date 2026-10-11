@@ -10,7 +10,7 @@ const SUPABASE_KEY = 'sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK';
 
 // Constants
 const ALARM_NAME = 'pollForChanges';
-const ALARM_INTERVAL_MINUTES = 0.33; // ~20 seconds
+const ALARM_INTERVAL_MINUTES = 0.05; // 3 seconds
 
 // Storage keys
 const STORAGE_KEYS = {
