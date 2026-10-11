@@ -59,11 +59,12 @@ section{padding:48px 0;border-top:1px solid var(--line)}
 .link-title{font-weight:600;font-size:.95rem;margin-bottom:2px}
 .link-desc{color:var(--soft);font-size:.85rem}
 .link-arrow{color:var(--soft)}
+.mobile-menu-btn{display:none}
 @media (max-width:820px){
   .wrap,nav{padding-left:20px;padding-right:20px}
   .resource-grid{grid-template-columns:1fr}
   .page-header{padding:40px 0 32px}
-  .mobile-menu-btn{display:flex !important;background:none;border:none;cursor:pointer;padding:8px;color:var(--ink)}
+  .mobile-menu-btn{display:none;background:none;border:none;cursor:pointer;padding:8px;color:var(--ink)}
   .nav-links{display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);flex-direction:column;padding:16px;border-bottom:1px solid var(--line);box-shadow:0 4px 12px rgba(0,0,0,0.1)}
   .nav-links.active{display:flex}
   .nav-links a{width:100%;text-align:center;padding:12px}
@@ -73,7 +74,7 @@ section{padding:48px 0;border-top:1px solid var(--line)}
 <body>
 <nav aria-label="Main">
 <div class="wordmark"><img src="/logo.svg" alt="" class="logo-mark"><span>Class<span class="word-accent">castle</span></span></div>
-<button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu" style="display:none;">
+<button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
     <line x1="3" y1="12" x2="21" y2="12"/>
     <line x1="3" y1="6" x2="21" y2="6"/>
