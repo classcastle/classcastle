@@ -7,7 +7,6 @@ const isManifestV3 = api.runtime.getManifest().manifest_version === 3;
 // Supabase configuration
 const SUPABASE_URL = 'https://hduyofdbpspjcuwvackd.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK';
-const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNsYXNzY2FzdGxlIiwicm9sZSI6ImFub24iLCJleHAiOjE5MzY2OTc5ODF9.' + SUPABASE_KEY;
 
 // Constants
 const ALARM_NAME = 'pollForChanges';
@@ -32,7 +31,7 @@ const JOIN_TIMEOUT_MS = 120000; // 2 minutes for join to complete
 // Direct Supabase REST API calls (no library needed, bypasses CSP)
 async function supabaseGet(table, filters = {}) {
   const url = new URL(`${SUPABASE_URL}/rest/v1/${table}`);
-  url.searchParams.append('apikey', SUPABASE_API_KEY);
+  url.searchParams.append('apikey', SUPABASE_KEY);
   
   for (const [key, value] of Object.entries(filters)) {
     url.searchParams.append(key, `eq.${value}`);
@@ -40,8 +39,8 @@ async function supabaseGet(table, filters = {}) {
   
   const response = await fetch(url, {
     headers: {
-      'apikey': SUPABASE_API_KEY,
-      'Authorization': `Bearer ${SUPABASE_API_KEY}`
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`
     }
   });
   
@@ -51,13 +50,13 @@ async function supabaseGet(table, filters = {}) {
 
 async function supabaseInsert(table, data) {
   const url = new URL(`${SUPABASE_URL}/rest/v1/${table}`);
-  url.searchParams.append('apikey', SUPABASE_API_KEY);
+  url.searchParams.append('apikey', SUPABASE_KEY);
   
   const response = await fetch(url, {
     method: 'POST',
     headers: {
-      'apikey': SUPABASE_API_KEY,
-      'Authorization': `Bearer ${SUPABASE_API_KEY}`,
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
       'Content-Type': 'application/json',
       'Prefer': 'return=representation'
     },
@@ -69,7 +68,7 @@ async function supabaseInsert(table, data) {
 
 async function supabaseUpdate(table, data, filters = {}) {
   const url = new URL(`${SUPABASE_URL}/rest/v1/${table}`);
-  url.searchParams.append('apikey', SUPABASE_API_KEY);
+  url.searchParams.append('apikey', SUPABASE_KEY);
   
   for (const [key, value] of Object.entries(filters)) {
     url.searchParams.append(key, `eq.${value}`);
@@ -78,8 +77,8 @@ async function supabaseUpdate(table, data, filters = {}) {
   const response = await fetch(url, {
     method: 'PATCH',
     headers: {
-      'apikey': SUPABASE_API_KEY,
-      'Authorization': `Bearer ${SUPABASE_API_KEY}`,
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
       'Content-Type': 'application/json',
       'Prefer': 'return=representation'
     },
@@ -91,7 +90,7 @@ async function supabaseUpdate(table, data, filters = {}) {
 
 async function supabaseDelete(table, filters = {}) {
   const url = new URL(`${SUPABASE_URL}/rest/v1/${table}`);
-  url.searchParams.append('apikey', SUPABASE_API_KEY);
+  url.searchParams.append('apikey', SUPABASE_KEY);
   
   for (const [key, value] of Object.entries(filters)) {
     url.searchParams.append(key, `eq.${value}`);
@@ -100,8 +99,8 @@ async function supabaseDelete(table, filters = {}) {
   const response = await fetch(url, {
     method: 'DELETE',
     headers: {
-      'apikey': SUPABASE_API_KEY,
-      'Authorization': `Bearer ${SUPABASE_API_KEY}`
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`
     }
   });
   
