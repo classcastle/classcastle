@@ -8,10 +8,6 @@
     "tabs",
     "alarms"
   ],
-  "host_permissions": [
-    "https://hduyofdbpspjcuwvackd.supabase.co/*",
-    "https://classcastle.org/*"
-  ],
   "background": {
     "scripts": ["background.js"],
     "persistent": false

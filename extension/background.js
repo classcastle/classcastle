@@ -1,11 +1,14 @@
 // API compatibility shim for Chrome and Firefox
 const api = globalThis.browser ?? globalThis.chrome;
 
+// Detect manifest version
+const isManifestV3 = api.runtime.getManifest().manifest_version === 3;
+
 // Supabase configuration
 const SUPABASE_URL = 'https://hduyofdbpspjcuwvackd.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK';
 
-// Supabase client (will be loaded dynamically for Firefox)
+// Supabase client (will be loaded dynamically)
 let SupabaseClient = null;
 
 // Initialize Supabase client
@@ -14,12 +17,19 @@ async function initSupabase() {
   
   try {
     // Try loading from local file (Chrome service worker)
-    importScripts('supabase.min.js');
-    SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    console.log('Supabase loaded from local file');
+    if (isManifestV3) {
+      importScripts('supabase.min.js');
+      SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      console.log('Supabase loaded from local file (manifest v3)');
+    } else {
+      // Firefox manifest v2 - try importScripts, may fail
+      importScripts('supabase.min.js');
+      SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      console.log('Supabase loaded from local file (manifest v2)');
+    }
   } catch (e) {
-    console.log('importScripts not available, will use fetch-based fallback');
-    // For Firefox/event pages, we'll use direct fetch calls instead
+    console.log('importScripts failed, Supabase may not be available:', e);
+    // For Firefox/event pages where importScripts fails, we'll rely on polling without realtime
   }
   
   return SupabaseClient;
@@ -234,6 +244,8 @@ async function subscribeToRoom(roomId, studentId) {
   await initSupabase();
   if (!SupabaseClient) {
     console.log('Supabase not available, will rely on polling only');
+    // Mark as joined anyway since we can still poll
+    await saveStorageData({ joinedAt: Date.now() });
     return;
   }
 
@@ -445,35 +457,38 @@ api.storage.local.get(['roomId', 'studentId'], (result) => {
   }
 });
 
-// Listen for external messages from join.html via content script
-api.runtime.onMessageExternal.addListener((request, sender, sendResponse) => {
-  console.log('External message received from:', sender.url, 'action:', request.action);
-  
-  const allowedOrigins = ['https://classcastle.org', 'https://www.classcastle.org'];
-  const senderOrigin = new URL(sender.url).origin;
-  
-  if (allowedOrigins.includes(senderOrigin)) {
-    if (request.action === 'studentJoined') {
-      console.log('External studentJoined message received:', request);
-      joinRoom(request.roomId, request.studentId, request.studentName).then(() => {
-        // Notify popup of status change
-        api.runtime.sendMessage({
-          action: 'statusUpdate',
-          joined: true
+// Listen for external messages from join.html (Chrome only, via externally_connectable)
+// Firefox uses content script instead
+if (isManifestV3) {
+  api.runtime.onMessageExternal.addListener((request, sender, sendResponse) => {
+    console.log('External message received from:', sender.url, 'action:', request.action);
+    
+    const allowedOrigins = ['https://classcastle.org', 'https://www.classcastle.org'];
+    const senderOrigin = new URL(sender.url).origin;
+    
+    if (allowedOrigins.includes(senderOrigin)) {
+      if (request.action === 'studentJoined') {
+        console.log('External studentJoined message received:', request);
+        joinRoom(request.roomId, request.studentId, request.studentName).then(() => {
+          // Notify popup of status change
+          api.runtime.sendMessage({
+            action: 'statusUpdate',
+            joined: true
+          }).catch(err => {
+            console.log('Failed to notify popup (popup may be closed):', err);
+          });
+          sendResponse({ success: true });
         }).catch(err => {
-          console.log('Failed to notify popup (popup may be closed):', err);
+          console.error('studentJoined error:', err);
+          sendResponse({ success: false, error: err.message });
         });
-        sendResponse({ success: true });
-      }).catch(err => {
-        console.error('studentJoined error:', err);
-        sendResponse({ success: false, error: err.message });
-      });
-      return true; // async response
+        return true; // async response
+      }
+    } else {
+      console.log('External message from unauthorized origin:', senderOrigin);
+      sendResponse({ success: false, error: 'Unauthorized origin' });
     }
-  } else {
-    console.log('External message from unauthorized origin:', senderOrigin);
-    sendResponse({ success: false, error: 'Unauthorized origin' });
-  }
-  
-  return false; // synchronous response
-});
+    
+    return false; // synchronous response
+  });
+}

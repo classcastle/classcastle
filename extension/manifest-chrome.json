@@ -1,0 +1,41 @@
+{
+  "manifest_version": 3,
+  "name": "Classcastle",
+  "version": "1.2.2",
+  "description": "Classroom management tool for teachers to navigate student browsers",
+  "permissions": [
+    "storage",
+    "alarms"
+  ],
+  "host_permissions": [
+    "https://hduyofdbpspjcuwvackd.supabase.co/*",
+    "https://classcastle.org/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "externally_connectable": {
+    "matches": ["https://classcastle.org/*", "https://www.classcastle.org/*"]
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://classcastle.org/join.html"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
