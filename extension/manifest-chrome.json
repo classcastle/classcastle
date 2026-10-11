@@ -28,7 +28,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://classcastle.org/join.html"],
+      "matches": ["https://classcastle.org/join*", "https://classcastle.org/join.html*"],
       "js": ["content.js"],
       "run_at": "document_end"
     }
