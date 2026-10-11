@@ -880,11 +880,6 @@
 
       // Send message to extension background script with actual IDs
       if (fromExtension) {
-        const extensionId = new URLSearchParams(window.location.search).get('extension_id');
-        
-        // API compatibility shim
-        const api = typeof browser !== 'undefined' ? browser : chrome;
-        
         // Try content script first (Firefox and Chrome)
         if (window.classcastleContentScriptReady) {
           console.log('Using content script to notify extension');
@@ -915,22 +910,27 @@
           console.log('Extension notified of join via content script:', response);
         } 
         // Fall back to externally_connectable (Chrome only)
-        else if (typeof chrome !== 'undefined' && chrome.runtime && extensionId) {
-          console.log('Using externally_connectable to notify extension');
-          try {
-            chrome.runtime.sendMessage(extensionId, {
-              action: 'studentJoined',
-              roomId: room.id,
-              studentId: studentData.id,
-              studentName: name
-            }, (response) => {
-              console.log('Extension notified of join:', response);
-            });
-          } catch (e) {
-            console.log('Chrome runtime error:', e);
+        else if (typeof chrome !== 'undefined' && chrome.runtime) {
+          const extensionId = new URLSearchParams(window.location.search).get('extension_id');
+          if (extensionId) {
+            console.log('Using externally_connectable to notify extension');
+            try {
+              chrome.runtime.sendMessage(extensionId, {
+                action: 'studentJoined',
+                roomId: room.id,
+                studentId: studentData.id,
+                studentName: name
+              }, (response) => {
+                console.log('Extension notified of join:', response);
+              });
+            } catch (e) {
+              console.log('Chrome runtime error:', e);
+            }
+          } else {
+            console.warn('No extension_id in URL for externally_connectable');
           }
         } else {
-          console.warn('No way to notify extension: no content script ready and no runtime API available');
+          console.warn('No way to notify extension: no content script ready and no chrome.runtime available');
         }
       }
 
