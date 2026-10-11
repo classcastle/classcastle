@@ -12,7 +12,30 @@ This extension uses separate manifest files for Chrome and Firefox to ensure ful
 - `content.js` - Content script for Firefox (also works in Chrome)
 - `supabase.min.js` - Supabase client library
 
-## Building for Chrome
+## Quick Build (ZIP files)
+
+Pre-built ZIP files are available in the `build/` folder:
+
+- `build/classcastle-chrome.zip` - Ready to load in Chrome
+- `build/classcastle-firefox.zip` - Ready to load in Firefox
+
+### Loading ZIP in Chrome
+
+1. Open `chrome://extensions/`
+2. Enable "Developer mode"
+3. Click "Load unpacked"
+4. Unzip `classcastle-chrome.zip` to a temporary folder
+5. Select the unzipped folder
+
+### Loading ZIP in Firefox
+
+1. Open `about:debugging#/runtime/this-firefox`
+2. Click "Load Temporary Add-on"
+3. Select `classcastle-firefox.zip` directly (Firefox can load ZIP files)
+
+## Manual Build
+
+### Building for Chrome
 
 1. Copy `manifest-chrome.json` to `manifest.json`:
    ```bash
@@ -25,7 +48,7 @@ This extension uses separate manifest files for Chrome and Firefox to ensure ful
    - Click "Load unpacked"
    - Select the extension folder
 
-## Building for Firefox
+### Building for Firefox
 
 1. Copy `manifest-firefox.json` to `manifest.json`:
    ```bash
@@ -36,6 +59,24 @@ This extension uses separate manifest files for Chrome and Firefox to ensure ful
    - Open `about:debugging#/runtime/this-firefox`
    - Click "Load Temporary Add-on"
    - Select the `manifest.json` file
+
+## Rebuilding ZIP Files
+
+To rebuild the ZIP files after making changes:
+
+```bash
+cd extension
+mkdir -p build/firefox build/chrome
+cp manifest-chrome.json build/chrome/manifest.json
+cp manifest-firefox.json build/firefox/manifest.json
+cp background.js popup.js popup.html content.js supabase.min.js build/chrome/
+cp background.js popup.js popup.html content.js supabase.min.js build/firefox/
+cp -r icons build/chrome/
+cp -r icons build/firefox/
+cd build
+zip -r classcastle-chrome.zip chrome/
+zip -r classcastle-firefox.zip firefox/
+```
 
 ## Testing Both Browsers
 
