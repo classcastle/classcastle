@@ -12,8 +12,6 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.31/dist/jspdf.plugin.autotable.min.js"></script>
-<script type="module" src="https://cdn.jsdelivr.net/npm/@videojs/cdn@10.0.1/video.js"></script>
-<script type="module" src="https://cdn.jsdelivr.net/npm/@videojs/cdn@10.0.1/media/youtube-video.js"></script>
 
 <style>
   :root {
@@ -2510,12 +2508,14 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         <h2 class="section-title" style="margin-bottom: 24px;">What is Classcastle?</h2>
         <p style="color: var(--soft); margin-bottom: 16px;">Classcastle is a free classroom management tool that helps teachers guide students to the same webpage instantly. Watch the video below to learn more about how it works:</p>
 
-        <div style="margin: 24px 0;">
-          <video-player>
-            <video-skin style="display: block; width: 100%; aspect-ratio: 16 / 9; border-radius: 6px; overflow: hidden;">
-              <youtube-video src="https://www.youtube.com/watch?v=Bzb4_y3rUW4"></youtube-video>
-            </video-skin>
-          </video-player>
+        <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 6px; margin: 24px 0; background: #000;">
+          <iframe
+            src="https://www.youtube.com/embed/Bzb4_y3rUW4"
+            title="About Classcastle"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;">
+          </iframe>
         </div>
 
         <p style="color: var(--soft); margin-bottom: 16px;">Classcastle makes it easy for teachers to manage their classroom by:</p>

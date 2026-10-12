@@ -17,8 +17,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script type="module" src="https://cdn.jsdelivr.net/npm/@videojs/cdn@10.0.1/video.js"></script>
-<script type="module" src="https://cdn.jsdelivr.net/npm/@videojs/cdn@10.0.1/media/youtube-video.js"></script>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[
 {"@type":"SoftwareApplication","name":"Classcastle","url":"https://classcastle.org/","applicationCategory":"EducationalApplication","operatingSystem":"Windows, macOS, ChromeOS, Linux","description":"A teacher web app and student browser extension that sends every student's browser to the same page in one click.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},
@@ -260,22 +258,14 @@ footer a{color:var(--soft)}
     <div class="video-grid">
       <div class="video-item">
         <div class="video-wrapper">
-          <video-player>
-            <video-skin style="display: block; width: 100%; aspect-ratio: 16 / 9;">
-              <youtube-video src="https://www.youtube.com/watch?v=Bzb4_y3rUW4"></youtube-video>
-            </video-skin>
-          </video-player>
+          <iframe width="560" height="315" src="https://www.youtube.com/embed/Bzb4_y3rUW4" title="Classcastle Overview" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
         <h3>Short Promo</h3>
         <p>A quick overview of how to set up and use Classcastle in your classroom.</p>
       </div>
       <div class="video-item">
         <div class="video-wrapper">
-          <video-player>
-            <video-skin style="display: block; width: 100%; aspect-ratio: 16 / 9;">
-              <youtube-video src="https://www.youtube.com/watch?v=KrNZoKGV0O8"></youtube-video>
-            </video-skin>
-          </video-player>
+          <iframe width="560" height="315" src="https://www.youtube.com/embed/KrNZoKGV0O8" title="Classcastle Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
         <h3>Full Trailer</h3>
         <p>Learn about templates, shortcuts, and analytics to maximize your classroom efficiency.</p>
