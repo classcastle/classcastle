@@ -1782,39 +1782,46 @@
     width: 20px;
     height: 20px;
     color: var(--soft);
-    transition: transform 0.2s ease;
   }
 
-  .license-item.open .license-chevron {
-    transform: rotate(180deg);
+  .license-back-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: none;
+    background: none;
+    color: var(--soft);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 400;
+    transition: color 0.15s ease;
+    margin-bottom: 16px;
   }
 
-  .license-content {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-    background: var(--surface);
+  .license-back-btn:hover {
+    color: var(--ink);
   }
 
-  .license-item.open .license-content {
-    max-height: 500px;
+  .license-back-btn svg {
+    width: 20px;
+    height: 20px;
   }
 
-  .license-text {
+  .license-detail-text {
     padding: 16px;
     font-size: 0.85rem;
     color: var(--soft);
     line-height: 1.6;
     white-space: pre-wrap;
-    border-top: 1px solid var(--line);
+    background: var(--bg);
+    border-radius: 6px;
+    margin-bottom: 16px;
   }
 
-  .license-links {
-    padding: 12px 16px;
-    border-top: 1px solid var(--line);
+  .license-detail-links {
     display: flex;
     gap: 12px;
-    background: var(--bg);
   }
 
   .license-link {
@@ -2414,7 +2421,10 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       <div class="card">
         <h2 class="section-title" style="margin-bottom: 16px;">Open Source Licenses</h2>
-        <p style="color: var(--soft); margin-bottom: 16px;">Classcastle uses open source libraries. View their licenses here.</p>
+        <p style="color: var(--soft); margin-bottom: 8px;">Classcastle uses open source libraries. View their licenses here.</p>
+        <p style="color: var(--soft); font-size: 0.85rem; margin-bottom: 16px;">
+          Open source licenses are legal agreements that allow developers to use, modify, and distribute software freely. These licenses ensure that the software remains open and accessible to everyone while protecting the rights of the original creators.
+        </p>
         <button class="btn btn-secondary" id="openLicensesBtn">View Open Source Licenses</button>
       </div>
 
@@ -2429,11 +2439,12 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     <div class="modal-overlay" id="licensesModalOverlay" style="display: none;">
       <div class="modal" id="licensesModal" style="max-width: 700px; max-height: 80vh; overflow: hidden; display: flex; flex-direction: column;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-          <h2 style="font-size: 1.4rem; margin: 0;">Open Source Licenses</h2>
+          <h2 style="font-size: 1.4rem; margin: 0;" id="licensesModalTitle">Open Source Licenses</h2>
           <button id="closeLicensesBtn" style="background: none; border: none; color: var(--soft); font-size: 1.5rem; cursor: pointer; padding: 8px; border-radius: 6px; transition: all 0.2s ease; line-height: 1; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">×</button>
         </div>
         <div style="flex: 1; overflow-y: auto; padding-right: 8px;">
-          <div id="licensesList"></div>
+          <div id="licensesListView"></div>
+          <div id="licenseDetailView" style="display: none;"></div>
         </div>
       </div>
     </div>
@@ -5229,7 +5240,9 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   const licensesModalOverlay = document.getElementById('licensesModalOverlay');
   const licensesModal = document.getElementById('licensesModal');
   const closeLicensesBtn = document.getElementById('closeLicensesBtn');
-  const licensesList = document.getElementById('licensesList');
+  const licensesModalTitle = document.getElementById('licensesModalTitle');
+  const licensesListView = document.getElementById('licensesListView');
+  const licenseDetailView = document.getElementById('licenseDetailView');
 
   const openSourceLicenses = [
     {
@@ -5340,8 +5353,8 @@ SOFTWARE.`,
     }
   ];
 
-  function renderLicenses() {
-    licensesList.innerHTML = openSourceLicenses.map(license => `
+  function renderLicensesList() {
+    licensesListView.innerHTML = openSourceLicenses.map(license => `
       <div class="license-item" data-license="${license.name}">
         <div class="license-header">
           <div>
@@ -5349,15 +5362,8 @@ SOFTWARE.`,
             <span class="license-version">${license.version}</span>
           </div>
           <svg class="license-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6 9 12 15 18 9"/>
+            <polyline points="9 18 15 12 9 6"/>
           </svg>
-        </div>
-        <div class="license-content">
-          <div class="license-text">${license.licenseText}</div>
-          <div class="license-links">
-            <a href="${license.github}" target="_blank" class="license-link">GitHub</a>
-            <a href="${license.website}" target="_blank" class="license-link">Website</a>
-          </div>
         </div>
       </div>
     `).join('');
@@ -5365,14 +5371,46 @@ SOFTWARE.`,
     // Add click handlers for license items
     document.querySelectorAll('.license-header').forEach(header => {
       header.addEventListener('click', () => {
-        const item = header.closest('.license-item');
-        item.classList.toggle('open');
+        const licenseName = header.closest('.license-item').dataset.license;
+        showLicenseDetail(licenseName);
       });
     });
   }
 
+  function showLicenseDetail(licenseName) {
+    const license = openSourceLicenses.find(l => l.name === licenseName);
+    if (!license) return;
+
+    licensesModalTitle.textContent = license.name;
+    licenseDetailView.innerHTML = `
+      <button class="license-back-btn" id="licenseBackBtn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        Back to Licenses
+      </button>
+      <div class="license-detail-text">${license.licenseText}</div>
+      <div class="license-detail-links">
+        <a href="${license.github}" target="_blank" class="license-link">GitHub</a>
+        <a href="${license.website}" target="_blank" class="license-link">Website</a>
+      </div>
+    `;
+
+    licensesListView.style.display = 'none';
+    licenseDetailView.style.display = 'block';
+
+    document.getElementById('licenseBackBtn').addEventListener('click', showLicensesList);
+  }
+
+  function showLicensesList() {
+    licensesModalTitle.textContent = 'Open Source Licenses';
+    licensesListView.style.display = 'block';
+    licenseDetailView.style.display = 'none';
+  }
+
   function openLicensesModal() {
-    renderLicenses();
+    showLicensesList();
+    renderLicensesList();
     licensesModalOverlay.style.display = 'flex';
     licensesModal.classList.remove('closing');
   }
@@ -5382,6 +5420,7 @@ SOFTWARE.`,
     setTimeout(() => {
       licensesModalOverlay.style.display = 'none';
       licensesModal.classList.remove('closing');
+      showLicensesList();
     }, 200);
   }
 
