@@ -1874,6 +1874,11 @@
     transform: translateX(0);
   }
 
+  #licensesListView,
+  #licenseDetailView {
+    min-height: 100%;
+  }
+
   @keyframes modalSlideOut {
     from {
       opacity: 1;
@@ -2478,7 +2483,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           <h2 style="font-size: 1.4rem; margin: 0;" id="licensesModalTitle">Open Source Licenses</h2>
           <button id="closeLicensesBtn" style="background: none; border: none; color: var(--soft); font-size: 1.5rem; cursor: pointer; padding: 8px; border-radius: 6px; transition: all 0.2s ease; line-height: 1; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">×</button>
         </div>
-        <div style="flex: 1; overflow-y: auto; padding-right: 8px; position: relative;">
+        <div style="flex: 1; overflow-y: auto; padding-right: 8px; position: relative; min-height: 0;">
           <div id="licensesListView" style="position: absolute; top: 0; left: 0; right: 0; transition: opacity 0.2s ease, transform 0.2s ease;"></div>
           <div id="licenseDetailView" style="display: none; position: absolute; top: 0; left: 0; right: 0; transition: opacity 0.2s ease, transform 0.2s ease;"></div>
         </div>
