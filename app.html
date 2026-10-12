@@ -1835,6 +1835,45 @@
     opacity: 0.8;
   }
 
+  .license-info-box {
+    background: var(--tint);
+    border: 1px solid var(--brand);
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .license-info-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--brand);
+    flex-shrink: 0;
+  }
+
+  .license-info-text {
+    color: var(--soft);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .license-view-transition {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .license-view-hidden {
+    opacity: 0;
+    transform: translateX(20px);
+    pointer-events: none;
+  }
+
+  .license-view-visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
   @keyframes modalSlideOut {
     from {
       opacity: 1;
@@ -1869,7 +1908,7 @@
         Templates
       </a>
       <a class="nav-item" data-page="shortcuts" href="#">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 7a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         Shortcuts
       </a>
       <a class="nav-item" data-page="analytics" href="#">
@@ -2421,10 +2460,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       <div class="card">
         <h2 class="section-title" style="margin-bottom: 16px;">Open Source Licenses</h2>
-        <p style="color: var(--soft); margin-bottom: 8px;">Classcastle uses open source libraries. View their licenses here.</p>
-        <p style="color: var(--soft); font-size: 0.85rem; margin-bottom: 16px;">
-          Open source licenses are legal agreements that allow developers to use, modify, and distribute software freely. These licenses ensure that the software remains open and accessible to everyone while protecting the rights of the original creators.
-        </p>
+        <p style="color: var(--soft); margin-bottom: 16px;">Classcastle uses open source libraries. View their licenses here.</p>
         <button class="btn btn-secondary" id="openLicensesBtn">View Open Source Licenses</button>
       </div>
 
@@ -2442,9 +2478,9 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           <h2 style="font-size: 1.4rem; margin: 0;" id="licensesModalTitle">Open Source Licenses</h2>
           <button id="closeLicensesBtn" style="background: none; border: none; color: var(--soft); font-size: 1.5rem; cursor: pointer; padding: 8px; border-radius: 6px; transition: all 0.2s ease; line-height: 1; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">×</button>
         </div>
-        <div style="flex: 1; overflow-y: auto; padding-right: 8px;">
-          <div id="licensesListView"></div>
-          <div id="licenseDetailView" style="display: none;"></div>
+        <div style="flex: 1; overflow-y: auto; padding-right: 8px; position: relative;">
+          <div id="licensesListView" style="position: absolute; top: 0; left: 0; right: 0; transition: opacity 0.2s ease, transform 0.2s ease;"></div>
+          <div id="licenseDetailView" style="display: none; position: absolute; top: 0; left: 0; right: 0; transition: opacity 0.2s ease, transform 0.2s ease;"></div>
         </div>
       </div>
     </div>
@@ -3380,7 +3416,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         const providerName = identity.provider.charAt(0).toUpperCase() + identity.provider.slice(1);
         const providerIcon = identity.provider === 'github'
           ? '<svg class="identity-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>'
-          : '<svg class="identity-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>';
+          : '<svg class="identity-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>';
 
         const info = document.createElement('div');
         info.className = 'identity-info';
@@ -5398,19 +5434,32 @@ SOFTWARE.`,
   ];
 
   function renderLicensesList() {
-    licensesListView.innerHTML = openSourceLicenses.map(license => `
-      <div class="license-item" data-license="${license.name}">
-        <div class="license-header">
-          <div>
-            <span class="license-name">${license.name}</span>
-            <span class="license-version">${license.version}</span>
-          </div>
-          <svg class="license-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="9 18 15 12 9 6"/>
-          </svg>
+    licensesListView.innerHTML = `
+      <div class="license-info-box">
+        <svg class="license-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" x2="12" y1="16" y2="12"/>
+          <line x1="12" x2="12.01" y1="8" y2="8"/>
+        </svg>
+        <div class="license-info-text">
+          <strong>What are Open Source Licenses?</strong><br>
+          Open source licenses are legal agreements that allow developers to use, modify, and distribute software freely. These licenses ensure that the software remains open and accessible to everyone while protecting the rights of the original creators. Classcastle uses several open source libraries to provide you with the best possible experience, and we're grateful to the developers who maintain them.
         </div>
       </div>
-    `).join('');
+      ${openSourceLicenses.map(license => `
+        <div class="license-item" data-license="${license.name}">
+          <div class="license-header">
+            <div>
+              <span class="license-name">${license.name}</span>
+              <span class="license-version">${license.version}</span>
+            </div>
+            <svg class="license-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </div>
+        </div>
+      `).join('')}
+    `;
 
     // Add click handlers for license items
     document.querySelectorAll('.license-header').forEach(header => {
@@ -5440,16 +5489,33 @@ SOFTWARE.`,
       </div>
     `;
 
-    licensesListView.style.display = 'none';
-    licenseDetailView.style.display = 'block';
+    // Animate transition
+    licensesListView.classList.add('license-view-hidden');
+    licensesListView.classList.remove('license-view-visible');
+
+    setTimeout(() => {
+      licensesListView.style.display = 'none';
+      licenseDetailView.style.display = 'block';
+      licenseDetailView.classList.add('license-view-visible');
+      licenseDetailView.classList.remove('license-view-hidden');
+    }, 200);
 
     document.getElementById('licenseBackBtn').addEventListener('click', showLicensesList);
   }
 
   function showLicensesList() {
     licensesModalTitle.textContent = 'Open Source Licenses';
-    licensesListView.style.display = 'block';
-    licenseDetailView.style.display = 'none';
+
+    // Animate transition
+    licenseDetailView.classList.add('license-view-hidden');
+    licenseDetailView.classList.remove('license-view-visible');
+
+    setTimeout(() => {
+      licenseDetailView.style.display = 'none';
+      licensesListView.style.display = 'block';
+      licensesListView.classList.add('license-view-visible');
+      licensesListView.classList.remove('license-view-hidden');
+    }, 200);
   }
 
   function openLicensesModal() {
@@ -5457,6 +5523,12 @@ SOFTWARE.`,
     renderLicensesList();
     licensesModalOverlay.style.display = 'flex';
     licensesModal.classList.remove('closing');
+
+    // Initialize transition classes
+    licensesListView.classList.add('license-view-visible');
+    licensesListView.classList.remove('license-view-hidden');
+    licenseDetailView.classList.add('license-view-hidden');
+    licenseDetailView.classList.remove('license-view-visible');
   }
 
   function closeLicensesModal() {
