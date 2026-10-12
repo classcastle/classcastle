@@ -6,11 +6,16 @@
  * If set to false or not set, allows normal routing.
  */
 
+// Maintenance Mode - Set to true to enable
+const IN_MAINTENANCE = false;
+
 export const onRequest = async (context) => {
   const { request, env } = context;
   
-  // Check if maintenance mode is enabled
-  if (env.IN_MAINTENANCE === 'true') {
+  // Check if maintenance mode is enabled (from env var or hardcoded)
+  const isMaintenance = env.IN_MAINTENANCE === 'true' || IN_MAINTENANCE === true;
+  
+  if (isMaintenance) {
     // Return maintenance page
     const maintenanceHtml = `
 <!DOCTYPE html>
