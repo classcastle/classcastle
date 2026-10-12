@@ -2793,10 +2793,15 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         modalCancel.style.display = 'inline-block';
       }
 
+      modal.classList.remove('closing');
       modalOverlay.classList.add('show');
 
       const handleConfirm = () => {
-        modalOverlay.classList.remove('show');
+        modal.classList.add('closing');
+        setTimeout(() => {
+          modalOverlay.classList.remove('show');
+          modal.classList.remove('closing');
+        }, 200);
         modalConfirm.removeEventListener('click', handleConfirm);
         modalCancel.removeEventListener('click', handleCancel);
         modalCancel.style.display = 'inline-block'; // Reset for next use
@@ -2804,7 +2809,11 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       };
 
       const handleCancel = () => {
-        modalOverlay.classList.remove('show');
+        modal.classList.add('closing');
+        setTimeout(() => {
+          modalOverlay.classList.remove('show');
+          modal.classList.remove('closing');
+        }, 200);
         modalConfirm.removeEventListener('click', handleConfirm);
         modalCancel.removeEventListener('click', handleCancel);
         modalCancel.style.display = 'inline-block'; // Reset for next use
@@ -2851,10 +2860,15 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       modalConfirm.textContent = 'OK';
       modalCancel.textContent = 'Cancel';
 
+      modal.classList.remove('closing');
       modalOverlay.classList.add('show');
 
       const handleConfirm = () => {
-        modalOverlay.classList.remove('show');
+        modal.classList.add('closing');
+        setTimeout(() => {
+          modalOverlay.classList.remove('show');
+          modal.classList.remove('closing');
+        }, 200);
         modalConfirm.removeEventListener('click', handleConfirm);
         modalCancel.removeEventListener('click', handleCancel);
         modalMessage.innerHTML = originalMessage;
@@ -2862,7 +2876,11 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       };
 
       const handleCancel = () => {
-        modalOverlay.classList.remove('show');
+        modal.classList.add('closing');
+        setTimeout(() => {
+          modalOverlay.classList.remove('show');
+          modal.classList.remove('closing');
+        }, 200);
         modalConfirm.removeEventListener('click', handleConfirm);
         modalCancel.removeEventListener('click', handleCancel);
         modalMessage.innerHTML = originalMessage;
@@ -2903,10 +2921,15 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   // Export format selection modal
   function showExportModal() {
     return new Promise((resolve) => {
+      exportModal.classList.remove('closing');
       exportModalOverlay.classList.add('show');
 
       const handleCancel = () => {
-        exportModalOverlay.classList.remove('show');
+        exportModal.classList.add('closing');
+        setTimeout(() => {
+          exportModalOverlay.classList.remove('show');
+          exportModal.classList.remove('closing');
+        }, 200);
         exportModalCancel.removeEventListener('click', handleCancel);
         document.querySelectorAll('.export-option').forEach(btn => {
           btn.removeEventListener('click', handleOption);
@@ -2917,9 +2940,13 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       const handleOption = (e) => {
         // Skip if button is disabled
         if (e.target.disabled) return;
-        
+
         const format = e.target.dataset.format;
-        exportModalOverlay.classList.remove('show');
+        exportModal.classList.add('closing');
+        setTimeout(() => {
+          exportModalOverlay.classList.remove('show');
+          exportModal.classList.remove('closing');
+        }, 200);
         exportModalCancel.removeEventListener('click', handleCancel);
         document.querySelectorAll('.export-option').forEach(btn => {
           btn.removeEventListener('click', handleOption);
@@ -4571,6 +4598,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         ? `https://classcastle.org/poll.html?id=${customId}`
         : `https://classcastle.org/poll.html?id=${pollId}`;
       document.getElementById('pollShareUrl').value = shareUrl;
+      const pollResultsModal = document.getElementById('pollResultsModal');
+      pollResultsModal.classList.remove('closing');
       document.getElementById('pollResultsModalOverlay').style.display = 'flex';
     } catch (error) {
       console.error('Error loading poll results:', error);
@@ -4631,6 +4660,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       <input type="text" class="form-input poll-option" placeholder="Option 1" style="margin-bottom: 8px;">
       <input type="text" class="form-input poll-option" placeholder="Option 2" style="margin-bottom: 8px;">
     `;
+    const pollModal = document.getElementById('pollModal');
+    pollModal.classList.remove('closing');
     document.getElementById('pollModalOverlay').style.display = 'flex';
 
     // Clear school selection
@@ -4655,7 +4686,12 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   }
 
   function closePollModal() {
-    document.getElementById('pollModalOverlay').style.display = 'none';
+    const pollModal = document.getElementById('pollModal');
+    pollModal.classList.add('closing');
+    setTimeout(() => {
+      document.getElementById('pollModalOverlay').style.display = 'none';
+      pollModal.classList.remove('closing');
+    }, 200);
   }
 
   function addPollOption() {
@@ -4936,7 +4972,12 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   if (savePollBtn) savePollBtn.addEventListener('click', createPoll);
   if (addOptionBtn) addOptionBtn.addEventListener('click', addPollOption);
   if (closeResultsBtn) closeResultsBtn.addEventListener('click', () => {
-    document.getElementById('pollResultsModalOverlay').style.display = 'none';
+    const pollResultsModal = document.getElementById('pollResultsModal');
+    pollResultsModal.classList.add('closing');
+    setTimeout(() => {
+      document.getElementById('pollResultsModalOverlay').style.display = 'none';
+      pollResultsModal.classList.remove('closing');
+    }, 200);
   });
   if (copyPollUrlBtn) copyPollUrlBtn.addEventListener('click', () => {
     const url = document.getElementById('pollShareUrl').value;
@@ -5442,24 +5483,29 @@ SOFTWARE.`,
   // Donate button
   document.getElementById('donateBtn').addEventListener('click', () => {
     donateFrame.src = 'https://donate.stripe.com/00wcN5cKpfD77KmeJz00000';
+    donateModal.classList.remove('closing');
     donateModalOverlay.classList.add('show');
   });
 
-  donateModalCancel.addEventListener('click', () => {
-    donateModalOverlay.classList.remove('show');
-    donateFrame.src = '';
-  });
+  function closeDonateModal() {
+    donateModal.classList.add('closing');
+    setTimeout(() => {
+      donateModalOverlay.classList.remove('show');
+      donateModal.classList.remove('closing');
+      donateFrame.src = '';
+    }, 200);
+  }
+
+  donateModalCancel.addEventListener('click', closeDonateModal);
 
   donateOpenNewTab.addEventListener('click', () => {
     window.open('https://donate.stripe.com/00wcN5cKpfD77KmeJz00000', '_blank');
-    donateModalOverlay.classList.remove('show');
-    donateFrame.src = '';
+    closeDonateModal();
   });
 
   donateModalOverlay.addEventListener('click', (e) => {
     if (e.target === donateModalOverlay) {
-      donateModalOverlay.classList.remove('show');
-      donateFrame.src = '';
+      closeDonateModal();
     }
   });
 
