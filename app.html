@@ -1874,10 +1874,7 @@
     transform: translateX(0);
   }
 
-  #licensesListView,
-  #licenseDetailView {
-    min-height: 100%;
-  }
+
 
   @keyframes modalSlideOut {
     from {
@@ -2489,8 +2486,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           </button>
         </div>
         <div style="flex: 1; overflow-y: auto; padding-right: 8px; position: relative; min-height: 0;">
-          <div id="licensesListView" style="position: absolute; top: 0; left: 0; right: 0; transition: opacity 0.2s ease, transform 0.2s ease;"></div>
-          <div id="licenseDetailView" style="display: none; position: absolute; top: 0; left: 0; right: 0; transition: opacity 0.2s ease, transform 0.2s ease;"></div>
+          <div id="licensesListView" style="position: relative; transition: opacity 0.2s ease, transform 0.2s ease;"></div>
+          <div id="licenseDetailView" style="display: none; position: relative; transition: opacity 0.2s ease, transform 0.2s ease;"></div>
         </div>
       </div>
     </div>
