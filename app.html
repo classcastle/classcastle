@@ -2763,6 +2763,9 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   const identitiesLoading = document.getElementById('identitiesLoading');
   const identitiesList = document.getElementById('identitiesList');
 
+  // Global identities array
+  let identities = [];
+
   // Onboarding elements
   const onboardingOverlay = document.getElementById('onboardingOverlay');
   const skipOnboarding = document.getElementById('skipOnboarding');
@@ -3362,7 +3365,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       identitiesList.style.display = 'block';
       identitiesList.innerHTML = '';
 
-      const identities = data?.identities || [];
+      identities = data?.identities || [];
 
       if (!identities || identities.length === 0) {
         identitiesList.innerHTML = '<p style="color: var(--soft); font-size: 0.9rem;">No linked accounts</p>';
