@@ -117,18 +117,6 @@ export const onRequest = async (context) => {
       margin-bottom: 24px;
       line-height: 1.5;
     }
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid var(--line);
-      border-top-color: var(--brand);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 24px;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
     .note {
       font-size: 14px;
       color: var(--soft);
@@ -139,9 +127,7 @@ export const onRequest = async (context) => {
       font-size: 1.5rem;
       font-weight: 600;
       letter-spacing: -0.01em;
-      display: flex;
-      align-items: center;
-      gap: 9px;
+      display: inline;
     }
     .word-accent {
       color: var(--brand);
@@ -152,14 +138,13 @@ export const onRequest = async (context) => {
   <div class="container">
     <div class="logo">
       <img src="/logo.svg" alt="" class="logo-mark" onerror="this.style.display='none'">
-      <div class="wordmark">Class<span class="word-accent">castle</span></div>
+      <span class="wordmark">Class<span class="word-accent">castle</span></span>
     </div>
     <h1>We'll Be Right Back!</h1>
     <p>Classcastle is currently undergoing scheduled maintenance. We're working hard to bring you a better experience.</p>
     <div class="reason">
       <strong>Reason:</strong> ${reason}
     </div>
-    <div class="spinner"></div>
     <p class="note">Please check back soon. Thank you for your patience!</p>
   </div>
 </body>
