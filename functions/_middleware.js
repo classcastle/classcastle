@@ -7,7 +7,7 @@
  */
 
 // Maintenance Mode - Set to true to enable
-const IN_MAINTENANCE = false;
+const IN_MAINTENANCE = true;
 
 export const onRequest = async (context) => {
   const { request, env } = context;
