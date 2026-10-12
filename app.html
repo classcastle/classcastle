@@ -5467,9 +5467,7 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.`,
-      github: 'https://github.com/jamestheakston/EasyOpen-Source',
-      website: 'https://github.com/jamestheakston/EasyOpen-Source'
+SOFTWARE.`
     }
   ];
 
@@ -5515,6 +5513,13 @@ SOFTWARE.`,
     if (!license) return;
 
     licensesModalTitle.textContent = license.name;
+    const linksHtml = license.github && license.website ? `
+      <div class="license-detail-links">
+        <a href="${license.github}" target="_blank" class="license-link">GitHub</a>
+        <a href="${license.website}" target="_blank" class="license-link">Website</a>
+      </div>
+    ` : '';
+
     licenseDetailView.innerHTML = `
       <button class="license-back-btn" id="licenseBackBtn">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -5523,10 +5528,7 @@ SOFTWARE.`,
         Back to Licenses
       </button>
       <div class="license-detail-text">${license.licenseText}</div>
-      <div class="license-detail-links">
-        <a href="${license.github}" target="_blank" class="license-link">GitHub</a>
-        <a href="${license.website}" target="_blank" class="license-link">Website</a>
-      </div>
+      ${linksHtml}
     `;
 
     // Animate transition
