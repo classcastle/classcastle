@@ -12,6 +12,10 @@ const IN_MAINTENANCE = true;
 // Maintenance Reason - Customize this message
 const MAINTENANCE_REASON = "We are working on moving away from Supabase to Appwrite for improved performance and reliability.";
 
+// Maintenance Window - Customize start and end dates
+const MAINTENANCE_START = "October 12, 2026";
+const MAINTENANCE_END = "October 17, 2026 at 5:00 PM";
+
 export const onRequest = async (context) => {
   const { request, env } = context;
   
@@ -20,6 +24,10 @@ export const onRequest = async (context) => {
   
   // Get reason from env var or use default
   const reason = env.MAINTENANCE_REASON || MAINTENANCE_REASON;
+  
+  // Get dates from env var or use default
+  const startDate = env.MAINTENANCE_START || MAINTENANCE_START;
+  const endDate = env.MAINTENANCE_END || MAINTENANCE_END;
   
   if (isMaintenance) {
     // Return maintenance page with Classcastle styling
@@ -117,6 +125,19 @@ export const onRequest = async (context) => {
       margin-bottom: 24px;
       line-height: 1.5;
     }
+    .dates {
+      background: var(--bg);
+      color: var(--ink);
+      padding: 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 24px;
+      line-height: 1.5;
+      border: 1px solid var(--line);
+    }
+    .dates p {
+      margin-bottom: 0;
+    }
     .note {
       font-size: 14px;
       color: var(--soft);
@@ -144,6 +165,9 @@ export const onRequest = async (context) => {
     <p>Classcastle is currently undergoing scheduled maintenance. We're working hard to bring you a better experience.</p>
     <div class="reason">
       <strong>Reason:</strong> ${reason}
+    </div>
+    <div class="dates">
+      <p><strong>Scheduled:</strong> ${startDate} - ${endDate}</p>
     </div>
     <p class="note">Please check back soon. Thank you for your patience!</p>
   </div>
