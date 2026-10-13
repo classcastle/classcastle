@@ -7,7 +7,7 @@
  */
 
 // Maintenance Mode - Set to true to enable
-const IN_MAINTENANCE = true;
+const IN_MAINTENANCE = false;
 
 // Maintenance Reason - Customize this message
 const MAINTENANCE_REASON = "We are returning to Supabase to restore full functionality after issues with the Appwrite migration.";
