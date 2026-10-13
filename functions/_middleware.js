@@ -10,7 +10,7 @@
 const IN_MAINTENANCE = true;
 
 // Maintenance Reason - Customize this message
-const MAINTENANCE_REASON = "We are working on moving away from Supabase to Appwrite for improved performance and reliability.";
+const MAINTENANCE_REASON = "We are returning to Supabase to restore full functionality after issues with the Appwrite migration.";
 
 // Maintenance Window - Customize start and end dates
 const MAINTENANCE_START = "October 12, 2026";
