@@ -7,10 +7,10 @@
  */
 
 // Maintenance Mode - Set to true to enable
-const IN_MAINTENANCE = false;
+const IN_MAINTENANCE = true;
 
 // Maintenance Reason - Customize this message
-const MAINTENANCE_REASON = "We are returning to Supabase to restore full functionality after issues with the Appwrite migration.";
+const MAINTENANCE_REASON = "We are returning to Supabase to restore full functionality after issues with the Appwrite migration. If you found that your account had been deleted and your data had been lost after the Appwrite migration, your data has been restored. Similarly, data you had created while we were with Appwrite has unfortunately been lost.";
 
 // Maintenance Window - Customize start and end dates
 const MAINTENANCE_START = "October 12, 2026";
