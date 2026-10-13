@@ -18,17 +18,24 @@ const MAINTENANCE_END = "October 17, 2026 at 5:00 PM";
 
 export const onRequest = async (context) => {
   const { request, env } = context;
-  
+  const url = new URL(request.url);
+
+  // Allowlist certain paths even during maintenance
+  const allowlist = ['/logo.svg', '/favicon.svg', '/favicon.ico', '/favicon.png'];
+  if (allowlist.includes(url.pathname)) {
+    return context.next();
+  }
+
   // Check if maintenance mode is enabled (from env var or hardcoded)
   const isMaintenance = env.IN_MAINTENANCE === 'true' || IN_MAINTENANCE === true;
-  
+
   // Get reason from env var or use default
   const reason = env.MAINTENANCE_REASON || MAINTENANCE_REASON;
-  
+
   // Get dates from env var or use default
   const startDate = env.MAINTENANCE_START || MAINTENANCE_START;
   const endDate = env.MAINTENANCE_END || MAINTENANCE_END;
-  
+
   if (isMaintenance) {
     // Return maintenance page with Classcastle styling
     const maintenanceHtml = `
