@@ -14,7 +14,7 @@ const MAINTENANCE_REASON = "We are returning to Supabase to restore full functio
 
 // Maintenance Window - Customize start and end dates
 const MAINTENANCE_START = "October 12, 2026";
-const MAINTENANCE_END = "October 17, 2026 at 5:00 PM";
+const MAINTENANCE_END = "October 12, 2026 at 8:00 PM";
 
 export const onRequest = async (context) => {
   const { request, env } = context;
