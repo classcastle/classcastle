@@ -10,7 +10,8 @@
   ],
   "host_permissions": [
     "https://hduyofdbpspjcuwvackd.supabase.co/*",
-    "https://classcastle.org/*"
+    "https://classcastle.org/*",
+    "https://maintenanceapi.classcastle.org/*"
   ],
   "background": {
     "service_worker": "background.js"

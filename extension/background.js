@@ -8,6 +8,9 @@ const isManifestV3 = api.runtime.getManifest().manifest_version === 3;
 const SUPABASE_URL = 'https://hduyofdbpspjcuwvackd.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK';
 
+// Maintenance API
+const MAINTENANCE_API_URL = 'https://maintenanceapi.classcastle.org/';
+
 // Constants
 const ALARM_NAME = 'pollForChanges';
 const ALARM_INTERVAL_MINUTES = 0.05; // 3 seconds
@@ -105,6 +108,19 @@ async function supabaseDelete(table, filters = {}) {
   });
   
   return response.ok;
+}
+
+// Check maintenance mode
+async function isInMaintenance() {
+  try {
+    const response = await fetch(MAINTENANCE_API_URL);
+    const data = await response.json();
+    return { maintenance: data.maintenance === true, message: data.message };
+  } catch (error) {
+    console.error('Error checking maintenance mode:', error);
+    // If we can't check, assume not in maintenance to avoid blocking users
+    return { maintenance: false, message: null };
+  }
 }
 
 // Listen for messages from popup and content scripts
@@ -225,6 +241,31 @@ async function saveStorageData(data) {
 // Join a room
 async function joinRoom(roomId, studentId, studentName) {
   console.log('Joining room:', roomId, 'student:', studentId, 'name:', studentName);
+
+  // Check maintenance mode
+  const maintenanceStatus = await isInMaintenance();
+  if (maintenanceStatus.maintenance) {
+    console.log('Maintenance mode is active, blocking join');
+    await saveStorageData({
+      roomId: null,
+      studentId: null,
+      studentName: null,
+      currentTargetUrl: null,
+      joinedAt: null,
+      wasKicked: false,
+      joiningSince: null,
+      tabId: null,
+      inMaintenance: true,
+      maintenanceMessage: maintenanceStatus.message
+    });
+    api.runtime.sendMessage({
+      action: 'maintenance',
+      message: maintenanceStatus.message
+    }).catch(err => {
+      console.log('Failed to notify popup of maintenance (popup may be closed):', err);
+    });
+    return;
+  }
 
   // Fetch current room target_url to avoid navigating to pre-existing URLs
   let initialTargetUrl = null;
