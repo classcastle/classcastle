@@ -6337,11 +6337,57 @@ usage/fair dealing.`,
   const expressInterestBtn = document.getElementById('expressInterestBtn');
 
   let currentThreadId = null;
+  let isPersonalThread = false;
+
+  // Commands for personal thread
+  const commands = {
+    '/publicfacingname': {
+      description: 'View, change, or remove your public-facing name',
+      usage: '/publicfacingname [view|change|remove] [new name for change]',
+      handler: async (args) => {
+        const action = args[0];
+        if (action === 'view') {
+          const { data: { user } } = await SupabaseClient.auth.getUser();
+          const publicName = user.user_metadata?.public_facing_name || 'Not set';
+          return `Your public-facing name: ${publicName}`;
+        } else if (action === 'change') {
+          const newName = args.slice(1).join(' ');
+          if (!newName) return 'Please provide a new name';
+          const { error } = await SupabaseClient.auth.updateUser({
+            data: { public_facing_name: newName }
+          });
+          if (error) throw error;
+          return `Public-facing name changed to: ${newName}`;
+        } else if (action === 'remove') {
+          const { error } = await SupabaseClient.auth.updateUser({
+            data: { public_facing_name: null }
+          });
+          if (error) throw error;
+          return 'Public-facing name removed';
+        } else {
+          return 'Invalid action. Use: view, change, or remove';
+        }
+      }
+    },
+    '/help': {
+      description: 'Show all available commands',
+      usage: '/help',
+      handler: () => {
+        let help = 'Available commands:\n\n';
+        for (const [cmd, info] of Object.entries(commands)) {
+          if (cmd === '/help') continue;
+          help += `${cmd}\n  ${info.description}\n  Usage: ${info.usage}\n\n`;
+        }
+        return help;
+      }
+    }
+  };
 
   function backToThreads() {
     messagesPanel.style.display = 'none';
     noThreadSelected.style.display = 'flex';
     currentThreadId = null;
+    isPersonalThread = false;
   }
 
   async function showMessagesInterface() {
@@ -6420,6 +6466,37 @@ usage/fair dealing.`,
         return;
       }
 
+      const userName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
+
+      // Check if personal thread exists, create if not
+      const { data: personalThread, error: personalError } = await SupabaseClient
+        .from('message_threads')
+        .select('*')
+        .eq('teacher_id', user.id)
+        .eq('is_personal', true)
+        .single();
+
+      if (personalError && personalError.code !== 'PGRST116') {
+        console.error('Error checking personal thread:', personalError);
+      }
+
+      if (!personalThread) {
+        // Create personal thread
+        const { data: newThread, error: createError } = await SupabaseClient
+          .from('message_threads')
+          .insert({
+            teacher_id: user.id,
+            title: userName,
+            message: '',
+            is_personal: true,
+            created_at: new Date().toISOString()
+          })
+          .select()
+          .single();
+
+        if (createError) throw createError;
+      }
+
       const { data: threads, error } = await SupabaseClient
         .from('message_threads')
         .select('*')
@@ -6445,16 +6522,20 @@ usage/fair dealing.`,
       threadsList.innerHTML = '';
       threads.forEach(thread => {
         const threadCard = document.createElement('div');
+        const isPersonal = thread.is_personal;
         threadCard.style.cssText = 'padding: 12px 16px; border-bottom: 1px solid var(--line); cursor: pointer; transition: background 0.15s;';
         threadCard.innerHTML = `
           <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 4px;">
-            <h4 style="font-size: 0.95rem; margin: 0; font-weight: 600; flex: 1; padding-right: 8px;">${thread.title}</h4>
+            <h4 style="font-size: 0.95rem; margin: 0; font-weight: 600; flex: 1; padding-right: 8px;">
+              ${thread.title}
+              ${isPersonal ? '<span style="font-size: 0.7rem; background: var(--tint); color: var(--brand); padding: 2px 6px; border-radius: 4px; margin-left: 8px;">Personal</span>' : ''}
+            </h4>
             <span style="font-size: 0.7rem; color: var(--soft); flex-shrink: 0;">${new Date(thread.created_at).toLocaleDateString()}</span>
           </div>
-          <p style="color: var(--soft); font-size: 0.85rem; margin: 0; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+          ${!isPersonal ? `<p style="color: var(--soft); font-size: 0.85rem; margin: 0; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
             ${thread.message}
-          </p>
-          ${thread.target_url ? `<div style="margin-top: 6px; font-size: 0.75rem; color: var(--brand);"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; vertical-align: middle;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> URL attached</div>` : ''}
+          </p>` : ''}
+          ${thread.target_url && !isPersonal ? `<div style="margin-top: 6px; font-size: 0.75rem; color: var(--brand);"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; vertical-align: middle;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> URL attached</div>` : ''}
         `;
         threadCard.addEventListener('click', () => selectThread(thread));
         threadCard.addEventListener('mouseenter', () => threadCard.style.background = 'var(--tint)');
@@ -6549,6 +6630,7 @@ usage/fair dealing.`,
     currentThreadId = thread.id;
     currentThreadTitle.textContent = thread.title;
     currentThreadDate.textContent = new Date(thread.created_at).toLocaleDateString();
+    isPersonalThread = thread.is_personal;
 
     noThreadSelected.style.display = 'none';
     messagesPanel.style.display = 'flex';
@@ -6557,6 +6639,9 @@ usage/fair dealing.`,
     if (window.innerWidth <= 780) {
       backToThreadsBtn.style.display = 'flex';
     }
+
+    // Hide share button for personal threads
+    shareThreadBtn.style.display = isPersonalThread ? 'none' : 'flex';
 
     try {
       const { data: messages, error } = await SupabaseClient
@@ -6567,46 +6652,63 @@ usage/fair dealing.`,
 
       if (error) throw error;
 
-      if (!messages || messages.length === 0) {
+      if (isPersonalThread) {
+        // Personal thread: show description and only input box
         threadMessages.innerHTML = `
           <div style="text-align: center; padding: 32px;">
-            <p style="color: var(--soft);">No messages yet in this thread.</p>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--chalk)" stroke-width="1.5" style="margin-bottom: 16px;">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+            <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Personal Space</h3>
+            <p style="color: var(--soft); margin-bottom: 16px; line-height: 1.5;">
+              This is your personal space where you can send messages to yourself. Use commands to manage your settings.
+            </p>
+            <p style="color: var(--soft); font-size: 0.85rem;">Type <code style="background: var(--tint); padding: 2px 6px; border-radius: 4px;">/</code> to see available commands.</p>
           </div>
         `;
-        return;
+      } else {
+        // Regular thread: show messages
+        if (!messages || messages.length === 0) {
+          threadMessages.innerHTML = `
+            <div style="text-align: center; padding: 32px;">
+              <p style="color: var(--soft);">No messages yet in this thread.</p>
+            </div>
+          `;
+          return;
+        }
+
+        threadMessages.innerHTML = '';
+        messages.forEach(msg => {
+          const msgDiv = document.createElement('div');
+          const isTeacher = msg.sender_type === 'teacher';
+          msgDiv.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            ${isTeacher ? 'align-items: flex-end;' : 'align-items: flex-start;'}
+            margin-bottom: 12px;
+          `;
+          msgDiv.innerHTML = `
+            <div style="font-size: 0.75rem; color: var(--soft); margin-bottom: 4px;">${msg.sender_name}</div>
+            <div style="
+              padding: 10px 14px;
+              border-radius: 6px;
+              font-size: 0.95rem;
+              line-height: 1.4;
+              max-width: 70%;
+              ${isTeacher
+                ? 'background: var(--brand); color: var(--brand-ink);'
+                : 'background: var(--tint); border: 1px solid var(--line);'}
+            ">
+              ${msg.message}
+            </div>
+            <div style="font-size: 0.7rem; color: var(--soft); margin-top: 4px;">${new Date(msg.created_at).toLocaleTimeString()}</div>
+          `;
+          threadMessages.appendChild(msgDiv);
+        });
+
+        // Scroll to bottom
+        threadMessages.scrollTop = threadMessages.scrollHeight;
       }
-
-      threadMessages.innerHTML = '';
-      messages.forEach(msg => {
-        const msgDiv = document.createElement('div');
-        const isTeacher = msg.sender_type === 'teacher';
-        msgDiv.style.cssText = `
-          display: flex;
-          flex-direction: column;
-          ${isTeacher ? 'align-items: flex-end;' : 'align-items: flex-start;'}
-          margin-bottom: 12px;
-        `;
-        msgDiv.innerHTML = `
-          <div style="font-size: 0.75rem; color: var(--soft); margin-bottom: 4px;">${msg.sender_name}</div>
-          <div style="
-            padding: 10px 14px;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            line-height: 1.4;
-            max-width: 70%;
-            ${isTeacher
-              ? 'background: var(--brand); color: var(--brand-ink);'
-              : 'background: var(--tint); border: 1px solid var(--line);'}
-          ">
-            ${msg.message}
-          </div>
-          <div style="font-size: 0.7rem; color: var(--soft); margin-top: 4px;">${new Date(msg.created_at).toLocaleTimeString()}</div>
-        `;
-        threadMessages.appendChild(msgDiv);
-      });
-
-      // Scroll to bottom
-      threadMessages.scrollTop = threadMessages.scrollHeight;
     } catch (error) {
       console.error('Error loading thread messages:', error);
       threadMessages.innerHTML = '<p style="text-align: center; color: var(--red);">Error loading messages. Please try again.</p>';
@@ -6664,6 +6766,37 @@ usage/fair dealing.`,
 
       if (!currentThreadId) return;
 
+      // Check if this is a command
+      if (reply.startsWith('/')) {
+        if (reply === '/') {
+          // Show command preview
+          let help = 'Available commands:\n\n';
+          for (const [cmd, info] of Object.entries(commands)) {
+            if (cmd === '/help') continue;
+            help += `${cmd}\n  ${info.description}\n  Usage: ${info.usage}\n\n`;
+          }
+          alert(help);
+          threadReplyInput.value = '';
+          return;
+        }
+
+        const commandParts = reply.split(' ');
+        const command = commandParts[0];
+        const args = commandParts.slice(1);
+
+        if (commands[command]) {
+          const result = await commands[command].handler(args);
+          alert(result);
+          threadReplyInput.value = '';
+          return;
+        } else {
+          alert(`Unknown command: ${command}. Type / to see available commands.`);
+          threadReplyInput.value = '';
+          return;
+        }
+      }
+
+      // Regular message
       const { error } = await SupabaseClient
         .from('thread_messages')
         .insert({
@@ -6679,7 +6812,7 @@ usage/fair dealing.`,
 
       threadReplyInput.value = '';
       // Reload messages to show the new reply
-      const thread = { id: currentThreadId, title: currentThreadTitle.textContent };
+      const thread = { id: currentThreadId, title: currentThreadTitle.textContent, is_personal: isPersonalThread };
       await selectThread(thread);
     } catch (error) {
       console.error('Error sending reply:', error);

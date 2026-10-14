@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS message_threads (
   title TEXT NOT NULL,
   message TEXT NOT NULL,
   target_url TEXT,
+  is_personal BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -41,15 +42,15 @@ CREATE POLICY "Teachers can create threads"
   ON message_threads FOR INSERT
   WITH CHECK (auth.uid() = teacher_id);
 
--- Teachers can update their own threads
+-- Teachers can update their own threads (but not is_personal flag)
 CREATE POLICY "Teachers can update own threads"
   ON message_threads FOR UPDATE
-  USING (auth.uid() = teacher_id);
+  USING (auth.uid() = teacher_id AND is_personal = FALSE);
 
--- Teachers can delete their own threads
+-- Teachers can delete their own threads (but not personal threads)
 CREATE POLICY "Teachers can delete own threads"
   ON message_threads FOR DELETE
-  USING (auth.uid() = teacher_id);
+  USING (auth.uid() = teacher_id AND is_personal = FALSE);
 
 -- RLS Policies for thread_messages
 -- Users can view messages in threads they have access to
