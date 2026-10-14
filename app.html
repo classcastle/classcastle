@@ -1897,6 +1897,315 @@
   .modal.closing {
     animation: modalSlideOut 0.2s ease-out forwards;
   }
+
+  /* Chat Animation Styles */
+  .chat-animation-stage {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1400px;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  .chat-animation-stage.show {
+    opacity: 1;
+  }
+  .chat-animation-tilt,
+  .chat-animation-drift {
+    transform-style: preserve-3d;
+  }
+  .chat-animation-tilt {
+    transition: transform 2s cubic-bezier(0.3, 0.7, 0.2, 1);
+    will-change: transform;
+  }
+  .chat-animation-tilt.on {
+    transform: rotateX(9deg) rotateY(-17deg) rotateZ(1deg);
+  }
+  .chat-animation-tilt.noanim {
+    transition: none;
+  }
+  .chat-animation-drift.float {
+    animation: chatAnimationDrift 7s ease-in-out infinite alternate;
+  }
+  @keyframes chatAnimationDrift {
+    from {
+      transform: translate3d(0, 0, 0) rotateX(0) rotateY(0);
+    }
+    to {
+      transform: translate3d(0, -12px, 0) rotateX(2.5deg) rotateY(3.5deg);
+    }
+  }
+  .chat-animation-drift {
+    position: relative;
+  }
+  .chat-animation-soft {
+    position: absolute;
+    inset: 14px;
+    background: rgba(0, 0, 0, 0.35);
+    filter: blur(30px);
+    opacity: 0;
+    transform: translate3d(26px, 40px, -60px);
+    transition: opacity 2s ease;
+  }
+  .chat-animation-tilt.on .chat-animation-soft {
+    opacity: 0.75;
+  }
+  .chat-animation-win {
+    position: relative;
+    width: 100%;
+    max-width: 380px;
+    height: 480px;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border-radius: 6px;
+    box-shadow: 12px 12px 0 var(--brand);
+    overflow: hidden;
+    margin: 16px;
+  }
+  .chat-animation-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--board);
+    color: #fff;
+  }
+  .chat-animation-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--chalk);
+    color: #18221C;
+    display: grid;
+    place-items: center;
+    flex: none;
+  }
+  .chat-animation-avatar svg {
+    width: 20px;
+    height: 20px;
+  }
+  .chat-animation-who {
+    flex: 1;
+    min-width: 0;
+    line-height: 1.25;
+  }
+  .chat-animation-who b {
+    display: block;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+  .chat-animation-who span {
+    font-size: 0.8rem;
+    opacity: 0.75;
+  }
+  .chat-animation-tag {
+    background: var(--chalk);
+    color: #18221C;
+    border: 2px solid #18221C;
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    transform: rotate(-2.5deg);
+    white-space: nowrap;
+  }
+  .chat-animation-msgs {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    background: var(--bg);
+    -webkit-mask-image: linear-gradient(transparent, #000 40px);
+    mask-image: linear-gradient(transparent, #000 40px);
+  }
+  .chat-animation-feed {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+  }
+  .chat-animation-g {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 78%;
+    align-self: flex-start;
+  }
+  .chat-animation-g.me {
+    align-self: flex-end;
+    align-items: flex-end;
+  }
+  .chat-animation-nm {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--soft);
+    padding-left: 2px;
+  }
+  .chat-animation-b {
+    padding: 10px 14px;
+    border-radius: 6px 6px 6px 2px;
+    font-size: 0.95rem;
+    line-height: 1.45;
+    background: var(--tint);
+    border: 1px solid var(--line);
+    box-shadow: 2px 2px 0 var(--line);
+    transform-origin: left bottom;
+  }
+  .chat-animation-b.me {
+    background: var(--brand);
+    color: var(--brand-ink);
+    border-color: var(--brand);
+    border-radius: 6px 6px 2px 6px;
+    box-shadow: 2px 2px 0 var(--ink);
+    transform-origin: right bottom;
+  }
+  .chat-animation-b.in {
+    animation: chatAnimationPop 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  }
+  @keyframes chatAnimationPop {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .chat-animation-b.typing {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    height: 38px;
+    padding: 0 14px;
+  }
+  .chat-animation-b.typing i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--soft);
+    animation: chatAnimationBounce 1s ease-in-out infinite;
+  }
+  .chat-animation-b.typing i:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+  .chat-animation-b.typing i:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  @keyframes chatAnimationBounce {
+    0%,
+    60%,
+    100% {
+      transform: translateY(0);
+      opacity: 0.5;
+    }
+    30% {
+      transform: translateY(-6px);
+      opacity: 1;
+    }
+  }
+  .chat-animation-bar {
+    display: flex;
+    gap: 10px;
+    padding: 12px;
+    border-top: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .chat-animation-field {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    min-height: 46px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--bg);
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .chat-animation-field.typing {
+    border-color: var(--brand);
+  }
+  .chat-animation-ph {
+    color: var(--soft);
+  }
+  .chat-animation-field.typing .chat-animation-ph {
+    display: none;
+  }
+  .chat-animation-caret {
+    width: 2px;
+    height: 1.2em;
+    margin-left: 1px;
+    background: var(--brand);
+    display: none;
+  }
+  .chat-animation-field.typing .chat-animation-caret {
+    display: block;
+    animation: chatAnimationBlink 1s steps(1) infinite;
+  }
+  @keyframes chatAnimationBlink {
+    50% {
+      opacity: 0;
+    }
+  }
+  .chat-animation-send {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: 0;
+    font: 600 0.92rem 'Instrument Sans', system-ui, sans-serif;
+    cursor: pointer;
+    background: var(--brand);
+    color: var(--brand-ink);
+    padding: 0 16px;
+    border-radius: 6px;
+    box-shadow: 3px 3px 0 var(--ink);
+    transition: transform 0.12s, box-shadow 0.12s;
+  }
+  .chat-animation-send svg {
+    width: 16px;
+    height: 16px;
+  }
+  .chat-animation-send.hover {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--ink);
+  }
+  .chat-animation-send.press {
+    transform: translate(3px, 3px) scale(0.92);
+    box-shadow: 0 0 0 var(--ink);
+  }
+  .chat-animation-cursor {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    will-change: transform;
+  }
+  .chat-animation-cursor.show {
+    opacity: 1;
+  }
+  .chat-animation-cursor svg {
+    display: block;
+    width: 26px;
+    height: 26px;
+    transition: transform 0.12s;
+    transform-origin: 3px 3px;
+    filter: drop-shadow(1px 2px 1px rgba(0, 0, 0, 0.3));
+  }
+  .chat-animation-cursor.press svg {
+    transform: scale(0.8);
+  }
 </style>
 </head>
 <body>
@@ -2398,8 +2707,27 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       <div class="card" style="margin-bottom: 32px;">
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;">
           <!-- Animation Container -->
-          <div style="position: relative; height: 400px; background: var(--bg); border-radius: 8px; overflow: hidden; border: 1px solid var(--line); display: flex; align-items: center; justify-content: center;">
-            <iframe src="/chatanimation.html" style="width: 380px; height: 480px; border: 0; display: block;"></iframe>
+          <div style="position: relative; height: 400px; background: var(--bg); border-radius: 8px; overflow: hidden; border: 1px solid var(--line);">
+            <div class="chat-animation-stage" id="chatAnimationStage">
+              <div class="chat-animation-tilt" id="chatAnimationTilt">
+                <div class="chat-animation-drift" id="chatAnimationDrift">
+                  <div class="chat-animation-soft"></div>
+                  <div class="chat-animation-win">
+                    <div class="chat-animation-header">
+                      <div class="chat-animation-avatar"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 20V7h3v2h2V7h2v2h4V7h2v2h2V7h3v13h-6v-5a2 2 0 0 0-4 0v5z"/></svg></div>
+                      <div class="chat-animation-who"><b>Room 4B</b><span>Ms. Okafor</span></div>
+                      <div class="chat-animation-tag">Room is live</div>
+                    </div>
+                    <div class="chat-animation-msgs"><div class="chat-animation-feed" id="chatAnimationFeed"></div></div>
+                    <div class="chat-animation-bar">
+                      <div class="chat-animation-field" id="chatAnimationField"><span class="chat-animation-ph">Type a message…</span><span id="chatAnimationTxt"></span><span class="chat-animation-caret"></span></div>
+                      <button class="chat-animation-send" id="chatAnimationSend" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>Send</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="chat-animation-cursor" id="chatAnimationCursor"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 2v17l4.6-4.4 3 6.9 3-1.3-3-6.8H18z" fill="#18221C" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
           </div>
 
           <!-- Text Content -->
@@ -5968,6 +6296,197 @@ usage/fair dealing.`,
       }, 5000);
     }
   });
+</script>
+
+<script>
+// Chat Animation Script
+const chatAnimationMessages = [
+  { name:"Ms. Okafor", text:"Morning! Is everyone in the room yet?" },
+  { name:"Ms. Okafor", text:"The code is on the board: 4 7 2 9 1 6" },
+  { name:"Ms. Okafor", text:"Let me know when you're in." },
+  { name:"Maya",   text:"I'm in!" },
+  { name:"Jordan", text:"Here!" },
+  { name:"Sam",    text:"Joined!" }
+];
+const chatAnimationYou = "Yep, I'm here too!!";
+const chatAnimationReply = "Perfect, sending the page now.";
+const chatAnimationT = { flat:600, tilt:1800, typing:900, gap:600, studentTyping:700, studentGap:450, typeTotal:2600, afterType:400,
+            cursorIn:1200, hover:400, press:220, afterSend:600, replyTyping:1200, hold:1400, fade:700 };
+
+const chatAnimationStage = document.getElementById('chatAnimationStage');
+const chatAnimationTilt = document.getElementById('chatAnimationTilt');
+const chatAnimationDrift = document.getElementById('chatAnimationDrift');
+const chatAnimationFeed = document.getElementById('chatAnimationFeed');
+const chatAnimationField = document.getElementById('chatAnimationField');
+const chatAnimationTxt = document.getElementById('chatAnimationTxt');
+const chatAnimationSend = document.getElementById('chatAnimationSend');
+const chatAnimationCur = document.getElementById('chatAnimationCursor');
+let chatAnimationRun = 0, chatAnimationTracking = false;
+
+const chatAnimationSleep = (ms, id) => new Promise((res, rej) => setTimeout(() => id === chatAnimationRun ? res() : rej('stale'), ms));
+
+function chatAnimationSlide(dy){
+  chatAnimationFeed.style.transition = 'none';
+  chatAnimationFeed.style.transform = `translateY(${dy}px)`;
+  chatAnimationFeed.offsetWidth;
+  chatAnimationFeed.style.transition = 'transform .35s cubic-bezier(.2,.8,.2,1)';
+  chatAnimationFeed.style.transform = 'none';
+}
+const chatAnimationTeacher = chatAnimationMessages[0].name;
+let chatAnimationLast = null;
+
+function chatAnimationAdd(side, text, name){
+  const g = document.createElement('div');
+  g.className = 'chat-animation-g ' + side;
+  const who = side === 'me' ? null : (name || chatAnimationTeacher);
+  if (who && who !== chatAnimationLast){ 
+    const n = document.createElement('div'); 
+    n.className = 'chat-animation-nm'; 
+    n.textContent = who; 
+    g.appendChild(n); 
+  }
+  chatAnimationLast = who || 'me';
+  const el = document.createElement('div');
+  el.className = 'chat-animation-b ' + side + ' in';
+  if (text) el.textContent = text; else { 
+    el.classList.add('typing'); 
+    el.innerHTML = '<i></i><i></i><i></i>'; 
+  }
+  g.appendChild(el);
+  chatAnimationFeed.appendChild(g);
+  chatAnimationSlide(g.offsetHeight + 10);
+  return el;
+}
+
+function chatAnimationResolve(el, text){
+  const g = el.parentNode, h0 = g.offsetHeight;
+  el.classList.remove('typing', 'in'); 
+  el.textContent = text;
+  el.offsetWidth; 
+  el.classList.add('in');
+  chatAnimationSlide(g.offsetHeight - h0);
+}
+
+function chatAnimationTarget(){
+  const r = chatAnimationSend.getBoundingClientRect();
+  return { x: r.left + r.width * .55, y: r.top + r.height * .6 };
+}
+function chatAnimationPlace(x, y){ 
+  chatAnimationCur.style.transform = `translate3d(${x}px,${y}px,0)`; 
+}
+function chatAnimationFollowLoop(id){
+  if (!chatAnimationTracking || id !== chatAnimationRun) return;
+  const t = chatAnimationTarget(); 
+  chatAnimationPlace(t.x, t.y);
+  requestAnimationFrame(() => chatAnimationFollowLoop(id));
+}
+function chatAnimationCursorTo(id, dur){
+  return new Promise((res, rej) => {
+    const s = { x: innerWidth + 30, y: innerHeight * .85 };
+    chatAnimationCur.classList.add('show');
+    const t0 = performance.now();
+    (function f(now){
+      if (id !== chatAnimationRun) return rej('stale');
+      const k = Math.min(1, (now - t0) / dur);
+      const e = k < .5 ? 4*k*k*k : 1 - Math.pow(-2*k + 2, 3) / 2;
+      const t = chatAnimationTarget(), dx = t.x - s.x, dy = t.y - s.y;
+      const cx = (s.x + t.x)/2 - dy * .3, cy = (s.y + t.y)/2 + dx * .3, u = 1 - e;
+      chatAnimationPlace(u*u*s.x + 2*u*e*cx + e*e*t.x, u*u*s.y + 2*u*e*cy + e*e*t.y);
+      if (k < 1) requestAnimationFrame(f);
+      else { 
+        chatAnimationTracking = true; 
+        chatAnimationFollowLoop(id); 
+        res(); 
+      }
+    })(t0);
+  });
+}
+
+function chatAnimationReset(){
+  chatAnimationTracking = false;
+  chatAnimationFeed.innerHTML = ''; 
+  chatAnimationFeed.style.transform = 'none'; 
+  chatAnimationLast = null;
+  chatAnimationTxt.textContent = ''; 
+  chatAnimationField.classList.remove('typing');
+  chatAnimationSend.className = 'chat-animation-send'; 
+  chatAnimationCur.className = 'chat-animation-cursor';
+  chatAnimationTilt.classList.add('noanim'); 
+  chatAnimationTilt.classList.remove('on'); 
+  chatAnimationDrift.classList.remove('float');
+  chatAnimationTilt.offsetWidth; 
+  chatAnimationTilt.classList.remove('noanim');
+}
+
+async function chatAnimationPlay(id){
+  const w = ms => chatAnimationSleep(ms, id);
+  chatAnimationStage.classList.remove('show'); 
+  chatAnimationReset(); 
+  chatAnimationStage.offsetWidth; 
+  chatAnimationStage.classList.add('show');
+  await w(chatAnimationT.flat);
+  chatAnimationTilt.classList.add('on'); 
+  chatAnimationDrift.classList.add('float');
+  await w(chatAnimationT.tilt);
+  for (const m of chatAnimationMessages){
+    const s = m.name !== chatAnimationTeacher;
+    const t = chatAnimationAdd('them', null, m.name);
+    await w(s ? chatAnimationT.studentTyping : chatAnimationT.typing); 
+    chatAnimationResolve(t, m.text); 
+    await w(s ? chatAnimationT.studentGap : chatAnimationT.gap);
+  }
+  chatAnimationField.classList.add('typing');
+  const per = chatAnimationT.typeTotal / chatAnimationYou.length;
+  for (const ch of chatAnimationYou){ 
+    chatAnimationTxt.textContent += ch; 
+    await w(per); 
+  }
+  await w(chatAnimationT.afterType);
+  await chatAnimationCursorTo(id, chatAnimationT.cursorIn);
+  chatAnimationSend.classList.add('hover'); 
+  await w(chatAnimationT.hover);
+  chatAnimationSend.classList.add('press'); 
+  chatAnimationCur.classList.add('press'); 
+  await w(chatAnimationT.press);
+  chatAnimationSend.classList.remove('press', 'hover'); 
+  chatAnimationCur.classList.remove('press');
+  chatAnimationTxt.textContent = ''; 
+  chatAnimationField.classList.remove('typing');
+  chatAnimationAdd('me', chatAnimationYou);
+  await w(150); 
+  chatAnimationCur.classList.remove('show'); 
+  chatAnimationTracking = false;
+  await w(chatAnimationT.afterSend);
+  const t = chatAnimationAdd('them');
+  await w(chatAnimationT.replyTyping); 
+  chatAnimationResolve(t, chatAnimationReply);
+  await w(chatAnimationT.hold);
+  chatAnimationStage.classList.remove('show'); 
+  await w(chatAnimationT.fade);
+}
+
+async function chatAnimationLoop(){
+  const id = ++chatAnimationRun;
+  while (id === chatAnimationRun){
+    try { 
+      await chatAnimationPlay(id); 
+    } catch(e){ 
+      return; 
+    }
+  }
+}
+
+// Start animation when page is visible
+const chatAnimationObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      chatAnimationLoop();
+      chatAnimationObserver.disconnect();
+    }
+  });
+}, { threshold: 0.1 });
+
+chatAnimationObserver.observe(chatAnimationStage);
 </script>
 
 </body>
