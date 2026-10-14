@@ -2221,6 +2221,22 @@
     .messages-hero-grid {
       grid-template-columns: 1fr !important;
     }
+    #messagesInterface > .card > div:first-child {
+      width: 100% !important;
+      border-right: none !important;
+    }
+    #messagesPanel {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 10000;
+      background: var(--surface);
+    }
+    #noThreadSelected {
+      display: none !important;
+    }
   }
 
   #getStartedBtn:hover {
@@ -2810,24 +2826,75 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       <!-- Messages Interface (Hidden by default) -->
       <div id="messagesInterface" style="display: none;">
-        <div class="card" style="height: calc(100vh - 200px); min-height: 500px; display: flex; flex-direction: column;">
-          <!-- Messages Header -->
-          <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--line); margin-bottom: 16px;">
-            <h2 style="font-size: 1.3rem; margin: 0;">Message Threads</h2>
-            <div style="display: flex; gap: 12px;">
-              <button id="optOutBtn" class="btn btn-secondary" style="font-size: 0.85rem; padding: 8px 16px;">Opt out</button>
-              <button id="newThreadBtn" class="btn btn-primary" style="display: flex; align-items: center; gap: 8px;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <div class="card" style="height: calc(100vh - 200px); min-height: 500px; display: flex; overflow: hidden;">
+          <!-- Threads Sidebar -->
+          <div style="width: 320px; border-right: 1px solid var(--line); display: flex; flex-direction: column; flex-shrink: 0;">
+            <!-- Sidebar Header -->
+            <div style="padding: 16px; border-bottom: 1px solid var(--line);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h2 style="font-size: 1.1rem; margin: 0;">Threads</h2>
+                <button id="optOutBtn" class="btn btn-secondary" style="font-size: 0.75rem; padding: 6px 12px;">Opt out</button>
+              </div>
+              <button id="newThreadBtn" class="btn btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 New Thread
               </button>
             </div>
+
+            <!-- Threads List -->
+            <div id="threadsList" style="flex: 1; overflow-y: auto;">
+              <div class="loading-state">
+                <div class="loading-spinner"></div>
+                <p>Loading threads...</p>
+              </div>
+            </div>
           </div>
 
-          <!-- Threads List -->
-          <div id="threadsList" style="flex: 1; overflow-y: auto;">
-            <div class="loading-state">
-              <div class="loading-spinner"></div>
-              <p>Loading threads...</p>
+          <!-- Messages Panel -->
+          <div id="messagesPanel" style="flex: 1; display: flex; flex-direction: column; display: none;">
+            <!-- Messages Header -->
+            <div style="padding: 16px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <button id="backToThreadsBtn" class="btn btn-secondary" style="display: none; padding: 6px 12px; font-size: 0.85rem;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                  Back
+                </button>
+                <div>
+                  <h3 id="currentThreadTitle" style="font-size: 1.1rem; margin: 0;">Thread Title</h3>
+                  <span id="currentThreadDate" style="font-size: 0.8rem; color: var(--soft);"></span>
+                </div>
+              </div>
+              <button id="shareThreadBtn" class="btn btn-secondary" style="display: flex; align-items: center; gap: 6px; font-size: 0.85rem; padding: 8px 12px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                Share
+              </button>
+            </div>
+
+            <!-- Messages List -->
+            <div id="threadMessages" style="flex: 1; overflow-y: auto; padding: 16px; background: var(--bg);">
+              <div class="loading-state">
+                <div class="loading-spinner"></div>
+                <p>Loading messages...</p>
+              </div>
+            </div>
+
+            <!-- Reply Input -->
+            <div style="padding: 16px; border-top: 1px solid var(--line);">
+              <div style="display: flex; gap: 12px;">
+                <input type="text" class="form-input" id="threadReplyInput" placeholder="Type a reply..." style="flex: 1;">
+                <button class="btn btn-primary" id="sendThreadReplyBtn">Send</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State (No thread selected) -->
+          <div id="noThreadSelected" style="flex: 1; display: flex; align-items: center; justify-content: center; background: var(--bg);">
+            <div style="text-align: center;">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--chalk)" stroke-width="1.5" style="margin-bottom: 16px;">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+              <h3 style="font-size: 1.2rem; margin-bottom: 8px;">Select a thread</h3>
+              <p style="color: var(--soft);">Choose a thread from the sidebar to view messages</p>
             </div>
           </div>
         </div>
@@ -2853,28 +2920,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           <div class="modal-actions">
             <button class="modal-btn modal-btn-cancel" id="cancelNewThreadBtn">Cancel</button>
             <button class="modal-btn modal-btn-confirm" id="createThreadBtn">Create Thread</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Thread View Modal -->
-      <div class="modal-overlay" id="threadViewModal" style="display: none;">
-        <div class="modal" style="max-width: 700px; max-height: 80vh; display: flex; flex-direction: column;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--line);">
-            <h2 id="threadViewTitle" style="font-size: 1.3rem; margin: 0;">Thread Title</h2>
-            <button id="closeThreadViewBtn" style="background: none; border: none; color: var(--soft); cursor: pointer; padding: 8px; border-radius: 6px;">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </button>
-          </div>
-          <div id="threadMessages" style="flex: 1; overflow-y: auto; margin-bottom: 16px; padding: 16px; background: var(--bg); border-radius: 8px;">
-            <div class="loading-state">
-              <div class="loading-spinner"></div>
-              <p>Loading messages...</p>
-            </div>
-          </div>
-          <div style="display: flex; gap: 12px;">
-            <input type="text" class="form-input" id="threadReplyInput" placeholder="Type a reply..." style="flex: 1;">
-            <button class="btn btn-primary" id="sendThreadReplyBtn">Send</button>
           </div>
         </div>
       </div>
@@ -6277,9 +6322,12 @@ usage/fair dealing.`,
   const newThreadTitle = document.getElementById('newThreadTitle');
   const newThreadMessage = document.getElementById('newThreadMessage');
   const newThreadUrl = document.getElementById('newThreadUrl');
-  const threadViewModal = document.getElementById('threadViewModal');
-  const closeThreadViewBtn = document.getElementById('closeThreadViewBtn');
-  const threadViewTitle = document.getElementById('threadViewTitle');
+  const messagesPanel = document.getElementById('messagesPanel');
+  const noThreadSelected = document.getElementById('noThreadSelected');
+  const backToThreadsBtn = document.getElementById('backToThreadsBtn');
+  const currentThreadTitle = document.getElementById('currentThreadTitle');
+  const currentThreadDate = document.getElementById('currentThreadDate');
+  const shareThreadBtn = document.getElementById('shareThreadBtn');
   const threadMessages = document.getElementById('threadMessages');
   const threadReplyInput = document.getElementById('threadReplyInput');
   const sendThreadReplyBtn = document.getElementById('sendThreadReplyBtn');
@@ -6287,6 +6335,14 @@ usage/fair dealing.`,
   const nonUkSchoolModal = document.getElementById('nonUkSchoolModal');
   const closeNonUkModalBtn = document.getElementById('closeNonUkModalBtn');
   const expressInterestBtn = document.getElementById('expressInterestBtn');
+
+  let currentThreadId = null;
+
+  function backToThreads() {
+    messagesPanel.style.display = 'none';
+    noThreadSelected.style.display = 'flex';
+    currentThreadId = null;
+  }
 
   async function showMessagesInterface() {
     try {
@@ -6389,20 +6445,20 @@ usage/fair dealing.`,
       threadsList.innerHTML = '';
       threads.forEach(thread => {
         const threadCard = document.createElement('div');
-        threadCard.style.cssText = 'padding: 16px; background: var(--bg); border-radius: 8px; border: 1px solid var(--line); margin-bottom: 12px; cursor: pointer; transition: border-color 0.15s;';
+        threadCard.style.cssText = 'padding: 12px 16px; border-bottom: 1px solid var(--line); cursor: pointer; transition: background 0.15s;';
         threadCard.innerHTML = `
-          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
-            <h4 style="font-size: 1rem; margin: 0; font-weight: 600;">${thread.title}</h4>
-            <span style="font-size: 0.75rem; color: var(--soft);">${new Date(thread.created_at).toLocaleDateString()}</span>
+          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 4px;">
+            <h4 style="font-size: 0.95rem; margin: 0; font-weight: 600; flex: 1; padding-right: 8px;">${thread.title}</h4>
+            <span style="font-size: 0.7rem; color: var(--soft); flex-shrink: 0;">${new Date(thread.created_at).toLocaleDateString()}</span>
           </div>
-          <p style="color: var(--soft); font-size: 0.9rem; margin: 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+          <p style="color: var(--soft); font-size: 0.85rem; margin: 0; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
             ${thread.message}
           </p>
-          ${thread.target_url ? `<div style="margin-top: 8px; font-size: 0.8rem; color: var(--brand);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; vertical-align: middle;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> URL attached</div>` : ''}
+          ${thread.target_url ? `<div style="margin-top: 6px; font-size: 0.75rem; color: var(--brand);"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; vertical-align: middle;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> URL attached</div>` : ''}
         `;
-        threadCard.addEventListener('click', () => openThreadView(thread.id, thread.title));
-        threadCard.addEventListener('mouseenter', () => threadCard.style.borderColor = 'var(--brand)');
-        threadCard.addEventListener('mouseleave', () => threadCard.style.borderColor = 'var(--line)');
+        threadCard.addEventListener('click', () => selectThread(thread));
+        threadCard.addEventListener('mouseenter', () => threadCard.style.background = 'var(--tint)');
+        threadCard.addEventListener('mouseleave', () => threadCard.style.background = 'transparent');
         threadsList.appendChild(threadCard);
       });
     } catch (error) {
@@ -6468,23 +6524,45 @@ usage/fair dealing.`,
 
       alert('Thread created!');
       closeNewThreadModal();
+
+      // If thread has a URL, update the room's target_url
+      if (url) {
+        const { error: roomError } = await SupabaseClient
+          .from('rooms')
+          .update({ target_url: url, updated_at: new Date().toISOString() })
+          .eq('teacher_id', user.id)
+          .eq('is_active', true);
+
+        if (roomError) console.error('Error updating room URL:', roomError);
+      }
+
       loadThreads();
+      // Select the newly created thread
+      selectThread(thread);
     } catch (error) {
       console.error('Error creating thread:', error);
       alert('Error creating thread. Please try again.');
     }
   }
 
-  async function openThreadView(threadId, title) {
-    threadViewTitle.textContent = title;
-    threadViewModal.style.display = 'flex';
-    threadMessages.dataset.threadId = threadId;
+  async function selectThread(thread) {
+    currentThreadId = thread.id;
+    currentThreadTitle.textContent = thread.title;
+    currentThreadDate.textContent = new Date(thread.created_at).toLocaleDateString();
+
+    noThreadSelected.style.display = 'none';
+    messagesPanel.style.display = 'flex';
+
+    // Show back button on mobile
+    if (window.innerWidth <= 780) {
+      backToThreadsBtn.style.display = 'flex';
+    }
 
     try {
       const { data: messages, error } = await SupabaseClient
         .from('thread_messages')
         .select('*')
-        .eq('thread_id', threadId)
+        .eq('thread_id', thread.id)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
@@ -6516,8 +6594,8 @@ usage/fair dealing.`,
             font-size: 0.95rem;
             line-height: 1.4;
             max-width: 70%;
-            ${isTeacher 
-              ? 'background: var(--brand); color: var(--brand-ink);' 
+            ${isTeacher
+              ? 'background: var(--brand); color: var(--brand-ink);'
               : 'background: var(--tint); border: 1px solid var(--line);'}
           ">
             ${msg.message}
@@ -6535,8 +6613,42 @@ usage/fair dealing.`,
     }
   }
 
-  function closeThreadView() {
-    threadViewModal.style.display = 'none';
+  async function shareThread() {
+    if (!currentThreadId) return;
+
+    try {
+      const { data: { user } } = await SupabaseClient.auth.getUser();
+      if (!user) return;
+
+      // Get the teacher's active room code
+      const { data: room, error: roomError } = await SupabaseClient
+        .from('rooms')
+        .select('code')
+        .eq('teacher_id', user.id)
+        .eq('is_active', true)
+        .single();
+
+      if (roomError || !room) {
+        alert('Please create an active room first to share messages with students.');
+        return;
+      }
+
+      // Update the room's target_url to point to the thread
+      const { error: updateError } = await SupabaseClient
+        .from('rooms')
+        .update({
+          target_url: `${window.location.origin}/?thread=${currentThreadId}`,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', room.id);
+
+      if (updateError) throw updateError;
+
+      alert(`Thread shared! Students in room "${room.code}" will now see this thread. The room target URL has been updated.`);
+    } catch (error) {
+      console.error('Error sharing thread:', error);
+      alert('Error sharing thread. Please try again.');
+    }
   }
 
   async function sendThreadReply() {
@@ -6550,13 +6662,12 @@ usage/fair dealing.`,
         return;
       }
 
-      const threadId = threadMessages.dataset.threadId;
-      if (!threadId) return;
+      if (!currentThreadId) return;
 
       const { error } = await SupabaseClient
         .from('thread_messages')
         .insert({
-          thread_id: threadId,
+          thread_id: currentThreadId,
           sender_id: user.id,
           sender_name: user.user_metadata?.full_name || user.email,
           sender_type: 'teacher',
@@ -6568,7 +6679,8 @@ usage/fair dealing.`,
 
       threadReplyInput.value = '';
       // Reload messages to show the new reply
-      openThreadView(threadId, threadViewTitle.textContent);
+      const thread = { id: currentThreadId, title: currentThreadTitle.textContent };
+      await selectThread(thread);
     } catch (error) {
       console.error('Error sending reply:', error);
       alert('Error sending reply. Please try again.');
@@ -6594,7 +6706,8 @@ usage/fair dealing.`,
   if (newThreadBtn) newThreadBtn.addEventListener('click', openNewThreadModal);
   if (cancelNewThreadBtn) cancelNewThreadBtn.addEventListener('click', closeNewThreadModal);
   if (createThreadBtn) createThreadBtn.addEventListener('click', createThread);
-  if (closeThreadViewBtn) closeThreadViewBtn.addEventListener('click', closeThreadView);
+  if (backToThreadsBtn) backToThreadsBtn.addEventListener('click', backToThreads);
+  if (shareThreadBtn) shareThreadBtn.addEventListener('click', shareThread);
   if (sendThreadReplyBtn) sendThreadReplyBtn.addEventListener('click', sendThreadReply);
   if (nonUkSchoolBtn) nonUkSchoolBtn.addEventListener('click', openNonUkModal);
   if (closeNonUkModalBtn) closeNonUkModalBtn.addEventListener('click', closeNonUkModal);
@@ -6602,10 +6715,6 @@ usage/fair dealing.`,
 
   newThreadModal.addEventListener('click', (e) => {
     if (e.target === newThreadModal) closeNewThreadModal();
-  });
-
-  threadViewModal.addEventListener('click', (e) => {
-    if (e.target === threadViewModal) closeThreadView();
   });
 
   nonUkSchoolModal.addEventListener('click', (e) => {
