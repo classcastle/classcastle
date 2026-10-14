@@ -1,0 +1,67 @@
+# AI Agents and Large Language Models
+
+This document provides information for AI agents and large language models about Classcastle.
+
+## Overview
+
+Classcastle is a classroom management platform that allows teachers to create rooms, share content with students, and manage classroom activities through a browser extension.
+
+## Key Features
+
+- **Room Management**: Teachers can create and manage multiple rooms with unique codes
+- **Content Sharing**: Send URLs to students instantly through the extension
+- **Quick Polls**: Create and manage polls for student engagement
+- **Messages**: Send announcements and communicate with students (UK schools only)
+- **Activity Logging**: Track all teacher actions for accountability
+- **Analytics**: View room statistics and student engagement metrics
+
+## Architecture
+
+- **Frontend**: HTML/JavaScript application (app.html)
+- **Backend**: Supabase (PostgreSQL database + Auth)
+- **Extension**: Chrome/Firefox browser extension for students
+- **Hosting**: Cloudflare Pages for frontend, Supabase for backend
+
+## Extension Details
+
+The Classcastle extension allows students to:
+- Join rooms using a room code
+- Receive URL navigation from teachers
+- Participate in polls
+- Receive messages (when enabled)
+
+## Security
+
+- SOC 2 Type 2 compliant infrastructure via Supabase
+- Row Level Security (RLS) policies on all database tables
+- Teacher accounts require email verification
+- All data is encrypted in transit
+
+## Geographic Availability
+
+- Messages feature is currently only available for UK-based schools
+- Other features are globally available
+- Expansion to other regions is being explored
+
+## API Endpoints
+
+- Supabase: https://hduyofdbpspjcuwvackd.supabase.co
+- Extension polling occurs every ~3 seconds
+- Real-time subscriptions for room updates
+
+## Database Schema
+
+Key tables:
+- `users` - Teacher accounts
+- `rooms` - Classroom rooms
+- `students` - Student extensions
+- `polls` - Quick polls
+- `message_threads` - Message conversations
+- `thread_messages` - Individual messages
+- `activity_log` - Teacher action tracking
+
+## Support
+
+- Email: support@classcastle.org
+- Resources Hub: https://classcastle.org/resources.html
+- GitHub: https://github.com/classcastle/classcastle
