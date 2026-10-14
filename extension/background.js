@@ -385,36 +385,13 @@ async function handleAlarm() {
     console.log('Room target_url from DB:', room?.target_url);
 
     if (room && room.target_url) {
-      // Check if we should navigate
-      let shouldNavigate = false;
-      
+      // Only navigate if the database URL has actually changed
       if (room.target_url !== data.currentTargetUrl) {
-        console.log('URL changed:', room.target_url);
-        shouldNavigate = true;
-      } else {
-        // URL is the same, but check if the tab still exists and is on that URL
-        if (data.tabId) {
-          try {
-            const tab = await api.tabs.get(data.tabId);
-            if (tab && !tab.discarded && tab.url === room.target_url) {
-              console.log('Tab already on target URL, skipping navigation');
-            } else {
-              console.log('Tab not on target URL or discarded, will navigate');
-              shouldNavigate = true;
-            }
-          } catch (e) {
-            console.log('Tab not found, will navigate');
-            shouldNavigate = true;
-          }
-        } else {
-          console.log('No tab tracked, will navigate');
-          shouldNavigate = true;
-        }
-      }
-      
-      if (shouldNavigate) {
+        console.log('URL changed in database, navigating to:', room.target_url);
         await saveStorageData({ currentTargetUrl: room.target_url });
         navigateToUrl(room.target_url, data.studentId);
+      } else {
+        console.log('URL unchanged, skipping navigation');
       }
     } else {
       console.log('No target_url set in room yet');
