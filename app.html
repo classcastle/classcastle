@@ -6284,18 +6284,59 @@ usage/fair dealing.`,
     loadThreads();
   }
 
-  function loadThreads() {
-    // TODO: Load threads from Supabase
-    threadsList.innerHTML = `
-      <div style="text-align: center; padding: 48px;">
-        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--chalk)" stroke-width="1.5" style="margin-bottom: 16px;">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-        </svg>
-        <h3 style="font-size: 1.2rem; margin-bottom: 8px;">No message threads yet</h3>
-        <p style="color: var(--soft); margin-bottom: 24px;">Create your first thread to start messaging your students.</p>
-        <button class="btn btn-primary" onclick="document.getElementById('newThreadBtn').click()">Create your first thread</button>
-      </div>
-    `;
+  async function loadThreads() {
+    try {
+      const { data: { user } } = await SupabaseClient.auth.getUser();
+      if (!user) {
+        threadsList.innerHTML = '<p style="text-align: center; color: var(--soft);">Please log in to view messages.</p>';
+        return;
+      }
+
+      const { data: threads, error } = await SupabaseClient
+        .from('message_threads')
+        .select('*')
+        .eq('teacher_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      if (!threads || threads.length === 0) {
+        threadsList.innerHTML = `
+          <div style="text-align: center; padding: 48px;">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--chalk)" stroke-width="1.5" style="margin-bottom: 16px;">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            <h3 style="font-size: 1.2rem; margin-bottom: 8px;">No message threads yet</h3>
+            <p style="color: var(--soft); margin-bottom: 24px;">Create your first thread to start messaging your students.</p>
+            <button class="btn btn-primary" onclick="document.getElementById('newThreadBtn').click()">Create your first thread</button>
+          </div>
+        `;
+        return;
+      }
+
+      threadsList.innerHTML = '';
+      threads.forEach(thread => {
+        const threadCard = document.createElement('div');
+        threadCard.style.cssText = 'padding: 16px; background: var(--bg); border-radius: 8px; border: 1px solid var(--line); margin-bottom: 12px; cursor: pointer; transition: border-color 0.15s;';
+        threadCard.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+            <h4 style="font-size: 1rem; margin: 0; font-weight: 600;">${thread.title}</h4>
+            <span style="font-size: 0.75rem; color: var(--soft);">${new Date(thread.created_at).toLocaleDateString()}</span>
+          </div>
+          <p style="color: var(--soft); font-size: 0.9rem; margin: 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+            ${thread.message}
+          </p>
+          ${thread.target_url ? `<div style="margin-top: 8px; font-size: 0.8rem; color: var(--brand);"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; vertical-align: middle;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> URL attached</div>` : ''}
+        `;
+        threadCard.addEventListener('click', () => openThreadView(thread.id, thread.title));
+        threadCard.addEventListener('mouseenter', () => threadCard.style.borderColor = 'var(--brand)');
+        threadCard.addEventListener('mouseleave', () => threadCard.style.borderColor = 'var(--line)');
+        threadsList.appendChild(threadCard);
+      });
+    } catch (error) {
+      console.error('Error loading threads:', error);
+      threadsList.innerHTML = '<p style="text-align: center; color: var(--red);">Error loading threads. Please try again.</p>';
+    }
   }
 
   function openNewThreadModal() {
@@ -6309,7 +6350,7 @@ usage/fair dealing.`,
     newThreadUrl.value = '';
   }
 
-  function createThread() {
+  async function createThread() {
     const title = newThreadTitle.value.trim();
     const message = newThreadMessage.value.trim();
     const url = newThreadUrl.value.trim();
@@ -6319,35 +6360,147 @@ usage/fair dealing.`,
       return;
     }
 
-    // TODO: Create thread in Supabase
-    console.log('Creating thread:', { title, message, url });
-    alert('Thread created!');
-    closeNewThreadModal();
-    loadThreads();
+    try {
+      const { data: { user } } = await SupabaseClient.auth.getUser();
+      if (!user) {
+        alert('Please log in to create a thread');
+        return;
+      }
+
+      const { data: thread, error } = await SupabaseClient
+        .from('message_threads')
+        .insert({
+          teacher_id: user.id,
+          title: title,
+          message: message,
+          target_url: url || null,
+          created_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Create initial message in the thread
+      const { error: msgError } = await SupabaseClient
+        .from('thread_messages')
+        .insert({
+          thread_id: thread.id,
+          sender_id: user.id,
+          sender_name: user.user_metadata?.full_name || user.email,
+          message: message,
+          created_at: new Date().toISOString()
+        });
+
+      if (msgError) throw msgError;
+
+      alert('Thread created!');
+      closeNewThreadModal();
+      loadThreads();
+    } catch (error) {
+      console.error('Error creating thread:', error);
+      alert('Error creating thread. Please try again.');
+    }
   }
 
-  function openThreadView(threadId, title) {
+  async function openThreadView(threadId, title) {
     threadViewTitle.textContent = title;
     threadViewModal.style.display = 'flex';
-    // TODO: Load thread messages from Supabase
-    threadMessages.innerHTML = `
-      <div style="text-align: center; padding: 32px;">
-        <p style="color: var(--soft);">No messages yet in this thread.</p>
-      </div>
-    `;
+    threadMessages.dataset.threadId = threadId;
+
+    try {
+      const { data: messages, error } = await SupabaseClient
+        .from('thread_messages')
+        .select('*')
+        .eq('thread_id', threadId)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      if (!messages || messages.length === 0) {
+        threadMessages.innerHTML = `
+          <div style="text-align: center; padding: 32px;">
+            <p style="color: var(--soft);">No messages yet in this thread.</p>
+          </div>
+        `;
+        return;
+      }
+
+      threadMessages.innerHTML = '';
+      messages.forEach(msg => {
+        const msgDiv = document.createElement('div');
+        const isTeacher = msg.sender_type === 'teacher';
+        msgDiv.style.cssText = `
+          display: flex;
+          flex-direction: column;
+          ${isTeacher ? 'align-items: flex-end;' : 'align-items: flex-start;'}
+          margin-bottom: 12px;
+        `;
+        msgDiv.innerHTML = `
+          <div style="font-size: 0.75rem; color: var(--soft); margin-bottom: 4px;">${msg.sender_name}</div>
+          <div style="
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            max-width: 70%;
+            ${isTeacher 
+              ? 'background: var(--brand); color: var(--brand-ink);' 
+              : 'background: var(--tint); border: 1px solid var(--line);'}
+          ">
+            ${msg.message}
+          </div>
+          <div style="font-size: 0.7rem; color: var(--soft); margin-top: 4px;">${new Date(msg.created_at).toLocaleTimeString()}</div>
+        `;
+        threadMessages.appendChild(msgDiv);
+      });
+
+      // Scroll to bottom
+      threadMessages.scrollTop = threadMessages.scrollHeight;
+    } catch (error) {
+      console.error('Error loading thread messages:', error);
+      threadMessages.innerHTML = '<p style="text-align: center; color: var(--red);">Error loading messages. Please try again.</p>';
+    }
   }
 
   function closeThreadView() {
     threadViewModal.style.display = 'none';
   }
 
-  function sendThreadReply() {
+  async function sendThreadReply() {
     const reply = threadReplyInput.value.trim();
     if (!reply) return;
 
-    // TODO: Send reply to Supabase
-    console.log('Sending reply:', reply);
-    threadReplyInput.value = '';
+    try {
+      const { data: { user } } = await SupabaseClient.auth.getUser();
+      if (!user) {
+        alert('Please log in to send a reply');
+        return;
+      }
+
+      const threadId = threadMessages.dataset.threadId;
+      if (!threadId) return;
+
+      const { error } = await SupabaseClient
+        .from('thread_messages')
+        .insert({
+          thread_id: threadId,
+          sender_id: user.id,
+          sender_name: user.user_metadata?.full_name || user.email,
+          sender_type: 'teacher',
+          message: reply,
+          created_at: new Date().toISOString()
+        });
+
+      if (error) throw error;
+
+      threadReplyInput.value = '';
+      // Reload messages to show the new reply
+      openThreadView(threadId, threadViewTitle.textContent);
+    } catch (error) {
+      console.error('Error sending reply:', error);
+      alert('Error sending reply. Please try again.');
+    }
   }
 
   function openNonUkModal() {
