@@ -2955,6 +2955,42 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           </div>
         </div>
       </div>
+
+      <!-- Custom Alert Modal -->
+      <div class="modal-overlay" id="alertModal" style="display: none;">
+        <div class="modal" style="max-width: 500px;">
+          <h2 id="alertModalTitle" style="font-size: 1.4rem; margin-bottom: 16px;">Notice</h2>
+          <p id="alertModalMessage" style="margin-bottom: 24px; line-height: 1.6; white-space: pre-wrap;"></p>
+          <div class="modal-actions">
+            <button class="modal-btn modal-btn-confirm" id="alertModalOkBtn">OK</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Custom Confirm Modal -->
+      <div class="modal-overlay" id="confirmModal" style="display: none;">
+        <div class="modal" style="max-width: 500px;">
+          <h2 id="confirmModalTitle" style="font-size: 1.4rem; margin-bottom: 16px;">Confirm</h2>
+          <p id="confirmModalMessage" style="margin-bottom: 24px; line-height: 1.6; white-space: pre-wrap;"></p>
+          <div class="modal-actions">
+            <button class="modal-btn modal-btn-cancel" id="confirmModalCancelBtn">Cancel</button>
+            <button class="modal-btn modal-btn-confirm" id="confirmModalOkBtn">Confirm</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Custom Prompt Modal -->
+      <div class="modal-overlay" id="promptModal" style="display: none;">
+        <div class="modal" style="max-width: 500px;">
+          <h2 id="promptModalTitle" style="font-size: 1.4rem; margin-bottom: 16px;">Input</h2>
+          <p id="promptModalMessage" style="margin-bottom: 16px; line-height: 1.6;"></p>
+          <input type="text" class="form-input" id="promptModalInput" style="margin-bottom: 24px;">
+          <div class="modal-actions">
+            <button class="modal-btn modal-btn-cancel" id="promptModalCancelBtn">Cancel</button>
+            <button class="modal-btn modal-btn-confirm" id="promptModalOkBtn">OK</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Pricing Page -->
@@ -6342,9 +6378,80 @@ usage/fair dealing.`,
   const nonUkSchoolModal = document.getElementById('nonUkSchoolModal');
   const closeNonUkModalBtn = document.getElementById('closeNonUkModalBtn');
   const expressInterestBtn = document.getElementById('expressInterestBtn');
+  const alertModal = document.getElementById('alertModal');
+  const alertModalTitle = document.getElementById('alertModalTitle');
+  const alertModalMessage = document.getElementById('alertModalMessage');
+  const alertModalOkBtn = document.getElementById('alertModalOkBtn');
+  const confirmModal = document.getElementById('confirmModal');
+  const confirmModalTitle = document.getElementById('confirmModalTitle');
+  const confirmModalMessage = document.getElementById('confirmModalMessage');
+  const confirmModalCancelBtn = document.getElementById('confirmModalCancelBtn');
+  const confirmModalOkBtn = document.getElementById('confirmModalOkBtn');
+  const promptModal = document.getElementById('promptModal');
+  const promptModalTitle = document.getElementById('promptModalTitle');
+  const promptModalMessage = document.getElementById('promptModalMessage');
+  const promptModalInput = document.getElementById('promptModalInput');
+  const promptModalCancelBtn = document.getElementById('promptModalCancelBtn');
+  const promptModalOkBtn = document.getElementById('promptModalOkBtn');
 
   let currentThreadId = null;
   let isPersonalThread = false;
+
+  // Custom alert function
+  function showAlert(message, title = 'Notice') {
+    alertModalTitle.textContent = title;
+    alertModalMessage.textContent = message;
+    alertModal.style.display = 'flex';
+  }
+
+  function closeAlert() {
+    alertModal.style.display = 'none';
+  }
+
+  // Custom confirm function
+  let confirmCallback = null;
+  function showConfirm(message, title = 'Confirm', callback) {
+    confirmModalTitle.textContent = title;
+    confirmModalMessage.textContent = message;
+    confirmCallback = callback;
+    confirmModal.style.display = 'flex';
+  }
+
+  function closeConfirm(result = false) {
+    confirmModal.style.display = 'none';
+    if (confirmCallback) {
+      confirmCallback(result);
+      confirmCallback = null;
+    }
+  }
+
+  // Custom prompt function
+  let promptCallback = null;
+  function showPrompt(message, title = 'Input', defaultValue = '', callback) {
+    promptModalTitle.textContent = title;
+    promptModalMessage.textContent = message;
+    promptModalInput.value = defaultValue;
+    promptCallback = callback;
+    promptModal.style.display = 'flex';
+    promptModalInput.focus();
+  }
+
+  function closePrompt(result = null) {
+    promptModal.style.display = 'none';
+    if (promptCallback) {
+      promptCallback(result);
+      promptCallback = null;
+    }
+  }
+
+  alertModalOkBtn.addEventListener('click', closeAlert);
+  confirmModalCancelBtn.addEventListener('click', () => closeConfirm(false));
+  confirmModalOkBtn.addEventListener('click', () => closeConfirm(true));
+  promptModalCancelBtn.addEventListener('click', () => closePrompt(null));
+  promptModalOkBtn.addEventListener('click', () => closePrompt(promptModalInput.value));
+  promptModalInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') closePrompt(promptModalInput.value);
+  });
 
   async function renameThread(threadId, newName) {
     try {
@@ -6355,9 +6462,12 @@ usage/fair dealing.`,
 
       if (error) throw error;
       loadThreads();
+      if (currentThreadId === threadId) {
+        currentThreadTitle.textContent = newName;
+      }
     } catch (error) {
       console.error('Error renaming thread:', error);
-      alert('Error renaming thread. Please try again.');
+      showAlert('Error renaming thread. Please try again.');
     }
   }
 
@@ -6399,8 +6509,14 @@ usage/fair dealing.`,
         const newName = args.join(' ');
         if (!newName) return 'Please provide a new name';
         
-        await renameThread(currentThreadId, newName);
-        return `Thread renamed to: ${newName}`;
+        try {
+          await renameThread(currentThreadId, newName);
+          currentThreadTitle.textContent = newName;
+          return `Thread renamed to: ${newName}`;
+        } catch (error) {
+          console.error('Error renaming thread:', error);
+          return 'Error renaming thread';
+        }
       }
     },
     '/delete': {
@@ -6409,20 +6525,35 @@ usage/fair dealing.`,
       handler: async () => {
         if (isPersonalThread) return 'Cannot delete personal threads';
         
-        if (!confirm('Are you sure you want to delete this thread? This action cannot be undone.')) {
-          return 'Deletion cancelled';
-        }
-        
-        const { error } = await SupabaseClient
-          .from('message_threads')
-          .delete()
-          .eq('id', currentThreadId);
-        
-        if (error) throw error;
-        
-        backToThreads();
-        loadThreads();
-        return 'Thread deleted';
+        return new Promise((resolve) => {
+          showConfirm(
+            'Are you sure you want to delete this thread? This action cannot be undone.',
+            'Delete Thread',
+            async (confirmed) => {
+              if (!confirmed) {
+                resolve('Deletion cancelled');
+                return;
+              }
+              
+              try {
+                const { error } = await SupabaseClient
+                  .from('message_threads')
+                  .delete()
+                  .eq('id', currentThreadId);
+                
+                if (error) throw error;
+                
+                backToThreads();
+                loadThreads();
+                resolve('Thread deleted');
+              } catch (error) {
+                console.error('Error deleting thread:', error);
+                showAlert('Error deleting thread. Please try again.');
+                resolve('Error deleting thread');
+              }
+            }
+          );
+        });
       }
     },
     '/help': {
@@ -6450,7 +6581,7 @@ usage/fair dealing.`,
     try {
       const { data: { user } } = await SupabaseClient.auth.getUser();
       if (!user) {
-        alert('Please log in to use Messages');
+        showAlert('Please log in to use Messages');
         return;
       }
 
@@ -6466,32 +6597,58 @@ usage/fair dealing.`,
       loadThreads();
     } catch (error) {
       console.error('Error opting in to messages:', error);
-      alert('Error enabling Messages. Please try again.');
+      showAlert('Error enabling Messages. Please try again.');
     }
   }
 
   async function optOutOfMessages() {
-    if (!confirm('Are you sure you want to opt out of Messages? This will hide the messaging interface.')) {
-      return;
-    }
+    showConfirm(
+      'Are you sure you want to opt out of Messages? This will permanently delete all your message threads and messages. This action cannot be undone.',
+      'Opt out of Messages',
+      async (confirmed) => {
+        if (!confirmed) return;
 
-    try {
-      const { data: { user } } = await SupabaseClient.auth.getUser();
-      if (!user) return;
+        try {
+          const { data: { user } } = await SupabaseClient.auth.getUser();
+          if (!user) return;
 
-      // Update user metadata to opt out of messages
-      const { error } = await SupabaseClient.auth.updateUser({
-        data: { messages_opted_in: false }
-      });
+          // Delete all thread messages
+          const { error: msgError } = await SupabaseClient
+            .from('thread_messages')
+            .delete()
+            .in('thread_id', (
+              await SupabaseClient
+                .from('message_threads')
+                .select('id')
+                .eq('teacher_id', user.id)
+            ).data?.map(t => t.id) || []);
 
-      if (error) throw error;
+          if (msgError) throw msgError;
 
-      messagesInterface.style.display = 'none';
-      messagesLanding.style.display = 'block';
-    } catch (error) {
-      console.error('Error opting out of messages:', error);
-      alert('Error opting out. Please try again.');
-    }
+          // Delete all threads
+          const { error: threadError } = await SupabaseClient
+            .from('message_threads')
+            .delete()
+            .eq('teacher_id', user.id);
+
+          if (threadError) throw threadError;
+
+          // Update user metadata to opt out
+          const { error } = await SupabaseClient.auth.updateUser({
+            data: { messages_opted_in: false }
+          });
+
+          if (error) throw error;
+
+          messagesInterface.style.display = 'none';
+          messagesLanding.style.display = 'block';
+          showAlert('You have opted out of Messages. All your data has been deleted.');
+        } catch (error) {
+          console.error('Error opting out of messages:', error);
+          showAlert('Error opting out. Please try again.');
+        }
+      }
+    );
   }
 
   async function checkMessagesOptIn() {
@@ -6613,10 +6770,16 @@ usage/fair dealing.`,
         threadCard.addEventListener('click', () => selectThread(thread));
         threadCard.addEventListener('contextmenu', (e) => {
           e.preventDefault();
-          const newName = prompt('Rename thread:', thread.title);
-          if (newName && newName !== thread.title) {
-            renameThread(thread.id, newName);
-          }
+          showPrompt(
+            'Enter new thread name:',
+            'Rename Thread',
+            thread.title,
+            (newName) => {
+              if (newName && newName !== thread.title) {
+                renameThread(thread.id, newName);
+              }
+            }
+          );
         });
         threadCard.addEventListener('mouseenter', () => threadCard.style.background = 'var(--tint)');
         threadCard.addEventListener('mouseleave', () => threadCard.style.background = 'transparent');
@@ -6645,14 +6808,14 @@ usage/fair dealing.`,
     const url = newThreadUrl.value.trim();
 
     if (!title || !message) {
-      alert('Please enter a title and message');
+      showAlert('Please enter a title and message');
       return;
     }
 
     try {
       const { data: { user } } = await SupabaseClient.auth.getUser();
       if (!user) {
-        alert('Please log in to create a thread');
+        showAlert('Please log in to create a thread');
         return;
       }
 
@@ -6683,7 +6846,7 @@ usage/fair dealing.`,
 
       if (msgError) throw msgError;
 
-      alert('Thread created!');
+      showAlert('Thread created!');
       closeNewThreadModal();
 
       // If thread has a URL, update the room's target_url
@@ -6702,7 +6865,7 @@ usage/fair dealing.`,
       selectThread(thread);
     } catch (error) {
       console.error('Error creating thread:', error);
-      alert('Error creating thread. Please try again.');
+      showAlert('Error creating thread. Please try again.');
     }
   }
 
@@ -6813,7 +6976,7 @@ usage/fair dealing.`,
         .single();
 
       if (roomError || !room) {
-        alert('Please create an active room first to share messages with students.');
+        showAlert('Please create an active room first to share messages with students.');
         return;
       }
 
@@ -6828,10 +6991,10 @@ usage/fair dealing.`,
 
       if (updateError) throw updateError;
 
-      alert(`Thread shared! Students in room "${room.code}" will now see this thread. The room target URL has been updated to:\n\n${window.location.origin}/?thread=${currentThreadId}`);
+      showAlert(`Thread shared! Students in room "${room.code}" will now see this thread. The room target URL has been updated to:\n\n${window.location.origin}/?thread=${currentThreadId}`);
     } catch (error) {
       console.error('Error sharing thread:', error);
-      alert('Error sharing thread. Please try again.');
+      showAlert('Error sharing thread. Please try again.');
     }
   }
 
@@ -6842,7 +7005,7 @@ usage/fair dealing.`,
     try {
       const { data: { user } } = await SupabaseClient.auth.getUser();
       if (!user) {
-        alert('Please log in to send a reply');
+        showAlert('Please log in to send a reply');
         return;
       }
 
@@ -6856,7 +7019,7 @@ usage/fair dealing.`,
           if (cmd === '/help') continue;
           help += `${cmd}\n  ${info.description}\n  Usage: ${info.usage}\n\n`;
         }
-        alert(help);
+        showAlert(help);
         threadReplyInput.value = '';
         return;
       }
@@ -6868,11 +7031,11 @@ usage/fair dealing.`,
 
         if (commands[command]) {
           const result = await commands[command].handler(args);
-          alert(result);
+          showAlert(result);
           threadReplyInput.value = '';
           return;
         } else {
-          alert(`Unknown command: ${command}. Type / to see available commands.`);
+          showAlert(`Unknown command: ${command}. Type / to see available commands.`);
           threadReplyInput.value = '';
           return;
         }
@@ -6898,7 +7061,7 @@ usage/fair dealing.`,
       await selectThread(thread);
     } catch (error) {
       console.error('Error sending reply:', error);
-      alert('Error sending reply. Please try again.');
+      showAlert('Error sending reply. Please try again.');
     }
   }
 
@@ -6912,7 +7075,7 @@ usage/fair dealing.`,
 
   function expressInterest() {
     // TODO: Open interest form or redirect to contact
-    alert('Thank you for your interest! We\'ll be in touch when we expand to your region.');
+    showAlert('Thank you for your interest! We\'ll be in touch when we expand to your region.');
     closeNonUkModal();
   }
 
@@ -6935,6 +7098,18 @@ usage/fair dealing.`,
 
   nonUkSchoolModal.addEventListener('click', (e) => {
     if (e.target === nonUkSchoolModal) closeNonUkModal();
+  });
+
+  alertModal.addEventListener('click', (e) => {
+    if (e.target === alertModal) closeAlert();
+  });
+
+  confirmModal.addEventListener('click', (e) => {
+    if (e.target === confirmModal) closeConfirm(false);
+  });
+
+  promptModal.addEventListener('click', (e) => {
+    if (e.target === promptModal) closePrompt(null);
   });
 
   threadReplyInput.addEventListener('keypress', (e) => {
