@@ -1690,6 +1690,15 @@
     .student-grid {
       grid-template-columns: 1fr;
     }
+
+    /* Messages page mobile */
+    #messagesPage .card:first-child > div {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    #messagesPage .card:first-child > div > div:first-child {
+      aspect-ratio: 3 / 4;
+    }
   }
 
   #pollsLockMenuBtn:hover {
@@ -2398,8 +2407,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       <div class="card" style="margin-bottom: 32px;">
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;">
           <!-- Animation Container -->
-          <div style="position: relative; min-height: 400px; background: var(--bg); border-radius: 8px; overflow: hidden; border: 1px solid var(--line);">
-            <iframe src="/chatanimation.html" style="width: 100%; height: 100%; border: none;"></iframe>
+          <div style="position: relative; aspect-ratio: 4 / 3; background: var(--bg); border-radius: 8px; overflow: hidden; border: 1px solid var(--line);">
+            <iframe src="/chatanimation.html" style="position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block;"></iframe>
           </div>
 
           <!-- Text Content -->
