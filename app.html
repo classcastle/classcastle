@@ -2726,76 +2726,147 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         </div>
       </div>
 
-      <!-- Hero Section -->
-      <div class="card" style="margin-bottom: 32px;">
-        <div class="messages-hero-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;">
-          <!-- Animation Container -->
-          <div style="position: relative; background: var(--bg); border-radius: 8px; border: 1px solid var(--line);">
-            <div class="chat-animation-stage" id="chatAnimationStage">
-              <div class="chat-animation-tilt" id="chatAnimationTilt">
-                <div class="chat-animation-drift" id="chatAnimationDrift">
-                  <div class="chat-animation-soft"></div>
-                  <div class="chat-animation-win">
-                    <div class="chat-animation-header">
-                      <div class="chat-animation-avatar"><img src="/logo.svg" alt="" style="width: 20px; height: 20px;"></div>
-                      <div class="chat-animation-who"><b>Room 4B</b><span>Ms. Okafor</span></div>
-                      <div class="chat-animation-tag">Room is live</div>
-                    </div>
-                    <div class="chat-animation-msgs"><div class="chat-animation-feed" id="chatAnimationFeed"></div></div>
-                    <div class="chat-animation-bar">
-                      <div class="chat-animation-field" id="chatAnimationField"><span class="chat-animation-ph">Type a message…</span><span id="chatAnimationTxt"></span><span class="chat-animation-caret"></span></div>
-                      <button class="chat-animation-send" id="chatAnimationSend" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>Send</button>
+      <!-- Messages Landing Content -->
+      <div id="messagesLanding">
+        <!-- Hero Section -->
+        <div class="card" style="margin-bottom: 32px;">
+          <div class="messages-hero-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;">
+            <!-- Animation Container -->
+            <div style="position: relative; background: var(--bg); border-radius: 8px; border: 1px solid var(--line);">
+              <div class="chat-animation-stage" id="chatAnimationStage">
+                <div class="chat-animation-tilt" id="chatAnimationTilt">
+                  <div class="chat-animation-drift" id="chatAnimationDrift">
+                    <div class="chat-animation-soft"></div>
+                    <div class="chat-animation-win">
+                      <div class="chat-animation-header">
+                        <div class="chat-animation-avatar"><img src="/logo.svg" alt="" style="width: 20px; height: 20px;"></div>
+                        <div class="chat-animation-who"><b>Room 4B</b><span>Ms. Okafor</span></div>
+                        <div class="chat-animation-tag">Room is live</div>
+                      </div>
+                      <div class="chat-animation-msgs"><div class="chat-animation-feed" id="chatAnimationFeed"></div></div>
+                      <div class="chat-animation-bar">
+                        <div class="chat-animation-field" id="chatAnimationField"><span class="chat-animation-ph">Type a message…</span><span id="chatAnimationTxt"></span><span class="chat-animation-caret"></span></div>
+                        <button class="chat-animation-send" id="chatAnimationSend" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>Send</button>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
             <div class="chat-animation-cursor" id="chatAnimationCursor"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 2v17l4.6-4.4 3 6.9 3-1.3-3-6.8H18z" fill="#18221C" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
-          </div>
 
-          <!-- Text Content -->
-          <div>
-            <h2 style="font-size: 2rem; margin-bottom: 16px; letter-spacing: -0.02em;">Send messages to your students</h2>
-            <p style="color: var(--soft); font-size: 1.1rem; line-height: 1.6; margin-bottom: 24px;">
-              Communicate with your entire class directly through Classcastle. Send announcements, instructions, or questions without leaving the platform.
-            </p>
-            <button id="getStartedBtn" style="display: inline-flex; align-items: center; gap: 8px; background: var(--brand); color: var(--brand-ink); padding: 12px 24px; border-radius: 6px; font-weight: 600; font-size: 0.95rem; border: none; cursor: pointer; transition: transform 0.12s, box-shadow 0.12s; box-shadow: 3px 3px 0 var(--ink);">
-              Get started
-            </button>
+            <!-- Text Content -->
+            <div>
+              <h2 style="font-size: 2rem; margin-bottom: 16px; letter-spacing: -0.02em;">Send messages to your students</h2>
+              <p style="color: var(--soft); font-size: 1.1rem; line-height: 1.6; margin-bottom: 24px;">
+                Communicate with your entire class directly through Classcastle. Send announcements, instructions, or questions without leaving the platform.
+              </p>
+              <button id="getStartedBtn" style="display: inline-flex; align-items: center; gap: 8px; background: var(--brand); color: var(--brand-ink); padding: 12px 24px; border-radius: 6px; font-weight: 600; font-size: 0.95rem; border: none; cursor: pointer; transition: transform 0.12s, box-shadow 0.12s; box-shadow: 3px 3px 0 var(--ink);">
+                Get started
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="card">
+          <h3 style="font-size: 1.3rem; margin-bottom: 24px;">What Messages will include:</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+            <div style="padding: 20px; background: var(--bg); border-radius: 8px; border: 1px solid var(--line);">
+              <div style="width: 40px; height: 40px; background: var(--tint); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </div>
+              <h4 style="font-size: 1.1rem; margin-bottom: 8px;">Room-wide announcements</h4>
+              <p style="color: var(--soft); font-size: 0.95rem; line-height: 1.5;">Send messages that appear in every student's extension instantly.</p>
+            </div>
+
+            <div style="padding: 20px; background: var(--bg); border-radius: 8px; border: 1px solid var(--line);">
+              <div style="width: 40px; height: 40px; background: var(--tint); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <h4 style="font-size: 1.1rem; margin-bottom: 8px;">Student responses</h4>
+              <p style="color: var(--soft); font-size: 0.95rem; line-height: 1.5;">Students can reply with text responses for quick check-ins and questions.</p>
+            </div>
+
+            <div style="padding: 20px; background: var(--bg); border-radius: 8px; border: 1px solid var(--line);">
+              <div style="width: 40px; height: 40px; background: var(--tint); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <h4 style="font-size: 1.1rem; margin-bottom: 8px;">Private by design</h4>
+              <p style="color: var(--soft); font-size: 0.95rem; line-height: 1.5;">Messages are only visible within your room - no public forums or cross-room communication.</p>
+              <div style="display: flex; align-items: center; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <span style="font-size: 0.85rem; color: var(--soft);">Hosted on enterprise-grade, SOC 2 Type 2 compliant cloud infrastructure. <a href="https://supabase.com/security" target="_blank" style="color: var(--brand);">Learn More</a></span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Features Section -->
-      <div class="card">
-        <h3 style="font-size: 1.3rem; margin-bottom: 24px;">What Messages will include:</h3>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
-          <div style="padding: 20px; background: var(--bg); border-radius: 8px; border: 1px solid var(--line);">
-            <div style="width: 40px; height: 40px; background: var(--tint); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            </div>
-            <h4 style="font-size: 1.1rem; margin-bottom: 8px;">Room-wide announcements</h4>
-            <p style="color: var(--soft); font-size: 0.95rem; line-height: 1.5;">Send messages that appear in every student's extension instantly.</p>
+      <!-- Messages Interface (Hidden by default) -->
+      <div id="messagesInterface" style="display: none;">
+        <div class="card" style="height: calc(100vh - 200px); min-height: 500px; display: flex; flex-direction: column;">
+          <!-- Messages Header -->
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--line); margin-bottom: 16px;">
+            <h2 style="font-size: 1.3rem; margin: 0;">Message Threads</h2>
+            <button id="newThreadBtn" class="btn btn-primary" style="display: flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              New Thread
+            </button>
           </div>
 
-          <div style="padding: 20px; background: var(--bg); border-radius: 8px; border: 1px solid var(--line);">
-            <div style="width: 40px; height: 40px; background: var(--tint); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <!-- Threads List -->
+          <div id="threadsList" style="flex: 1; overflow-y: auto;">
+            <div class="loading-state">
+              <div class="loading-spinner"></div>
+              <p>Loading threads...</p>
             </div>
-            <h4 style="font-size: 1.1rem; margin-bottom: 8px;">Student responses</h4>
-            <p style="color: var(--soft); font-size: 0.95rem; line-height: 1.5;">Students can reply with text responses for quick check-ins and questions.</p>
           </div>
+        </div>
+      </div>
 
-          <div style="padding: 20px; background: var(--bg); border-radius: 8px; border: 1px solid var(--line);">
-            <div style="width: 40px; height: 40px; background: var(--tint); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <!-- New Thread Modal -->
+      <div class="modal-overlay" id="newThreadModal" style="display: none;">
+        <div class="modal" style="max-width: 500px;">
+          <h2 style="font-size: 1.4rem; margin-bottom: 20px;">Start a new message thread</h2>
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label">Thread Title</label>
+            <input type="text" class="form-input" id="newThreadTitle" placeholder="e.g., Homework questions, Today's announcement">
+          </div>
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label">Message</label>
+            <textarea class="form-input" id="newThreadMessage" placeholder="Type your message to students..." rows="4" style="resize: vertical;"></textarea>
+          </div>
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label">Send URL (optional)</label>
+            <input type="url" class="form-input" id="newThreadUrl" placeholder="https://example.com">
+            <p style="font-size: 0.85rem; color: var(--soft); margin-top: 4px;">Students will be navigated to this URL after reading your message</p>
+          </div>
+          <div class="modal-actions">
+            <button class="modal-btn modal-btn-cancel" id="cancelNewThreadBtn">Cancel</button>
+            <button class="modal-btn modal-btn-confirm" id="createThreadBtn">Create Thread</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Thread View Modal -->
+      <div class="modal-overlay" id="threadViewModal" style="display: none;">
+        <div class="modal" style="max-width: 700px; max-height: 80vh; display: flex; flex-direction: column;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--line);">
+            <h2 id="threadViewTitle" style="font-size: 1.3rem; margin: 0;">Thread Title</h2>
+            <button id="closeThreadViewBtn" style="background: none; border: none; color: var(--soft); cursor: pointer; padding: 8px; border-radius: 6px;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div id="threadMessages" style="flex: 1; overflow-y: auto; margin-bottom: 16px; padding: 16px; background: var(--bg); border-radius: 8px;">
+            <div class="loading-state">
+              <div class="loading-spinner"></div>
+              <p>Loading messages...</p>
             </div>
-            <h4 style="font-size: 1.1rem; margin-bottom: 8px;">Private by design</h4>
-            <p style="color: var(--soft); font-size: 0.95rem; line-height: 1.5;">Messages are only visible within your room - no public forums or cross-room communication.</p>
-            <div style="display: flex; align-items: center; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line);">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <span style="font-size: 0.85rem; color: var(--soft);">Hosted on enterprise-grade, SOC 2 Type 2 compliant cloud infrastructure. <a href="https://supabase.com/security" target="_blank" style="color: var(--brand);">Learn More</a></span>
-            </div>
+          </div>
+          <div style="display: flex; gap: 12px;">
+            <input type="text" class="form-input" id="threadReplyInput" placeholder="Type a reply..." style="flex: 1;">
+            <button class="btn btn-primary" id="sendThreadReplyBtn">Send</button>
           </div>
         </div>
       </div>
@@ -2916,51 +2987,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         <div style="flex: 1; overflow-y: auto; padding-right: 8px; position: relative; min-height: 0;">
           <div id="licensesListView" style="position: relative; transition: opacity 0.2s ease, transform 0.2s ease;"></div>
           <div id="licenseDetailView" style="display: none; position: relative; transition: opacity 0.2s ease, transform 0.2s ease;"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Messages Get Started Modal -->
-    <div class="modal-overlay" id="messagesGetStartedModal" style="display: none;">
-      <div class="modal" style="max-width: 500px;">
-        <h2 style="font-size: 1.4rem; margin-bottom: 20px;">Get started with Messages</h2>
-        <div class="form-group" style="margin-bottom: 16px;">
-          <label class="form-label">School Name</label>
-          <input type="text" class="form-input" id="messagesSchoolName" placeholder="Search for your school or postcode (e.g., Manchester Grammar School or M1 7DW)">
-          <button class="btn btn-secondary" id="messagesSearchSchoolsBtn" style="margin-top: 8px; font-size: 0.85rem; padding: 6px 12px;">Search Schools</button>
-          <div id="messagesSchoolSearchStatus" style="margin-top: 8px; font-size: 0.85rem; color: var(--soft);"></div>
-          <div id="messagesSchoolResults" style="margin-top: 12px; max-height: 200px; overflow-y: auto; display: none;">
-            <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
-              <thead>
-                <tr>
-                  <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--line);">School Name</th>
-                  <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--line);">Location</th>
-                  <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--line);">Select</th>
-                </tr>
-              </thead>
-              <tbody id="messagesSchoolResultsBody"></tbody>
-            </table>
-          </div>
-        </div>
-        <div class="form-group" style="margin-bottom: 16px;">
-          <label class="form-label">Full Name</label>
-          <input type="text" class="form-input" id="messagesFullName" placeholder="Your full name">
-        </div>
-        <div class="form-group" style="margin-bottom: 16px;">
-          <label class="form-label">Position in School</label>
-          <input type="text" class="form-input" id="messagesPosition" placeholder="e.g., Teacher, Head of Department, Principal">
-        </div>
-        <div class="form-group" style="margin-bottom: 16px;">
-          <label class="form-label">Email Address</label>
-          <input type="email" class="form-input" id="messagesEmail" placeholder="your.email@school.co.uk">
-        </div>
-        <div class="form-group" style="margin-bottom: 24px;">
-          <label class="form-label">Additional Notes (optional)</label>
-          <textarea class="form-input" id="messagesNotes" placeholder="Any additional information you'd like to share" rows="3" style="resize: vertical;"></textarea>
-        </div>
-        <div class="modal-actions">
-          <button class="modal-btn modal-btn-cancel" id="messagesCancelBtn">Cancel</button>
-          <button class="modal-btn modal-btn-confirm" id="messagesSubmitBtn">Submit</button>
         </div>
       </div>
     </div>
@@ -6198,111 +6224,114 @@ usage/fair dealing.`,
     }
   });
 
-  // Messages Get Started Modal
+  // Messages Interface
   const getStartedBtn = document.getElementById('getStartedBtn');
-  const messagesGetStartedModal = document.getElementById('messagesGetStartedModal');
-  const messagesCancelBtn = document.getElementById('messagesCancelBtn');
-  const messagesSubmitBtn = document.getElementById('messagesSubmitBtn');
-  const messagesSearchSchoolsBtn = document.getElementById('messagesSearchSchoolsBtn');
-  const messagesSchoolName = document.getElementById('messagesSchoolName');
-  const messagesSchoolSearchStatus = document.getElementById('messagesSchoolSearchStatus');
-  const messagesSchoolResults = document.getElementById('messagesSchoolResults');
-  const messagesSchoolResultsBody = document.getElementById('messagesSchoolResultsBody');
+  const messagesLanding = document.getElementById('messagesLanding');
+  const messagesInterface = document.getElementById('messagesInterface');
+  const threadsList = document.getElementById('threadsList');
+  const newThreadBtn = document.getElementById('newThreadBtn');
+  const newThreadModal = document.getElementById('newThreadModal');
+  const cancelNewThreadBtn = document.getElementById('cancelNewThreadBtn');
+  const createThreadBtn = document.getElementById('createThreadBtn');
+  const newThreadTitle = document.getElementById('newThreadTitle');
+  const newThreadMessage = document.getElementById('newThreadMessage');
+  const newThreadUrl = document.getElementById('newThreadUrl');
+  const threadViewModal = document.getElementById('threadViewModal');
+  const closeThreadViewBtn = document.getElementById('closeThreadViewBtn');
+  const threadViewTitle = document.getElementById('threadViewTitle');
+  const threadMessages = document.getElementById('threadMessages');
+  const threadReplyInput = document.getElementById('threadReplyInput');
+  const sendThreadReplyBtn = document.getElementById('sendThreadReplyBtn');
 
-  function openMessagesModal() {
-    messagesGetStartedModal.style.display = 'flex';
+  function showMessagesInterface() {
+    messagesLanding.style.display = 'none';
+    messagesInterface.style.display = 'block';
+    loadThreads();
   }
 
-  function closeMessagesModal() {
-    messagesGetStartedModal.style.display = 'none';
+  function loadThreads() {
+    // TODO: Load threads from Supabase
+    threadsList.innerHTML = `
+      <div style="text-align: center; padding: 48px;">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--chalk)" stroke-width="1.5" style="margin-bottom: 16px;">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        <h3 style="font-size: 1.2rem; margin-bottom: 8px;">No message threads yet</h3>
+        <p style="color: var(--soft); margin-bottom: 24px;">Create your first thread to start messaging your students.</p>
+        <button class="btn btn-primary" onclick="document.getElementById('newThreadBtn').click()">Create your first thread</button>
+      </div>
+    `;
   }
 
-  async function searchSchools() {
-    const query = messagesSchoolName.value.trim();
-    if (!query) {
-      messagesSchoolSearchStatus.textContent = 'Please enter a school name or postcode';
-      messagesSchoolSearchStatus.style.color = 'var(--red)';
+  function openNewThreadModal() {
+    newThreadModal.style.display = 'flex';
+  }
+
+  function closeNewThreadModal() {
+    newThreadModal.style.display = 'none';
+    newThreadTitle.value = '';
+    newThreadMessage.value = '';
+    newThreadUrl.value = '';
+  }
+
+  function createThread() {
+    const title = newThreadTitle.value.trim();
+    const message = newThreadMessage.value.trim();
+    const url = newThreadUrl.value.trim();
+
+    if (!title || !message) {
+      alert('Please enter a title and message');
       return;
     }
 
-    messagesSchoolSearchStatus.textContent = 'Searching...';
-    messagesSchoolSearchStatus.style.color = 'var(--soft)';
-    messagesSchoolResults.style.display = 'none';
-
-    try {
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`);
-      const data = await response.json();
-
-      if (data.length === 0) {
-        messagesSchoolSearchStatus.textContent = 'No schools found. Try a different search term.';
-        messagesSchoolSearchStatus.style.color = 'var(--red)';
-        return;
-      }
-
-      messagesSchoolResultsBody.innerHTML = '';
-      data.forEach((place, index) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td style="padding: 8px; border-bottom: 1px solid var(--line);">${place.display_name.split(',')[0]}</td>
-          <td style="padding: 8px; border-bottom: 1px solid var(--line);">${place.address.city || place.address.town || place.address.village || ''}</td>
-          <td style="padding: 8px; border-bottom: 1px solid var(--line);">
-            <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 8px;" data-name="${place.display_name.split(',')[0]}">Select</button>
-          </td>
-        `;
-        messagesSchoolResultsBody.appendChild(row);
-      });
-
-      messagesSchoolResults.style.display = 'block';
-      messagesSchoolSearchStatus.textContent = `Found ${data.length} results`;
-      messagesSchoolSearchStatus.style.color = 'var(--brand)';
-
-      // Add click handlers for select buttons
-      messagesSchoolResultsBody.querySelectorAll('button[data-name]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          messagesSchoolName.value = btn.dataset.name;
-          messagesSchoolResults.style.display = 'none';
-        });
-      });
-    } catch (error) {
-      messagesSchoolSearchStatus.textContent = 'Error searching for schools. Please try again.';
-      messagesSchoolSearchStatus.style.color = 'var(--red)';
-    }
+    // TODO: Create thread in Supabase
+    console.log('Creating thread:', { title, message, url });
+    alert('Thread created!');
+    closeNewThreadModal();
+    loadThreads();
   }
 
-  function submitMessagesForm() {
-    const schoolName = messagesSchoolName.value.trim();
-    const fullName = document.getElementById('messagesFullName').value.trim();
-    const position = document.getElementById('messagesPosition').value.trim();
-    const email = document.getElementById('messagesEmail').value.trim();
-    const notes = document.getElementById('messagesNotes').value.trim();
-
-    if (!schoolName || !fullName || !position || !email) {
-      alert('Please fill in all required fields');
-      return;
-    }
-
-    // TODO: Submit to backend
-    console.log('Messages interest form submitted:', {
-      schoolName,
-      fullName,
-      position,
-      email,
-      notes
-    });
-
-    alert('Thank you for your interest! We\'ll be in touch soon.');
-    closeMessagesModal();
+  function openThreadView(threadId, title) {
+    threadViewTitle.textContent = title;
+    threadViewModal.style.display = 'flex';
+    // TODO: Load thread messages from Supabase
+    threadMessages.innerHTML = `
+      <div style="text-align: center; padding: 32px;">
+        <p style="color: var(--soft);">No messages yet in this thread.</p>
+      </div>
+    `;
   }
 
-  if (getStartedBtn) getStartedBtn.addEventListener('click', openMessagesModal);
-  if (messagesCancelBtn) messagesCancelBtn.addEventListener('click', closeMessagesModal);
-  if (messagesSubmitBtn) messagesSubmitBtn.addEventListener('click', submitMessagesForm);
-  if (messagesSearchSchoolsBtn) messagesSearchSchoolsBtn.addEventListener('click', searchSchools);
+  function closeThreadView() {
+    threadViewModal.style.display = 'none';
+  }
 
-  messagesGetStartedModal.addEventListener('click', (e) => {
-    if (e.target === messagesGetStartedModal) {
-      closeMessagesModal();
-    }
+  function sendThreadReply() {
+    const reply = threadReplyInput.value.trim();
+    if (!reply) return;
+
+    // TODO: Send reply to Supabase
+    console.log('Sending reply:', reply);
+    threadReplyInput.value = '';
+  }
+
+  if (getStartedBtn) getStartedBtn.addEventListener('click', showMessagesInterface);
+  if (newThreadBtn) newThreadBtn.addEventListener('click', openNewThreadModal);
+  if (cancelNewThreadBtn) cancelNewThreadBtn.addEventListener('click', closeNewThreadModal);
+  if (createThreadBtn) createThreadBtn.addEventListener('click', createThread);
+  if (closeThreadViewBtn) closeThreadViewBtn.addEventListener('click', closeThreadView);
+  if (sendThreadReplyBtn) sendThreadReplyBtn.addEventListener('click', sendThreadReply);
+
+  newThreadModal.addEventListener('click', (e) => {
+    if (e.target === newThreadModal) closeNewThreadModal();
+  });
+
+  threadViewModal.addEventListener('click', (e) => {
+    if (e.target === threadViewModal) closeThreadView();
+  });
+
+  threadReplyInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendThreadReply();
   });
 
   document.addEventListener('keydown', (e) => {
