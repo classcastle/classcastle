@@ -2864,10 +2864,16 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
                   <span id="currentThreadDate" style="font-size: 0.8rem; color: var(--soft);"></span>
                 </div>
               </div>
-              <button id="shareThreadBtn" class="btn btn-secondary" style="display: flex; align-items: center; gap: 6px; font-size: 0.85rem; padding: 8px 12px;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-                Share
-              </button>
+              <div style="display: flex; gap: 8px;">
+                <button id="deleteThreadBtn" class="btn btn-secondary" style="display: none; align-items: center; gap: 6px; font-size: 0.85rem; padding: 8px 12px; color: var(--red); border-color: var(--red);">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="13" x2="14" y2="17"/></svg>
+                  Delete
+                </button>
+                <button id="shareThreadBtn" class="btn btn-secondary" style="display: flex; align-items: center; gap: 6px; font-size: 0.85rem; padding: 8px 12px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                  Share
+                </button>
+              </div>
             </div>
 
             <!-- Messages List -->
@@ -6327,6 +6333,7 @@ usage/fair dealing.`,
   const backToThreadsBtn = document.getElementById('backToThreadsBtn');
   const currentThreadTitle = document.getElementById('currentThreadTitle');
   const currentThreadDate = document.getElementById('currentThreadDate');
+  const deleteThreadBtn = document.getElementById('deleteThreadBtn');
   const shareThreadBtn = document.getElementById('shareThreadBtn');
   const threadMessages = document.getElementById('threadMessages');
   const threadReplyInput = document.getElementById('threadReplyInput');
@@ -6338,6 +6345,21 @@ usage/fair dealing.`,
 
   let currentThreadId = null;
   let isPersonalThread = false;
+
+  async function renameThread(threadId, newName) {
+    try {
+      const { error } = await SupabaseClient
+        .from('message_threads')
+        .update({ title: newName })
+        .eq('id', threadId);
+
+      if (error) throw error;
+      loadThreads();
+    } catch (error) {
+      console.error('Error renaming thread:', error);
+      alert('Error renaming thread. Please try again.');
+    }
+  }
 
   // Commands for personal thread
   const commands = {
@@ -6367,6 +6389,40 @@ usage/fair dealing.`,
         } else {
           return 'Invalid action. Use: view, change, or remove';
         }
+      }
+    },
+    '/rename': {
+      description: 'Rename the current thread (personal thread only)',
+      usage: '/rename [new name]',
+      handler: async (args) => {
+        if (!isPersonalThread) return 'Can only rename personal threads';
+        const newName = args.join(' ');
+        if (!newName) return 'Please provide a new name';
+        
+        await renameThread(currentThreadId, newName);
+        return `Thread renamed to: ${newName}`;
+      }
+    },
+    '/delete': {
+      description: 'Delete the current thread (regular threads only)',
+      usage: '/delete',
+      handler: async () => {
+        if (isPersonalThread) return 'Cannot delete personal threads';
+        
+        if (!confirm('Are you sure you want to delete this thread? This action cannot be undone.')) {
+          return 'Deletion cancelled';
+        }
+        
+        const { error } = await SupabaseClient
+          .from('message_threads')
+          .delete()
+          .eq('id', currentThreadId);
+        
+        if (error) throw error;
+        
+        backToThreads();
+        loadThreads();
+        return 'Thread deleted';
       }
     },
     '/help': {
@@ -6555,6 +6611,13 @@ usage/fair dealing.`,
           ${thread.target_url && !isPersonal ? `<div style="margin-top: 6px; font-size: 0.75rem; color: var(--brand);"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; vertical-align: middle;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> URL attached</div>` : ''}
         `;
         threadCard.addEventListener('click', () => selectThread(thread));
+        threadCard.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          const newName = prompt('Rename thread:', thread.title);
+          if (newName && newName !== thread.title) {
+            renameThread(thread.id, newName);
+          }
+        });
         threadCard.addEventListener('mouseenter', () => threadCard.style.background = 'var(--tint)');
         threadCard.addEventListener('mouseleave', () => threadCard.style.background = 'transparent');
         threadsList.appendChild(threadCard);
@@ -6659,6 +6722,8 @@ usage/fair dealing.`,
 
     // Hide share button for personal threads
     shareThreadBtn.style.display = isPersonalThread ? 'none' : 'flex';
+    // Show delete button for non-personal threads
+    deleteThreadBtn.style.display = isPersonalThread ? 'none' : 'flex';
 
     try {
       const { data: messages, error } = await SupabaseClient
@@ -6763,7 +6828,7 @@ usage/fair dealing.`,
 
       if (updateError) throw updateError;
 
-      alert(`Thread shared! Students in room "${room.code}" will now see this thread. The room target URL has been updated.`);
+      alert(`Thread shared! Students in room "${room.code}" will now see this thread. The room target URL has been updated to:\n\n${window.location.origin}/?thread=${currentThreadId}`);
     } catch (error) {
       console.error('Error sharing thread:', error);
       alert('Error sharing thread. Please try again.');
@@ -6771,7 +6836,7 @@ usage/fair dealing.`,
   }
 
   async function sendThreadReply() {
-    const reply = threadReplyInput.value.trim();
+    const reply = threadReplyInput.value;
     if (!reply) return;
 
     try {
@@ -6784,19 +6849,19 @@ usage/fair dealing.`,
       if (!currentThreadId) return;
 
       // Check if this is a command
-      if (reply.startsWith('/')) {
-        if (reply === '/') {
-          // Show command preview
-          let help = 'Available commands:\n\n';
-          for (const [cmd, info] of Object.entries(commands)) {
-            if (cmd === '/help') continue;
-            help += `${cmd}\n  ${info.description}\n  Usage: ${info.usage}\n\n`;
-          }
-          alert(help);
-          threadReplyInput.value = '';
-          return;
+      if (reply.trim() === '/') {
+        // Show command preview
+        let help = 'Available commands:\n\n';
+        for (const [cmd, info] of Object.entries(commands)) {
+          if (cmd === '/help') continue;
+          help += `${cmd}\n  ${info.description}\n  Usage: ${info.usage}\n\n`;
         }
+        alert(help);
+        threadReplyInput.value = '';
+        return;
+      }
 
+      if (reply.startsWith('/')) {
         const commandParts = reply.split(' ');
         const command = commandParts[0];
         const args = commandParts.slice(1);
@@ -6857,6 +6922,7 @@ usage/fair dealing.`,
   if (cancelNewThreadBtn) cancelNewThreadBtn.addEventListener('click', closeNewThreadModal);
   if (createThreadBtn) createThreadBtn.addEventListener('click', createThread);
   if (backToThreadsBtn) backToThreadsBtn.addEventListener('click', backToThreads);
+  if (deleteThreadBtn) deleteThreadBtn.addEventListener('click', () => commands['/delete'].handler([]));
   if (shareThreadBtn) shareThreadBtn.addEventListener('click', shareThread);
   if (sendThreadReplyBtn) sendThreadReplyBtn.addEventListener('click', sendThreadReply);
   if (nonUkSchoolBtn) nonUkSchoolBtn.addEventListener('click', openNonUkModal);
