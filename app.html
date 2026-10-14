@@ -6469,20 +6469,39 @@ usage/fair dealing.`,
       const userName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
 
       // Check if personal thread exists, create if not
-      const { data: personalThread, error: personalError } = await SupabaseClient
+      const { data: personalThreads, error: personalError } = await SupabaseClient
         .from('message_threads')
         .select('*')
         .eq('teacher_id', user.id)
-        .eq('is_personal', true)
-        .single();
+        .eq('is_personal', true);
 
-      if (personalError && personalError.code !== 'PGRST116') {
-        console.error('Error checking personal thread:', personalError);
+      if (personalError) {
+        console.error('Error checking personal threads:', personalError);
       }
 
-      if (!personalThread) {
+      // If multiple personal threads exist, delete all but the most recent one
+      if (personalThreads && personalThreads.length > 1) {
+        const sorted = personalThreads.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        const toKeep = sorted[0];
+        const toDelete = sorted.slice(1);
+
+        for (const thread of toDelete) {
+          await SupabaseClient
+            .from('message_threads')
+            .delete()
+            .eq('id', thread.id);
+        }
+
+        // Update the kept thread's title if it changed
+        if (toKeep.title !== userName) {
+          await SupabaseClient
+            .from('message_threads')
+            .update({ title: userName })
+            .eq('id', toKeep.id);
+        }
+      } else if (!personalThreads || personalThreads.length === 0) {
         // Create personal thread
-        const { data: newThread, error: createError } = await SupabaseClient
+        const { error: createError } = await SupabaseClient
           .from('message_threads')
           .insert({
             teacher_id: user.id,
@@ -6490,9 +6509,7 @@ usage/fair dealing.`,
             message: '',
             is_personal: true,
             created_at: new Date().toISOString()
-          })
-          .select()
-          .single();
+          });
 
         if (createError) throw createError;
       }
