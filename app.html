@@ -21,6 +21,7 @@
     --soft: #5E675F;
     --line: #D9DDD3;
     --brand: #1F5C3A;
+    --brand-ink: #fff;
     --tint: #E4F1E6;
     --board: #17352A;
     --chalk: #F4D35E;
@@ -41,6 +42,7 @@
       --soft: #9EAA9F;
       --line: #2A362D;
       --brand: #4DAA72;
+      --brand-ink: #0F1511;
       --tint: #1A2B20;
       --board: #1C4030;
       --chalk: #F4D35E;
@@ -57,6 +59,7 @@
     --soft: #9EAA9F;
     --line: #2A362D;
     --brand: #4DAA72;
+    --brand-ink: #0F1511;
     --tint: #1A2B20;
     --board: #1C4030;
     --chalk: #F4D35E;
@@ -1901,13 +1904,14 @@
   /* Chat Animation Styles */
   .chat-animation-stage {
     width: 100%;
-    height: 100%;
+    min-height: 400px;
     display: flex;
     align-items: center;
     justify-content: center;
-    perspective: 1400px;
+    perspective: 2000px;
     opacity: 0;
     transition: opacity 0.6s ease;
+    padding: 32px;
   }
   .chat-animation-stage.show {
     opacity: 1;
@@ -1921,7 +1925,7 @@
     will-change: transform;
   }
   .chat-animation-tilt.on {
-    transform: rotateX(9deg) rotateY(-17deg) rotateZ(1deg);
+    transform: rotateX(5deg) rotateY(-8deg) rotateZ(0.5deg);
   }
   .chat-animation-tilt.noanim {
     transition: none;
@@ -1934,7 +1938,7 @@
       transform: translate3d(0, 0, 0) rotateX(0) rotateY(0);
     }
     to {
-      transform: translate3d(0, -12px, 0) rotateX(2.5deg) rotateY(3.5deg);
+      transform: translate3d(0, -8px, 0) rotateX(1.5deg) rotateY(2deg);
     }
   }
   .chat-animation-drift {
@@ -1946,7 +1950,7 @@
     background: rgba(0, 0, 0, 0.35);
     filter: blur(30px);
     opacity: 0;
-    transform: translate3d(26px, 40px, -60px);
+    transform: translate3d(20px, 30px, -40px);
     transition: opacity 2s ease;
   }
   .chat-animation-tilt.on .chat-animation-soft {
@@ -1954,16 +1958,14 @@
   }
   .chat-animation-win {
     position: relative;
-    width: 100%;
-    max-width: 340px;
-    height: 360px;
+    width: min(100%, 320px);
+    height: 340px;
     display: flex;
     flex-direction: column;
     background: var(--surface);
     border-radius: 6px;
-    box-shadow: 12px 12px 0 var(--brand);
+    box-shadow: 8px 8px 0 var(--brand);
     overflow: hidden;
-    margin: 16px;
   }
   .chat-animation-header {
     display: flex;
@@ -2183,7 +2185,7 @@
     box-shadow: 0 0 0 var(--ink);
   }
   .chat-animation-cursor {
-    position: fixed;
+    position: absolute;
     left: 0;
     top: 0;
     z-index: 10;
@@ -2205,6 +2207,20 @@
   }
   .chat-animation-cursor.press svg {
     transform: scale(0.8);
+  }
+
+  @media (max-width: 780px) {
+    .chat-animation-stage {
+      min-height: 360px;
+      padding: 20px;
+    }
+    .chat-animation-win {
+      width: min(100%, 280px);
+      height: 300px;
+    }
+    .messages-hero-grid {
+      grid-template-columns: 1fr !important;
+    }
   }
 </style>
 </head>
@@ -2705,9 +2721,9 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       <!-- Hero Section -->
       <div class="card" style="margin-bottom: 32px;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;">
+        <div class="messages-hero-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;">
           <!-- Animation Container -->
-          <div style="position: relative; height: 320px; background: var(--bg); border-radius: 8px; overflow: hidden; border: 1px solid var(--line);">
+          <div style="position: relative; background: var(--bg); border-radius: 8px; border: 1px solid var(--line);">
             <div class="chat-animation-stage" id="chatAnimationStage">
               <div class="chat-animation-tilt" id="chatAnimationTilt">
                 <div class="chat-animation-drift" id="chatAnimationDrift">
@@ -6368,21 +6384,26 @@ function chatAnimationResolve(el, text){
 }
 
 function chatAnimationTarget(){
-  const r = chatAnimationSend.getBoundingClientRect();
-  return { x: r.left + r.width * .55, y: r.top + r.height * .6 };
+  const container = chatAnimationStage.getBoundingClientRect();
+  const sendRect = chatAnimationSend.getBoundingClientRect();
+  return { 
+    x: sendRect.left - container.left + sendRect.width * .55, 
+    y: sendRect.top - container.top + sendRect.height * .6 
+  };
 }
-function chatAnimationPlace(x, y){ 
-  chatAnimationCur.style.transform = `translate3d(${x}px,${y}px,0)`; 
+function chatAnimationPlace(x, y){
+  chatAnimationCur.style.transform = `translate3d(${x}px,${y}px,0)`;
 }
 function chatAnimationFollowLoop(id){
   if (!chatAnimationTracking || id !== chatAnimationRun) return;
-  const t = chatAnimationTarget(); 
+  const t = chatAnimationTarget();
   chatAnimationPlace(t.x, t.y);
   requestAnimationFrame(() => chatAnimationFollowLoop(id));
 }
 function chatAnimationCursorTo(id, dur){
   return new Promise((res, rej) => {
-    const s = { x: innerWidth + 30, y: innerHeight * .85 };
+    const container = chatAnimationStage.getBoundingClientRect();
+    const s = { x: container.width + 30, y: container.height * .85 };
     chatAnimationCur.classList.add('show');
     const t0 = performance.now();
     (function f(now){
@@ -6393,10 +6414,10 @@ function chatAnimationCursorTo(id, dur){
       const cx = (s.x + t.x)/2 - dy * .3, cy = (s.y + t.y)/2 + dx * .3, u = 1 - e;
       chatAnimationPlace(u*u*s.x + 2*u*e*cx + e*e*t.x, u*u*s.y + 2*u*e*cy + e*e*t.y);
       if (k < 1) requestAnimationFrame(f);
-      else { 
-        chatAnimationTracking = true; 
-        chatAnimationFollowLoop(id); 
-        res(); 
+      else {
+        chatAnimationTracking = true;
+        chatAnimationFollowLoop(id);
+        res();
       }
     })(t0);
   });
