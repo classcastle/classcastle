@@ -1897,9 +1897,25 @@
   .modal.closing {
     animation: modalSlideOut 0.2s ease-out forwards;
   }
+
+  .banner {
+    background: var(--chalk);
+    color: #18221C;
+    padding: 16px 0;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  .banner p {
+    margin: 0;
+  }
 </style>
 </head>
 <body>
+
+<div class="banner">
+  <p><strong>Data restoration notice:</strong> We have returned to Supabase to restore full functionality after issues with the Appwrite migration. If your account was deleted or data was lost during the Appwrite migration, your data has been restored. However, data created while using Appwrite has unfortunately been lost.</p>
+</div>
 
 <div class="app-layout">
   <aside class="sidebar" id="sidebar">
