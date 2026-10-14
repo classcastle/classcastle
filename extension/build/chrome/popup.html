@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classcastle Extension</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 320px;
+      min-height: 400px;
+      font-family: 'Instrument Sans', system-ui, sans-serif;
+      background: #FCFCFA;
+      color: #18221C;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #D9DDD3;
+    }
+
+    .logo {
+      width: 32px;
+      height: 32px;
+    }
+
+    .header h1 {
+      font-size: 1.1rem;
+      font-weight: 400;
+      font-family: 'Instrument Sans', system-ui, sans-serif;
+    }
+
+    .status {
+      background: #E4F1E6;
+      padding: 20px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      display: none;
+      text-align: center;
+    }
+
+    .status.active {
+      display: block;
+    }
+
+    .status.kicked {
+      background: #f5e0e0;
+    }
+
+    .status.kicked .status-icon {
+      background: #B23A2E;
+    }
+
+    .status.kicked h2 {
+      color: #B23A2E;
+    }
+
+    .status-icon {
+      width: 48px;
+      height: 48px;
+      background: #1F5C3A;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+    }
+
+    .status-icon svg {
+      width: 28px;
+      height: 28px;
+      color: white;
+    }
+
+    .status h2 {
+      font-size: 1.1rem;
+      font-weight: 400;
+      margin-bottom: 4px;
+      color: #1F5C3A;
+      font-family: 'Instrument Sans', system-ui, sans-serif;
+    }
+
+    .status p {
+      font-size: 0.85rem;
+      color: #5E675F;
+    }
+
+    .status button {
+      margin-top: 16px;
+    }
+
+    .form {
+      display: block;
+    }
+
+    .form.hidden {
+      display: none;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #18221C;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #D9DDD3;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .form-group input:focus {
+      border-color: #1F5C3A;
+      outline: 3px solid #1F5C3A;
+      outline-offset: 3px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+
+    .btn-primary {
+      background: #1F5C3A;
+      color: #FCFCFA;
+      box-shadow: 3px 3px 0 #18221C;
+    }
+
+    .btn-primary:hover {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0 #18221C;
+    }
+
+    .btn-primary:active {
+      transform: translate(0, 0);
+      box-shadow: none;
+    }
+
+    .btn-primary:disabled {
+      background: #5E675F;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #18221C;
+      border: 1px solid #D9DDD3;
+      margin-top: 8px;
+    }
+
+    .btn-secondary:hover {
+      border-color: #1F5C3A;
+    }
+
+    .error {
+      background: #f5e0e0;
+      color: #B23A2E;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .error.show {
+      display: block;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: #0F1511;
+        color: #EEF2EA;
+      }
+
+      .btn-primary {
+        color: #0F1511;
+      }
+
+      .header {
+        border-bottom-color: #2A362D;
+      }
+
+      .status {
+        background: #1A2B20;
+      }
+
+      .status-icon {
+        background: #4DAA72;
+      }
+
+      .status h2 {
+        color: #4DAA72;
+      }
+
+      .status p {
+        color: #9EAA9F;
+      }
+
+      .form-group label {
+        color: #EEF2EA;
+      }
+
+      .form-group input {
+        border-color: #2A362D;
+        background: #18211B;
+        color: #EEF2EA;
+      }
+
+      .form-group input:focus {
+        border-color: #4DAA72;
+        outline-color: #4DAA72;
+      }
+
+      .btn-primary {
+        background: #4DAA72;
+        color: #0F1511;
+        box-shadow: 3px 3px 0 #EEF2EA;
+      }
+
+      .btn-primary:hover {
+        box-shadow: 1px 1px 0 #EEF2EA;
+      }
+
+      .btn-secondary {
+        background: #18211B;
+        color: #EEF2EA;
+        border-color: #2A362D;
+      }
+
+      .btn-secondary:hover {
+        border-color: #4DAA72;
+      }
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .loading.show {
+      display: block;
+    }
+
+    .loading .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #E2E0D6;
+      border-top-color: #2F5233;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    .loading h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .loading p {
+      font-size: 0.9rem;
+      color: #6B6A61;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .instructions {
+      font-size: 0.8rem;
+      color: #6B6A61;
+      line-height: 1.5;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #E2E0D6;
+    }
+
+    .instructions a {
+      color: #2F5233;
+      text-decoration: none;
+    }
+
+    .instructions a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img class="logo" src="icons/logo.svg" alt="Classcastle logo">
+      <h1>Classcastle</h1>
+    </div>
+
+    <div class="status" id="status">
+      <div class="status-icon" id="statusIcon">
+        <svg id="checkIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        <svg id="kickedIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </div>
+      <h2 id="statusTitle">You're in!</h2>
+      <p id="statusMessage">Your browser is being managed by your teacher</p>
+      <button class="btn btn-secondary" id="leaveBtn">Leave Room</button>
+      <button class="btn btn-secondary" id="dismissKickedBtn" style="display: none;">Dismiss</button>
+    </div>
+
+    <div class="form" id="joinForm">
+      <div class="form-group">
+        <label for="roomId">Room ID</label>
+        <input type="text" id="roomId" placeholder="Enter room ID from teacher">
+      </div>
+
+      <div class="form-group">
+        <label for="studentName">Your Name</label>
+        <input type="text" id="studentName" placeholder="e.g., John Doe">
+      </div>
+
+      <div class="error" id="error"></div>
+
+      <button class="btn btn-primary" id="joinBtn">Join Room</button>
+    </div>
+
+    <div class="loading" id="joiningLoading">
+      <div class="spinner"></div>
+      <p>Joining room...</p>
+    </div>
+
+    <div class="loading" id="waitingLoading">
+      <div class="spinner"></div>
+      <h2>Please wait a moment...</h2>
+      <p>Continue in the opened window.</p>
+      <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
+    </div>
+
+    <div class="instructions">
+      Enter the room ID and your name provided by your teacher. Your browser will then follow the teacher's navigation instructions.
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
