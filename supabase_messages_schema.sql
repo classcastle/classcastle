@@ -10,6 +10,18 @@ CREATE TABLE IF NOT EXISTS message_threads (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Add is_personal column if it doesn't exist (for existing tables)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'message_threads'
+    AND column_name = 'is_personal'
+  ) THEN
+    ALTER TABLE message_threads ADD COLUMN is_personal BOOLEAN DEFAULT FALSE;
+  END IF;
+END $$;
+
 -- Create thread_messages table
 CREATE TABLE IF NOT EXISTS thread_messages (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -30,6 +42,14 @@ CREATE INDEX IF NOT EXISTS idx_thread_messages_created_at ON thread_messages(cre
 -- Enable Row Level Security
 ALTER TABLE message_threads ENABLE ROW LEVEL SECURITY;
 ALTER TABLE thread_messages ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Teachers can view own threads" ON message_threads;
+DROP POLICY IF EXISTS "Teachers can create threads" ON message_threads;
+DROP POLICY IF EXISTS "Teachers can update own threads" ON message_threads;
+DROP POLICY IF EXISTS "Teachers can delete own threads" ON message_threads;
+DROP POLICY IF EXISTS "Users can view thread messages" ON thread_messages;
+DROP POLICY IF EXISTS "Teachers can create messages in own threads" ON thread_messages;
 
 -- RLS Policies for message_threads
 -- Teachers can view their own threads
@@ -85,16 +105,18 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Trigger to update updated_at on message_threads
+DROP TRIGGER IF EXISTS update_message_threads_updated_at ON message_threads;
 CREATE TRIGGER update_message_threads_updated_at
   BEFORE UPDATE ON message_threads
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
--- Function to update room target_url when a thread with URL is created
+-- Function to update room target_url when a thread with URL is created or updated
 CREATE OR REPLACE FUNCTION update_room_target_url()
 RETURNS TRIGGER AS $$
 BEGIN
-  IF NEW.target_url IS NOT NULL THEN
+  IF (TG_OP = 'INSERT' AND NEW.target_url IS NOT NULL) OR
+     (TG_OP = 'UPDATE' AND NEW.target_url IS NOT NULL AND (OLD.target_url IS NULL OR NEW.target_url != OLD.target_url)) THEN
     -- Update the teacher's active room with the target URL
     UPDATE rooms
     SET target_url = NEW.target_url,
@@ -106,8 +128,9 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Trigger to call update_room_target_url when a thread is created
+-- Trigger to call update_room_target_url when a thread is created or updated
+DROP TRIGGER IF EXISTS update_room_url_on_thread_create ON message_threads;
 CREATE TRIGGER update_room_url_on_thread_create
-  AFTER INSERT ON message_threads
+  AFTER INSERT OR UPDATE ON message_threads
   FOR EACH ROW
   EXECUTE FUNCTION update_room_target_url();
