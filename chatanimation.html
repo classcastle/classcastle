@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chat animation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FCFCFA; --surface:#fff; --ink:#18221C; --soft:#5E675F; --line:#D9DDD3;
+  --brand:#1F5C3A; --brand-ink:#fff; --tint:#E4F1E6; --board:#17352A; --chalk:#F4D35E;
+  color-scheme:light dark; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#0F1511;--surface:#18211B;--ink:#EEF2EA;--soft:#9EAA9F;--line:#2A362D;--brand:#4DAA72;--brand-ink:#0F1511;--tint:#1A2B20;--board:#1C4030}
+}
+:root[data-theme="dark"]{--bg:#0F1511;--surface:#18211B;--ink:#EEF2EA;--soft:#9EAA9F;--line:#2A362D;--brand:#4DAA72;--brand-ink:#0F1511;--tint:#1A2B20;--board:#1C4030}
+*{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{margin:0;height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--ink);font:400 1.02rem/1.6 'Instrument Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+:focus-visible{outline:3px solid var(--brand);outline-offset:3px}
+
+.stage{height:100%;display:flex;align-items:center;justify-content:center;perspective:1400px;opacity:0;transition:opacity .6s ease}
+.stage.show{opacity:1}
+.tilt,.drift{transform-style:preserve-3d}
+.tilt{transition:transform 2s cubic-bezier(.3,.7,.2,1);will-change:transform}
+.tilt.on{transform:rotateX(9deg) rotateY(-17deg) rotateZ(1deg)}
+.tilt.noanim{transition:none}
+.drift.float{animation:drift 7s ease-in-out infinite alternate}
+@keyframes drift{from{transform:translate3d(0,0,0) rotateX(0) rotateY(0)}to{transform:translate3d(0,-12px,0) rotateX(2.5deg) rotateY(3.5deg)}}
+.drift{position:relative}
+.soft{position:absolute;inset:14px;background:rgba(0,0,0,.35);filter:blur(30px);opacity:0;transform:translate3d(26px,40px,-60px);transition:opacity 2s ease}
+.tilt.on .soft{opacity:.75}
+
+.win{position:relative;width:min(400px,calc(100vw - 56px));height:min(560px,calc(100vh - 150px));min-height:380px;display:flex;flex-direction:column;background:var(--surface);border-radius:6px;box-shadow:12px 12px 0 var(--brand);overflow:hidden}
+header{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--board);color:#fff}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--chalk);color:#18221C;display:grid;place-items:center;flex:none}
+.avatar svg{width:20px;height:20px}
+.who{flex:1;min-width:0;line-height:1.25}
+.who b{display:block;font-weight:600;font-size:1rem}
+.who span{font-size:.8rem;opacity:.75}
+.tag{background:var(--chalk);color:#18221C;border:2px solid #18221C;border-radius:4px;padding:3px 8px;font-size:.78rem;font-weight:600;transform:rotate(-2.5deg);white-space:nowrap}
+
+.msgs{flex:1;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;background:var(--bg);-webkit-mask-image:linear-gradient(transparent,#000 40px);mask-image:linear-gradient(transparent,#000 40px)}
+.feed{flex:none;display:flex;flex-direction:column;gap:10px;padding:16px}
+.g{display:flex;flex-direction:column;gap:4px;max-width:78%;align-self:flex-start}
+.g.me{align-self:flex-end;align-items:flex-end}
+.nm{font-size:.78rem;font-weight:600;color:var(--soft);padding-left:2px}
+.b{padding:10px 14px;border-radius:6px 6px 6px 2px;font-size:.95rem;line-height:1.45;background:var(--tint);border:1px solid var(--line);box-shadow:2px 2px 0 var(--line);transform-origin:left bottom}
+.b.me{background:var(--brand);color:var(--brand-ink);border-color:var(--brand);border-radius:6px 6px 2px 6px;box-shadow:2px 2px 0 var(--ink);transform-origin:right bottom}
+.b.in{animation:pop .3s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes pop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
+.b.typing{display:flex;gap:5px;align-items:center;height:38px;padding:0 14px}
+.b.typing i{width:7px;height:7px;border-radius:50%;background:var(--soft);animation:bounce 1s ease-in-out infinite}
+.b.typing i:nth-child(2){animation-delay:.15s}.b.typing i:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-6px);opacity:1}}
+
+.bar{display:flex;gap:10px;padding:12px;border-top:1px solid var(--line);background:var(--surface)}
+.field{flex:1;min-width:0;display:flex;align-items:center;padding:0 14px;min-height:46px;border:1px solid var(--line);border-radius:6px;background:var(--bg);font-size:.95rem;white-space:nowrap;overflow:hidden;transition:border-color .15s}
+.field.typing{border-color:var(--brand)}
+.ph{color:var(--soft)}
+.field.typing .ph{display:none}
+.caret{width:2px;height:1.2em;margin-left:1px;background:var(--brand);display:none}
+.field.typing .caret{display:block;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.send{display:flex;align-items:center;gap:6px;border:0;font:600 .92rem 'Instrument Sans',system-ui,sans-serif;cursor:pointer;background:var(--brand);color:var(--brand-ink);padding:0 16px;border-radius:6px;box-shadow:3px 3px 0 var(--ink);transition:transform .12s,box-shadow .12s}
+.send svg{width:16px;height:16px}
+.send.hover{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.send.press{transform:translate(3px,3px) scale(.92);box-shadow:0 0 0 var(--ink)}
+
+.cursor{position:fixed;left:0;top:0;z-index:10;pointer-events:none;opacity:0;transition:opacity .3s;will-change:transform}
+.cursor.show{opacity:1}
+.cursor svg{display:block;width:26px;height:26px;transition:transform .12s;transform-origin:3px 3px;filter:drop-shadow(1px 2px 1px rgba(0,0,0,.3))}
+.cursor.press svg{transform:scale(.8)}
+
+@media (prefers-reduced-motion:reduce){.drift.float{animation:none}}
+</style>
+</head>
+<body>
+
+<div class="stage" id="stage">
+  <div class="tilt" id="tilt">
+    <div class="drift" id="drift">
+      <div class="soft"></div>
+      <div class="win">
+        <header>
+          <div class="avatar"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 20V7h3v2h2V7h2v2h4V7h2v2h2V7h3v13h-6v-5a2 2 0 0 0-4 0v5z"/></svg></div>
+          <div class="who"><b>Room 4B</b><span>Ms. Okafor</span></div>
+          <div class="tag">Room is live</div>
+        </header>
+        <div class="msgs"><div class="feed" id="feed"></div></div>
+        <div class="bar">
+          <div class="field" id="field"><span class="ph">Type a message…</span><span id="txt"></span><span class="caret"></span></div>
+          <button class="send" id="send" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="cursor" id="cursor"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 2v17l4.6-4.4 3 6.9 3-1.3-3-6.8H18z" fill="#18221C" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
+
+<script>
+// ---------- Edit these ----------
+// Incoming messages in order. The first sender is the teacher; the name shows above their message.
+const messages = [
+  { name:"Ms. Okafor", text:"Morning! Is everyone in the room yet?" },
+  { name:"Ms. Okafor", text:"The code is on the board: 4 7 2 9 1 6" },
+  { name:"Ms. Okafor", text:"Let me know when you're in." },
+  { name:"Maya",   text:"Yes" },
+  { name:"Jordan", text:"Yes" },
+  { name:"Sam",    text:"Yes" }
+];
+const you   = "Yep, I'm here too!!";   // typed by the viewer
+const reply = "Perfect, sending the page now.";
+
+// Timeline durations (ms)
+const T = { flat:600, tilt:1800, typing:900, gap:600, studentTyping:700, studentGap:450, typeTotal:2600, afterType:400,
+            cursorIn:1200, hover:400, press:220, afterSend:600, replyTyping:1200, hold:1400, fade:700 };
+// --------------------------------
+
+const $ = id => document.getElementById(id);
+const stage=$('stage'), tilt=$('tilt'), drift=$('drift'), feed=$('feed'), field=$('field'),
+      txt=$('txt'), send=$('send'), cur=$('cursor');
+let run = 0, tracking = false;
+const sleep = (ms, id) => new Promise((res, rej) => setTimeout(() => id === run ? res() : rej('stale'), ms));
+
+function slide(dy){
+  feed.style.transition = 'none';
+  feed.style.transform = `translateY(${dy}px)`;
+  feed.offsetWidth;
+  feed.style.transition = 'transform .35s cubic-bezier(.2,.8,.2,1)';
+  feed.style.transform = 'none';
+}
+const teacher = messages[0].name;
+let last = null;   // last sender shown, so the name label only appears when the sender changes
+function add(side, text, name){
+  const g = document.createElement('div');
+  g.className = 'g ' + side;
+  const who = side === 'me' ? null : (name || teacher);
+  if (who && who !== last){ const n = document.createElement('div'); n.className = 'nm'; n.textContent = who; g.appendChild(n); }
+  last = who || 'me';
+  const el = document.createElement('div');
+  el.className = 'b ' + side + ' in';
+  if (text) el.textContent = text; else { el.classList.add('typing'); el.innerHTML = '<i></i><i></i><i></i>'; }
+  g.appendChild(el);
+  feed.appendChild(g);
+  slide(g.offsetHeight + 10);
+  return el;
+}
+function resolve(el, text){
+  const g = el.parentNode, h0 = g.offsetHeight;
+  el.classList.remove('typing', 'in'); el.textContent = text;
+  el.offsetWidth; el.classList.add('in');
+  slide(g.offsetHeight - h0);
+}
+
+function target(){
+  const r = send.getBoundingClientRect();
+  return { x: r.left + r.width * .55, y: r.top + r.height * .6 };
+}
+function place(x, y){ cur.style.transform = `translate3d(${x}px,${y}px,0)`; }
+function followLoop(id){
+  if (!tracking || id !== run) return;
+  const t = target(); place(t.x, t.y);
+  requestAnimationFrame(() => followLoop(id));
+}
+function cursorTo(id, dur){
+  return new Promise((res, rej) => {
+    const s = { x: innerWidth + 30, y: innerHeight * .85 };
+    cur.classList.add('show');
+    const t0 = performance.now();
+    (function f(now){
+      if (id !== run) return rej('stale');
+      const k = Math.min(1, (now - t0) / dur);
+      const e = k < .5 ? 4*k*k*k : 1 - Math.pow(-2*k + 2, 3) / 2;
+      const t = target(), dx = t.x - s.x, dy = t.y - s.y;
+      const cx = (s.x + t.x)/2 - dy * .3, cy = (s.y + t.y)/2 + dx * .3, u = 1 - e;
+      place(u*u*s.x + 2*u*e*cx + e*e*t.x, u*u*s.y + 2*u*e*cy + e*e*t.y);
+      if (k < 1) requestAnimationFrame(f);
+      else { tracking = true; followLoop(id); res(); }
+    })(t0);
+  });
+}
+
+function reset(){
+  tracking = false;
+  feed.innerHTML = ''; feed.style.transform = 'none'; last = null;
+  txt.textContent = ''; field.classList.remove('typing');
+  send.className = 'send'; cur.className = 'cursor';
+  tilt.classList.add('noanim'); tilt.classList.remove('on'); drift.classList.remove('float');
+  tilt.offsetWidth; tilt.classList.remove('noanim');
+}
+
+async function play(id){
+  const w = ms => sleep(ms, id);
+  stage.classList.remove('show'); reset(); stage.offsetWidth; stage.classList.add('show');
+  await w(T.flat);                                   // 1. flat
+  tilt.classList.add('on'); drift.classList.add('float');
+  await w(T.tilt);                                   // 2. tilt to 3D
+  for (const m of messages){                         // 3. incoming
+    const s = m.name !== teacher;
+    const t = add('them', null, m.name);
+    await w(s ? T.studentTyping : T.typing); resolve(t, m.text); await w(s ? T.studentGap : T.gap);
+  }
+  field.classList.add('typing');                     // 4. viewer types
+  const per = T.typeTotal / you.length;
+  for (const ch of you){ txt.textContent += ch; await w(per); }
+  await w(T.afterType);
+  await cursorTo(id, T.cursorIn);                    // 5. cursor + send
+  send.classList.add('hover'); await w(T.hover);
+  send.classList.add('press'); cur.classList.add('press'); await w(T.press);
+  send.classList.remove('press', 'hover'); cur.classList.remove('press');
+  txt.textContent = ''; field.classList.remove('typing');
+  add('me', you);
+  await w(150); cur.classList.remove('show'); tracking = false;
+  await w(T.afterSend);
+  const t = add('them');                             // 6. reply + loop
+  await w(T.replyTyping); resolve(t, reply);
+  await w(T.hold);
+  stage.classList.remove('show'); await w(T.fade);
+}
+
+async function loop(){
+  const id = ++run;
+  while (id === run){
+    try { await play(id); } catch(e){ return; }
+  }
+}
+loop();
+</script>
+</body>
+</html>
