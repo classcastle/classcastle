@@ -20,7 +20,7 @@ const waitingLoadingEl = document.getElementById('waitingLoading');
 const cancelBtn = document.getElementById('cancelBtn');
 const instructionsEl = document.querySelector('.instructions');
 
-// State machine: 'idle' | 'joining' | 'joined' | 'kicked' | 'maintenance'
+// State machine: 'idle' | 'joining' | 'joined' | 'kicked'
 let currentState = 'idle';
 
 // Constants
@@ -97,22 +97,6 @@ function render(state, data = {}) {
       errorEl.textContent = data.message || 'An error occurred';
       errorEl.classList.add('show');
       break;
-
-    case 'maintenance':
-      console.log('Showing maintenance state');
-      statusEl.classList.add('active', 'kicked');
-      checkIcon.style.display = 'none';
-      kickedIcon.style.display = 'block';
-      statusTitle.textContent = 'Maintenance Mode';
-      statusMessage.textContent = data.message || 'Classcastle is currently under maintenance. Please try again later.';
-      leaveBtn.style.display = 'none';
-      dismissKickedBtn.style.display = 'none';
-      joinForm.classList.add('hidden');
-      roomIdInput.value = '';
-      studentNameInput.value = '';
-      roomIdInput.disabled = false;
-      studentNameInput.disabled = false;
-      break;
   }
 }
 
@@ -120,41 +104,19 @@ function render(state, data = {}) {
 async function initializeState() {
   console.log('Initializing popup state from storage...');
 
-  // Check maintenance mode on popup open
-  try {
-    const response = await fetch('https://maintenanceapi.classcastle.org/');
-    const data = await response.json();
-    if (data.maintenance === true) {
-      console.log('Maintenance mode active from API, showing maintenance state');
-      await new Promise((resolve) => {
-        api.storage.local.set({ inMaintenance: true, maintenanceMessage: data.message }, resolve);
-      });
-      render('maintenance', { message: data.message });
-      return;
-    }
-  } catch (error) {
-    console.error('Error checking maintenance mode:', error);
-    // If we can't check, continue normally (fail open)
-  }
-
   const result = await new Promise((resolve) => {
     api.storage.local.get([
       'roomId',
       'studentId',
       'studentName',
       'wasKicked',
-      'joiningSince',
-      'inMaintenance',
-      'maintenanceMessage'
+      'joiningSince'
     ], resolve);
   });
 
   console.log('Storage data:', result);
 
-  if (result.inMaintenance) {
-    console.log('Maintenance mode active, showing maintenance state');
-    render('maintenance', { message: result.maintenanceMessage });
-  } else if (result.wasKicked) {
+  if (result.wasKicked) {
     console.log('User was kicked, showing kicked state');
     render('kicked');
   } else if (result.roomId && result.studentId) {
@@ -212,9 +174,6 @@ api.runtime.onMessage.addListener((request, sender, sendResponse) => {
   } else if (request.action === 'kicked') {
     console.log('Status update: kicked');
     render('kicked');
-  } else if (request.action === 'maintenance') {
-    console.log('Status update: maintenance');
-    render('maintenance', { message: request.message });
   }
 
   // Return true for async response if needed
@@ -241,22 +200,6 @@ async function handleJoin() {
   if (!/^\d{6}$/.test(roomId)) {
     render('error', { message: 'Room code must be exactly 6 digits' });
     return;
-  }
-
-  // Check maintenance mode
-  try {
-    const response = await fetch('https://maintenanceapi.classcastle.org/');
-    const data = await response.json();
-    if (data.maintenance === true) {
-      await new Promise((resolve) => {
-        api.storage.local.set({ inMaintenance: true, maintenanceMessage: data.message }, resolve);
-      });
-      render('maintenance', { message: data.message });
-      return;
-    }
-  } catch (error) {
-    console.error('Error checking maintenance mode:', error);
-    // If we can't check, allow join (fail open)
   }
 
   console.log('Join requested:', roomId, studentName);
