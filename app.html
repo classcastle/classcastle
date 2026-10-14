@@ -2814,10 +2814,13 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           <!-- Messages Header -->
           <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--line); margin-bottom: 16px;">
             <h2 style="font-size: 1.3rem; margin: 0;">Message Threads</h2>
-            <button id="newThreadBtn" class="btn btn-primary" style="display: flex; align-items: center; gap: 8px;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              New Thread
-            </button>
+            <div style="display: flex; gap: 12px;">
+              <button id="optOutBtn" class="btn btn-secondary" style="font-size: 0.85rem; padding: 8px 16px;">Opt out</button>
+              <button id="newThreadBtn" class="btn btn-primary" style="display: flex; align-items: center; gap: 8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                New Thread
+              </button>
+            </div>
           </div>
 
           <!-- Threads List -->
@@ -3564,6 +3567,11 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
     const navItem = document.querySelector(`[data-page="${pageId.replace('Page', '')}"]`);
     if (navItem) navItem.classList.add('active');
+
+    // Check messages opt-in status when navigating to messages page
+    if (pageId === 'messagesPage') {
+      checkMessagesOptIn();
+    }
 
     // Handle admin submenu - only close when explicitly navigating to dashboard
     // Don't auto-close when just toggling the submenu
@@ -5651,6 +5659,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       if (page === 'analytics') loadAnalytics();
       if (page === 'activity') loadActivityLog();
       if (page === 'polls') loadPolls();
+      if (page === 'messages') checkMessagesOptIn();
       if (page === 'settings') loadIdentities();
 
       // Close sidebar on mobile
@@ -6261,6 +6270,7 @@ usage/fair dealing.`,
   const messagesInterface = document.getElementById('messagesInterface');
   const threadsList = document.getElementById('threadsList');
   const newThreadBtn = document.getElementById('newThreadBtn');
+  const optOutBtn = document.getElementById('optOutBtn');
   const newThreadModal = document.getElementById('newThreadModal');
   const cancelNewThreadBtn = document.getElementById('cancelNewThreadBtn');
   const createThreadBtn = document.getElementById('createThreadBtn');
@@ -6278,10 +6288,72 @@ usage/fair dealing.`,
   const closeNonUkModalBtn = document.getElementById('closeNonUkModalBtn');
   const expressInterestBtn = document.getElementById('expressInterestBtn');
 
-  function showMessagesInterface() {
-    messagesLanding.style.display = 'none';
-    messagesInterface.style.display = 'block';
-    loadThreads();
+  async function showMessagesInterface() {
+    try {
+      const { data: { user } } = await SupabaseClient.auth.getUser();
+      if (!user) {
+        alert('Please log in to use Messages');
+        return;
+      }
+
+      // Update user metadata to opt in to messages
+      const { error } = await SupabaseClient.auth.updateUser({
+        data: { messages_opted_in: true }
+      });
+
+      if (error) throw error;
+
+      messagesLanding.style.display = 'none';
+      messagesInterface.style.display = 'block';
+      loadThreads();
+    } catch (error) {
+      console.error('Error opting in to messages:', error);
+      alert('Error enabling Messages. Please try again.');
+    }
+  }
+
+  async function optOutOfMessages() {
+    if (!confirm('Are you sure you want to opt out of Messages? This will hide the messaging interface.')) {
+      return;
+    }
+
+    try {
+      const { data: { user } } = await SupabaseClient.auth.getUser();
+      if (!user) return;
+
+      // Update user metadata to opt out of messages
+      const { error } = await SupabaseClient.auth.updateUser({
+        data: { messages_opted_in: false }
+      });
+
+      if (error) throw error;
+
+      messagesInterface.style.display = 'none';
+      messagesLanding.style.display = 'block';
+    } catch (error) {
+      console.error('Error opting out of messages:', error);
+      alert('Error opting out. Please try again.');
+    }
+  }
+
+  async function checkMessagesOptIn() {
+    try {
+      const { data: { user } } = await SupabaseClient.auth.getUser();
+      if (!user) return;
+
+      const hasOptedIn = user.user_metadata?.messages_opted_in === true;
+
+      if (hasOptedIn) {
+        messagesLanding.style.display = 'none';
+        messagesInterface.style.display = 'block';
+        loadThreads();
+      } else {
+        messagesLanding.style.display = 'block';
+        messagesInterface.style.display = 'none';
+      }
+    } catch (error) {
+      console.error('Error checking messages opt-in status:', error);
+    }
   }
 
   async function loadThreads() {
@@ -6518,6 +6590,7 @@ usage/fair dealing.`,
   }
 
   if (getStartedBtn) getStartedBtn.addEventListener('click', showMessagesInterface);
+  if (optOutBtn) optOutBtn.addEventListener('click', optOutOfMessages);
   if (newThreadBtn) newThreadBtn.addEventListener('click', openNewThreadModal);
   if (cancelNewThreadBtn) cancelNewThreadBtn.addEventListener('click', closeNewThreadModal);
   if (createThreadBtn) createThreadBtn.addEventListener('click', createThread);
@@ -6898,10 +6971,10 @@ async function chatAnimationLoop(){
   }
 }
 
-// Start animation when page is visible
+// Start animation when landing page is visible
 const chatAnimationObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
-    if (entry.isIntersecting) {
+    if (entry.isIntersecting && messagesLanding.style.display !== 'none') {
       chatAnimationLoop();
       chatAnimationObserver.disconnect();
     }
