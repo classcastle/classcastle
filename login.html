@@ -416,24 +416,23 @@
     }
   }
 
-  .banner {
-    background: var(--chalk);
-    color: #18221C;
-    padding: 16px 0;
-    text-align: center;
+  .info-box {
+    background: var(--tint);
+    border: 1px solid var(--brand);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
     font-size: 0.9rem;
-    font-weight: 500;
+    line-height: 1.5;
+    color: var(--brand);
   }
-  .banner p {
-    margin: 0;
+  .info-box strong {
+    display: block;
+    margin-bottom: 4px;
   }
 </style>
 </head>
 <body>
-
-<div class="banner">
-  <p><strong>Data restoration notice:</strong> We have returned to Supabase to restore full functionality after issues with the Appwrite migration. If your account was deleted or data was lost during the Appwrite migration, your data has been restored. However, data created while using Appwrite has unfortunately been lost.</p>
-</div>
 
 <main>
   <div class="auth-container">
@@ -454,6 +453,10 @@
         <div class="page-header">
           <h1 class="page-title">Welcome back</h1>
           <p class="page-subtitle">You need to login to Classcastle to continue.</p>
+        </div>
+        <div class="info-box">
+          <strong>Data restoration notice</strong>
+          We have returned to Supabase to restore full functionality after issues with the Appwrite migration. If your account was deleted or data was lost during the Appwrite migration, your data has been restored. However, data created while using Appwrite has unfortunately been lost.
         </div>
       <button class="btn btn-secondary btn-full" id="githubLoginBtn" style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 16px;">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
