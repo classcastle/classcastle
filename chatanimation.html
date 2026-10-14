@@ -77,6 +77,8 @@ header{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var
 .cursor svg{display:block;width:26px;height:26px;transition:transform .12s;transform-origin:3px 3px;filter:drop-shadow(1px 2px 1px rgba(0,0,0,.3))}
 .cursor.press svg{transform:scale(.8)}
 
+.replay{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:11;font:600 .88rem 'Instrument Sans',system-ui,sans-serif;background:var(--surface);color:var(--ink);border:1px solid var(--ink);border-radius:6px;padding:8px 14px;cursor:pointer;box-shadow:3px 3px 0 var(--ink);transition:transform .12s,box-shadow .12s}
+.replay:hover{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
 @media (prefers-reduced-motion:reduce){.drift.float{animation:none}}
 </style>
 </head>
@@ -103,6 +105,7 @@ header{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var
 </div>
 
 <div class="cursor" id="cursor"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 2v17l4.6-4.4 3 6.9 3-1.3-3-6.8H18z" fill="#18221C" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
+<button class="replay" id="replay">Replay</button>
 
 <script>
 // ---------- Edit these ----------
@@ -231,6 +234,7 @@ async function loop(){
     try { await play(id); } catch(e){ return; }
   }
 }
+$('replay').addEventListener('click', loop);
 loop();
 </script>
 </body>
