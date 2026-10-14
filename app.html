@@ -2764,6 +2764,11 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
               <button id="getStartedBtn" style="display: inline-flex; align-items: center; gap: 8px; background: var(--brand); color: var(--brand-ink); padding: 12px 24px; border-radius: 6px; font-weight: 600; font-size: 0.95rem; border: none; cursor: pointer; transition: transform 0.12s, box-shadow 0.12s; box-shadow: 3px 3px 0 var(--ink);">
                 Get started
               </button>
+              <div style="margin-top: 16px;">
+                <button id="nonUkSchoolBtn" style="background: none; border: none; color: var(--soft); font-size: 0.85rem; cursor: pointer; text-decoration: underline; padding: 0;">
+                  Teach in a school not based in the UK?
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -2867,6 +2872,32 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           <div style="display: flex; gap: 12px;">
             <input type="text" class="form-input" id="threadReplyInput" placeholder="Type a reply..." style="flex: 1;">
             <button class="btn btn-primary" id="sendThreadReplyBtn">Send</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Non-UK Schools Modal -->
+      <div class="modal-overlay" id="nonUkSchoolModal" style="display: none;">
+        <div class="modal" style="max-width: 500px;">
+          <h2 style="font-size: 1.4rem; margin-bottom: 16px;">Non-UK Schools</h2>
+          <p style="color: var(--soft); margin-bottom: 16px; line-height: 1.6;">
+            At this time, Classcastle Messages is only available for schools based in the United Kingdom. We're focused on supporting UK schools with region-specific features and compliance requirements.
+          </p>
+          <p style="color: var(--soft); margin-bottom: 16px; line-height: 1.6;">
+            However, we're actively exploring expansion to other regions. If you're interested in using Classcastle at your school outside the UK, we'd love to hear from you.
+          </p>
+          <div style="background: var(--bg); padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+            <h4 style="font-size: 1rem; margin-bottom: 8px;">Why UK-only for now?</h4>
+            <ul style="color: var(--soft); font-size: 0.9rem; line-height: 1.6; padding-left: 20px; margin: 0;">
+              <li>GDPR compliance and data residency requirements</li>
+              <li>UK-specific curriculum integration</li>
+              <li>Regional support and onboarding resources</li>
+              <li>Time zone considerations for live features</li>
+            </ul>
+          </div>
+          <div class="modal-actions">
+            <button class="modal-btn modal-btn-cancel" id="closeNonUkModalBtn">Close</button>
+            <button class="modal-btn modal-btn-confirm" id="expressInterestBtn">Express Interest</button>
           </div>
         </div>
       </div>
@@ -6242,6 +6273,10 @@ usage/fair dealing.`,
   const threadMessages = document.getElementById('threadMessages');
   const threadReplyInput = document.getElementById('threadReplyInput');
   const sendThreadReplyBtn = document.getElementById('sendThreadReplyBtn');
+  const nonUkSchoolBtn = document.getElementById('nonUkSchoolBtn');
+  const nonUkSchoolModal = document.getElementById('nonUkSchoolModal');
+  const closeNonUkModalBtn = document.getElementById('closeNonUkModalBtn');
+  const expressInterestBtn = document.getElementById('expressInterestBtn');
 
   function showMessagesInterface() {
     messagesLanding.style.display = 'none';
@@ -6315,12 +6350,29 @@ usage/fair dealing.`,
     threadReplyInput.value = '';
   }
 
+  function openNonUkModal() {
+    nonUkSchoolModal.style.display = 'flex';
+  }
+
+  function closeNonUkModal() {
+    nonUkSchoolModal.style.display = 'none';
+  }
+
+  function expressInterest() {
+    // TODO: Open interest form or redirect to contact
+    alert('Thank you for your interest! We\'ll be in touch when we expand to your region.');
+    closeNonUkModal();
+  }
+
   if (getStartedBtn) getStartedBtn.addEventListener('click', showMessagesInterface);
   if (newThreadBtn) newThreadBtn.addEventListener('click', openNewThreadModal);
   if (cancelNewThreadBtn) cancelNewThreadBtn.addEventListener('click', closeNewThreadModal);
   if (createThreadBtn) createThreadBtn.addEventListener('click', createThread);
   if (closeThreadViewBtn) closeThreadViewBtn.addEventListener('click', closeThreadView);
   if (sendThreadReplyBtn) sendThreadReplyBtn.addEventListener('click', sendThreadReply);
+  if (nonUkSchoolBtn) nonUkSchoolBtn.addEventListener('click', openNonUkModal);
+  if (closeNonUkModalBtn) closeNonUkModalBtn.addEventListener('click', closeNonUkModal);
+  if (expressInterestBtn) expressInterestBtn.addEventListener('click', expressInterest);
 
   newThreadModal.addEventListener('click', (e) => {
     if (e.target === newThreadModal) closeNewThreadModal();
@@ -6328,6 +6380,10 @@ usage/fair dealing.`,
 
   threadViewModal.addEventListener('click', (e) => {
     if (e.target === threadViewModal) closeThreadView();
+  });
+
+  nonUkSchoolModal.addEventListener('click', (e) => {
+    if (e.target === nonUkSchoolModal) closeNonUkModal();
   });
 
   threadReplyInput.addEventListener('keypress', (e) => {
