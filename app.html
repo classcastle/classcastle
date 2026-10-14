@@ -6403,7 +6403,7 @@ function chatAnimationFollowLoop(id){
 function chatAnimationCursorTo(id, dur){
   return new Promise((res, rej) => {
     const container = chatAnimationStage.getBoundingClientRect();
-    const s = { x: container.width + 30, y: container.height * .85 };
+    const s = { x: container.width - 50, y: container.height * .85 };
     chatAnimationCur.classList.add('show');
     const t0 = performance.now();
     (function f(now){
