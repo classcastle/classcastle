@@ -3,295 +3,223 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Classcastle — Terms of Service</title>
+<title>Terms of Service — Classcastle</title>
+<meta name="description" content="The terms that apply when you use Classcastle, the teacher web app and student browser extension.">
+<link rel="canonical" href="https://classcastle.org/terms.html">
 <link rel="icon" type="image/svg+xml" href="/logo.svg" id="favicon">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #FCFCFA;
-    --surface: #fff;
-    --ink: #18221C;
-    --soft: #5E675F;
-    --line: #D9DDD3;
-    --brand: #1F5C3A;
-    --tint: #E4F1E6;
-    --board: #17352A;
-    --chalk: #F4D35E;
-    --red: #B23A2E;
-    --amber: #D98E2B;
-    --sky: var(--brand);
-    --sky-soft: var(--tint);
-    color-scheme: light dark;
-    box-sizing: border-box;
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #0F1511;
-      --surface: #18211B;
-      --ink: #EEF2EA;
-      --soft: #9EAA9F;
-      --line: #2A362D;
-      --brand: #4DAA72;
-      --tint: #1A2B20;
-      --board: #1C4030;
-      --chalk: #F4D35E;
-      --red: #D2503F;
-      --amber: #F0B84D;
-      --sky: var(--brand);
-      --sky-soft: var(--tint);
-    }
-  }
-  :root[data-theme="dark"] {
-    --bg: #0F1511;
-    --surface: #18211B;
-    --ink: #EEF2EA;
-    --soft: #9EAA9F;
-    --line: #2A362D;
-    --brand: #4DAA72;
-    --tint: #1A2B20;
-    --board: #1C4030;
-    --chalk: #F4D35E;
-    --red: #D2503F;
-    --amber: #F0B84D;
-    --sky: var(--brand);
-    --sky-soft: var(--tint);
-  }
-  * { box-sizing: inherit; }
-  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
-  html, body { margin: 0; padding: 0; }
-  body {
-    background: var(--bg);
-    color: var(--ink);
-    font-family: 'Instrument Sans', system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased;
-  }
-  h1, h2, h3 { font-family: 'Instrument Sans', system-ui, sans-serif; margin: 0; font-weight: 400; }
-  p { margin: 0; }
-  a { color: inherit; }
-
-  nav {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 28px 32px;
-    max-width: 1080px; margin: 0 auto;
-  }
-  .wordmark { font-family: 'Instrument Sans', system-ui, sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; display: flex; align-items: center; gap: 9px; }
-  .logo-mark { width: 24px; height: 24px; display: block; }
-  .wordmark .word-accent { color: var(--brand); }
-  .nav-link {
-    font-size: 0.88rem; font-weight: 400; color: var(--soft);
-    text-decoration: none;
-  }
-
-  .wrap { max-width: 720px; margin: 0 auto; padding: 40px 32px 80px; }
-
-  .page-header {
-    margin-bottom: 48px;
-  }
-
-  .page-title {
-    font-size: clamp(2rem, 4vw, 2.5rem);
-    letter-spacing: -0.015em;
-    margin-bottom: 12px;
-  }
-
-  .page-subtitle {
-    color: var(--soft);
-    font-size: 1.05rem;
-    line-height: 1.6;
-  }
-
-  .content {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 40px;
-  }
-
-  .section {
-    margin-bottom: 32px;
-  }
-
-  .section h2 {
-    font-size: 1.4rem;
-    margin-bottom: 16px;
-    color: var(--brand);
-  }
-
-  .section h3 {
-    font-size: 1.1rem;
-    margin-bottom: 12px;
-    margin-top: 20px;
-  }
-
-  .section p {
-    color: var(--soft);
-    line-height: 1.7;
-    margin-bottom: 16px;
-  }
-
-  .section ul {
-    color: var(--soft);
-    line-height: 1.7;
-    margin-bottom: 16px;
-    padding-left: 24px;
-  }
-
-  .section li {
-    margin-bottom: 8px;
-  }
-
-  .last-updated {
-    margin-top: 40px;
-    padding-top: 24px;
-    border-top: 1px solid var(--line);
-    color: var(--soft);
-    font-size: 0.9rem;
-  }
-
-  @media (max-width: 780px) {
-    nav { padding: 22px 24px; }
-    .wrap { padding: 32px 24px 60px; }
-    .content { padding: 28px 24px; }
-    .nav-link { display: none; }
-  }
+:root{
+  --bg:#FCFCFA; --surface:#fff; --ink:#18221C; --soft:#5E675F; --line:#D9DDD3;
+  --brand:#1F5C3A; --tint:#E4F1E6; --chalk:#F4D35E;
+  color-scheme:light dark; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#0F1511;--surface:#18211B;--ink:#EEF2EA;--soft:#9EAA9F;--line:#2A362D;--brand:#4DAA72;--tint:#1A2B20}
+}
+:root[data-theme="dark"]{--bg:#0F1511;--surface:#18211B;--ink:#EEF2EA;--soft:#9EAA9F;--line:#2A362D;--brand:#4DAA72;--tint:#1A2B20}
+*{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font:400 1.02rem/1.65 'Instrument Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--brand)}
+:focus-visible{outline:3px solid var(--brand);outline-offset:3px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+nav{display:flex;align-items:center;justify-content:space-between;max-width:1080px;margin:0 auto;padding:22px 28px}
+.wordmark{display:flex;align-items:center;gap:10px;font:400 1.3rem 'Instrument Sans',system-ui,sans-serif;text-decoration:none;color:var(--ink)}
+.wordmark img{width:26px;height:26px;display:block}
+.word-accent{color:var(--brand)}
+.nav-cta{font-weight:600;font-size:.92rem;text-decoration:none;color:var(--ink);padding:8px 2px;border-bottom:2px solid var(--ink)}
+header.page{padding:44px 0 36px;border-bottom:1px solid var(--line)}
+header.page h1{font-weight:400;font-size:clamp(2.2rem,4.2vw,3.3rem);line-height:1.1;margin:0}
+header.page p{margin:14px 0 0;color:var(--soft)}
+.layout{display:grid;grid-template-columns:240px 1fr;gap:64px;padding:44px 0 80px;align-items:start}
+.toc{position:sticky;top:24px;font-size:.92rem}
+.toc strong{display:block;margin-bottom:10px}
+.toc ol{margin:0;padding:0;list-style:none;border-left:2px solid var(--line)}
+.toc a{display:block;padding:5px 0 5px 14px;color:var(--soft);text-decoration:none}
+.toc a:hover{color:var(--ink)}
+.summary{background:var(--chalk);color:#18221C;border:2px solid #18221C;border-radius:4px;padding:16px 18px;margin-bottom:40px;font-weight:500}
+.summary p{margin:0}
+article{max-width:68ch}
+article h2{font-weight:600;font-size:1.3rem;line-height:1.25;margin:44px 0 10px;padding-top:28px;border-top:1px solid var(--line)}
+article h2:first-of-type{margin-top:0;padding-top:0;border-top:0}
+article h3{font-weight:600;font-size:1.02rem;margin:22px 0 4px}
+article p{margin:0 0 14px}
+article ul{margin:0 0 14px;padding-left:1.2rem}
+article li{margin-bottom:6px}
+.caps{font-size:.95rem}
+footer{padding:26px 0 44px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--soft);font-size:.85rem;border-top:1px solid var(--line)}
+footer a{color:var(--soft)}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+@media (max-width:820px){
+  .wrap,nav{padding-left:20px;padding-right:20px}
+  .layout{grid-template-columns:1fr;gap:28px;padding-top:32px}
+  .toc{position:static}
+  .toc ol{columns:2;column-gap:20px;border-left:0}
+  .toc a{padding-left:0}
+}
 </style>
 </head>
 <body>
-
-<nav>
-  <div class="wordmark"><img src="/logo.svg" alt="" class="logo-mark"><span class="word-text">Class<span class="word-accent">castle</span></span></div>
-  <a class="nav-link" href="/">Back to home</a>
+<nav aria-label="Main">
+  <a class="wordmark" href="/"><img src="/logo.svg" alt=""><span>Class<span class="word-accent">castle</span></span></a>
+  <a class="nav-cta" href="/login.html">Open teacher app</a>
 </nav>
 
-<div class="wrap">
-  <div class="page-header">
-    <h1 class="page-title">Terms of Service</h1>
-    <p class="page-subtitle">Effective date: September 27, 2026</p>
-  </div>
+<main class="wrap">
+  <header class="page">
+    <h1>Terms of Service</h1>
+    <p>Last updated: October 15, 2026</p>
+  </header>
 
-  <div class="content">
-    <div class="section">
-      <h2>1. Acceptance of Terms</h2>
-      <p>By accessing and using Classcastle (the "Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service.</p>
-    </div>
+  <div class="layout">
+    <aside class="toc" aria-label="Contents">
+      <strong>On this page</strong>
+      <ol>
+        <li><a href="#acceptance">Acceptance</a></li>
+        <li><a href="#service">The service</a></li>
+        <li><a href="#schools">Schools and students</a></li>
+        <li><a href="#accounts">Teacher accounts</a></li>
+        <li><a href="#use">Acceptable use</a></li>
+        <li><a href="#extension">Student extension</a></li>
+        <li><a href="#desktop">Desktop app</a></li>
+        <li><a href="#messaging">Messaging</a></li>
+        <li><a href="#data">Data and privacy</a></li>
+        <li><a href="#ip">Ownership</a></li>
+        <li><a href="#third">Third-party content</a></li>
+        <li><a href="#availability">Availability and changes</a></li>
+        <li><a href="#termination">Ending use</a></li>
+        <li><a href="#disclaimers">Disclaimers</a></li>
+        <li><a href="#liability">Liability</a></li>
+        <li><a href="#law">Governing law</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ol>
+    </aside>
 
-    <div class="section">
-      <h2>2. Teacher Account Requirements</h2>
-      <p>Classcastle is designed exclusively for teachers and educators. By creating an account, you confirm that:</p>
+    <article>
+      <div class="summary"><p>In short: Classcastle is free for teachers. Use it to move your own class to web pages you choose, keep it lawful and classroom-appropriate, and don't try to break it. The service comes as is, and these terms explain the details.</p></div>
+
+      <h2 id="acceptance">1. Acceptance of these terms</h2>
+      <p>These Terms of Service ("Terms") govern your use of Classcastle, including the teacher web app at classcastle.org, the student browser extension, the messaging feature, and the Classcastle desktop app for Windows once it is released (together, the "Service"). By creating an account, joining a room, installing the extension, or otherwise using the Service, you agree to these Terms and to our <a href="/privacy.html">Privacy Policy</a>.</p>
+      <p>The Service is provided by James Theakston, trading as JAMES THEAKSTON APPLICATION DEVELOPMENT ("we", "us", "our").</p>
+      <p>If you are using the Service on behalf of a school or organization, you confirm that you have authority to accept these Terms for it. If you don't agree, please don't use the Service.</p>
+
+      <h2 id="service">2. What Classcastle does</h2>
+      <p>Classcastle lets a teacher create a room and share a room code. Students join the room with the browser extension. The teacher can then send a web address, and the browsers of joined students open it. The teacher dashboard shows each student's name, online status, and current page address.</p>
+      <p>Classcastle does not lock a student's browser, block other sites, or monitor anything beyond what is described in our Privacy Policy.</p>
+
+      <h2 id="schools">3. Schools, teachers, and students</h2>
+      <p>Classcastle is designed for use in classrooms under the supervision of a teacher. Teachers are responsible for how they use the Service with their students.</p>
       <ul>
-        <li>You are a teacher, educator, or authorized school staff member</li>
-        <li>You will use the Service solely for educational purposes</li>
-        <li>You have the authority to manage students and classroom activities</li>
-        <li>You will comply with all applicable laws and educational policies</li>
+        <li><strong>Teachers</strong> must be adults and must be authorized by their school or organization to use classroom tools, where that is required.</li>
+        <li><strong>Students</strong> join with a room code and do not create accounts. Students under the age of consent in their country may use the Service only under a teacher's direction in a school setting.</li>
+        <li><strong>Schools</strong> are responsible for ensuring that their use of Classcastle complies with their own policies and with laws that apply to them, such as FERPA, COPPA, or UK and EU data protection law. If your school needs a data processing agreement or other documentation, contact us.</li>
       </ul>
-    </div>
 
-    <div class="section">
-      <h2>3. Service Description</h2>
-      <p>Classcastle provides a classroom management platform that allows teachers to:</p>
-      <ul>
-        <li>Create and manage virtual classrooms with room codes</li>
-        <li>Control student browser navigation during lessons</li>
-        <li>Monitor student participation and online status</li>
-        <li>Share educational resources and URLs with students</li>
-        <li>Kick students from rooms when needed</li>
-        <li>View URL history for the session</li>
-        <li>Rename rooms and regenerate room codes</li>
-        <li>Search, sort, and filter student lists</li>
-      </ul>
-    </div>
+      <h2 id="accounts">4. Teacher accounts</h2>
+      <p>To run a room you must create an account with accurate information. You are responsible for keeping your login details secure and for all activity under your account. Tell us promptly at <a href="mailto:support@classcastle.org">support@classcastle.org</a> if you think your account has been accessed without permission.</p>
+      <p>One account is for one teacher. Please don't share your account with other people or let students run rooms under your login.</p>
 
-    <div class="section">
-      <h2>4. Teacher Responsibilities</h2>
-      <p>As a teacher using Classcastle, you agree to:</p>
-      <ul>
-        <li>Maintain the security of your account credentials</li>
-        <li>Use the Service in accordance with your school's policies</li>
-        <li>Protect student privacy and educational data</li>
-        <li>Obtain necessary permissions for student participation</li>
-        <li>Use the Service for legitimate educational purposes only</li>
-      </ul>
-    </div>
-
-    <div class="section">
-      <h2>5. Student Data and Privacy</h2>
-      <p>Teachers are responsible for:</p>
-      <ul>
-        <li>Obtaining appropriate parental consent for student participation</li>
-        <li>Complying with student privacy laws (FERPA, COPPA, etc.)</li>
-        <li>Using student data only for educational purposes</li>
-        <li>Not sharing student data with unauthorized parties</li>
-      </ul>
-    </div>
-
-    <div class="section">
-      <h2>6. Acceptable Use</h2>
+      <h2 id="use">5. Acceptable use</h2>
       <p>You agree not to:</p>
       <ul>
-        <li>Use the Service for any illegal or unauthorized purpose</li>
-        <li>Share your account credentials with others</li>
-        <li>Attempt to gain unauthorized access to other accounts</li>
-        <li>Interfere with or disrupt the Service</li>
-        <li>Use the Service to harass, harm, or exploit students</li>
+        <li>send students to content that is illegal, harmful, harassing, sexually explicit, or otherwise unsuitable for the age of your students;</li>
+        <li>send students to sites that attempt to steal information, install malware, or deceive them (phishing, scams, and similar);</li>
+        <li>use the Service to monitor, track, or target any person outside a legitimate educational purpose;</li>
+        <li>join a room you haven't been invited to, guess room codes, or interfere with another teacher's room;</li>
+        <li>attempt to probe, scan, overload, or bypass security or access controls of the Service, or access data that isn't yours;</li>
+        <li>reverse engineer, copy, resell, or build a competing service from Classcastle, except where the law allows it despite this restriction;</li>
+        <li>use automated tools to create accounts or rooms in bulk; or</li>
+        <li>use the Service in a way that breaks any law or the rights of others.</li>
       </ul>
-    </div>
+      <p>We may remove rooms, content, or accounts that break these rules.</p>
 
-    <div class="section">
-      <h2>7. Intellectual Property</h2>
-      <p>Classcastle and its original content, features, and functionality are owned by Classcastle.org and are protected by international copyright, trademark, and other intellectual property laws.</p>
-    </div>
+      <h2 id="extension">6. The student extension</h2>
+      <p>The extension is installed on a student's browser, either by the student or by a school administrator through a managed policy. When joined to a room, it allows the teacher to open pages in that browser. The extension only requests the permissions it needs to do this (for example storage for the session and tabs for navigation).</p>
+      <p>Students can leave a room at any time. Teachers can remove students from a room. Schools that deploy the extension or desktop app to managed devices are responsible for informing students and families as their policies and local law require.</p>
 
-    <div class="section">
-      <h2>8. Account Suspension and Termination</h2>
-      <p>We reserve the right to suspend or terminate your account at any time for violation of these Terms or for any other reason at our sole discretion. This includes the ability to ban your account temporarily or permanently. If your account is banned, you will not be able to access the Service until the ban period expires (if temporary) or indefinitely (if permanent). Reasons for banning may include but are not limited to:</p>
+      <h2 id="desktop">7. The desktop app</h2>
+      <p>We are building a native Classcastle app for Windows 10 and 11 (64-bit and ARM64), which is announced at <a href="https://classcastle.org/desktopapp">classcastle.org/desktopapp</a> and is not yet released. Once available, it is part of the Service and these Terms apply to it in full.</p>
       <ul>
-        <li>Violation of these Terms of Service</li>
-        <li>Abuse of the Service or other users</li>
-        <li>Unauthorized access attempts</li>
-        <li>Sharing account credentials</li>
-        <li>Using the Service for non-educational purposes</li>
-        <li>Any activity that compromises the security or integrity of the Service</li>
+        <li><strong>Students only.</strong> The desktop app is for students to join rooms with a room code, and to take part in messaging threads they have been given a code for. Teachers continue to run and manage rooms and messaging from the web app.</li>
+        <li><strong>An alternative to the extension.</strong> It works in the same way as the extension: when a student has joined a room, the teacher can open pages on that device. Students and schools can choose either option.</li>
+        <li><strong>Free.</strong> Like the rest of the Service, it is free for teachers and students at the time of writing, and section 12 applies to any future change.</li>
+        <li><strong>School deployment.</strong> Schools may install the app centrally on their devices (for example with an MSI package through Intune or Group Policy). Schools are responsible for their own network settings, device policies, and for informing students and families as their policies and local law require.</li>
+        <li><strong>Licence.</strong> We give you a limited, non-exclusive, non-transferable, revocable licence to install and use the app on devices you own or are authorized to manage, for classroom use. Don't modify, decompile, or redistribute it except where the law allows.</li>
+        <li><strong>Pre-release features.</strong> Descriptions of the app on our site are plans. Features, supported platforms, and release dates may change.</li>
       </ul>
-      <p>If your account is banned, you may contact support@classcastle.org to inquire about the status and duration of your ban.</p>
-    </div>
 
-    <div class="section">
-      <h2>9. Limitation of Liability</h2>
-      <p>Classcastle shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the Service.</p>
-    </div>
+      <h2 id="messaging">8. Messaging</h2>
+      <p>Classcastle includes a messaging feature for classroom communication. Teachers use messaging in the web app, and students use it in the Classcastle desktop app once it is released.</p>
+      <ul>
+        <li><strong>How it works.</strong> A teacher creates a messaging thread in the web app and gets a shareable URL for it. People take part in the thread by joining it with a code in the app.</li>
+        <li><strong>Who can take part.</strong> Anyone who has the thread's URL or code may be able to join it, so treat both like a key. Share them only with the students and staff who should be in the thread, and don't post them publicly. Teachers are responsible for who they share them with and for removing anyone who shouldn't be there.</li>
+        <li><strong>What you may send.</strong> You are responsible for what you send. Section 5 applies to all messages. In particular, don't send messages that are abusive, bullying, discriminatory, sexually explicit, threatening, or that share personal information about someone else.</li>
+        <li><strong>Student safety.</strong> Teachers must supervise messaging with students as they would any other classroom communication, and should not use it for private, non-educational conversations with students. Students should not share personal contact details, passwords, or other private information in a thread.</li>
+        <li><strong>Not for emergencies.</strong> Messaging may be delayed or not delivered, for example if someone is offline. Don't use it for urgent or safety-critical communication.</li>
+        <li><strong>Handling and review.</strong> We process messages only to deliver them and operate the Service, and we don't use them for advertising. We don't routinely read messages, but we may review them if we receive a report, need to protect a person or the Service, or are legally required to. How long messages are kept is set out in our <a href="/privacy.html">Privacy Policy</a>.</li>
+        <li><strong>Moderation.</strong> We may remove messages, close a thread, or suspend an account that breaks these Terms.</li>
+      </ul>
 
-    <div class="section">
-      <h2>10. Changes to Terms</h2>
-      <p>We reserve the right to modify these Terms at any time. Continued use of the Service after changes constitutes acceptance of the new Terms.</p>
-    </div>
+      <h2 id="data">9. Data and privacy</h2>
+      <p>We collect only what is needed to run the Service. For students this is a name entered when joining, online status, and the current page address, shown to the teacher of the room. Messages sent through a room are processed so they can be delivered. For teachers this includes account details such as name and email address. We do not collect browsing history or use the Service to track students. Full details, including how long data is kept and your rights, are in our <a href="/privacy.html">Privacy Policy</a>.</p>
+      <p>Data is encrypted in transit. We do not sell personal data.</p>
+      <p><strong>International transfers.</strong> Our database is hosted in Ireland using Supabase. If you use the Service from outside Ireland, your data may be transferred to, stored, and processed in Ireland and other countries, which may have different data protection laws from your own. By using the Service you acknowledge this. For more information, including the safeguards we use, see our <a href="/privacy.html">Privacy Policy</a>.</p>
 
-    <div class="section">
-      <h2>11. Contact Information</h2>
-      <p>For questions about these Terms, please contact us at: legal@classcastle.org</p>
-    </div>
+      <h2 id="ip">10. Ownership and licence</h2>
+      <p>Classcastle, its software, design, logo, and documentation belong to us and our licensors. We give you a limited, non-exclusive, non-transferable, revocable licence to use the Service for its intended classroom purpose while these Terms are in effect.</p>
+      <p>You keep ownership of anything you provide, such as your room names, saved templates, and shortcuts. You give us permission to store and process that content only to operate and improve the Service for you.</p>
+      <p>If you send us feedback or suggestions, we may use them without obligation to you.</p>
 
-    <div class="last-updated">
-      Last updated: September 27, 2026
-    </div>
+      <h2 id="third">11. Third-party content and services</h2>
+      <p>Classcastle sends students to web pages chosen by teachers. We do not own, review, or control those pages and are not responsible for them. Third-party sites have their own terms and privacy practices. The Service also relies on providers such as hosting, authentication, and the Chrome Web Store, and your use of those is subject to their terms.</p>
+
+      <h2 id="availability">12. Availability and changes</h2>
+      <p>We work to keep Classcastle reliable, but we don't promise it will always be available, error-free, or work on every network. School filters, firewalls, browser policies, or a browser pausing the extension can stop commands from arriving. Don't depend on Classcastle for anything where a failure could cause harm.</p>
+      <p>The Service is free for teachers today. We may change, add, or remove features, and may introduce paid plans in the future. If we introduce charges for something that is currently free, we will give notice before it takes effect.</p>
+      <p>We may update these Terms from time to time. If a change is material we will post a notice on the site or in the app. Continuing to use the Service after changes take effect means you accept them.</p>
+
+      <h2 id="termination">13. Ending your use</h2>
+      <p>You can stop using Classcastle at any time and may ask us to delete your account by emailing <a href="mailto:support@classcastle.org">support@classcastle.org</a>.</p>
+      <p>We may suspend or end access if you break these Terms, if your use puts students or the Service at risk, or if we are required to by law. Sections that by their nature should continue (ownership, disclaimers, liability, governing law) survive termination.</p>
+
+      <h2 id="disclaimers">14. Disclaimers</h2>
+      <p class="caps">THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE", WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT, TO THE FULLEST EXTENT THE LAW ALLOWS.</p>
+      <p>We don't guarantee that the Service will meet your needs, that students will always receive navigation commands, or that the Service will be secure or uninterrupted. Teachers remain responsible for supervising their students.</p>
+
+      <h2 id="liability">15. Limitation of liability</h2>
+      <p class="caps">TO THE FULLEST EXTENT THE LAW ALLOWS, WE ARE NOT LIABLE FOR INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR FOR LOST DATA, LOST PROFITS, OR LOST TEACHING TIME ARISING FROM YOUR USE OF THE SERVICE. BECAUSE THE SERVICE IS FREE FOR TEACHERS, OUR TOTAL LIABILITY FOR ANY CLAIM RELATING TO THE SERVICE IS LIMITED TO £50, OR THE AMOUNT YOU PAID US IN THE PRECEDING 12 MONTHS IF HIGHER.</p>
+      <p>Nothing in these Terms limits liability that cannot be limited by law, including for fraud, or for death or personal injury caused by negligence. Some places don't allow certain limits, so parts of this section may not apply to you.</p>
+      <p>You agree to be responsible for claims arising from your own breach of these Terms, including sending students to content that you were not permitted to share.</p>
+
+      <h2 id="law">16. Governing law and disputes</h2>
+      <p>These Terms are governed by the laws of England and Wales, without regard to conflict-of-law rules. The courts of England and Wales have exclusive jurisdiction over disputes, except where consumer or education law gives you the right to bring a claim where you live. Before starting a formal dispute, please contact us so we can try to resolve it informally.</p>
+      <p>If any part of these Terms is found unenforceable, the rest stays in effect. If we don't enforce a term right away, that doesn't waive our right to do so later. You may not transfer your rights under these Terms without our consent; we may transfer ours as part of a merger, sale, or reorganization.</p>
+
+      <h2 id="contact">17. Contact</h2>
+      <p>Questions about these Terms? Email <a href="mailto:support@classcastle.org">support@classcastle.org</a>.</p>
+      <p>Classcastle is operated by James Theakston, trading as JAMES THEAKSTON APPLICATION DEVELOPMENT.</p>
+    </article>
   </div>
+</main>
+
+<div class="wrap">
+  <footer>
+    <span>Classcastle · Made for classrooms</span>
+    <span><a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a> · <a href="/">Home</a></span>
+  </footer>
 </div>
 
 <script>
-  // Switch favicon based on theme
-  function updateFavicon() {
-    const favicon = document.getElementById('favicon');
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    favicon.href = isDark ? '/logo-dark.svg' : '/logo.svg';
+  function updateFavicon(){
+    document.getElementById('favicon').href = matchMedia('(prefers-color-scheme: dark)').matches ? '/logo-dark.svg' : '/logo.svg';
   }
-
-  // Update favicon on load and when theme changes
   updateFavicon();
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
 </script>
-
 </body>
 </html>
