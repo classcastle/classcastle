@@ -12,14 +12,14 @@
 <style>
 :root{
   --bg:#FCFCFA; --surface:#fff; --ink:#18221C; --soft:#5E675F; --line:#D9DDD3;
-  --brand:#1F5C3A; --brand-ink:#fff; --tint:#E4F1E6; --board:#17352A; --chalk:#F4D35E;
+  --brand:#1F5C3A; --brand-ink:#fff; --tint:#E4F1E6; --board:#17352A; --chalk:#F4D35E; --red:#B3261E;
   color-scheme:light dark; box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
 @media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){--bg:#0F1511;--surface:#18211B;--ink:#EEF2EA;--soft:#9EAA9F;--line:#2A362D;--brand:#4DAA72;--brand-ink:#0F1511;--tint:#1A2B20;--board:#1C4030}
+  :root:not([data-theme="light"]){--bg:#0F1511;--surface:#18211B;--ink:#EEF2EA;--soft:#9EAA9F;--line:#2A362D;--brand:#4DAA72;--brand-ink:#0F1511;--tint:#1A2B20;--board:#1C4030;--red:#D9534F}
 }
-:root[data-theme="dark"]{--bg:#0F1511;--surface:#18211B;--ink:#EEF2EA;--soft:#9EAA9F;--line:#2A362D;--brand:#4DAA72;--brand-ink:#0F1511;--tint:#1A2B20;--board:#1C4030}
+:root[data-theme="dark"]{--bg:#0F1511;--surface:#18211B;--ink:#EEF2EA;--soft:#9EAA9F;--line:#2A362D;--brand:#4DAA72;--brand-ink:#0F1511;--tint:#1A2B20;--board:#1C4030;--red:#D9534F}
 *{box-sizing:inherit}
 html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
 html,body{margin:0;padding:0}
@@ -61,13 +61,50 @@ section{padding:76px 0;border-top:1px solid var(--line)}
 .copy-btn:hover{background:var(--bg);border-color:var(--brand)}
 
 .endpoint-list{display:grid;gap:16px}
-.endpoint-item{display:grid;grid-template-columns:180px 1fr;gap:16px;padding:16px;background:var(--surface);border:1px solid var(--line);border-radius:6px}
+.endpoint-item{display:grid;grid-template-columns:180px 1fr auto;gap:16px;align-items:center;padding:16px;background:var(--surface);border:1px solid var(--line);border-radius:6px}
 .endpoint-method{font-family:'Monaco','Consolas',monospace;font-size:.85rem;font-weight:600;padding:4px 8px;border-radius:4px;display:inline-block;text-align:center}
 .endpoint-get{background:var(--tint);color:var(--brand)}
 .endpoint-post{background:var(--brand);color:var(--brand-ink)}
 .endpoint-delete{background:var(--red);color:#fff}
-.endpoint-path{font-family:'Monaco','Consolas',monospace;font-size:.85rem;color:var(--ink)}
+.endpoint-path{font-family:'Monaco','Consolas',monospace;font-size:.85rem;color:var(--ink);overflow-wrap:anywhere}
 .endpoint-desc{color:var(--soft);font-size:.95rem}
+
+.run-btn{background:var(--surface);color:var(--ink);border:2px solid var(--ink);border-radius:6px;padding:8px 16px;font:600 .9rem 'Instrument Sans',system-ui,sans-serif;cursor:pointer;box-shadow:2px 2px 0 var(--ink);transition:transform .12s,box-shadow .12s;white-space:nowrap}
+.run-btn:hover{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--ink)}
+
+/* Run modal */
+dialog.modal{width:min(680px,calc(100vw - 24px));max-height:calc(100dvh - 24px);padding:0;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);box-shadow:6px 6px 0 var(--ink);overflow:auto}
+dialog.modal::backdrop{background:rgba(10,18,13,.6)}
+@keyframes modal-in{from{opacity:0;transform:translateY(18px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes modal-out{from{opacity:1;transform:none}to{opacity:0;transform:translateY(12px) scale(.97)}}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+@keyframes fade-out{from{opacity:1}to{opacity:0}}
+dialog.modal[open]{animation:modal-in .22s cubic-bezier(.2,.8,.2,1)}
+dialog.modal[open]::backdrop{animation:fade-in .22s ease-out}
+dialog.modal.closing{animation:modal-out .18s ease-in forwards}
+dialog.modal.closing::backdrop{animation:fade-out .18s ease-in forwards}
+@media (prefers-reduced-motion:reduce){dialog.modal[open],dialog.modal[open]::backdrop,dialog.modal.closing,dialog.modal.closing::backdrop{animation:none!important}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid var(--line)}
+.modal-head h3{font-size:1.1rem;font-weight:600}
+.modal-close{background:none;border:0;color:var(--soft);font-size:1.6rem;line-height:1;cursor:pointer;padding:4px 8px;border-radius:4px}
+.modal-close:hover{color:var(--ink)}
+.modal-body{padding:20px 22px;display:grid;gap:16px}
+.modal-route{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.field label{display:block;font-weight:600;font-size:.88rem;margin-bottom:6px}
+.field input[type=text],.field input[type=password],.field textarea{width:100%;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font:400 .9rem 'Monaco','Consolas',monospace}
+.field textarea{min-height:90px;resize:vertical}
+.field .hint{color:var(--soft);font-size:.82rem;margin-top:6px}
+.remember{display:flex;gap:8px;align-items:center;font-size:.88rem;color:var(--soft)}
+.warn{background:var(--tint);border-left:4px solid var(--red);padding:10px 12px;border-radius:4px;font-size:.88rem}
+.modal-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.modal-actions .btn-primary{border:0;font:600 .95rem 'Instrument Sans',system-ui,sans-serif;padding:12px 22px;cursor:pointer}
+.modal-actions .btn-primary:disabled{opacity:.6;cursor:wait}
+.log-box{background:#101814;color:#E6EDE6;border-radius:6px;padding:14px;font:400 .8rem/1.55 'Monaco','Consolas',monospace;max-height:320px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}
+.log-box .t{color:#6F8A78;margin-right:8px}
+.log-box .info{color:#9CC8FF}
+.log-box .ok{color:#7EE2A0}
+.log-box .err{color:#FF8F87}
+.log-box .muted{color:#9AA79E}
 
 .cta-band{position:relative;background:var(--board);color:#fff;padding:64px 48px 60px;border-radius:0 0 6px 6px;margin-top:16px}
 .cta-band::before{content:'';position:absolute;left:0;right:0;top:-16px;height:16px;background:linear-gradient(90deg,var(--board) 50%,transparent 50%) 0 0/32px 100%}
@@ -83,8 +120,9 @@ footer a{color:var(--soft)}
   .wrap,nav{padding-left:20px;padding-right:20px}
   .hero{padding:48px 0 56px}
   .feature-grid{grid-template-columns:1fr}
-  .endpoint-item{grid-template-columns:1fr}
+  .endpoint-item{grid-template-columns:1fr;align-items:start}
   .endpoint-method{width:fit-content;margin-bottom:8px}
+  .run-btn{width:fit-content}
   section{padding:52px 0}
   .cta-band{padding:44px 24px}
   .hero-ctas{flex-direction:column;align-items:stretch;text-align:center}
@@ -167,7 +205,7 @@ await classcastle.sleep(2);</code><button class="copy-btn" onclick="copyCode(thi
 
 <section id="endpoints">
   <div class="wrap">
-    <div class="section-head"><h2>Core endpoints</h2><p>The most commonly used API endpoints for building integrations.</p></div>
+    <div class="section-head"><h2>Core endpoints</h2><p>The most commonly used API endpoints for building integrations. Hit Run on any endpoint to try it live with your own API key.</p></div>
     <div class="endpoint-list">
       <div class="endpoint-item">
         <div>
@@ -361,6 +399,36 @@ await fetch(`https://api.classcastle.org/.netlify/functions/rooms/deleteroom/${r
   </div>
 </footer>
 
+<dialog class="modal" id="runModal" aria-labelledby="runTitle">
+  <div class="modal-head">
+    <h3 id="runTitle">Run endpoint</h3>
+    <button type="button" class="modal-close" id="runClose" aria-label="Close">&times;</button>
+  </div>
+  <div class="modal-body">
+    <div class="modal-route"><span class="endpoint-method" id="runMethod"></span><span class="endpoint-path" id="runPath"></span></div>
+    <div class="field">
+      <label for="runKey">API key</label>
+      <input type="password" id="runKey" autocomplete="off" spellcheck="false" placeholder="Paste your API key">
+      <div class="hint">Sent only to api.classcastle.org from your browser. Never logged in full. <a href="https://devlabs.classcastle.org/generateapikey" style="color:var(--brand)">Need a key?</a></div>
+    </div>
+    <label class="remember"><input type="checkbox" id="runRemember"> Remember key for this browser tab</label>
+    <div class="field" id="idField" hidden>
+      <label for="runId">Room ID</label>
+      <input type="text" id="runId" autocomplete="off" spellcheck="false" placeholder="e.g. the id returned by createroom">
+    </div>
+    <div class="field" id="bodyField" hidden>
+      <label for="runBody">Request body (JSON)</label>
+      <textarea id="runBody" spellcheck="false"></textarea>
+    </div>
+    <div class="warn" id="runWarn" hidden><strong>This is a live request.</strong> It will permanently delete the room.</div>
+    <div class="modal-actions">
+      <button type="button" class="btn-primary" id="runGo">Send request</button>
+      <button type="button" class="btn-secondary" id="runClear" style="background:none;border:0;color:var(--ink);cursor:pointer;font-family:inherit;font-size:.95rem">Clear logs</button>
+    </div>
+    <div class="log-box" id="runLogs" role="log" aria-live="polite"><span class="muted">Logs will appear here.</span></div>
+  </div>
+</dialog>
+
 <script>
 function copyCode(button) {
   const codeBlock = button.parentElement;
@@ -379,6 +447,163 @@ function copyCode(button) {
     }, 2000);
   });
 }
+
+/* ---------- Per-endpoint Run buttons + modal ---------- */
+(function () {
+  const API_BASE = 'https://api.classcastle.org';
+  const KEY_STORE = 'cc_devlabs_key';
+  const DEFAULT_BODIES = {
+    '/.netlify/functions/createroom': { name: 'Test Room' },
+    '/.netlify/functions/rooms/{id}/navigate': { url: 'https://microbit.org' }
+  };
+
+  const modal = document.getElementById('runModal');
+  const el = id => document.getElementById(id);
+  const keyInput = el('runKey'), idInput = el('runId'), bodyInput = el('runBody');
+  const logs = el('runLogs'), goBtn = el('runGo');
+  let current = null;
+
+  function store(op, val) {
+    try {
+      if (op === 'get') return sessionStorage.getItem(KEY_STORE) || '';
+      if (op === 'set') sessionStorage.setItem(KEY_STORE, val);
+      if (op === 'del') sessionStorage.removeItem(KEY_STORE);
+    } catch (e) {}
+    return '';
+  }
+
+  function log(cls, text) {
+    if (logs.firstElementChild && logs.firstElementChild.classList.contains('muted') && logs.children.length === 1 && logs.textContent === 'Logs will appear here.') logs.textContent = '';
+    const line = document.createElement('div');
+    const t = document.createElement('span');
+    t.className = 't';
+    t.textContent = new Date().toLocaleTimeString([], { hour12: false });
+    const m = document.createElement('span');
+    m.className = cls;
+    m.textContent = text;
+    line.append(t, m);
+    logs.appendChild(line);
+    logs.scrollTop = logs.scrollHeight;
+  }
+
+  function resetLogs() {
+    logs.textContent = '';
+    const s = document.createElement('span');
+    s.className = 'muted';
+    s.textContent = 'Logs will appear here.';
+    logs.appendChild(s);
+  }
+
+  function mask(k) { return k.length > 8 ? k.slice(0, 4) + '••••' + k.slice(-2) : '••••'; }
+
+  function openRun(method, path) {
+    current = { method, path };
+    el('runTitle').textContent = 'Run endpoint';
+    const m = el('runMethod');
+    m.textContent = method;
+    m.className = 'endpoint-method ' + (method === 'GET' ? 'endpoint-get' : 'endpoint-post');
+    el('runPath').textContent = path;
+    const saved = store('get');
+    keyInput.value = saved;
+    el('runRemember').checked = !!saved;
+    el('idField').hidden = !path.includes('{id}');
+    if (path.includes('{id}')) idInput.value = '';
+    const needsBody = method === 'POST' && !path.includes('deleteroom');
+    el('bodyField').hidden = !needsBody;
+    bodyInput.value = needsBody && DEFAULT_BODIES[path] ? JSON.stringify(DEFAULT_BODIES[path], null, 2) : (needsBody ? '{}' : '');
+    el('runWarn').hidden = !path.includes('deleteroom');
+    resetLogs();
+    goBtn.disabled = false;
+    goBtn.textContent = 'Send request';
+    modal.showModal();
+    (saved ? (path.includes('{id}') ? idInput : goBtn) : keyInput).focus();
+  }
+
+  async function send() {
+    const key = keyInput.value.trim();
+    if (!key) { log('err', 'Enter your API key first.'); keyInput.focus(); return; }
+    let path = current.path;
+    if (path.includes('{id}')) {
+      const id = idInput.value.trim();
+      if (!id) { log('err', 'Enter a room ID first.'); idInput.focus(); return; }
+      path = path.replace('{id}', encodeURIComponent(id));
+    }
+    let bodyText = null;
+    if (!el('bodyField').hidden) {
+      const raw = bodyInput.value.trim();
+      if (raw) {
+        try { bodyText = JSON.stringify(JSON.parse(raw)); }
+        catch (e) { log('err', 'Request body is not valid JSON: ' + e.message); bodyInput.focus(); return; }
+      }
+    }
+    if (el('runRemember').checked) store('set', key); else store('del');
+
+    const url = API_BASE + path;
+    const headers = { 'Authorization': 'Bearer ' + key };
+    if (bodyText !== null) headers['Content-Type'] = 'application/json';
+
+    goBtn.disabled = true;
+    goBtn.textContent = 'Running…';
+    log('info', '→ ' + current.method + ' ' + url);
+    log('muted', '  Authorization: Bearer ' + mask(key));
+    if (bodyText !== null) log('muted', '  Body: ' + bodyText);
+
+    const started = performance.now();
+    try {
+      const res = await fetch(url, { method: current.method, headers, body: bodyText });
+      const ms = Math.round(performance.now() - started);
+      const text = await res.text();
+      let pretty = text;
+      try { pretty = JSON.stringify(JSON.parse(text), null, 2); } catch (e) {}
+      log(res.ok ? 'ok' : 'err', '← ' + res.status + ' ' + (res.statusText || '') + ' (' + ms + ' ms)');
+      const ct = res.headers.get('content-type');
+      if (ct) log('muted', '  Content-Type: ' + ct);
+      log('', pretty ? pretty : '(empty response body)');
+      if (res.status === 401) log('muted', 'Tip: check your API key at devlabs.classcastle.org/generateapikey');
+      if (res.status === 429) log('muted', 'Tip: you hit the rate limit. Wait a moment and try again.');
+    } catch (err) {
+      const ms = Math.round(performance.now() - started);
+      log('err', '✕ Request failed after ' + ms + ' ms: ' + err.message);
+      log('muted', 'This usually means a network problem, or the API blocked the browser request (CORS). Check the browser console for details.');
+    } finally {
+      goBtn.disabled = false;
+      goBtn.textContent = 'Send again';
+    }
+  }
+
+  document.querySelectorAll('#endpoints .endpoint-item').forEach(item => {
+    const method = item.querySelector('.endpoint-method').textContent.trim();
+    const path = item.querySelector('.endpoint-path').textContent.trim();
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'run-btn';
+    btn.textContent = '▶ Run';
+    btn.setAttribute('aria-label', 'Run ' + method + ' ' + path);
+    btn.addEventListener('click', () => openRun(method, path));
+    item.appendChild(btn);
+  });
+
+  goBtn.addEventListener('click', send);
+  el('runClear').addEventListener('click', resetLogs);
+  function closeModal() {
+    if (!modal.open || modal.classList.contains('closing')) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { modal.close(); return; }
+    modal.classList.add('closing');
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      modal.classList.remove('closing');
+      modal.close();
+    };
+    modal.addEventListener('animationend', finish, { once: true });
+    setTimeout(finish, 300);
+  }
+  el('runClose').addEventListener('click', closeModal);
+  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+  modal.addEventListener('cancel', e => { e.preventDefault(); closeModal(); });
+  [keyInput, idInput].forEach(i => i.addEventListener('keydown', e => { if (e.key === 'Enter') send(); }));
+})();
 
 document.getElementById('runButton').addEventListener('click', async () => {
   const apiKey = 'test_api_key_demo';
