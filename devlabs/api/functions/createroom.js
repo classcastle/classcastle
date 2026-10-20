@@ -1,36 +1,74 @@
 /**
  * Create Room API Endpoint
- * POST /api/v1/createroom
+ * POST /createroom
  */
 
-export const onRequestPost = async (context) => {
-  const { request, env } = context;
+export async function handler(event, context) {
+  // Handle CORS preflight
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 204,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      },
+      body: ''
+    };
+  }
+
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: 'Method not allowed'
+    };
+  }
 
   try {
-    // Get Authorization header
-    const authHeader = request.headers.get('Authorization');
+    // Get Authorization header - convert headers object to standard format
+    const headers = {};
+    for (const key in event.headers) {
+      headers[key.toLowerCase()] = event.headers[key];
+    }
+    const authHeader = headers['authorization'];
+    
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return new Response(JSON.stringify({ error: 'Missing or invalid Authorization header' }), {
-        status: 4002,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return {
+        statusCode: 401,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({ error: 'Missing or invalid Authorization header' })
+      };
     }
 
     const apiKey = authHeader.replace('Bearer ', '');
 
     // Validate API key against Supabase
-    const supabaseUrl = env.SUPABASE_URL || 'https://hduyofdbpspjcuwvackd.supabase.co';
-    const supabaseKey = env.SUPABASE_KEY || 'sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK';
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_KEY;
+
+    if (!supabaseUrl || !supabaseKey) {
+      return {
+        statusCode: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({ error: 'Server configuration error' })
+      };
+    }
 
     // Hash the API key to compare with stored hash
-    const encoder = new TextEncoder();
-    const data = encoder.encode(apiKey);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
+    const crypto = require('crypto');
+    const hash = crypto.createHash('sha256').update(apiKey).digest('hex');
+    
     // Check if API key exists in Supabase
-    const keyCheckResponse = await fetch(`${supabaseUrl}/rest/v1/api_keys?key_hash=eq.${hashHex}&select=*`, {
+    const keyCheckResponse = await fetch(`${supabaseUrl}/rest/v1/api_keys?key_hash=eq.${hash}&select=*`, {
       headers: {
         'apikey': supabaseKey,
         'Authorization': `Bearer ${supabaseKey}`
@@ -40,23 +78,31 @@ export const onRequestPost = async (context) => {
     const keyData = await keyCheckResponse.json();
 
     if (!keyData || keyData.length === 0) {
-      return new Response(JSON.stringify({ error: 'Invalid API key' }), {
-        status: 4002,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return {
+        statusCode: 401,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({ error: 'Invalid API key' })
+      };
     }
 
     const userId = keyData[0].user_id;
 
     // Get request body
-    const body = await request.json();
+    const body = JSON.parse(event.body);
     const { name, trycode } = body;
 
     if (!name) {
-      return new Response(JSON.stringify({ error: 'Room name is required' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return {
+        statusCode: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({ error: 'Room name is required' })
+      };
     }
 
     // Generate room code
@@ -73,10 +119,14 @@ export const onRequestPost = async (context) => {
       const codeData = await codeCheckResponse.json();
 
       if (codeData && codeData.length > 0) {
-        return new Response(JSON.stringify({ error: 'Room code already exists' }), {
-          status: 4001,
-          headers: { 'Content-Type': 'application/json' }
-        });
+        return {
+          statusCode: 409,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
+          body: JSON.stringify({ error: 'Room code already exists' })
+        };
       }
 
       roomCode = trycode;
@@ -112,10 +162,14 @@ export const onRequestPost = async (context) => {
     const roomData = await createResponse.json();
 
     if (!createResponse.ok) {
-      return new Response(JSON.stringify({ error: 'Failed to create room' }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return {
+        statusCode: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({ error: 'Failed to create room' })
+      };
     }
 
     // Update last_used_at for API key
@@ -129,18 +183,26 @@ export const onRequestPost = async (context) => {
       body: JSON.stringify({ last_used_at: new Date().toISOString() })
     });
 
-    return new Response(JSON.stringify(roomData[0]), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify(roomData[0])
+    };
 
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return {
+      statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({ error: error.message })
+    };
   }
-};
+}
 
 async function codeExists(supabaseUrl, supabaseKey, code) {
   const response = await fetch(`${supabaseUrl}/rest/v1/rooms?code=eq.${code}&select=code`, {

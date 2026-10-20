@@ -157,7 +157,7 @@ await classcastle.sleep(2);</code><button class="copy-btn" onclick="copyCode(thi
       <h3>4. Make your first request</h3>
       <p style="margin-bottom:16px;">Create a room to verify everything is working.</p>
 
-      <div class="code-block"><code>curl https://api.classcastle.org/createroom \
+      <div class="code-block"><code>curl https://api.classcastle.org/.netlify/functions/createroom \
   -H "Authorization: Bearer your_api_key_here" \
   -H "Content-Type: application/json" \
   -d '{"name": "Test Room"}'</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
@@ -174,7 +174,7 @@ await classcastle.sleep(2);</code><button class="copy-btn" onclick="copyCode(thi
           <span class="endpoint-method endpoint-post">POST</span>
         </div>
         <div>
-          <div class="endpoint-path">/createroom</div>
+          <div class="endpoint-path">/.netlify/functions/createroom</div>
           <div class="endpoint-desc">Create a new room. Optional <code>trycode</code> parameter to request a specific room code.</div>
         </div>
       </div>
@@ -183,7 +183,7 @@ await classcastle.sleep(2);</code><button class="copy-btn" onclick="copyCode(thi
           <span class="endpoint-method endpoint-get">GET</span>
         </div>
         <div>
-          <div class="endpoint-path">/rooms</div>
+          <div class="endpoint-path">/.netlify/functions/rooms</div>
           <div class="endpoint-desc">List all rooms for your account</div>
         </div>
       </div>
@@ -192,7 +192,7 @@ await classcastle.sleep(2);</code><button class="copy-btn" onclick="copyCode(thi
           <span class="endpoint-method endpoint-get">GET</span>
         </div>
         <div>
-          <div class="endpoint-path">/rooms/{id}</div>
+          <div class="endpoint-path">/.netlify/functions/rooms/{id}</div>
           <div class="endpoint-desc">Get details for a specific room</div>
         </div>
       </div>
@@ -201,7 +201,7 @@ await classcastle.sleep(2);</code><button class="copy-btn" onclick="copyCode(thi
           <span class="endpoint-method endpoint-post">POST</span>
         </div>
         <div>
-          <div class="endpoint-path">/rooms/{id}/navigate</div>
+          <div class="endpoint-path">/.netlify/functions/rooms/{id}/navigate</div>
           <div class="endpoint-desc">Send all students in a room to a URL</div>
         </div>
       </div>
@@ -210,7 +210,7 @@ await classcastle.sleep(2);</code><button class="copy-btn" onclick="copyCode(thi
           <span class="endpoint-method endpoint-get">GET</span>
         </div>
         <div>
-          <div class="endpoint-path">/rooms/{id}/students</div>
+          <div class="endpoint-path">/.netlify/functions/rooms/{id}/students</div>
           <div class="endpoint-desc">List all students in a room</div>
         </div>
       </div>
@@ -219,7 +219,7 @@ await classcastle.sleep(2);</code><button class="copy-btn" onclick="copyCode(thi
           <span class="endpoint-method endpoint-get">GET</span>
         </div>
         <div>
-          <div class="endpoint-path">/rooms/{id}/activity</div>
+          <div class="endpoint-path">/.netlify/functions/rooms/{id}/activity</div>
           <div class="endpoint-desc">Get activity log for a room</div>
         </div>
       </div>
@@ -228,7 +228,7 @@ await classcastle.sleep(2);</code><button class="copy-btn" onclick="copyCode(thi
           <span class="endpoint-method endpoint-post">POST</span>
         </div>
         <div>
-          <div class="endpoint-path">/rooms/deleteroom/{id}</div>
+          <div class="endpoint-path">/.netlify/functions/rooms/deleteroom/{id}</div>
           <div class="endpoint-desc">Delete a room permanently</div>
         </div>
       </div>
@@ -244,7 +244,7 @@ await classcastle.sleep(2);</code><button class="copy-btn" onclick="copyCode(thi
 classcastle.sleep = (seconds) => new Promise(resolve => setTimeout(resolve, seconds * 1000));
 
 // Create a new room
-const response = await fetch('https://api.classcastle.org/createroom', {
+const response = await fetch('https://api.classcastle.org/.netlify/functions/createroom', {
   method: 'POST',
   headers: {
     'Authorization': 'Bearer your_api_key_here',
@@ -262,7 +262,7 @@ const room = await response.json();
 await classcastle.sleep(2);
 
 // Navigate all students to a URL
-await fetch(`https://api.classcastle.org/rooms/${room.id}/navigate`, {
+await fetch(`https://api.classcastle.org/.netlify/functions/rooms/${room.id}/navigate`, {
   method: 'POST',
   headers: {
     'Authorization': 'Bearer your_api_key_here',
@@ -274,7 +274,7 @@ await fetch(`https://api.classcastle.org/rooms/${room.id}/navigate`, {
 });
 
 // Delete the room when done
-await fetch(`https://api.classcastle.org/rooms/deleteroom/${room.id}`, {
+await fetch(`https://api.classcastle.org/.netlify/functions/rooms/deleteroom/${room.id}`, {
   method: 'POST',
   headers: {
     'Authorization': 'Bearer your_api_key_here',
@@ -293,7 +293,7 @@ await fetch(`https://api.classcastle.org/rooms/deleteroom/${room.id}`, {
     <div class="endpoint-list">
       <div class="endpoint-item">
         <div>
-          <span class="endpoint-method endpoint-get">4001</span>
+          <span class="endpoint-method endpoint-get">409</span>
         </div>
         <div>
           <div class="endpoint-path">The requested room code is already taken</div>
@@ -302,7 +302,7 @@ await fetch(`https://api.classcastle.org/rooms/deleteroom/${room.id}`, {
       </div>
       <div class="endpoint-item">
         <div>
-          <span class="endpoint-method endpoint-get">4002</span>
+          <span class="endpoint-method endpoint-get">401</span>
         </div>
         <div>
           <div class="endpoint-path">Invalid or missing API key</div>
@@ -311,7 +311,7 @@ await fetch(`https://api.classcastle.org/rooms/deleteroom/${room.id}`, {
       </div>
       <div class="endpoint-item">
         <div>
-          <span class="endpoint-method endpoint-get">4003</span>
+          <span class="endpoint-method endpoint-get">404</span>
         </div>
         <div>
           <div class="endpoint-path">Room does not exist</div>
@@ -320,7 +320,7 @@ await fetch(`https://api.classcastle.org/rooms/deleteroom/${room.id}`, {
       </div>
       <div class="endpoint-item">
         <div>
-          <span class="endpoint-method endpoint-get">4004</span>
+          <span class="endpoint-method endpoint-get">400</span>
         </div>
         <div>
           <div class="endpoint-path">Invalid URL provided</div>
@@ -395,7 +395,7 @@ document.getElementById('runButton').addEventListener('click', async () => {
   output.textContent = 'Creating room...';
 
   try {
-    const response = await fetch('https://api.classcastle.org/createroom', {
+    const response = await fetch('https://api.classcastle.org/.netlify/functions/createroom', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
@@ -424,7 +424,7 @@ document.getElementById('runButton').addEventListener('click', async () => {
     output.textContent += `\n\nWaiting 2 seconds...`;
     await classcastle.sleep(2);
 
-    const navResponse = await fetch(`https://api.classcastle.org/rooms/${room.id}/navigate`, {
+    const navResponse = await fetch(`https://api.classcastle.org/.netlify/functions/rooms/${room.id}/navigate`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
@@ -447,7 +447,7 @@ document.getElementById('runButton').addEventListener('click', async () => {
     output.textContent += `\n\nNavigation successful: ${JSON.stringify(navResult, null, 2)}`;
 
     // Delete the room
-    const deleteResponse = await fetch(`https://api.classcastle.org/rooms/deleteroom/${room.id}`, {
+    const deleteResponse = await fetch(`https://api.classcastle.org/.netlify/functions/rooms/deleteroom/${room.id}`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,

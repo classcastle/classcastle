@@ -18,5 +18,5 @@ echo "Creating devlabs.zip..."
 zip -r devlabs.zip index.html generateapikey.html
 
 echo "Build complete!"
-echo "  - api.zip ready for deployment to api.classcastle.org"
-echo "  - devlabs.zip ready for deployment to devlabs.classcastle.org"
+echo "  - api.zip ready for deployment to Netlify (api.classcastle.org)"
+echo "  - devlabs.zip ready for deployment to Cloudflare Pages (devlabs.classcastle.org)"
