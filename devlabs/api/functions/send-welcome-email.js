@@ -4,7 +4,7 @@
  * Sends a welcome email using Resend API
  */
 
-const handler = async (event) => {
+export async function handler(event, context) {
   // Handle CORS preflight request
   if (event.httpMethod === 'OPTIONS') {
     return {
@@ -239,6 +239,4 @@ const handler = async (event) => {
       body: JSON.stringify({ error: error.message })
     };
   }
-};
-
-module.exports = { handler };
+}
