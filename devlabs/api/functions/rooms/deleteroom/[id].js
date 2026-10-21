@@ -3,6 +3,8 @@
  * POST /rooms/deleteroom/{id}
  */
 
+const { recordHit, recordFailure } = require('./stats-helper');
+
 // Simple in-memory rate limiter (per API key, per minute)
 const rateLimitMap = new Map();
 const RATE_LIMIT = 60; // requests per minute
@@ -22,11 +24,7 @@ function checkRateLimit(apiKey) {
   entry.count = entry.requests.length;
 
   if (entry.count >= RATE_LIMIT) {
-    const stats = require('./stats.js').stats;
-    stats.totalRequests++;
-    stats.failedRequests++;
-    stats.endpoints.deleteroom.failures++;
-    stats.failuresByReason['Rate limit exceeded'] = (stats.failuresByReason['Rate limit exceeded'] || 0) + 1;
+    recordFailure('deleteroom', 'Rate limit exceeded');
     return false;
   }
 
@@ -109,11 +107,7 @@ export async function handler(event, context) {
     const keyData = await keyCheckResponse.json();
 
     if (!keyData || keyData.length === 0) {
-      const { stats } = require('./stats.js');
-      stats.totalRequests++;
-      stats.failedRequests++;
-      stats.endpoints.deleteroom.failures++;
-      stats.failuresByReason['Invalid API key'] = (stats.failuresByReason['Invalid API key'] || 0) + 1;
+      recordFailure('deleteroom', 'Invalid API key');
 
       return {
         statusCode: 401,
@@ -129,12 +123,6 @@ export async function handler(event, context) {
 
     // Check rate limit
     if (!checkRateLimit(apiKey)) {
-      const { stats } = require('./stats.js');
-      stats.totalRequests++;
-      stats.failedRequests++;
-      stats.endpoints.deleteroom.failures++;
-      stats.failuresByReason['Rate limit exceeded'] = (stats.failuresByReason['Rate limit exceeded'] || 0) + 1;
-
       return {
         statusCode: 429,
         headers: {
@@ -156,11 +144,7 @@ export async function handler(event, context) {
     const roomData = await roomCheckResponse.json();
 
     if (!roomData || roomData.length === 0) {
-      const { stats } = require('./stats.js');
-      stats.totalRequests++;
-      stats.failedRequests++;
-      stats.endpoints.deleteroom.failures++;
-      stats.failuresByReason['Room not found'] = (stats.failuresByReason['Room not found'] || 0) + 1;
+      recordFailure('deleteroom', 'Room not found');
 
       return {
         statusCode: 404,
@@ -203,11 +187,7 @@ export async function handler(event, context) {
       body: JSON.stringify({ last_used_at: new Date().toISOString() })
     });
 
-    // Record stats
-    const stats = require('./stats.js').stats;
-    stats.totalRequests++;
-    stats.successfulRequests++;
-    stats.endpoints.deleteroom.hits++;
+    recordHit('deleteroom');
 
     return {
       statusCode: 200,
@@ -221,12 +201,7 @@ export async function handler(event, context) {
     };
 
   } catch (error) {
-    // Record stats
-    const stats = require('./stats.js').stats;
-    stats.totalRequests++;
-    stats.failedRequests++;
-    stats.endpoints.deleteroom.failures++;
-    stats.failuresByReason[error.message] = (stats.failuresByReason[error.message] || 0) + 1;
+    recordFailure('deleteroom', error.message);
 
     return {
       statusCode: 500,

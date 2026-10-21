@@ -2,28 +2,8 @@
  * Stats API Endpoint
  * GET /stats
  * Public endpoint - no authentication required
+ * Reads statistics from Supabase for persistent tracking
  */
-
-// Simple in-memory stats tracking
-const stats = {
-  startTime: Date.now(),
-  totalRequests: 0,
-  successfulRequests: 0,
-  failedRequests: 0,
-  failuresByReason: {},
-  endpoints: {
-    createroom: { hits: 0, failures: 0 },
-    rooms: { hits: 0, failures: 0 },
-    roomdetails: { hits: 0, failures: 0 },
-    navigate: { hits: 0, failures: 0 },
-    activity: { hits: 0, failures: 0 },
-    students: { hits: 0, failures: 0 },
-    deleteroom: { hits: 0, failures: 0 }
-  }
-};
-
-// Export stats object for other functions to access
-module.exports = { stats };
 
 async function handler(event, context) {
   // Handle CORS preflight
@@ -49,29 +29,95 @@ async function handler(event, context) {
     };
   }
 
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    return {
+      statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({ error: 'Server configuration error' })
+    };
+  }
+
   try {
-    const uptime = Date.now() - stats.startTime;
+    // Fetch global stats
+    const globalResponse = await fetch(`${supabaseUrl}/rest/v1/api_global_stats?id=eq.1&select=*`, {
+      headers: {
+        'apikey': supabaseKey,
+        'Authorization': `Bearer ${supabaseKey}`
+      }
+    });
+
+    const globalData = await globalResponse.json();
+
+    if (!globalData || globalData.length === 0) {
+      return {
+        statusCode: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({ error: 'Stats not initialized' })
+      };
+    }
+
+    const global = globalData[0];
+
+    // Fetch endpoint stats
+    const endpointResponse = await fetch(`${supabaseUrl}/rest/v1/api_stats?select=*`, {
+      headers: {
+        'apikey': supabaseKey,
+        'Authorization': `Bearer ${supabaseKey}`
+      }
+    });
+
+    const endpointData = await endpointResponse.json();
+
+    // Fetch failures by reason
+    const failuresResponse = await fetch(`${supabaseUrl}/rest/v1/api_failures?select=*`, {
+      headers: {
+        'apikey': supabaseKey,
+        'Authorization': `Bearer ${supabaseKey}`
+      }
+    });
+
+    const failuresData = await failuresResponse.json();
+
+    // Calculate uptime
+    const uptime = Date.now() - new Date(global.start_time).getTime();
     const uptimeSeconds = Math.floor(uptime / 1000);
     const uptimeMinutes = Math.floor(uptimeSeconds / 60);
     const uptimeHours = Math.floor(uptimeMinutes / 60);
     const uptimeDays = Math.floor(uptimeHours / 24);
 
-    const uptimeString = uptimeDays > 0 
+    const uptimeString = uptimeDays > 0
       ? `${uptimeDays}d ${uptimeHours % 24}h ${uptimeMinutes % 60}m`
       : uptimeHours > 0
       ? `${uptimeHours}h ${uptimeMinutes % 60}m`
       : `${uptimeMinutes}m ${uptimeSeconds % 60}s`;
 
-    const successRate = stats.totalRequests > 0 
-      ? ((stats.successfulRequests / stats.totalRequests) * 100).toFixed(2) + '%'
+    // Calculate success rate
+    const successRate = global.total_requests > 0
+      ? ((global.successful_requests / global.total_requests) * 100).toFixed(2) + '%'
       : '0%';
 
-    const endpointStats = Object.entries(stats.endpoints).map(([name, data]) => ({
-      endpoint: name,
-      hits: data.hits,
-      failures: data.failures,
-      successRate: data.hits > 0 ? ((data.hits - data.failures) / data.hits * 100).toFixed(2) + '%' : '0%'
+    // Format endpoint stats
+    const endpointStats = endpointData.map(ep => ({
+      endpoint: ep.endpoint,
+      hits: ep.hits,
+      failures: ep.failures,
+      successRate: ep.hits > 0 ? ((ep.hits - ep.failures) / ep.hits * 100).toFixed(2) + '%' : '0%'
     }));
+
+    // Format failures by reason
+    const failuresByReason = {};
+    failuresData.forEach(f => {
+      failuresByReason[f.reason] = f.count;
+    });
 
     return {
       statusCode: 200,
@@ -82,11 +128,11 @@ async function handler(event, context) {
       body: JSON.stringify({
         uptime: uptimeString,
         uptimeMs: uptime,
-        totalRequests: stats.totalRequests,
-        successfulRequests: stats.successfulRequests,
-        failedRequests: stats.failedRequests,
+        totalRequests: global.total_requests,
+        successfulRequests: global.successful_requests,
+        failedRequests: global.failed_requests,
         successRate: successRate,
-        failuresByReason: stats.failuresByReason,
+        failuresByReason: failuresByReason,
         endpoints: endpointStats
       })
     };
