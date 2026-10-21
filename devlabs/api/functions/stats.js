@@ -25,7 +25,7 @@ const stats = {
 // Export stats object for other functions to access
 module.exports = { stats };
 
-export async function handler(event, context) {
+async function handler(event, context) {
   // Handle CORS preflight
   if (event.httpMethod === 'OPTIONS') {
     return {
@@ -102,4 +102,6 @@ export async function handler(event, context) {
     };
   }
 }
+
+module.exports.handler = handler;
 
