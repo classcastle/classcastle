@@ -37,6 +37,7 @@ nav{display:flex;align-items:center;justify-content:space-between;max-width:1080
 .nav-links{display:flex;gap:16px;align-items:center}
 .nav-link{font-weight:600;font-size:.92rem;text-decoration:none;padding:8px 2px;border-bottom:2px solid var(--ink);transition:border-color .15s}
 .nav-link:hover{border-color:var(--brand)}
+#logoutBtn:hover{border-color:var(--brand)}
 .btn-primary{background:var(--brand);color:var(--brand-ink);text-decoration:none;font-weight:600;padding:14px 24px;border-radius:6px;display:inline-block;box-shadow:3px 3px 0 var(--ink);transition:transform .12s,box-shadow .12s;border:none;cursor:pointer}
 .btn-primary:hover{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
 .btn-secondary{font-weight:600;text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:2px;background:none;border:none;cursor:pointer;color:inherit}
@@ -87,6 +88,7 @@ nav{display:flex;align-items:center;justify-content:space-between;max-width:1080
     <a class="nav-link" href="/">Home</a>
     <a class="nav-link" href="/login.html">Teacher App</a>
     <a class="nav-link" href="/devlabs/">Dev Labs</a>
+    <button id="logoutBtn" class="nav-link" style="display:none;background:none;border:none;cursor:pointer;font-weight:600;font-size:.92rem;padding:8px 2px;border-bottom:2px solid var(--ink);transition:border-color .15s;">Sign out</button>
   </div>
 </nav>
 
@@ -328,6 +330,7 @@ async function handleLogin() {
 
     document.getElementById('loginState').style.display = 'none';
     document.getElementById('contentState').style.display = 'block';
+    document.getElementById('logoutBtn').style.display = 'inline-block';
     loadApiKeys();
   } catch (error) {
     console.error('[Dev Labs] Login error:', error);
@@ -406,6 +409,20 @@ async function handleSignup() {
 function showLogin() {
   document.getElementById('signupState').style.display = 'none';
   document.getElementById('loginState').style.display = 'block';
+}
+
+async function handleLogout() {
+  try {
+    await SupabaseClient.auth.signOut();
+    console.log('[Dev Labs] User signed out');
+    document.getElementById('contentState').style.display = 'none';
+    document.getElementById('logoutBtn').style.display = 'none';
+    document.getElementById('loginState').style.display = 'block';
+    showNotification('Signed out successfully');
+  } catch (error) {
+    console.error('[Dev Labs] Logout error:', error);
+    showNotification('Error signing out', true);
+  }
 }
 
 function showSignup() {
@@ -556,6 +573,7 @@ function showNotification(message, isError = false) {
 document.getElementById('generateBtn').addEventListener('click', generateApiKey);
 document.getElementById('loginBtn').addEventListener('click', handleLogin);
 document.getElementById('signupBtn').addEventListener('click', handleSignup);
+document.getElementById('logoutBtn').addEventListener('click', handleLogout);
 
 init();
 </script>
