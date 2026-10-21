@@ -108,7 +108,7 @@ export async function handler(event, context) {
     const keyData = await keyCheckResponse.json();
 
     if (!keyData || keyData.length === 0) {
-      const stats = require('./stats.js').stats;
+      const { stats } = require('./stats.js');
       stats.totalRequests++;
       stats.failedRequests++;
       stats.endpoints.createroom.failures++;
@@ -128,7 +128,7 @@ export async function handler(event, context) {
 
     // Check rate limit
     if (!checkRateLimit(apiKey)) {
-      const stats = require('./stats.js').stats;
+      const { stats } = require('./stats.js');
       stats.totalRequests++;
       stats.failedRequests++;
       stats.endpoints.createroom.failures++;
@@ -164,7 +164,7 @@ export async function handler(event, context) {
     if (trycode) {
       // Validate that trycode is exactly 6 characters and only numbers
       if (trycode.length !== 6) {
-        const stats = require('./stats.js').stats;
+        const { stats } = require('./stats.js');
         stats.totalRequests++;
         stats.failedRequests++;
         stats.endpoints.createroom.failures++;
@@ -181,7 +181,7 @@ export async function handler(event, context) {
       }
 
       if (!/^\d{6}$/.test(trycode)) {
-        const stats = require('./stats.js').stats;
+        const { stats } = require('./stats.js');
         stats.totalRequests++;
         stats.failedRequests++;
         stats.endpoints.createroom.failures++;
@@ -208,7 +208,7 @@ export async function handler(event, context) {
       const codeData = await codeCheckResponse.json();
 
       if (codeData && codeData.length > 0) {
-        const stats = require('./stats.js').stats;
+        const { stats } = require('./stats.js');
         stats.totalRequests++;
         stats.failedRequests++;
         stats.endpoints.createroom.failures++;

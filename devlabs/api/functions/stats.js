@@ -23,7 +23,7 @@ const stats = {
 };
 
 // Export stats object for other functions to access
-module.exports.stats = stats;
+module.exports = { stats };
 
 export async function handler(event, context) {
   // Handle CORS preflight

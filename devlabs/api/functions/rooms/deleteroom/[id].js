@@ -109,7 +109,7 @@ export async function handler(event, context) {
     const keyData = await keyCheckResponse.json();
 
     if (!keyData || keyData.length === 0) {
-      const stats = require('./stats.js').stats;
+      const { stats } = require('./stats.js');
       stats.totalRequests++;
       stats.failedRequests++;
       stats.endpoints.deleteroom.failures++;
@@ -129,7 +129,7 @@ export async function handler(event, context) {
 
     // Check rate limit
     if (!checkRateLimit(apiKey)) {
-      const stats = require('./stats.js').stats;
+      const { stats } = require('./stats.js');
       stats.totalRequests++;
       stats.failedRequests++;
       stats.endpoints.deleteroom.failures++;
@@ -156,7 +156,7 @@ export async function handler(event, context) {
     const roomData = await roomCheckResponse.json();
 
     if (!roomData || roomData.length === 0) {
-      const stats = require('./stats.js').stats;
+      const { stats } = require('./stats.js');
       stats.totalRequests++;
       stats.failedRequests++;
       stats.endpoints.deleteroom.failures++;
