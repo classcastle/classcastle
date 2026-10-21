@@ -371,9 +371,16 @@ await fetch(`https://api.classcastle.org/.netlify/functions/rooms/deleteroom/${r
         </div>
         <div>
           <div class="endpoint-path">Too many requests</div>
-          <div class="endpoint-desc">You've exceeded the rate limit for API calls. Wait a moment before retrying, or contact us about increasing your limit.</div>
+          <div class="endpoint-desc">You've exceeded the rate limit for API calls (60 requests per minute). Wait a moment before retrying, or contact us about increasing your limit.</div>
         </div>
       </div>
+    </div>
+    <div style="margin-top: 32px; padding: 20px; background: var(--tint); border-radius: 6px;">
+      <h3 style="font-size: 1.1rem; margin: 0 0 12px 0;">Error response format</h3>
+      <p style="margin: 0 0 12px 0; color: var(--soft);">All errors are returned in the following JSON format:</p>
+      <div class="code-block"><code>{
+  "error": "Error message here"
+}</code></div>
     </div>
   </div>
 </section>

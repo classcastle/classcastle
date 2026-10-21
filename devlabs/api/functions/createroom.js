@@ -3,6 +3,36 @@
  * POST /createroom
  */
 
+// Simple in-memory rate limiter (per API key, per minute)
+const rateLimitMap = new Map();
+const RATE_LIMIT = 60; // requests per minute
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute in milliseconds
+
+function checkRateLimit(apiKey) {
+  const now = Date.now();
+  const windowStart = now - RATE_LIMIT_WINDOW;
+
+  // Get or create rate limit entry for this API key
+  let entry = rateLimitMap.get(apiKey);
+  if (!entry) {
+    entry = { requests: [], count: 0 };
+    rateLimitMap.set(apiKey, entry);
+  }
+
+  // Clean up old requests outside the window
+  entry.requests = entry.requests.filter(timestamp => timestamp > windowStart);
+  entry.count = entry.requests.length;
+
+  // Check if over limit
+  if (entry.count >= RATE_LIMIT) {
+    return false;
+  }
+
+  // Add current request
+  entry.requests.push(now);
+  return true;
+}
+
 export async function handler(event, context) {
   // Handle CORS preflight
   if (event.httpMethod === 'OPTIONS') {
@@ -89,6 +119,18 @@ export async function handler(event, context) {
     }
 
     const userId = keyData[0].user_id;
+
+    // Check rate limit
+    if (!checkRateLimit(apiKey)) {
+      return {
+        statusCode: 429,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({ error: 'Too many requests' })
+      };
+    }
 
     // Get request body
     const body = JSON.parse(event.body);

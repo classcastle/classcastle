@@ -3,6 +3,32 @@
  * GET /rooms
  */
 
+// Simple in-memory rate limiter (per API key, per minute)
+const rateLimitMap = new Map();
+const RATE_LIMIT = 60; // requests per minute
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute in milliseconds
+
+function checkRateLimit(apiKey) {
+  const now = Date.now();
+  const windowStart = now - RATE_LIMIT_WINDOW;
+
+  let entry = rateLimitMap.get(apiKey);
+  if (!entry) {
+    entry = { requests: [], count: 0 };
+    rateLimitMap.set(apiKey, entry);
+  }
+
+  entry.requests = entry.requests.filter(timestamp => timestamp > windowStart);
+  entry.count = entry.requests.length;
+
+  if (entry.count >= RATE_LIMIT) {
+    return false;
+  }
+
+  entry.requests.push(now);
+  return true;
+}
+
 export async function handler(event, context) {
   // Handle CORS preflight
   if (event.httpMethod === 'OPTIONS') {
@@ -88,6 +114,18 @@ export async function handler(event, context) {
     }
 
     const userId = keyData[0].user_id;
+
+    // Check rate limit
+    if (!checkRateLimit(apiKey)) {
+      return {
+        statusCode: 429,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({ error: 'Too many requests' })
+      };
+    }
 
     // Get all rooms for the user
     const roomsResponse = await fetch(`${supabaseUrl}/rest/v1/rooms?teacher_id=eq.${userId}&select=*`, {
