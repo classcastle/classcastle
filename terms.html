@@ -73,7 +73,7 @@ footer a{color:var(--soft)}
 <main class="wrap">
   <header class="page">
     <h1>Terms of Service</h1>
-    <p>Last updated: October 15, 2026</p>
+    <p>Last updated: October 21, 2026</p>
   </header>
 
   <div class="layout">
@@ -84,6 +84,7 @@ footer a{color:var(--soft)}
         <li><a href="#service">The service</a></li>
         <li><a href="#schools">Schools and students</a></li>
         <li><a href="#accounts">Teacher accounts</a></li>
+        <li><a href="#api">Developer API</a></li>
         <li><a href="#use">Acceptable use</a></li>
         <li><a href="#extension">Student extension</a></li>
         <li><a href="#desktop">Desktop app</a></li>
@@ -101,10 +102,10 @@ footer a{color:var(--soft)}
     </aside>
 
     <article>
-      <div class="summary"><p>In short: Classcastle is free for teachers. Use it to move your own class to web pages you choose, keep it lawful and classroom-appropriate, and don't try to break it. The service comes as is, and these terms explain the details.</p></div>
+      <div class="summary"><p>In short: Classcastle is free for teachers. Use it to move your own class to web pages you choose, keep it lawful and classroom-appropriate, and don't try to break it. The developer API is for building educational integrations. Treat your API key like a password. The service comes as is, and these terms explain the details.</p></div>
 
       <h2 id="acceptance">1. Acceptance of these terms</h2>
-      <p>These Terms of Service ("Terms") govern your use of Classcastle, including the teacher web app at classcastle.org, the student browser extension, the messaging feature, and the Classcastle desktop app for Windows once it is released (together, the "Service"). By creating an account, joining a room, installing the extension, or otherwise using the Service, you agree to these Terms and to our <a href="/privacy.html">Privacy Policy</a>.</p>
+      <p>These Terms of Service ("Terms") govern your use of Classcastle, including the teacher web app at classcastle.org, the student browser extension, the messaging feature, the Classcastle desktop app for Windows once it is released, and the developer API at devlabs.classcastle.org (together, the "Service"). By creating an account, joining a room, installing the extension, generating an API key, or otherwise using the Service, you agree to these Terms and to our <a href="/privacy.html">Privacy Policy</a>.</p>
       <p>The Service is provided by James Theakston, trading as JAMES THEAKSTON APPLICATION DEVELOPMENT ("we", "us", "our").</p>
       <p>If you are using the Service on behalf of a school or organization, you confirm that you have authority to accept these Terms for it. If you don't agree, please don't use the Service.</p>
 
@@ -124,7 +125,17 @@ footer a{color:var(--soft)}
       <p>To run a room you must create an account with accurate information. You are responsible for keeping your login details secure and for all activity under your account. Tell us promptly at <a href="mailto:support@classcastle.org">support@classcastle.org</a> if you think your account has been accessed without permission.</p>
       <p>One account is for one teacher. Please don't share your account with other people or let students run rooms under your login.</p>
 
-      <h2 id="use">5. Acceptable use</h2>
+      <h2 id="api">5. Developer API</h2>
+      <p>Classcastle provides a developer API (the "API") at <a href="https://devlabs.classcastle.org">devlabs.classcastle.org</a> that allows programmatic access to create and manage rooms. The API is governed by these Terms and by the documentation in Dev Labs.</p>
+      <ul>
+        <li><strong>API keys.</strong> To use the API you must generate an API key through Dev Labs. Your API key is tied to your teacher account. You are responsible for keeping your API key secure and for all API requests made with it. Treat your API key like a password.</li>
+        <li><strong>Rate limits.</strong> The API has rate limits to prevent abuse. Stay within the limits documented in Dev Labs. Don't use automated tools to bypass or overload the API.</li>
+        <li><strong>Acceptable use.</strong> Section 6 applies to all API use. In particular, don't use the API to create rooms in bulk for non-educational purposes, to probe or scan the Service, or to access data that isn't yours.</li>
+        <li><strong>Integrations.</strong> If you build an integration using the API, make it clear to users that the integration is not provided by Classcastle. Don't imply Classcastle endorses your integration.</li>
+        <li><strong>Availability.</strong> The API is provided as part of the Service. Section 12 applies to any changes or charges that may affect the API.</li>
+      </ul>
+
+      <h2 id="use">6. Acceptable use</h2>
       <p>You agree not to:</p>
       <ul>
         <li>send students to content that is illegal, harmful, harassing, sexually explicit, or otherwise unsuitable for the age of your students;</li>
@@ -138,11 +149,11 @@ footer a{color:var(--soft)}
       </ul>
       <p>We may remove rooms, content, or accounts that break these rules.</p>
 
-      <h2 id="extension">6. The student extension</h2>
+      <h2 id="extension">7. The student extension</h2>
       <p>The extension is installed on a student's browser, either by the student or by a school administrator through a managed policy. When joined to a room, it allows the teacher to open pages in that browser. The extension only requests the permissions it needs to do this (for example storage for the session and tabs for navigation).</p>
       <p>Students can leave a room at any time. Teachers can remove students from a room. Schools that deploy the extension or desktop app to managed devices are responsible for informing students and families as their policies and local law require.</p>
 
-      <h2 id="desktop">7. The desktop app</h2>
+      <h2 id="desktop">8. The desktop app</h2>
       <p>We are building a native Classcastle app for Windows 10 and 11 (64-bit and ARM64), which is announced at <a href="https://classcastle.org/desktopapp">classcastle.org/desktopapp</a> and is not yet released. Once available, it is part of the Service and these Terms apply to it in full.</p>
       <ul>
         <li><strong>Students only.</strong> The desktop app is for students to join rooms with a room code, and to take part in messaging threads they have been given a code for. Teachers continue to run and manage rooms and messaging from the web app.</li>
@@ -153,7 +164,7 @@ footer a{color:var(--soft)}
         <li><strong>Pre-release features.</strong> Descriptions of the app on our site are plans. Features, supported platforms, and release dates may change.</li>
       </ul>
 
-      <h2 id="messaging">8. Messaging</h2>
+      <h2 id="messaging">9. Messaging</h2>
       <p>Classcastle includes a messaging feature for classroom communication. Teachers use messaging in the web app, and students use it in the Classcastle desktop app once it is released.</p>
       <ul>
         <li><strong>How it works.</strong> A teacher creates a messaging thread in the web app and gets a shareable URL for it. People take part in the thread by joining it with a code in the app.</li>
@@ -165,42 +176,42 @@ footer a{color:var(--soft)}
         <li><strong>Moderation.</strong> We may remove messages, close a thread, or suspend an account that breaks these Terms.</li>
       </ul>
 
-      <h2 id="data">9. Data and privacy</h2>
+      <h2 id="data">10. Data and privacy</h2>
       <p>We collect only what is needed to run the Service. For students this is a name entered when joining, online status, and the current page address, shown to the teacher of the room. Messages sent through a room are processed so they can be delivered. For teachers this includes account details such as name and email address. We do not collect browsing history or use the Service to track students. Full details, including how long data is kept and your rights, are in our <a href="/privacy.html">Privacy Policy</a>.</p>
       <p>Data is encrypted in transit. We do not sell personal data.</p>
       <p><strong>International transfers.</strong> Our database is hosted in Ireland using Supabase. If you use the Service from outside Ireland, your data may be transferred to, stored, and processed in Ireland and other countries, which may have different data protection laws from your own. By using the Service you acknowledge this. For more information, including the safeguards we use, see our <a href="/privacy.html">Privacy Policy</a>.</p>
 
-      <h2 id="ip">10. Ownership and licence</h2>
+      <h2 id="ip">11. Ownership and licence</h2>
       <p>Classcastle, its software, design, logo, and documentation belong to us and our licensors. We give you a limited, non-exclusive, non-transferable, revocable licence to use the Service for its intended classroom purpose while these Terms are in effect.</p>
       <p>You keep ownership of anything you provide, such as your room names, saved templates, and shortcuts. You give us permission to store and process that content only to operate and improve the Service for you.</p>
       <p>If you send us feedback or suggestions, we may use them without obligation to you.</p>
 
-      <h2 id="third">11. Third-party content and services</h2>
+      <h2 id="third">12. Third-party content and services</h2>
       <p>Classcastle sends students to web pages chosen by teachers. We do not own, review, or control those pages and are not responsible for them. Third-party sites have their own terms and privacy practices. The Service also relies on providers such as hosting, authentication, and the Chrome Web Store, and your use of those is subject to their terms.</p>
 
-      <h2 id="availability">12. Availability and changes</h2>
+      <h2 id="availability">13. Availability and changes</h2>
       <p>We work to keep Classcastle reliable, but we don't promise it will always be available, error-free, or work on every network. School filters, firewalls, browser policies, or a browser pausing the extension can stop commands from arriving. Don't depend on Classcastle for anything where a failure could cause harm.</p>
       <p>The Service is free for teachers today. We may change, add, or remove features, and may introduce paid plans in the future. If we introduce charges for something that is currently free, we will give notice before it takes effect.</p>
       <p>We may update these Terms from time to time. If a change is material we will post a notice on the site or in the app. Continuing to use the Service after changes take effect means you accept them.</p>
 
-      <h2 id="termination">13. Ending your use</h2>
+      <h2 id="termination">14. Ending your use</h2>
       <p>You can stop using Classcastle at any time and may ask us to delete your account by emailing <a href="mailto:support@classcastle.org">support@classcastle.org</a>.</p>
       <p>We may suspend or end access if you break these Terms, if your use puts students or the Service at risk, or if we are required to by law. Sections that by their nature should continue (ownership, disclaimers, liability, governing law) survive termination.</p>
 
-      <h2 id="disclaimers">14. Disclaimers</h2>
+      <h2 id="disclaimers">15. Disclaimers</h2>
       <p class="caps">THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE", WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT, TO THE FULLEST EXTENT THE LAW ALLOWS.</p>
       <p>We don't guarantee that the Service will meet your needs, that students will always receive navigation commands, or that the Service will be secure or uninterrupted. Teachers remain responsible for supervising their students.</p>
 
-      <h2 id="liability">15. Limitation of liability</h2>
+      <h2 id="liability">16. Limitation of liability</h2>
       <p class="caps">TO THE FULLEST EXTENT THE LAW ALLOWS, WE ARE NOT LIABLE FOR INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR FOR LOST DATA, LOST PROFITS, OR LOST TEACHING TIME ARISING FROM YOUR USE OF THE SERVICE. BECAUSE THE SERVICE IS FREE FOR TEACHERS, OUR TOTAL LIABILITY FOR ANY CLAIM RELATING TO THE SERVICE IS LIMITED TO £50, OR THE AMOUNT YOU PAID US IN THE PRECEDING 12 MONTHS IF HIGHER.</p>
       <p>Nothing in these Terms limits liability that cannot be limited by law, including for fraud, or for death or personal injury caused by negligence. Some places don't allow certain limits, so parts of this section may not apply to you.</p>
       <p>You agree to be responsible for claims arising from your own breach of these Terms, including sending students to content that you were not permitted to share.</p>
 
-      <h2 id="law">16. Governing law and disputes</h2>
+      <h2 id="law">17. Governing law and disputes</h2>
       <p>These Terms are governed by the laws of England and Wales, without regard to conflict-of-law rules. The courts of England and Wales have exclusive jurisdiction over disputes, except where consumer or education law gives you the right to bring a claim where you live. Before starting a formal dispute, please contact us so we can try to resolve it informally.</p>
       <p>If any part of these Terms is found unenforceable, the rest stays in effect. If we don't enforce a term right away, that doesn't waive our right to do so later. You may not transfer your rights under these Terms without our consent; we may transfer ours as part of a merger, sale, or reorganization.</p>
 
-      <h2 id="contact">17. Contact</h2>
+      <h2 id="contact">18. Contact</h2>
       <p>Questions about these Terms? Email <a href="mailto:support@classcastle.org">support@classcastle.org</a>.</p>
       <p>Classcastle is operated by James Theakston, trading as JAMES THEAKSTON APPLICATION DEVELOPMENT.</p>
     </article>
