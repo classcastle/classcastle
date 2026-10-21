@@ -295,6 +295,22 @@ async function handleSignup() {
 
     if (error) throw error;
 
+    // Send welcome email via Netlify function
+    try {
+      await fetch('https://api.classcastle.org/.netlify/functions/send-welcome-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: email
+        })
+      });
+    } catch (emailError) {
+      console.error('Failed to send welcome email:', emailError);
+      // Don't block signup if email fails
+    }
+
     showNotification('Account created! You can now sign in.');
     showLogin();
   } catch (error) {
