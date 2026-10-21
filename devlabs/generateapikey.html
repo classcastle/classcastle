@@ -118,7 +118,10 @@ nav{display:flex;align-items:center;justify-content:space-between;max-width:1080
     
     <button id="loginBtn" class="btn-primary" style="width:100%;">Sign in</button>
     <p style="color:var(--soft);margin-top:16px;text-align:center;font-size:.9rem;">
-      Don't have an account? <button class="btn-secondary" onclick="showSignup()">Sign up</button>
+      Don't have an account? <button class="btn-secondary" onclick="window.location.href='https://classcastle.org/signup?redirect=classcastleapigenerate'">Sign up</button>
+    </p>
+    <p style="color:var(--soft);margin-top:8px;text-align:center;font-size:.85rem;">
+      Already have an account with Classcastle? You can use those credentials to login.
     </p>
   </div>
 
@@ -139,6 +142,9 @@ nav{display:flex;align-items:center;justify-content:space-between;max-width:1080
     <button id="signupBtn" class="btn-primary" style="width:100%;">Sign up</button>
     <p style="color:var(--soft);margin-top:16px;text-align:center;font-size:.9rem;">
       Already have an account? <button class="btn-secondary" onclick="showLogin()">Sign in</button>
+    </p>
+    <p style="color:var(--soft);margin-top:8px;text-align:center;font-size:.85rem;">
+      Already have an account with Classcastle? You can use those credentials to login.
     </p>
   </div>
 
@@ -188,6 +194,12 @@ async function init() {
   const { data: { session } } = await SupabaseClient.auth.getSession();
 
   document.getElementById('loadingState').style.display = 'none';
+
+  // Check if user just confirmed email
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('confirm') === 'true' && session) {
+    showNotification('Email confirmed! You are now signed in.');
+  }
 
   if (!session) {
     document.getElementById('loginState').style.display = 'block';

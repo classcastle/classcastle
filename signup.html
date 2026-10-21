@@ -1227,6 +1227,13 @@
     showAlert('Account Already Exists', 'This account already exists. Please log in instead.');
   }
 
+  // Check for redirect parameter
+  const redirectParam = urlParams.get('redirect');
+  const redirectMap = {
+    'classcastleapigenerate': 'https://api.classcastle.org/generateapikey'
+  };
+  const redirectUrl = redirectMap[redirectParam];
+
   // Onboarding elements
   const onboardingOverlay = document.getElementById('onboardingOverlay');
   const skipOnboarding = document.getElementById('skipOnboarding');
@@ -1417,12 +1424,12 @@
       if (data.session) {
         showNotification('Teacher account created successfully!');
         setTimeout(() => {
-          window.location.href = '/app.html';
+          window.location.href = redirectUrl || '/app.html';
         }, 1000);
       } else {
         showNotification('Account created! Please check your email to confirm.');
         setTimeout(() => {
-          window.location.href = '/login.html';
+          window.location.href = redirectUrl ? redirectUrl + '?confirm=true' : '/login.html';
         }, 2000);
       }
     } catch (error) {
@@ -1481,12 +1488,12 @@
       if (data.session) {
         showNotification('Teacher account created successfully!');
         setTimeout(() => {
-          window.location.href = '/app.html';
+          window.location.href = redirectUrl || '/app.html';
         }, 1000);
       } else {
         showNotification('Account created! Please check your email to confirm.');
         setTimeout(() => {
-          window.location.href = '/login.html';
+          window.location.href = redirectUrl ? redirectUrl + '?confirm=true' : '/login.html';
         }, 2000);
       }
     } catch (error) {
