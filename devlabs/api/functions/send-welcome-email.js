@@ -7,6 +7,18 @@
 export const onRequestPost = async (context) => {
   const { request, env } = context;
 
+  // Handle CORS preflight request
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type'
+      }
+    });
+  }
+
   try {
     const body = await request.json();
     const { email, name } = body;
@@ -14,7 +26,10 @@ export const onRequestPost = async (context) => {
     if (!email) {
       return new Response(JSON.stringify({ error: 'Email is required' }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' }
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
       });
     }
 
@@ -23,7 +38,10 @@ export const onRequestPost = async (context) => {
     if (!resendApiKey) {
       return new Response(JSON.stringify({ error: 'Resend API key not configured' }), {
         status: 500,
-        headers: { 'Content-Type': 'application/json' }
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
       });
     }
 
@@ -181,19 +199,28 @@ export const onRequestPost = async (context) => {
     if (!response.ok) {
       return new Response(JSON.stringify({ error: 'Failed to send email', details: result }), {
         status: 500,
-        headers: { 'Content-Type': 'application/json' }
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        }
       });
     }
 
     return new Response(JSON.stringify({ success: true, messageId: result.id }), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
     });
 
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
     });
   }
 };
