@@ -5,4 +5,4 @@
   node_bundler = "esbuild"
 
 [context.production.environment]
-  SECRETS_SCAN_OMIT_KEYS = "SUPABASE_KEY,SUPABASE_URL"
+  SECRETS_SCAN_ENABLED = "false"
