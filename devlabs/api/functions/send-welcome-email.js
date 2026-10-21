@@ -4,45 +4,58 @@
  * Sends a welcome email using Resend API
  */
 
-export const onRequestPost = async (context) => {
-  const { request, env } = context;
-
+const handler = async (event) => {
   // Handle CORS preflight request
-  if (request.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 204,
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 204,
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type'
-      }
-    });
+      },
+      body: ''
+    };
+  }
+
+  // Only allow POST
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ error: 'Method not allowed' })
+    };
   }
 
   try {
-    const body = await request.json();
+    const body = JSON.parse(event.body);
     const { email, name } = body;
 
     if (!email) {
-      return new Response(JSON.stringify({ error: 'Email is required' }), {
-        status: 400,
+      return {
+        statusCode: 400,
         headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
-      });
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ error: 'Email is required' })
+      };
     }
 
-    const resendApiKey = env.RESEND_API_KEY;
+    const resendApiKey = process.env.RESEND_API_KEY;
 
     if (!resendApiKey) {
-      return new Response(JSON.stringify({ error: 'Resend API key not configured' }), {
-        status: 500,
+      return {
+        statusCode: 500,
         headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
-      });
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ error: 'Resend API key not configured' })
+      };
     }
 
     const emailData = {
@@ -159,9 +172,9 @@ export const onRequestPost = async (context) => {
       </div>
 
       <h1>Welcome to the API</h1>
-      
+
       <p>Our developer API lets you integrate Classcastle into your own tools. Create custom dashboards, automate room management, and extend classroom management however you need.</p>
-      
+
       <p>To get started, make sure you have generated your API key and included it as a Bearer token in your request headers:</p>
 
       <div class="code-block">
@@ -197,30 +210,35 @@ export const onRequestPost = async (context) => {
     const result = await response.json();
 
     if (!response.ok) {
-      return new Response(JSON.stringify({ error: 'Failed to send email', details: result }), {
-        status: 500,
+      return {
+        statusCode: 500,
         headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
-      });
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ error: 'Failed to send email', details: result })
+      };
     }
 
-    return new Response(JSON.stringify({ success: true, messageId: result.id }), {
-      status: 200,
+    return {
+      statusCode: 200,
       headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    });
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ success: true, messageId: result.id })
+    };
 
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
+    return {
+      statusCode: 500,
       headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    });
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ error: error.message })
+    };
   }
 };
+
+module.exports = { handler };
