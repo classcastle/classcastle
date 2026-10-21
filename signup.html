@@ -1487,6 +1487,23 @@
 
       if (data.session) {
         showNotification('Teacher account created successfully!');
+        
+        // If this was a Dev Labs signup, mark as API user
+        if (redirectParam === 'classcastleapigenerate') {
+          try {
+            await SupabaseClient.auth.updateUser({
+              data: { 
+                api_used: true,
+                api_first_use: new Date().toISOString(),
+                welcome_email_sent: true
+              }
+            });
+            console.log('[Dev Labs] Marked user as API user and welcome email sent for:', email);
+          } catch (metadataError) {
+            console.error('[Dev Labs] Failed to set API user metadata:', metadataError);
+          }
+        }
+        
         setTimeout(() => {
           window.location.href = redirectUrl || '/app.html';
         }, 1000);

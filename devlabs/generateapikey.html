@@ -270,10 +270,67 @@ async function handleLogin() {
 
     if (error) throw error;
 
+    console.log('[Dev Labs] User signed in:', email);
+
+    // Get user metadata
+    const { data: { user } } = await SupabaseClient.auth.getUser();
+    const metadata = user.user_metadata || {};
+    const hasUsedApi = metadata.api_used || false;
+    const welcomeEmailSent = metadata.welcome_email_sent || false;
+
+    console.log('[Dev Labs] User metadata:', metadata);
+    console.log('[Dev Labs] Has used API before:', hasUsedApi);
+    console.log('[Dev Labs] Welcome email already sent:', welcomeEmailSent);
+
+    // If user hasn't used API before, mark as used and send welcome email
+    if (!hasUsedApi) {
+      console.log('[Dev Labs] First time API user - marking as used and sending welcome email');
+      
+      try {
+        // Mark as API user in metadata
+        await SupabaseClient.auth.updateUser({
+          data: { 
+            api_used: true,
+            api_first_use: new Date().toISOString()
+          }
+        });
+        console.log('[Dev Labs] Marked user as API user');
+      } catch (metadataError) {
+        console.error('[Dev Labs] Failed to update metadata:', metadataError);
+      }
+
+      // Send welcome email
+      if (!welcomeEmailSent) {
+        console.log('[Dev Labs] Sending welcome email...');
+        try {
+          await fetch('https://api.classcastle.org/.netlify/functions/send-welcome-email', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              email: email
+            })
+          });
+          console.log('[Dev Labs] Welcome email sent successfully');
+
+          // Mark as sent
+          await SupabaseClient.auth.updateUser({
+            data: { welcome_email_sent: true }
+          });
+        } catch (emailError) {
+          console.error('[Dev Labs] Failed to send welcome email:', emailError);
+        }
+      }
+    } else {
+      console.log('[Dev Labs] Returning API user - skipping welcome email');
+    }
+
     document.getElementById('loginState').style.display = 'none';
     document.getElementById('contentState').style.display = 'block';
     loadApiKeys();
   } catch (error) {
+    console.error('[Dev Labs] Login error:', error);
     showNotification('Error signing in: ' + error.message, true);
   } finally {
     btn.disabled = false;
@@ -302,13 +359,24 @@ async function handleSignup() {
   try {
     const { data, error } = await SupabaseClient.auth.signUp({
       email,
-      password
+      password,
+      options: {
+        data: {
+          api_used: true,
+          api_first_use: new Date().toISOString(),
+          welcome_email_sent: true
+        }
+      }
     });
 
     if (error) throw error;
 
+    console.log('[Dev Labs] User signed up:', email);
+    console.log('[Dev Labs] Set API user metadata on signup');
+
     // Send welcome email via Netlify function
     try {
+      console.log('[Dev Labs] Sending welcome email...');
       await fetch('https://api.classcastle.org/.netlify/functions/send-welcome-email', {
         method: 'POST',
         headers: {
@@ -318,14 +386,16 @@ async function handleSignup() {
           email: email
         })
       });
+      console.log('[Dev Labs] Welcome email sent successfully');
     } catch (emailError) {
-      console.error('Failed to send welcome email:', emailError);
+      console.error('[Dev Labs] Failed to send welcome email:', emailError);
       // Don't block signup if email fails
     }
 
     showNotification('Account created! You can now sign in.');
     showLogin();
   } catch (error) {
+    console.error('[Dev Labs] Signup error:', error);
     showNotification('Error signing up: ' + error.message, true);
   } finally {
     btn.disabled = false;
