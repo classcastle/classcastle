@@ -83,7 +83,7 @@ export async function handler(event, context) {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'
         },
-        body: JSON.stringify({ error: 'Invalid API key', code: 4002 })
+        body: JSON.stringify({ error: 'Invalid API key' })
       };
     }
 

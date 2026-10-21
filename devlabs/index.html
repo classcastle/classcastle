@@ -331,7 +331,7 @@ await fetch(`https://api.classcastle.org/.netlify/functions/rooms/deleteroom/${r
     <div class="endpoint-list">
       <div class="endpoint-item">
         <div>
-          <span class="endpoint-method endpoint-get">4001</span>
+          <span class="endpoint-method endpoint-get">409</span>
         </div>
         <div>
           <div class="endpoint-path">Room code already exists</div>
@@ -340,7 +340,7 @@ await fetch(`https://api.classcastle.org/.netlify/functions/rooms/deleteroom/${r
       </div>
       <div class="endpoint-item">
         <div>
-          <span class="endpoint-method endpoint-get">4002</span>
+          <span class="endpoint-method endpoint-get">401</span>
         </div>
         <div>
           <div class="endpoint-path">Invalid or missing API key</div>
@@ -349,7 +349,7 @@ await fetch(`https://api.classcastle.org/.netlify/functions/rooms/deleteroom/${r
       </div>
       <div class="endpoint-item">
         <div>
-          <span class="endpoint-method endpoint-get">4003</span>
+          <span class="endpoint-method endpoint-get">404</span>
         </div>
         <div>
           <div class="endpoint-path">Room does not exist</div>
@@ -358,20 +358,11 @@ await fetch(`https://api.classcastle.org/.netlify/functions/rooms/deleteroom/${r
       </div>
       <div class="endpoint-item">
         <div>
-          <span class="endpoint-method endpoint-get">4004</span>
+          <span class="endpoint-method endpoint-get">400</span>
         </div>
         <div>
-          <div class="endpoint-path">Invalid URL provided</div>
-          <div class="endpoint-desc">The URL you're trying to navigate to is malformed or not allowed. Ensure it starts with http:// or https://.</div>
-        </div>
-      </div>
-      <div class="endpoint-item">
-        <div>
-          <span class="endpoint-method endpoint-get">4005</span>
-        </div>
-        <div>
-          <div class="endpoint-path">Invalid room code length</div>
-          <div class="endpoint-desc">The <code>trycode</code> parameter must be exactly 6 characters long. Room codes are 6-character alphanumeric strings.</div>
+          <div class="endpoint-path">Invalid room code or URL</div>
+          <div class="endpoint-desc">The room code must be exactly 6 digits (numbers only). The URL must be valid and start with http:// or https://.</div>
         </div>
       </div>
       <div class="endpoint-item">

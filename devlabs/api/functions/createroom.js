@@ -84,7 +84,7 @@ export async function handler(event, context) {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'
         },
-        body: JSON.stringify({ error: 'Invalid API key', code: 4002 })
+        body: JSON.stringify({ error: 'Invalid API key' })
       };
     }
 
@@ -108,7 +108,7 @@ export async function handler(event, context) {
     // Generate room code
     let roomCode;
     if (trycode) {
-      // Validate that trycode is exactly 6 characters
+      // Validate that trycode is exactly 6 characters and only numbers
       if (trycode.length !== 6) {
         return {
           statusCode: 400,
@@ -116,7 +116,18 @@ export async function handler(event, context) {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*'
           },
-          body: JSON.stringify({ error: 'Room code must be exactly 6 characters', code: 4005 })
+          body: JSON.stringify({ error: 'Room code must be exactly 6 digits' })
+        };
+      }
+
+      if (!/^\d{6}$/.test(trycode)) {
+        return {
+          statusCode: 400,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
+          body: JSON.stringify({ error: 'Room code must contain only numbers' })
         };
       }
 
@@ -137,18 +148,17 @@ export async function handler(event, context) {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*'
           },
-          body: JSON.stringify({ error: 'Room code already exists', code: 4001 })
+          body: JSON.stringify({ error: 'Room code already exists' })
         };
       }
 
       roomCode = trycode;
     } else {
-      // Generate random 6-character code
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      // Generate random 6-digit code
       do {
         roomCode = '';
         for (let i = 0; i < 6; i++) {
-          roomCode += chars.charAt(Math.floor(Math.random() * chars.length));
+          roomCode += Math.floor(Math.random() * 10);
         }
       } while (await codeExists(supabaseUrl, supabaseKey, roomCode));
     }

@@ -3781,6 +3781,38 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         }
       });
     });
+
+    document.querySelectorAll('.room-card-btn-delete').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const roomId = btn.dataset.roomId;
+        deleteRoom(roomId);
+      });
+    });
+
+    document.querySelectorAll('.room-card-btn-archive').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const roomId = btn.dataset.roomId;
+        archiveRoom(roomId);
+      });
+    });
+
+    document.querySelectorAll('.room-card-btn-restore').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const roomId = btn.dataset.roomId;
+        restoreRoom(roomId);
+      });
+    });
+
+    document.querySelectorAll('.room-card-btn-export').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const roomId = btn.dataset.roomId;
+        exportRoomData(roomId);
+      });
+    });
   }
 
   function showLoadingState() {
