@@ -247,6 +247,10 @@ export async function handler(event, context) {
       body: JSON.stringify({ last_used_at: new Date().toISOString() })
     });
 
+    // Record stats
+    const { recordRequest } = require('./stats.js');
+    recordRequest('createroom', true);
+
     return {
       statusCode: 200,
       headers: {
@@ -257,6 +261,10 @@ export async function handler(event, context) {
     };
 
   } catch (error) {
+    // Record stats
+    const { recordRequest } = require('./stats.js');
+    recordRequest('createroom', false, error.message);
+
     return {
       statusCode: 500,
       headers: {
