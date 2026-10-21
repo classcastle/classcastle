@@ -209,6 +209,15 @@ await classcastle.sleep(2);</code><button class="copy-btn" onclick="copyCode(thi
     <div class="endpoint-list">
       <div class="endpoint-item">
         <div>
+          <span class="endpoint-method endpoint-get">GET</span>
+        </div>
+        <div>
+          <div class="endpoint-path">/.netlify/functions/stats</div>
+          <div class="endpoint-desc">Get API statistics (public endpoint, no authentication required). Returns uptime, total requests, success/failure counts, and per-endpoint breakdown.</div>
+        </div>
+      </div>
+      <div class="endpoint-item">
+        <div>
           <span class="endpoint-method endpoint-post">POST</span>
         </div>
         <div>
@@ -370,6 +379,7 @@ await fetch(`https://api.classcastle.org/.netlify/functions/rooms/deleteroom/${r
       <div style="margin-bottom: 20px;">
         <label style="display: block; font-weight: 600; margin-bottom: 8px;">Select endpoint</label>
         <select id="endpointSelect" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 6px; font-family: 'Instrument Sans', sans-serif; font-size: 0.95rem;">
+          <option value="stats">Get stats (public)</option>
           <option value="createroom">Create room</option>
           <option value="rooms">List rooms</option>
           <option value="roomdetails">Get room details</option>
@@ -702,6 +712,11 @@ function copyCode(button) {
   const codeOutput = document.getElementById('codeOutput');
 
   const endpointConfigs = {
+    stats: {
+      fields: [],
+      method: 'GET',
+      path: '/.netlify/functions/stats'
+    },
     createroom: {
       fields: [
         { name: 'name', label: 'Room name', required: true, placeholder: 'Period 3 - Science' },
@@ -821,38 +836,48 @@ function copyCode(button) {
     let code;
     
     if (format === 'curl') {
-      code = `curl -X ${config.method} 'https://api.classcastle.org${path}' \\
+      if (endpoint === 'stats') {
+        code = `curl 'https://api.classcastle.org${path}'`;
+      } else {
+        code = `curl -X ${config.method} 'https://api.classcastle.org${path}' \\
   -H 'Authorization: Bearer ${apiKey}' \\
-  -H 'Content-Type: application/json'`;
-      
-      if (body) {
-        const bodyStr = JSON.stringify(body);
-        code += ` \\
+  -H 'Content-Type: application/json`;
+        
+        if (body) {
+          const bodyStr = JSON.stringify(body);
+          code += ` \\
   -d '${bodyStr}'`;
+        }
       }
     } else {
-      code = `const response = await fetch('https://api.classcastle.org${path}', {
+      if (endpoint === 'stats') {
+        code = `const response = await fetch('https://api.classcastle.org${path}');
+const data = await response.json();
+console.log(data);`;
+      } else {
+        code = `const response = await fetch('https://api.classcastle.org${path}', {
   method: '${config.method}',
   headers: {
     'Authorization': 'Bearer ${apiKey}',
     'Content-Type': 'application/json'
   }`;
-      
-      if (body) {
-        const bodyStr = JSON.stringify(body, null, 2);
-        const indentedBody = bodyStr.split('\n').map(line => '    ' + line).join('\n');
-        code += `,
+        
+        if (body) {
+          const bodyStr = JSON.stringify(body, null, 2);
+          const indentedBody = bodyStr.split('\n').map(line => '    ' + line).join('\n');
+          code += `,
   body: ${indentedBody}
 `;
-      } else {
-        code += `
+        } else {
+          code += `
 `;
-      }
-      
-      code += `});
+        }
+        
+        code += `});
 
 const data = await response.json();
 console.log(data);`;
+      }
     }
     
     codeOutput.textContent = code;

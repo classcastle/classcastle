@@ -22,6 +22,9 @@ const stats = {
   }
 };
 
+// Export stats object for other functions to access
+module.exports.stats = stats;
+
 export async function handler(event, context) {
   // Handle CORS preflight
   if (event.httpMethod === 'OPTIONS') {
@@ -100,22 +103,3 @@ export async function handler(event, context) {
   }
 }
 
-// Export function to record stats (to be called by other endpoints)
-export function recordRequest(endpoint, success, reason = null) {
-  stats.totalRequests++;
-  
-  if (success) {
-    stats.successfulRequests++;
-    if (stats.endpoints[endpoint]) {
-      stats.endpoints[endpoint].hits++;
-    }
-  } else {
-    stats.failedRequests++;
-    if (stats.endpoints[endpoint]) {
-      stats.endpoints[endpoint].failures++;
-    }
-    if (reason) {
-      stats.failuresByReason[reason] = (stats.failuresByReason[reason] || 0) + 1;
-    }
-  }
-}

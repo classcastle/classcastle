@@ -108,6 +108,12 @@ export async function handler(event, context) {
     const keyData = await keyCheckResponse.json();
 
     if (!keyData || keyData.length === 0) {
+      const stats = require('./stats.js').stats;
+      stats.totalRequests++;
+      stats.failedRequests++;
+      stats.endpoints.createroom.failures++;
+      stats.failuresByReason['Invalid API key'] = (stats.failuresByReason['Invalid API key'] || 0) + 1;
+
       return {
         statusCode: 401,
         headers: {
@@ -122,6 +128,12 @@ export async function handler(event, context) {
 
     // Check rate limit
     if (!checkRateLimit(apiKey)) {
+      const stats = require('./stats.js').stats;
+      stats.totalRequests++;
+      stats.failedRequests++;
+      stats.endpoints.createroom.failures++;
+      stats.failuresByReason['Rate limit exceeded'] = (stats.failuresByReason['Rate limit exceeded'] || 0) + 1;
+
       return {
         statusCode: 429,
         headers: {
@@ -152,6 +164,12 @@ export async function handler(event, context) {
     if (trycode) {
       // Validate that trycode is exactly 6 characters and only numbers
       if (trycode.length !== 6) {
+        const stats = require('./stats.js').stats;
+        stats.totalRequests++;
+        stats.failedRequests++;
+        stats.endpoints.createroom.failures++;
+        stats.failuresByReason['Invalid room code length'] = (stats.failuresByReason['Invalid room code length'] || 0) + 1;
+
         return {
           statusCode: 400,
           headers: {
@@ -163,6 +181,12 @@ export async function handler(event, context) {
       }
 
       if (!/^\d{6}$/.test(trycode)) {
+        const stats = require('./stats.js').stats;
+        stats.totalRequests++;
+        stats.failedRequests++;
+        stats.endpoints.createroom.failures++;
+        stats.failuresByReason['Room code must contain only numbers'] = (stats.failuresByReason['Room code must contain only numbers'] || 0) + 1;
+
         return {
           statusCode: 400,
           headers: {
@@ -184,6 +208,12 @@ export async function handler(event, context) {
       const codeData = await codeCheckResponse.json();
 
       if (codeData && codeData.length > 0) {
+        const stats = require('./stats.js').stats;
+        stats.totalRequests++;
+        stats.failedRequests++;
+        stats.endpoints.createroom.failures++;
+        stats.failuresByReason['Room code already exists'] = (stats.failuresByReason['Room code already exists'] || 0) + 1;
+
         return {
           statusCode: 409,
           headers: {
@@ -248,8 +278,10 @@ export async function handler(event, context) {
     });
 
     // Record stats
-    const { recordRequest } = require('./stats.js');
-    recordRequest('createroom', true);
+    const stats = require('./stats.js').stats;
+    stats.totalRequests++;
+    stats.successfulRequests++;
+    stats.endpoints.createroom.hits++;
 
     return {
       statusCode: 200,
@@ -262,8 +294,11 @@ export async function handler(event, context) {
 
   } catch (error) {
     // Record stats
-    const { recordRequest } = require('./stats.js');
-    recordRequest('createroom', false, error.message);
+    const stats = require('./stats.js').stats;
+    stats.totalRequests++;
+    stats.failedRequests++;
+    stats.endpoints.createroom.failures++;
+    stats.failuresByReason[error.message] = (stats.failuresByReason[error.message] || 0) + 1;
 
     return {
       statusCode: 500,
