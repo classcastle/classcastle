@@ -1234,6 +1234,29 @@
   };
   const redirectUrl = redirectMap[redirectParam];
 
+  // If Dev Labs redirect, update page header
+  if (redirectParam === 'classcastleapigenerate') {
+    const pageTitle = document.querySelector('.page-title');
+    const pageSubtitle = document.querySelector('.page-subtitle');
+    if (pageTitle) {
+      pageTitle.textContent = 'Create teacher account';
+    }
+    if (pageSubtitle) {
+      pageSubtitle.textContent = 'To continue to Dev Labs';
+      
+      // Add verified badge
+      const badge = document.createElement('span');
+      badge.style.cssText = 'display: inline-flex; align-items: center; gap: 4px; margin-left: 8px; background: var(--tint); color: var(--brand); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 500;';
+      badge.innerHTML = `
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        Verified
+      `;
+      pageSubtitle.appendChild(badge);
+    }
+  }
+
   // Onboarding elements
   const onboardingOverlay = document.getElementById('onboardingOverlay');
   const skipOnboarding = document.getElementById('skipOnboarding');
