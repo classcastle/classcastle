@@ -284,48 +284,60 @@ async function handleLogin() {
     console.log('[Dev Labs] Has used API before:', hasUsedApi);
     console.log('[Dev Labs] Welcome email already sent:', welcomeEmailSent);
 
-    // If user hasn't used API before, mark as used and send welcome email
-    if (!hasUsedApi) {
-      console.log('[Dev Labs] First time API user - marking as used and sending welcome email');
-      
+    // Only send welcome email if not already sent
+    if (!welcomeEmailSent) {
+      console.log('[Dev Labs] Sending welcome email...');
       try {
-        // Mark as API user in metadata
+        await fetch('https://api.classcastle.org/.netlify/functions/send-welcome-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: email
+          })
+        });
+        console.log('[Dev Labs] Welcome email sent successfully');
+
+        // Mark as sent and as API user
         await SupabaseClient.auth.updateUser({
           data: { 
             api_used: true,
-            api_first_use: new Date().toISOString()
+            api_first_use: new Date().toISOString(),
+            welcome_email_sent: true
           }
         });
-        console.log('[Dev Labs] Marked user as API user');
-      } catch (metadataError) {
-        console.error('[Dev Labs] Failed to update metadata:', metadataError);
-      }
-
-      // Send welcome email
-      if (!welcomeEmailSent) {
-        console.log('[Dev Labs] Sending welcome email...');
+        console.log('[Dev Labs] Marked user as API user and welcome email sent');
+      } catch (emailError) {
+        console.error('[Dev Labs] Failed to send welcome email:', emailError);
+        // Still mark as API user even if email fails
         try {
-          await fetch('https://api.classcastle.org/.netlify/functions/send-welcome-email', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              email: email
-            })
-          });
-          console.log('[Dev Labs] Welcome email sent successfully');
-
-          // Mark as sent
           await SupabaseClient.auth.updateUser({
-            data: { welcome_email_sent: true }
+            data: { 
+              api_used: true,
+              api_first_use: new Date().toISOString()
+            }
           });
-        } catch (emailError) {
-          console.error('[Dev Labs] Failed to send welcome email:', emailError);
+        } catch (metadataError) {
+          console.error('[Dev Labs] Failed to update metadata:', metadataError);
         }
       }
     } else {
-      console.log('[Dev Labs] Returning API user - skipping welcome email');
+      console.log('[Dev Labs] Welcome email already sent, skipping');
+      // Ensure api_used is set
+      if (!hasUsedApi) {
+        try {
+          await SupabaseClient.auth.updateUser({
+            data: { 
+              api_used: true,
+              api_first_use: new Date().toISOString()
+            }
+          });
+          console.log('[Dev Labs] Set api_used metadata');
+        } catch (metadataError) {
+          console.error('[Dev Labs] Failed to set api_used metadata:', metadataError);
+        }
+      }
     }
 
     document.getElementById('loginState').style.display = 'none';
