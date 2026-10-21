@@ -84,7 +84,7 @@ export async function handler(event, context) {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'
         },
-        body: JSON.stringify({ error: 'Invalid API key' })
+        body: JSON.stringify({ error: 'Invalid API key', code: 4002 })
       };
     }
 
@@ -115,7 +115,7 @@ export async function handler(event, context) {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'
         },
-        body: JSON.stringify({ error: 'Invalid URL' })
+        body: JSON.stringify({ error: 'Invalid URL', code: 4004 })
       };
     }
 
@@ -136,7 +136,7 @@ export async function handler(event, context) {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'
         },
-        body: JSON.stringify({ error: 'Room not found' })
+        body: JSON.stringify({ error: 'Room not found', code: 4003 })
       };
     }
 

@@ -84,7 +84,7 @@ export async function handler(event, context) {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'
         },
-        body: JSON.stringify({ error: 'Invalid API key' })
+        body: JSON.stringify({ error: 'Invalid API key', code: 4002 })
       };
     }
 
@@ -108,6 +108,18 @@ export async function handler(event, context) {
     // Generate room code
     let roomCode;
     if (trycode) {
+      // Validate that trycode is exactly 6 characters
+      if (trycode.length !== 6) {
+        return {
+          statusCode: 400,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
+          body: JSON.stringify({ error: 'Room code must be exactly 6 characters', code: 4005 })
+        };
+      }
+
       // Check if code already exists
       const codeCheckResponse = await fetch(`${supabaseUrl}/rest/v1/rooms?code=eq.${trycode}&select=code`, {
         headers: {
@@ -125,7 +137,7 @@ export async function handler(event, context) {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*'
           },
-          body: JSON.stringify({ error: 'Room code already exists' })
+          body: JSON.stringify({ error: 'Room code already exists', code: 4001 })
         };
       }
 
