@@ -337,6 +337,13 @@ await fetch(`https://api.classcastle.org/.netlify/functions/rooms/deleteroom/${r
 <section id="stats">
   <div class="wrap">
     <div class="section-head"><h2>API Statistics</h2><p>Real-time API performance metrics and usage statistics.</p></div>
+    <div style="background: #FFF8E1; border: 1px solid #FFC107; border-radius: 6px; padding: 16px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px;">
+      <span style="font-size: 1.2rem;">⚠️</span>
+      <div>
+        <div style="font-weight: 600; color: #B00020; margin-bottom: 4px;">Stats Currently Unavailable</div>
+        <div style="font-size: 0.9rem; color: var(--soft);">We're experiencing issues with the statistics endpoint. This is a known issue and we're working on a fix. The API itself is functioning normally.</div>
+      </div>
+    </div>
     <div class="feature-card">
       <div id="statsLoading" style="text-align: center; padding: 40px;">
         <div class="loading-spinner" style="margin: 0 auto 16px;"></div>
