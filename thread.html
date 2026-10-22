@@ -107,6 +107,17 @@
     font-size: 0.9rem;
   }
 
+  .continue-btn {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 12px 24px;
+    background: var(--brand);
+    color: var(--brand-ink);
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+
   .messages-container {
     display: flex;
     flex-direction: column;
@@ -141,6 +152,8 @@
     border-radius: 8px;
     font-size: 0.95rem;
     line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
   }
 
   .message.teacher .message-bubble {
@@ -162,6 +175,24 @@
   .reply-section {
     padding-top: 24px;
     border-top: 1px solid var(--line);
+  }
+
+  .name-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 1rem;
+    background: var(--bg);
+    color: var(--ink);
+    outline: none;
+    margin-bottom: 12px;
+  }
+
+  .name-input:focus {
+    border-color: var(--brand);
+    background: var(--surface);
   }
 
   .reply-input {
@@ -240,11 +271,13 @@
       <div class="thread-header">
         <h2 id="threadTitle" class="thread-title">Thread Title</h2>
         <p id="threadDate" class="thread-date"></p>
+        <a id="continueBtn" class="continue-btn" style="display: none;" target="_blank">Continue to URL</a>
       </div>
 
       <div id="messagesContainer" class="messages-container"></div>
 
       <div class="reply-section">
+        <input type="text" id="nameInput" class="name-input" placeholder="Your name (for replies)">
         <input type="text" id="replyInput" class="reply-input" placeholder="Type your reply...">
         <button id="sendReplyBtn" class="btn">Send Reply</button>
       </div>
@@ -255,11 +288,17 @@
 
   <script>
     const SUPABASE_URL = 'https://hduyofdbpspjcuwvackd.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhkdXlvZmRicHNwanNjdXZhY2tkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjM5NzQxNTcsImV4cCI6MjAzOTUzMDE1N30.T6BbKp3qj3qj3qj3qj3qj3qj3qj3qj3qj3qj3qj3q';
-    const SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhkdXlvZmRicHNwanNjdXZhY2tkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjM5NzQxNTcsImV4cCI6MjAzOTUzMDE1N30.T6BbKp3qj3qj3qj3qj3qj3qj3qj3qj3qj3qj3qj3q';
+    const SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentThreadId = null;
-    let currentRoomCode = null;
+    let currentThread = null;
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
 
     function showNotification(message, duration = 3000) {
       const notification = document.getElementById('notification');
@@ -268,11 +307,16 @@
       setTimeout(() => notification.classList.remove('show'), duration);
     }
 
+    function isValidUUID(str) {
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      return uuidRegex.test(str);
+    }
+
     async function loadThread() {
       const urlParams = new URLSearchParams(window.location.search);
       const threadId = urlParams.get('thread');
 
-      if (!threadId) {
+      if (!threadId || !isValidUUID(threadId)) {
         document.getElementById('loadingState').style.display = 'none';
         document.getElementById('errorState').style.display = 'block';
         return;
@@ -281,47 +325,40 @@
       currentThreadId = threadId;
 
       try {
-        // Get thread details
-        const { data: thread, error: threadError } = await SupabaseClient
-          .from('message_threads')
-          .select('*')
-          .eq('id', threadId)
-          .single();
+        const { data, error } = await SupabaseClient.rpc('get_shared_thread', { p_thread_id: threadId });
 
-        if (threadError || !thread) {
-          throw threadError || new Error('Thread not found');
+        if (error) throw error;
+
+        if (!data || !data.thread) {
+          throw new Error('Thread not found');
         }
 
-        document.getElementById('threadTitle').textContent = thread.title;
-        document.getElementById('threadDate').textContent = new Date(thread.created_at).toLocaleDateString();
+        currentThread = data.thread;
+        const messages = data.messages || [];
 
-        // Get messages
-        const { data: messages, error: messagesError } = await SupabaseClient
-          .from('thread_messages')
-          .select('*')
-          .eq('thread_id', threadId)
-          .order('created_at', { ascending: true });
+        document.getElementById('threadTitle').textContent = escapeHtml(currentThread.title);
+        document.getElementById('threadDate').textContent = new Date(currentThread.created_at).toLocaleDateString();
 
-        if (messagesError) throw messagesError;
+        // Show continue button if target_url is set
+        if (currentThread.target_url) {
+          const continueBtn = document.getElementById('continueBtn');
+          continueBtn.href = currentThread.target_url;
+          continueBtn.style.display = 'inline-block';
+        }
 
         renderMessages(messages);
 
         document.getElementById('loadingState').style.display = 'none';
         document.getElementById('threadContent').style.display = 'block';
 
-        // Subscribe to new messages
-        const channel = SupabaseClient
-          .channel(`thread-${threadId}`)
-          .on('postgres_changes', {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'thread_messages',
-            filter: `thread_id=eq.${threadId}`
-          }, (payload) => {
-            addMessage(payload.new);
-          })
-          .subscribe();
+        // Restore name from sessionStorage
+        const savedName = sessionStorage.getItem('classcastle_student_name');
+        if (savedName) {
+          document.getElementById('nameInput').value = savedName;
+        }
 
+        // Poll for new messages every 5 seconds
+        setInterval(loadThread, 5000);
       } catch (error) {
         console.error('Error loading thread:', error);
         document.getElementById('loadingState').style.display = 'none';
@@ -348,8 +385,8 @@
 
       messageDiv.className = `message ${isTeacher ? 'teacher' : 'student'}`;
       messageDiv.innerHTML = `
-        <div class="message-sender">${msg.sender_name}</div>
-        <div class="message-bubble">${msg.message}</div>
+        <div class="message-sender">${escapeHtml(msg.sender_name)}</div>
+        <div class="message-bubble">${escapeHtml(msg.message)}</div>
         <div class="message-time">${new Date(msg.created_at).toLocaleTimeString()}</div>
       `;
 
@@ -358,43 +395,39 @@
     }
 
     async function sendReply() {
+      const nameInput = document.getElementById('nameInput');
       const replyInput = document.getElementById('replyInput');
+      const name = nameInput.value.trim();
       const reply = replyInput.value.trim();
 
-      if (!reply) return;
+      if (!name) {
+        showNotification('Please enter your name');
+        return;
+      }
+
+      if (!reply) {
+        showNotification('Please enter a message');
+        return;
+      }
 
       const sendBtn = document.getElementById('sendReplyBtn');
       sendBtn.disabled = true;
 
       try {
-        // For students, we need to identify them somehow.
-        // For now, we'll use a simple prompt to get their name
-        const studentName = localStorage.getItem('classcastle_student_name') || 
-          prompt('Please enter your name:', 'Student');
-
-        if (!studentName) {
-          showNotification('Name is required to send a message');
-          sendBtn.disabled = false;
-          return;
-        }
-
-        localStorage.setItem('classcastle_student_name', studentName);
-
-        const { error } = await SupabaseClient
-          .from('thread_messages')
-          .insert({
-            thread_id: currentThreadId,
-            sender_id: crypto.randomUUID(),
-            sender_name: studentName,
-            sender_type: 'student',
-            message: reply,
-            created_at: new Date().toISOString()
-          });
+        const { error } = await SupabaseClient.rpc('post_student_reply', {
+          p_thread_id: currentThreadId,
+          p_name: name,
+          p_message: reply
+        });
 
         if (error) throw error;
 
+        sessionStorage.setItem('classcastle_student_name', name);
         replyInput.value = '';
         showNotification('Reply sent!');
+
+        // Reload to show new message
+        await loadThread();
       } catch (error) {
         console.error('Error sending reply:', error);
         showNotification('Error sending reply. Please try again.');

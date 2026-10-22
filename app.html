@@ -2990,7 +2990,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       <div class="modal-overlay" id="promptModal" style="display: none;">
         <div class="modal" style="max-width: 500px;">
           <h2 id="promptModalTitle" style="font-size: 1.4rem; margin-bottom: 16px;">Input</h2>
-          <p id="promptModalMessage" style="margin-bottom: 16px; line-height: 1.6;"></p>
+          <p id="promptModalMessage" style="margin-bottom: 16px; line-height: 1.6; white-space: pre-wrap;"></p>
           <input type="text" class="form-input" id="promptModalInput" style="margin-bottom: 24px;">
           <div class="modal-actions">
             <button class="modal-btn modal-btn-cancel" id="promptModalCancelBtn">Cancel</button>
@@ -3725,7 +3725,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       <div class="room-card" data-room-id="${room.id}">
         <div class="room-card-header">
           <input type="checkbox" class="room-checkbox" data-room-id="${room.id}" ${selectedRooms.has(room.id) ? 'checked' : ''}>
-          <span class="room-card-code">${room.code}</span>
+          <span class="room-card-code">${escapeHtml(room.code)}</span>
           <span class="room-card-status">${room.archived ? 'Archived' : (room.active ? 'Active' : 'Closed')}</span>
         </div>
         <div class="room-card-info">
@@ -4198,7 +4198,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   async function changeEmail() {
     if (!currentUser) return;
 
-    showPrompt(
+    promptCb(
       'Enter your new email address:',
       'Change Email',
       '',
@@ -5355,7 +5355,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   }
 
   async function deletePoll(pollId) {
-    showConfirm(
+    confirmCb(
       'Are you sure you want to delete this poll?',
       'Delete Poll',
       async (confirmed) => {
@@ -6454,6 +6454,8 @@ usage/fair dealing.`,
 
   let currentThreadId = null;
   let isPersonalThread = false;
+  let currentThread = null;
+  let messagesChannel = null;
 
   // Custom alert function
   function showAlert(message, title = 'Notice') {
@@ -6466,9 +6468,9 @@ usage/fair dealing.`,
     alertModal.style.display = 'none';
   }
 
-  // Custom confirm function
+  // Custom confirm function (callback style for Messages section)
   let confirmCallback = null;
-  function showConfirm(message, title = 'Confirm', callback) {
+  function confirmCb(message, title = 'Confirm', callback) {
     confirmModalTitle.textContent = title;
     confirmModalMessage.textContent = message;
     confirmCallback = callback;
@@ -6483,9 +6485,9 @@ usage/fair dealing.`,
     }
   }
 
-  // Custom prompt function
+  // Custom prompt function (callback style for Messages section)
   let promptCallback = null;
-  function showPrompt(message, title = 'Input', defaultValue = '', callback) {
+  function promptCb(message, title = 'Input', defaultValue = '', callback) {
     promptModalTitle.textContent = title;
     promptModalMessage.textContent = message;
     promptModalInput.value = defaultValue;
@@ -6611,9 +6613,9 @@ usage/fair dealing.`,
       usage: '/delete',
       handler: async () => {
         if (isPersonalThread) return 'Cannot delete personal threads';
-        
+
         return new Promise((resolve) => {
-          showConfirm(
+          confirmCb(
             'Are you sure you want to delete this thread? This action cannot be undone.',
             'Delete Thread',
             async (confirmed) => {
@@ -6689,7 +6691,7 @@ usage/fair dealing.`,
   }
 
   async function optOutOfMessages() {
-    showConfirm(
+    confirmCb(
       'Are you sure you want to opt out of Messages? This will permanently delete all your message threads and messages. This action cannot be undone.',
       'Opt out of Messages',
       async (confirmed) => {
@@ -6844,20 +6846,20 @@ usage/fair dealing.`,
         threadCard.innerHTML = `
           <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 4px;">
             <h4 style="font-size: 0.95rem; margin: 0; font-weight: 600; flex: 1; padding-right: 8px;">
-              ${thread.title}
+              ${escapeHtml(thread.title)}
               ${isPersonal ? '<span style="font-size: 0.7rem; background: var(--tint); color: var(--brand); padding: 2px 6px; border-radius: 4px; margin-left: 8px;">Personal</span>' : ''}
             </h4>
             <span style="font-size: 0.7rem; color: var(--soft); flex-shrink: 0;">${new Date(thread.created_at).toLocaleDateString()}</span>
           </div>
           ${!isPersonal ? `<p style="color: var(--soft); font-size: 0.85rem; margin: 0; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-            ${thread.message}
+            ${escapeHtml(thread.message)}
           </p>` : ''}
           ${thread.target_url && !isPersonal ? `<div style="margin-top: 6px; font-size: 0.75rem; color: var(--brand);"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; vertical-align: middle;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> URL attached</div>` : ''}
         `;
         threadCard.addEventListener('click', () => selectThread(thread));
         threadCard.addEventListener('contextmenu', (e) => {
           e.preventDefault();
-          showPrompt(
+          promptCb(
             'Enter new thread name:',
             'Rename Thread',
             thread.title,
@@ -6937,17 +6939,6 @@ usage/fair dealing.`,
       showAlert('Thread created!');
       closeNewThreadModal();
 
-      // If thread has a URL, update the room's target_url
-      if (url) {
-        const { error: roomError } = await SupabaseClient
-          .from('rooms')
-          .update({ target_url: url })
-          .eq('teacher_id', user.id)
-          .eq('active', true);
-
-        if (roomError) console.error('Error updating room URL:', roomError);
-      }
-
       loadThreads();
       // Select the newly created thread
       selectThread(thread);
@@ -6959,7 +6950,8 @@ usage/fair dealing.`,
 
   async function selectThread(thread) {
     currentThreadId = thread.id;
-    currentThreadTitle.textContent = thread.title;
+    currentThread = thread;
+    currentThreadTitle.textContent = escapeHtml(thread.title);
     currentThreadDate.textContent = new Date(thread.created_at).toLocaleDateString();
     isPersonalThread = thread.is_personal;
 
@@ -7021,18 +7013,20 @@ usage/fair dealing.`,
             margin-bottom: 12px;
           `;
           msgDiv.innerHTML = `
-            <div style="font-size: 0.75rem; color: var(--soft); margin-bottom: 4px;">${msg.sender_name}</div>
+            <div style="font-size: 0.75rem; color: var(--soft); margin-bottom: 4px;">${escapeHtml(msg.sender_name)}</div>
             <div style="
               padding: 10px 14px;
               border-radius: 6px;
               font-size: 0.95rem;
               line-height: 1.4;
               max-width: 70%;
+              white-space: pre-wrap;
+              word-break: break-word;
               ${isTeacher
                 ? 'background: var(--brand); color: var(--brand-ink);'
                 : 'background: var(--tint); border: 1px solid var(--line);'}
             ">
-              ${msg.message}
+              ${escapeHtml(msg.message)}
             </div>
             <div style="font-size: 0.7rem; color: var(--soft); margin-top: 4px;">${new Date(msg.created_at).toLocaleTimeString()}</div>
           `;
@@ -7041,6 +7035,27 @@ usage/fair dealing.`,
 
         // Scroll to bottom
         threadMessages.scrollTop = threadMessages.scrollHeight;
+      }
+
+      // Subscribe to new messages for non-personal threads
+      if (!isPersonalThread) {
+        // Unsubscribe from previous channel if exists
+        if (messagesChannel) {
+          messagesChannel.unsubscribe();
+        }
+
+        messagesChannel = SupabaseClient
+          .channel(`thread-messages-${thread.id}`)
+          .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'thread_messages',
+            filter: `thread_id=eq.${thread.id}`
+          }, (payload) => {
+            // Reload messages to show new student replies
+            selectThread(currentThread);
+          })
+          .subscribe();
       }
     } catch (error) {
       console.error('Error loading thread messages:', error);
@@ -7060,7 +7075,7 @@ usage/fair dealing.`,
         .from('rooms')
         .select('id, code, name')
         .eq('teacher_id', user.id)
-        .eq('archived', false)
+        .or('archived.is.null,archived.eq.false')
         .order('created_at', { ascending: false });
 
       if (roomsError) {
@@ -7074,41 +7089,29 @@ usage/fair dealing.`,
         return;
       }
 
-      // If only one room, use it automatically. Otherwise, show a prompt to select.
-      let selectedRoom;
-      if (rooms.length === 1) {
-        selectedRoom = rooms[0];
-      } else {
-        // Build room selection prompt
-        const roomOptions = rooms.map((r, i) => `${i + 1}. ${r.name || r.code} (${r.code})`).join('\n');
-        const selection = await new Promise((resolve) => {
-          showPrompt(
-            `Select a room to share to:\n\n${roomOptions}\n\nEnter the number (1-${rooms.length}):`,
-            'Share to Room',
-            '1',
-            (value) => resolve(value)
-          );
-        });
-
-        const selectedIndex = parseInt(selection) - 1;
-        if (isNaN(selectedIndex) || selectedIndex < 0 || selectedIndex >= rooms.length) {
-          showAlert('Invalid selection. Please try again.');
-          return;
-        }
-        selectedRoom = rooms[selectedIndex];
+      // Select room: auto-select if only one, otherwise show picker
+      let selectedRoom = rooms.length === 1 ? rooms[0] : null;
+      if (!selectedRoom) {
+        const id = await pickRoom(rooms);
+        if (!id) return;
+        selectedRoom = rooms.find(r => r.id === id);
       }
 
-      // Update the room's target_url to point to the thread
-      const { error: updateError } = await SupabaseClient
+      // Update the room's target_url to point to the thread with RLS detection
+      const { data: updated, error: updateError } = await SupabaseClient
         .from('rooms')
-        .update({
-          target_url: `${window.location.origin}/thread.html?thread=${currentThreadId}`
-        })
-        .eq('id', selectedRoom.id);
+        .update({ target_url: `${window.location.origin}/thread.html?thread=${currentThreadId}` })
+        .eq('id', selectedRoom.id)
+        .eq('teacher_id', user.id)
+        .select('id');
 
       if (updateError) {
-        console.error('Error updating room:', updateError);
+        console.error(updateError);
         showAlert(`Error sharing thread: ${updateError.message}`);
+        return;
+      }
+      if (!updated || updated.length === 0) {
+        showAlert('Could not update the room (permission denied or room not found).');
         return;
       }
 
@@ -7117,6 +7120,26 @@ usage/fair dealing.`,
       console.error('Error sharing thread:', error);
       showAlert(`Error sharing thread: ${error.message}`);
     }
+  }
+
+  function pickRoom(roomList) {
+    return new Promise(resolve => {
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay show';
+      overlay.innerHTML = `<div class="modal"><h2>Share to which room?</h2>
+        <select class="form-input" id="pickRoomSelect" style="margin-bottom:20px">
+          ${roomList.map(r => `<option value="${r.id}">${escapeHtml(r.name || 'Room')} (${escapeHtml(r.code)})</option>`).join('')}
+        </select>
+        <div class="modal-actions">
+          <button class="modal-btn modal-btn-cancel" id="pickCancel">Cancel</button>
+          <button class="modal-btn modal-btn-confirm" id="pickOk">Share</button>
+        </div></div>`;
+      document.body.appendChild(overlay);
+      const done = v => { overlay.remove(); resolve(v); };
+      overlay.querySelector('#pickCancel').onclick = () => done(null);
+      overlay.querySelector('#pickOk').onclick = () => done(overlay.querySelector('#pickRoomSelect').value);
+      overlay.addEventListener('click', e => { if (e.target === overlay) done(null); });
+    });
   }
 
   async function sendThreadReply() {
@@ -7170,8 +7193,7 @@ usage/fair dealing.`,
 
       threadReplyInput.value = '';
       // Reload messages to show the new reply
-      const thread = { id: currentThreadId, title: currentThreadTitle.textContent, is_personal: isPersonalThread };
-      await selectThread(thread);
+      await selectThread(currentThread);
     } catch (error) {
       console.error('Error sending reply:', error);
       showAlert('Error sending reply. Please try again.');
