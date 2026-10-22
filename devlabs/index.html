@@ -184,7 +184,10 @@ footer a{color:var(--soft)}
 
       <div class="code-block"><code>Authorization: Bearer your_api_key_here</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
 
-      <h3>3. Use the sleep helper</h3>
+      <h3>3. Check system status</h3>
+      <p style="margin-bottom:16px;">Before making API calls, check the <a href="https://classcastle.instatus.com" style="color:var(--brand);">Classcastle status page</a> to ensure all systems are operational. The status badge in the main site header also shows current system status in real-time.</p>
+
+      <h3>4. Use the sleep helper</h3>
       <p style="margin-bottom:16px;">The <code>classcastle.sleep()</code> helper lets you add delays between API calls. Pass the number of seconds to wait.</p>
 
       <div class="code-block"><code>classcastle.sleep = (seconds) => new Promise(resolve => setTimeout(resolve, seconds * 1000));
@@ -192,7 +195,7 @@ footer a{color:var(--soft)}
 // Wait 2 seconds before the next action
 await classcastle.sleep(2);</code><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
 
-      <h3>4. Make your first request</h3>
+      <h3>5. Make your first request</h3>
       <p style="margin-bottom:16px;">Create a room to verify everything is working.</p>
 
       <div class="code-block"><code>curl https://api.classcastle.org/.netlify/functions/createroom \
@@ -212,7 +215,7 @@ await classcastle.sleep(2);</code><button class="copy-btn" onclick="copyCode(thi
           <span class="endpoint-method endpoint-get">GET</span>
         </div>
         <div>
-          <div class="endpoint-path">/.netlify/functions/stats</div>
+          <div class="endpoint-path">https://api.classcastle.org/.netlify/functions/stats</div>
           <div class="endpoint-desc">Get API statistics (public endpoint, no authentication required). Returns uptime, total requests, success/failure counts, and per-endpoint breakdown.</div>
         </div>
       </div>
@@ -221,7 +224,7 @@ await classcastle.sleep(2);</code><button class="copy-btn" onclick="copyCode(thi
           <span class="endpoint-method endpoint-post">POST</span>
         </div>
         <div>
-          <div class="endpoint-path">/.netlify/functions/createroom</div>
+          <div class="endpoint-path">https://api.classcastle.org/.netlify/functions/createroom</div>
           <div class="endpoint-desc">Create a new room. Optional <code>trycode</code> parameter to request a specific room code.</div>
         </div>
       </div>
@@ -230,7 +233,7 @@ await classcastle.sleep(2);</code><button class="copy-btn" onclick="copyCode(thi
           <span class="endpoint-method endpoint-get">GET</span>
         </div>
         <div>
-          <div class="endpoint-path">/.netlify/functions/rooms</div>
+          <div class="endpoint-path">https://api.classcastle.org/.netlify/functions/rooms</div>
           <div class="endpoint-desc">List all rooms for your account</div>
         </div>
       </div>
@@ -239,7 +242,7 @@ await classcastle.sleep(2);</code><button class="copy-btn" onclick="copyCode(thi
           <span class="endpoint-method endpoint-get">GET</span>
         </div>
         <div>
-          <div class="endpoint-path">/.netlify/functions/rooms/{id}</div>
+          <div class="endpoint-path">https://api.classcastle.org/.netlify/functions/rooms/{id}</div>
           <div class="endpoint-desc">Get details for a specific room</div>
         </div>
       </div>
@@ -248,7 +251,7 @@ await classcastle.sleep(2);</code><button class="copy-btn" onclick="copyCode(thi
           <span class="endpoint-method endpoint-post">POST</span>
         </div>
         <div>
-          <div class="endpoint-path">/.netlify/functions/rooms/{id}/navigate</div>
+          <div class="endpoint-path">https://api.classcastle.org/.netlify/functions/rooms/{id}/navigate</div>
           <div class="endpoint-desc">Send all students in a room to a URL</div>
         </div>
       </div>
@@ -257,7 +260,7 @@ await classcastle.sleep(2);</code><button class="copy-btn" onclick="copyCode(thi
           <span class="endpoint-method endpoint-get">GET</span>
         </div>
         <div>
-          <div class="endpoint-path">/.netlify/functions/rooms/{id}/students</div>
+          <div class="endpoint-path">https://api.classcastle.org/.netlify/functions/rooms/{id}/students</div>
           <div class="endpoint-desc">List all students in a room</div>
         </div>
       </div>
@@ -266,7 +269,7 @@ await classcastle.sleep(2);</code><button class="copy-btn" onclick="copyCode(thi
           <span class="endpoint-method endpoint-get">GET</span>
         </div>
         <div>
-          <div class="endpoint-path">/.netlify/functions/rooms/{id}/activity</div>
+          <div class="endpoint-path">https://api.classcastle.org/.netlify/functions/rooms/{id}/activity</div>
           <div class="endpoint-desc">Get activity log for a room</div>
         </div>
       </div>
@@ -275,7 +278,7 @@ await classcastle.sleep(2);</code><button class="copy-btn" onclick="copyCode(thi
           <span class="endpoint-method endpoint-post">POST</span>
         </div>
         <div>
-          <div class="endpoint-path">/.netlify/functions/rooms/deleteroom/{id}</div>
+          <div class="endpoint-path">https://api.classcastle.org/.netlify/functions/rooms/deleteroom/{id}</div>
           <div class="endpoint-desc">Delete a room permanently</div>
         </div>
       </div>
@@ -726,7 +729,7 @@ function copyCode(button) {
     stats: {
       fields: [],
       method: 'GET',
-      path: '/.netlify/functions/stats'
+      path: 'https://api.classcastle.org/.netlify/functions/stats'
     },
     createroom: {
       fields: [
@@ -734,19 +737,19 @@ function copyCode(button) {
         { name: 'trycode', label: 'Room code (optional)', required: false, placeholder: '123456' }
       ],
       method: 'POST',
-      path: '/.netlify/functions/createroom'
+      path: 'https://api.classcastle.org/.netlify/functions/createroom'
     },
     rooms: {
       fields: [],
       method: 'GET',
-      path: '/.netlify/functions/rooms'
+      path: 'https://api.classcastle.org/.netlify/functions/rooms'
     },
     roomdetails: {
       fields: [
         { name: 'id', label: 'Room ID', required: true, placeholder: 'room_id_here' }
       ],
       method: 'GET',
-      path: '/.netlify/functions/rooms/{id}'
+      path: 'https://api.classcastle.org/.netlify/functions/rooms/{id}'
     },
     navigate: {
       fields: [
@@ -754,28 +757,28 @@ function copyCode(button) {
         { name: 'url', label: 'Target URL', required: true, placeholder: 'https://example.com' }
       ],
       method: 'POST',
-      path: '/.netlify/functions/rooms/{id}/navigate'
+      path: 'https://api.classcastle.org/.netlify/functions/rooms/{id}/navigate'
     },
     activity: {
       fields: [
         { name: 'id', label: 'Room ID', required: true, placeholder: 'room_id_here' }
       ],
       method: 'GET',
-      path: '/.netlify/functions/rooms/{id}/activity'
+      path: 'https://api.classcastle.org/.netlify/functions/rooms/{id}/activity'
     },
     students: {
       fields: [
         { name: 'id', label: 'Room ID', required: true, placeholder: 'room_id_here' }
       ],
       method: 'GET',
-      path: '/.netlify/functions/rooms/{id}/students'
+      path: 'https://api.classcastle.org/.netlify/functions/rooms/{id}/students'
     },
     deleteroom: {
       fields: [
         { name: 'id', label: 'Room ID', required: true, placeholder: 'room_id_here' }
       ],
       method: 'POST',
-      path: '/.netlify/functions/rooms/deleteroom/{id}'
+      path: 'https://api.classcastle.org/.netlify/functions/rooms/deleteroom/{id}'
     }
   };
 
