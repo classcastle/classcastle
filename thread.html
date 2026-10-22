@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Classcastle — Thread</title>
+<link rel="icon" type="image/svg+xml" href="/logo.svg" id="favicon">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+  :root {
+    --bg: #FCFCFA;
+    --surface: #fff;
+    --ink: #18221C;
+    --soft: #5E675F;
+    --line: #D9DDD3;
+    --brand: #1F5C3A;
+    --brand-ink: #fff;
+    --tint: #E4F1E6;
+    color-scheme: light dark;
+    box-sizing: border-box;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0F1511;
+      --surface: #18211B;
+      --ink: #EEF2EA;
+      --soft: #9EAA9F;
+      --line: #2A362D;
+      --brand: #4DAA72;
+      --brand-ink: #0F1511;
+      --tint: #1A2B20;
+    }
+  }
+  * { box-sizing: inherit; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Instrument Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .header {
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .header h1 {
+    font-size: 1.5rem;
+    margin: 0;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 32px 28px;
+    flex: 1;
+  }
+
+  .loading-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--soft);
+  }
+
+  .loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--line);
+    border-top-color: var(--brand);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .error-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--red);
+  }
+
+  .thread-header {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .thread-title {
+    font-size: 1.8rem;
+    margin: 0 0 8px 0;
+  }
+
+  .thread-date {
+    color: var(--soft);
+    font-size: 0.9rem;
+  }
+
+  .messages-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .message {
+    display: flex;
+    flex-direction: column;
+    max-width: 70%;
+  }
+
+  .message.teacher {
+    align-self: flex-end;
+    align-items: flex-end;
+  }
+
+  .message.student {
+    align-self: flex-start;
+    align-items: flex-start;
+  }
+
+  .message-sender {
+    font-size: 0.85rem;
+    color: var(--soft);
+    margin-bottom: 4px;
+  }
+
+  .message-bubble {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .message.teacher .message-bubble {
+    background: var(--brand);
+    color: var(--brand-ink);
+  }
+
+  .message.student .message-bubble {
+    background: var(--tint);
+    border: 1px solid var(--line);
+  }
+
+  .message-time {
+    font-size: 0.75rem;
+    color: var(--soft);
+    margin-top: 4px;
+  }
+
+  .reply-section {
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+
+  .reply-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 1rem;
+    background: var(--bg);
+    color: var(--ink);
+    outline: none;
+    margin-bottom: 12px;
+  }
+
+  .reply-input:focus {
+    border-color: var(--brand);
+    background: var(--surface);
+  }
+
+  .btn {
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-weight: 400;
+    font-size: 0.98rem;
+    cursor: pointer;
+    border: none;
+    background: var(--brand);
+    color: var(--surface);
+  }
+
+  .btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .notification {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--ink);
+    color: var(--bg);
+    padding: 16px 20px;
+    border-radius: 6px;
+    font-size: 0.92rem;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+    z-index: 10001;
+  }
+
+  .notification.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <h1>Classcastle Thread</h1>
+  </div>
+
+  <div class="container">
+    <div id="loadingState" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Loading thread...</p>
+    </div>
+
+    <div id="errorState" class="error-state" style="display: none;">
+      <p>Thread not found or could not be loaded.</p>
+    </div>
+
+    <div id="threadContent" style="display: none;">
+      <div class="thread-header">
+        <h2 id="threadTitle" class="thread-title">Thread Title</h2>
+        <p id="threadDate" class="thread-date"></p>
+      </div>
+
+      <div id="messagesContainer" class="messages-container"></div>
+
+      <div class="reply-section">
+        <input type="text" id="replyInput" class="reply-input" placeholder="Type your reply...">
+        <button id="sendReplyBtn" class="btn">Send Reply</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="notification" class="notification"></div>
+
+  <script>
+    const SUPABASE_URL = 'https://hduyofdbpspjcuwvackd.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhkdXlvZmRicHNwanNjdXZhY2tkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjM5NzQxNTcsImV4cCI6MjAzOTUzMDE1N30.T6BbKp3qj3qj3qj3qj3qj3qj3qj3qj3qj3qj3qj3q';
+    const SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let currentThreadId = null;
+    let currentRoomCode = null;
+
+    function showNotification(message, duration = 3000) {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.classList.add('show');
+      setTimeout(() => notification.classList.remove('show'), duration);
+    }
+
+    async function loadThread() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const threadId = urlParams.get('thread');
+
+      if (!threadId) {
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('errorState').style.display = 'block';
+        return;
+      }
+
+      currentThreadId = threadId;
+
+      try {
+        // Get thread details
+        const { data: thread, error: threadError } = await SupabaseClient
+          .from('message_threads')
+          .select('*')
+          .eq('id', threadId)
+          .single();
+
+        if (threadError || !thread) {
+          throw threadError || new Error('Thread not found');
+        }
+
+        document.getElementById('threadTitle').textContent = thread.title;
+        document.getElementById('threadDate').textContent = new Date(thread.created_at).toLocaleDateString();
+
+        // Get messages
+        const { data: messages, error: messagesError } = await SupabaseClient
+          .from('thread_messages')
+          .select('*')
+          .eq('thread_id', threadId)
+          .order('created_at', { ascending: true });
+
+        if (messagesError) throw messagesError;
+
+        renderMessages(messages);
+
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('threadContent').style.display = 'block';
+
+        // Subscribe to new messages
+        const channel = SupabaseClient
+          .channel(`thread-${threadId}`)
+          .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'thread_messages',
+            filter: `thread_id=eq.${threadId}`
+          }, (payload) => {
+            addMessage(payload.new);
+          })
+          .subscribe();
+
+      } catch (error) {
+        console.error('Error loading thread:', error);
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('errorState').style.display = 'block';
+      }
+    }
+
+    function renderMessages(messages) {
+      const container = document.getElementById('messagesContainer');
+      container.innerHTML = '';
+
+      messages.forEach(msg => {
+        addMessage(msg);
+      });
+
+      // Scroll to bottom
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function addMessage(msg) {
+      const container = document.getElementById('messagesContainer');
+      const messageDiv = document.createElement('div');
+      const isTeacher = msg.sender_type === 'teacher';
+
+      messageDiv.className = `message ${isTeacher ? 'teacher' : 'student'}`;
+      messageDiv.innerHTML = `
+        <div class="message-sender">${msg.sender_name}</div>
+        <div class="message-bubble">${msg.message}</div>
+        <div class="message-time">${new Date(msg.created_at).toLocaleTimeString()}</div>
+      `;
+
+      container.appendChild(messageDiv);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    async function sendReply() {
+      const replyInput = document.getElementById('replyInput');
+      const reply = replyInput.value.trim();
+
+      if (!reply) return;
+
+      const sendBtn = document.getElementById('sendReplyBtn');
+      sendBtn.disabled = true;
+
+      try {
+        // For students, we need to identify them somehow.
+        // For now, we'll use a simple prompt to get their name
+        const studentName = localStorage.getItem('classcastle_student_name') || 
+          prompt('Please enter your name:', 'Student');
+
+        if (!studentName) {
+          showNotification('Name is required to send a message');
+          sendBtn.disabled = false;
+          return;
+        }
+
+        localStorage.setItem('classcastle_student_name', studentName);
+
+        const { error } = await SupabaseClient
+          .from('thread_messages')
+          .insert({
+            thread_id: currentThreadId,
+            sender_id: crypto.randomUUID(),
+            sender_name: studentName,
+            sender_type: 'student',
+            message: reply,
+            created_at: new Date().toISOString()
+          });
+
+        if (error) throw error;
+
+        replyInput.value = '';
+        showNotification('Reply sent!');
+      } catch (error) {
+        console.error('Error sending reply:', error);
+        showNotification('Error sending reply. Please try again.');
+      } finally {
+        sendBtn.disabled = false;
+      }
+    }
+
+    document.getElementById('sendReplyBtn').addEventListener('click', sendReply);
+    document.getElementById('replyInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendReply();
+    });
+
+    // Load thread on page load
+    loadThread();
+  </script>
+</body>
+</html>
