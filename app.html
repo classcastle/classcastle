@@ -6046,7 +6046,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       const { data, error } = await SupabaseClient
         .from('announcements')
         .select('*')
-        .eq('school_name', teacherSchool.name)
+        .eq('teacher_id', (await SupabaseClient.auth.getUser()).data.user.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
