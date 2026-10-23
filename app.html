@@ -2287,6 +2287,10 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         Messages
       </a>
+      <a class="nav-item" data-page="students" href="#">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Students
+      </a>
       <a class="nav-item" href="/resources.html" target="_blank">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
         Resources Hub
@@ -2962,6 +2966,74 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           </div>
         </div>
       </div>
+
+    <!-- Students Page -->
+    <div class="page" id="studentsPage">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Students</h1>
+          <p class="page-subtitle">Manage student accounts for your school</p>
+        </div>
+      </div>
+
+      <!-- School Selection -->
+      <div class="card" style="margin-bottom: 24px;">
+        <h3 style="font-size: 1.1rem; margin-bottom: 16px;">Your School</h3>
+        <div id="schoolDisplay" style="padding: 12px; background: var(--tint); border-radius: 6px; display: none;">
+          <strong id="displaySchoolName"></strong>
+          <button class="btn btn-secondary" id="changeSchoolBtn" style="margin-left: 12px; font-size: 0.8rem; padding: 4px 12px;">Change</button>
+        </div>
+        <div id="schoolSelection" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">Find your school</label>
+            <input type="text" class="form-input" id="studentSchoolSearch" placeholder="Search for your school or postcode (e.g., Manchester Grammar School or M1 7DW)">
+            <button class="btn btn-secondary" id="searchStudentSchoolsBtn" style="margin-top: 8px;">Search Schools</button>
+            <div id="studentSchoolSearchStatus" style="margin-top: 8px; font-size: 0.85rem; color: var(--soft);"></div>
+            <div id="studentSchoolResults" style="margin-top: 12px; max-height: 200px; overflow-y: auto; display: none;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                <thead>
+                  <tr>
+                    <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--line);">School Name</th>
+                    <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--line);">Location</th>
+                  </tr>
+                </thead>
+                <tbody id="studentSchoolResultsBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Student Form -->
+      <div class="card" id="addStudentCard" style="display: none;">
+        <h3 style="font-size: 1.1rem; margin-bottom: 16px;">Add Student</h3>
+        <div class="form-group">
+          <label class="form-label">Student Name</label>
+          <input type="text" class="form-input" id="studentName" placeholder="John Smith">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Student Email</label>
+          <input type="email" class="form-input" id="studentEmail" placeholder="john.smith@school.edu">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-input" id="studentPassword" placeholder="••••••••">
+          <p style="font-size: 0.8rem; color: var(--soft); margin-top: 4px;">Share this password with the student</p>
+        </div>
+        <button class="btn btn-primary" id="addStudentBtn">Add Student</button>
+      </div>
+
+      <!-- Students List -->
+      <div class="card" id="studentsListCard" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="font-size: 1.1rem; margin: 0;">Students</h3>
+          <button class="btn btn-primary" id="showAddStudentBtn">Add Student</button>
+        </div>
+        <div id="studentsList" style="display: flex; flex-direction: column; gap: 8px;">
+          <p style="color: var(--soft);">No students added yet.</p>
+        </div>
+      </div>
+    </div>
 
       <!-- Custom Alert Modal -->
       <div class="modal-overlay" id="alertModal" style="display: none;">
@@ -5727,6 +5799,299 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   }
   if (clearSchoolBtn) clearSchoolBtn.addEventListener('click', clearSchool);
 
+  // Students Page
+  const schoolDisplay = document.getElementById('schoolDisplay');
+  const displaySchoolName = document.getElementById('displaySchoolName');
+  const changeSchoolBtn = document.getElementById('changeSchoolBtn');
+  const schoolSelection = document.getElementById('schoolSelection');
+  const studentSchoolSearch = document.getElementById('studentSchoolSearch');
+  const searchStudentSchoolsBtn = document.getElementById('searchStudentSchoolsBtn');
+  const studentSchoolSearchStatus = document.getElementById('studentSchoolSearchStatus');
+  const studentSchoolResults = document.getElementById('studentSchoolResults');
+  const studentSchoolResultsBody = document.getElementById('studentSchoolResultsBody');
+  const addStudentCard = document.getElementById('addStudentCard');
+  const studentsListCard = document.getElementById('studentsListCard');
+  const showAddStudentBtn = document.getElementById('showAddStudentBtn');
+  const addStudentBtn = document.getElementById('addStudentBtn');
+  const studentName = document.getElementById('studentName');
+  const studentEmail = document.getElementById('studentEmail');
+  const studentPassword = document.getElementById('studentPassword');
+  const studentsList = document.getElementById('studentsList');
+
+  let teacherSchool = null;
+  let students = [];
+
+  // Load teacher's school from metadata
+  async function loadTeacherSchool() {
+    const { data: { user } } = await SupabaseClient.auth.getUser();
+    if (user.user_metadata?.school_name) {
+      teacherSchool = {
+        name: user.user_metadata.school_name,
+        postcode: user.user_metadata.school_postcode,
+        lat: user.user_metadata.school_lat,
+        lon: user.user_metadata.school_lon
+      };
+      displaySchoolName.textContent = teacherSchool.name;
+      schoolDisplay.style.display = 'block';
+      schoolSelection.style.display = 'none';
+      loadStudents();
+    } else {
+      schoolDisplay.style.display = 'none';
+      schoolSelection.style.display = 'block';
+    }
+  }
+
+  // Search schools for student page
+  async function searchStudentSchools() {
+    const searchTerm = studentSchoolSearch.value.trim();
+    const status = studentSchoolSearchStatus;
+    const resultsDiv = studentSchoolResults;
+    const resultsBody = studentSchoolResultsBody;
+
+    if (!searchTerm) {
+      status.textContent = 'Please enter a school name or postcode';
+      status.style.color = 'var(--red)';
+      return;
+    }
+
+    status.textContent = 'Searching...';
+    status.style.color = 'var(--soft)';
+    resultsDiv.style.display = 'none';
+
+    try {
+      const isPostcode = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i.test(searchTerm);
+      let query = isPostcode ? searchTerm : `${encodeURIComponent(searchTerm)}+school`;
+
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&addressdetails=1&limit=20&countrycodes=gb`, {
+        headers: { 'User-Agent': 'Classcastle' }
+      });
+
+      if (!response.ok) throw new Error(`API request failed: ${response.status}`);
+
+      const data = await response.json();
+
+      if (!data || data.length === 0) {
+        status.textContent = "No schools found";
+        status.style.color = 'var(--amber)';
+        return;
+      }
+
+      const schools = data
+        .filter(item => {
+          const isUK = item.address && (item.address.country_code === 'gb' || item.address.country === 'United Kingdom');
+          const isSchool = item.type === 'school' || item.class === 'amenity' || item.display_name.toLowerCase().includes('school');
+          return isUK && isSchool;
+        })
+        .map(item => ({
+          id: item.place_id,
+          name: item.display_name.split(',')[0] || 'Unknown School',
+          location: item.address.city || item.address.town || item.address.village || item.address.county || 'Unknown',
+          postcode: item.address.postcode || 'Not available',
+          lat: parseFloat(item.lat),
+          lon: parseFloat(item.lon)
+        }));
+
+      if (schools.length === 0) {
+        status.textContent = "No UK schools found";
+        status.style.color = 'var(--amber)';
+        return;
+      }
+
+      resultsBody.innerHTML = schools.map(school => `
+        <tr style="cursor: pointer; border-bottom: 1px solid var(--line);" data-school-id="${school.id}">
+          <td style="padding: 8px;">${escapeHtml(school.name)}</td>
+          <td style="padding: 8px;">${escapeHtml(school.location)}</td>
+        </tr>
+      `).join('');
+
+      resultsDiv.style.display = 'block';
+      status.textContent = `Found ${schools.length} UK schools`;
+      status.style.color = 'var(--brand)';
+
+      resultsBody.querySelectorAll('tr[data-school-id]').forEach(row => {
+        row.addEventListener('click', () => {
+          const schoolId = row.dataset.schoolId;
+          const school = schools.find(s => s.id == schoolId);
+          if (school) {
+            selectTeacherSchool(school);
+          }
+        });
+      });
+    } catch (error) {
+      console.error('Error searching schools:', error);
+      status.textContent = `Error: ${error.message}`;
+      status.style.color = 'var(--red)';
+    }
+  }
+
+  async function selectTeacherSchool(school) {
+    teacherSchool = school;
+    
+    // Update user metadata
+    try {
+      await SupabaseClient.auth.updateUser({
+        data: {
+          school_name: school.name,
+          school_postcode: school.postcode,
+          school_lat: school.lat,
+          school_lon: school.lon
+        }
+      });
+    } catch (error) {
+      console.error('Error updating school metadata:', error);
+    }
+
+    displaySchoolName.textContent = school.name;
+    schoolDisplay.style.display = 'block';
+    schoolSelection.style.display = 'none';
+    studentSchoolResults.style.display = 'none';
+    loadStudents();
+  }
+
+  async function loadStudents() {
+    if (!teacherSchool) return;
+
+    try {
+      const { data, error } = await SupabaseClient
+        .from('students')
+        .select('*')
+        .eq('school_name', teacherSchool.name);
+
+      if (error) throw error;
+
+      students = data || [];
+      renderStudents();
+    } catch (error) {
+      console.error('Error loading students:', error);
+    }
+  }
+
+  function renderStudents() {
+    if (students.length === 0) {
+      studentsList.innerHTML = '<p style="color: var(--soft);">No students added yet.</p>';
+      studentsListCard.style.display = 'none';
+      addStudentCard.style.display = 'block';
+    } else {
+      studentsList.innerHTML = students.map(student => `
+        <div style="padding: 12px; background: var(--bg); border-radius: 6px; border: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-weight: 500;">${escapeHtml(student.name)}</div>
+            <div style="font-size: 0.85rem; color: var(--soft);">${escapeHtml(student.email)}</div>
+          </div>
+          <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 4px 12px;" onclick="deleteStudent('${student.id}')">Remove</button>
+        </div>
+      `).join('');
+      studentsListCard.style.display = 'block';
+      addStudentCard.style.display = 'none';
+    }
+  }
+
+  async function addStudent() {
+    const name = studentName.value.trim();
+    const email = studentEmail.value.trim();
+    const password = studentPassword.value;
+
+    if (!name || !email || !password) {
+      showNotification('Please fill in all fields');
+      return;
+    }
+
+    if (!teacherSchool) {
+      showNotification('Please select your school first');
+      return;
+    }
+
+    addStudentBtn.disabled = true;
+    addStudentBtn.textContent = 'Adding...';
+
+    try {
+      // Create student account
+      const { data, error } = await SupabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name: name,
+            user_type: 'student',
+            school_name: teacherSchool.name,
+            school_postcode: teacherSchool.postcode,
+            school_lat: teacherSchool.lat,
+            school_lon: teacherSchool.lon
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      // Add to students table
+      const { error: dbError } = await SupabaseClient
+        .from('students')
+        .insert({
+          id: data.user.id,
+          name: name,
+          email: email,
+          school_name: teacherSchool.name,
+          teacher_id: (await SupabaseClient.auth.getUser()).data.user.id
+        });
+
+      if (dbError) throw dbError;
+
+      showNotification('Student added successfully!');
+      studentName.value = '';
+      studentEmail.value = '';
+      studentPassword.value = '';
+      loadStudents();
+    } catch (error) {
+      console.error('Error adding student:', error);
+      showNotification(error.message || 'Error adding student');
+    } finally {
+      addStudentBtn.disabled = false;
+      addStudentBtn.textContent = 'Add Student';
+    }
+  }
+
+  async function deleteStudent(studentId) {
+    if (!confirm('Are you sure you want to remove this student?')) return;
+
+    try {
+      const { error } = await SupabaseClient
+        .from('students')
+        .delete()
+        .eq('id', studentId);
+
+      if (error) throw error;
+
+      showNotification('Student removed');
+      loadStudents();
+    } catch (error) {
+      console.error('Error removing student:', error);
+      showNotification('Error removing student');
+    }
+  }
+
+  // Students page event listeners
+  if (changeSchoolBtn) changeSchoolBtn.addEventListener('click', () => {
+    schoolDisplay.style.display = 'none';
+    schoolSelection.style.display = 'block';
+  });
+
+  if (searchStudentSchoolsBtn) searchStudentSchoolsBtn.addEventListener('click', searchStudentSchools);
+  if (studentSchoolSearch) {
+    studentSchoolSearch.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') searchStudentSchools();
+    });
+  }
+
+  if (showAddStudentBtn) showAddStudentBtn.addEventListener('click', () => {
+    studentsListCard.style.display = 'none';
+    addStudentCard.style.display = 'block';
+  });
+
+  if (addStudentBtn) addStudentBtn.addEventListener('click', addStudent);
+
+  // Expose deleteStudent globally
+  window.deleteStudent = deleteStudent;
+
   // Update custom ID preview
   if (pollCustomId) {
     pollCustomId.addEventListener('input', () => {
@@ -5803,6 +6168,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       if (page === 'activity') loadActivityLog();
       if (page === 'polls') loadPolls();
       if (page === 'messages') checkMessagesOptIn();
+      if (page === 'students') loadTeacherSchool();
       if (page === 'settings') loadIdentities();
 
       // Close sidebar on mobile

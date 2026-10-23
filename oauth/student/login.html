@@ -549,6 +549,9 @@
       <div class="auth-footer" style="margin-top: 8px;">
         <a href="/login.html">Teacher login</a>
       </div>
+      <div class="auth-footer" style="margin-top: 8px;">
+        Don't have an account? Ask your teacher to add you.
+      </div>
       <div class="auth-footer" style="margin-top: 12px; font-size: 0.85rem;">
         By signing in, you agree to our <a href="/terms.html">Terms of Service</a> and <a href="/privacy.html">Privacy Policy</a>
       </div>
@@ -713,6 +716,33 @@
       });
 
       if (error) throw error;
+
+      // Check if user is a teacher
+      const userType = data.user.user_metadata?.user_type;
+      if (userType === 'teacher') {
+        await SupabaseClient.auth.signOut();
+        showAlert('Teacher Account', 'This is a teacher account. Please use the teacher login page instead.');
+        loginBtn.disabled = false;
+        loginBtnText.style.display = 'inline-block';
+        loginBtnLoading.style.display = 'none';
+        return;
+      }
+
+      // Update school metadata if selected
+      if (selectedSchool) {
+        try {
+          await SupabaseClient.auth.updateUser({
+            data: {
+              school_name: selectedSchool.name,
+              school_postcode: selectedSchool.postcode,
+              school_lat: selectedSchool.lat,
+              school_lon: selectedSchool.lon
+            }
+          });
+        } catch (metadataError) {
+          console.error('Error updating school metadata:', metadataError);
+        }
+      }
 
       showNotification('Welcome back!');
       setTimeout(() => {
