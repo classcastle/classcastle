@@ -486,13 +486,19 @@ footer a{color:var(--soft)}
     let color, text;
 
     switch(status) {
+      case 'UP':
       case 'OPERATIONAL':
         color = '#1F5C3A';
         text = 'All systems operational';
         break;
+      case 'HASISSUES':
       case 'DEGRADED':
         color = '#F4D35E';
-        text = 'Degraded performance';
+        text = 'Some issues';
+        break;
+      case 'UNDERMAINTENANCE':
+        color = '#E9A23C';
+        text = 'Under maintenance';
         break;
       case 'PARTIALOUTAGE':
         color = '#E9A23C';
@@ -501,10 +507,6 @@ footer a{color:var(--soft)}
       case 'MAJOROUTAGE':
         color = '#C53030';
         text = 'Major outage';
-        break;
-      case 'HASISSUES':
-        color = '#E9A23C';
-        text = 'Some issues';
         break;
       default:
         color = '#5E675F';
