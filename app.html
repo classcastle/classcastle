@@ -6061,21 +6061,30 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     addStudentBtn.textContent = 'Adding...';
 
     try {
-      // Use RPC to create student account without signing in as the student
-      const { data, error } = await SupabaseClient.rpc('create_student_account', {
-        p_email: email,
-        p_password: password,
-        p_name: name,
-        p_school_name: teacherSchool.name,
-        p_school_postcode: teacherSchool.postcode,
-        p_school_lat: teacherSchool.lat,
-        p_school_lon: teacherSchool.lon
+      // Get current teacher session to restore later
+      const { data: { session: teacherSession } } = await SupabaseClient.auth.getSession();
+
+      // Create student account
+      const { data, error } = await SupabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name: name,
+            user_type: 'student',
+            school_name: teacherSchool.name,
+            school_postcode: teacherSchool.postcode,
+            school_lat: teacherSchool.lat,
+            school_lon: teacherSchool.lon
+          }
+        }
       });
 
       if (error) throw error;
 
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to create student account');
+      // Sign back in as teacher if we were logged in
+      if (teacherSession) {
+        await SupabaseClient.auth.setSession(teacherSession);
       }
 
       showNotification('Student added successfully!');
