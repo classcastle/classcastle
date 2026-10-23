@@ -481,6 +481,9 @@
       <div class="auth-footer">
         New teacher? <a href="/signup.html">Create your account</a>
       </div>
+      <div class="auth-footer" style="margin-top: 8px;">
+        <a href="#" id="studentLoginBtn" style="color: var(--soft); text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 2px;">Student login</a>
+      </div>
       <div class="auth-footer" style="margin-top: 12px; font-size: 0.85rem;">
         By signing in, you agree to our <a href="/terms.html">Terms of Service</a> and <a href="/privacy.html">Privacy Policy</a>
       </div>
@@ -498,6 +501,18 @@
     <p id="alertModalMessage">Message goes here</p>
     <div class="modal-actions">
       <button class="modal-btn modal-btn-primary" id="alertModalConfirm">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Student Login Modal -->
+<div class="modal-overlay" id="studentLoginModalOverlay">
+  <div class="modal" id="studentLoginModal">
+    <h2>Student Login</h2>
+    <p>Students don't need to login unless your class uses points features. If your teacher hasn't mentioned points, you can join a room without an account using your room code.</p>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-secondary" id="studentLoginCancel">Cancel</button>
+      <button class="modal-btn modal-btn-primary" id="studentLoginContinue">Continue to login</button>
     </div>
   </div>
 </div>
@@ -537,6 +552,13 @@
   const alertModalMessage = document.getElementById('alertModalMessage');
   const alertModalConfirm = document.getElementById('alertModalConfirm');
 
+  // Student login modal elements
+  const studentLoginModalOverlay = document.getElementById('studentLoginModalOverlay');
+  const studentLoginModal = document.getElementById('studentLoginModal');
+  const studentLoginCancel = document.getElementById('studentLoginCancel');
+  const studentLoginContinue = document.getElementById('studentLoginContinue');
+  const studentLoginBtn = document.getElementById('studentLoginBtn');
+
   function showAlert(title, message, errorCode = null) {
     alertModalTitle.textContent = title;
     alertModalMessage.textContent = message;
@@ -553,6 +575,27 @@
 
   alertModalConfirm.addEventListener('click', () => {
     alertModalOverlay.classList.remove('show');
+  });
+
+  // Student login modal handlers
+  studentLoginBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    studentLoginModalOverlay.classList.add('show');
+  });
+
+  studentLoginCancel.addEventListener('click', () => {
+    studentLoginModalOverlay.classList.remove('show');
+  });
+
+  studentLoginContinue.addEventListener('click', () => {
+    studentLoginModalOverlay.classList.remove('show');
+    window.location.href = '/oauth/student/login.html';
+  });
+
+  studentLoginModalOverlay.addEventListener('click', (e) => {
+    if (e.target === studentLoginModalOverlay) {
+      studentLoginModalOverlay.classList.remove('show');
+    }
   });
 
   function showNotification(message, duration = 3000) {
