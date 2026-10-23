@@ -23,17 +23,18 @@ CREATE POLICY "Teachers can view own school"
   TO authenticated
   USING (teacher_id = auth.uid());
 
--- Policy: Teachers cannot modify their own school assignment
-CREATE POLICY "No updates to teacher_schools"
+-- Policy: Block updates to teacher_schools
+CREATE POLICY "Block updates to teacher_schools"
   ON teacher_schools FOR UPDATE
   TO authenticated
-  USING (false);
+  USING (false)
+  WITH CHECK (false);
 
--- Policy: Only service role can insert teacher_schools
-CREATE POLICY "Service role can insert teacher_schools"
+-- Policy: Block inserts from authenticated users (only service role can insert)
+CREATE POLICY "Block inserts to teacher_schools"
   ON teacher_schools FOR INSERT
   TO authenticated
-  USING (false);
+  WITH CHECK (false);
 
 -- Create RPC function to get students from auth.users by school
 CREATE OR REPLACE FUNCTION public.get_school_students(p_school_name TEXT)
