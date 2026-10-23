@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classcastle - Student Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FCFCFA;
+      --surface: #FFFFFF;
+      --ink: #18221C;
+      --soft: #5E675F;
+      --line: #D9DDD3;
+      --brand: #1F5C3A;
+      --brand-ink: #FFFFFF;
+      --tint: #E4F1E6;
+      --red: #DC4444;
+      --amber: #F59E0B;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Instrument Sans', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--ink);
+    }
+
+    .logo svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    .logo-text {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .logout-btn {
+      padding: 8px 16px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--soft);
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .logout-btn:hover {
+      border-color: var(--brand);
+      color: var(--brand);
+    }
+
+    .welcome-section {
+      background: var(--brand);
+      color: var(--brand-ink);
+      padding: 32px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+    }
+
+    .welcome-section h1 {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+
+    .welcome-section p {
+      opacity: 0.9;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .card h2 {
+      font-size: 1.25rem;
+      margin-bottom: 16px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      color: var(--soft);
+      font-size: 0.9rem;
+    }
+
+    .info-value {
+      font-weight: 500;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--soft);
+    }
+
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--soft);
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--line);
+      border-top-color: var(--brand);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .notification {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--ink);
+      color: var(--brand-ink);
+      padding: 12px 24px;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s;
+    }
+
+    .notification.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <a href="/" class="logo">
+        <svg viewBox="0 0 32 32" fill="none">
+          <rect width="32" height="32" rx="8" fill="var(--brand)"/>
+          <path d="M8 16L13 21L24 10" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="logo-text">Classcastle</span>
+      </a>
+      <button class="logout-btn" id="logoutBtn">Sign out</button>
+    </div>
+
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+      <p>Loading your dashboard...</p>
+    </div>
+
+    <div id="content" style="display: none;">
+      <div class="welcome-section">
+        <h1 id="welcomeText">Welcome!</h1>
+        <p>Student Dashboard</p>
+      </div>
+
+      <div class="card">
+        <h2>Your Information</h2>
+        <div class="info-row">
+          <span class="info-label">Name</span>
+          <span class="info-value" id="studentName">-</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Email</span>
+          <span class="info-value" id="studentEmail">-</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">School</span>
+          <span class="info-value" id="studentSchool">-</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Messages from Teacher</h2>
+        <div id="messagesSection">
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            <p>No messages from your teacher yet.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notification" id="notification"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://hduyofdbpspjcuwvackd.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhkdXlvZmRicHNwanN1d3ZhY2tkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjU1NzY3NzQsImV4cCI6MjA0MTE1Mjc3NH0.QP7q5bW5n5gH5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b';
+
+    const SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    function showNotification(message, duration = 3000) {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.classList.add('show');
+      setTimeout(() => notification.classList.remove('show'), duration);
+    }
+
+    async function loadDashboard() {
+      try {
+        const { data: { user }, error } = await SupabaseClient.auth.getUser();
+
+        if (error || !user) {
+          window.location.href = '/oauth/student/login.html';
+          return;
+        }
+
+        // Check if user is a student
+        const userType = user.user_metadata?.user_type;
+        if (userType !== 'student') {
+          await SupabaseClient.auth.signOut();
+          showNotification('Please use the student login page');
+          window.location.href = '/oauth/student/login.html';
+          return;
+        }
+
+        // Display user info
+        document.getElementById('welcomeText').textContent = `Welcome, ${user.user_metadata?.name || 'Student'}!`;
+        document.getElementById('studentName').textContent = user.user_metadata?.name || '-';
+        document.getElementById('studentEmail').textContent = user.email || '-';
+        document.getElementById('studentSchool').textContent = user.user_metadata?.school_name || '-';
+
+        // Hide loading, show content
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+
+      } catch (error) {
+        console.error('Error loading dashboard:', error);
+        showNotification('Error loading dashboard');
+        window.location.href = '/oauth/student/login.html';
+      }
+    }
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await SupabaseClient.auth.signOut();
+      window.location.href = '/oauth/student/login.html';
+    });
+
+    // Load dashboard on page load
+    loadDashboard();
+  </script>
+</body>
+</html>
