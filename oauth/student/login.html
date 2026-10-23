@@ -729,6 +729,16 @@
         return;
       }
 
+      // Require school selection
+      if (!selectedSchool) {
+        await SupabaseClient.auth.signOut();
+        showAlert('School Required', 'Please select your school before logging in.');
+        loginBtn.disabled = false;
+        loginBtnText.style.display = 'inline-block';
+        loginBtnLoading.style.display = 'none';
+        return;
+      }
+
       // Check if selected school matches user's account school
       const userSchool = data.user.user_metadata?.school_name;
       if (selectedSchool && userSchool && userSchool !== selectedSchool.name) {
