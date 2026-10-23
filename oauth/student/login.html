@@ -719,7 +719,8 @@
 
       // Check if user is a teacher
       const userType = data.user.user_metadata?.user_type;
-      if (userType === 'teacher') {
+      // If user_type is not set, assume it's a teacher (old accounts)
+      if (userType === 'teacher' || !userType) {
         await SupabaseClient.auth.signOut();
         showAlert('Teacher Account', 'This is a teacher account. Please use the teacher login page instead.');
         loginBtn.disabled = false;
