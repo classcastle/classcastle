@@ -24,7 +24,6 @@ AS $$
   FROM auth.users
   WHERE raw_user_meta_data->>'user_type' = 'student'
     AND raw_user_meta_data->>'school_name' = p_school_name
-    AND NOT is_anonymous()
     AND raw_user_meta_data->>'school_name' IS NOT NULL;
 $$;
 
