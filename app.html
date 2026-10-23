@@ -6061,6 +6061,12 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     addStudentBtn.textContent = 'Adding...';
 
     try {
+      // Check if email already exists
+      const { data: { user: existingUser }, error: checkError } = await SupabaseClient.auth.getUser();
+      if (checkError && checkError.message !== 'Auth session missing') {
+        throw checkError;
+      }
+
       // Get current teacher session to restore later
       const { data: { session: teacherSession } } = await SupabaseClient.auth.getSession();
 
@@ -6080,12 +6086,12 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         }
       });
 
-      if (error) throw error;
-
-      // Verify the student was created with the correct school
-      const { data: { user: createdUser } } = await SupabaseClient.auth.getUser();
-      if (createdUser.user_metadata?.school_name !== teacherSchool.name) {
-        throw new Error('Student school does not match your selected school');
+      if (error) {
+        // If email already exists, check if it's for a different school
+        if (error.message.includes('already registered') || error.message.includes('duplicate')) {
+          throw new Error('An account with this email already exists');
+        }
+        throw error;
       }
 
       // Sign back in as teacher if we were logged in
