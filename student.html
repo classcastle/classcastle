@@ -223,16 +223,20 @@
           <span class="info-label">School</span>
           <span class="info-value" id="studentSchool">-</span>
         </div>
+        <div class="info-row">
+          <span class="info-label">Points</span>
+          <span class="info-value" id="studentPoints" style="color: var(--brand); font-size: 1.5rem; font-weight: 600;">0</span>
+        </div>
       </div>
 
       <div class="card">
-        <h2>Messages from Teacher</h2>
-        <div id="messagesSection">
+        <h2>Announcements</h2>
+        <div id="announcementsSection">
           <div class="empty-state">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              <path d="M11 5.882V19.24a1.76 1.76 0 0 1-3.417.592l-2.147-6.15M18 13a3 3 0 1 0 0-6M7.436 13.683A4.001 4.001 0 0 1 7 12a4 4 0 0 1 4-4h5"/>
             </svg>
-            <p>No messages from your teacher yet.</p>
+            <p>No announcements from your teacher yet.</p>
           </div>
         </div>
       </div>
@@ -279,6 +283,12 @@
         document.getElementById('studentEmail').textContent = user.email || '-';
         document.getElementById('studentSchool').textContent = user.user_metadata?.school_name || '-';
 
+        // Load student points
+        loadStudentPoints(user.id);
+
+        // Load announcements
+        loadAnnouncements(user.user_metadata?.school_name);
+
         // Hide loading, show content
         document.getElementById('loading').style.display = 'none';
         document.getElementById('content').style.display = 'block';
@@ -295,6 +305,60 @@
       await SupabaseClient.auth.signOut();
       window.location.href = '/oauth/student/login.html';
     });
+
+    async function loadStudentPoints(studentId) {
+      try {
+        const { data, error } = await SupabaseClient.rpc('get_student_points', {
+          p_student_id: studentId
+        });
+
+        if (error) throw error;
+
+        document.getElementById('studentPoints').textContent = data || 0;
+      } catch (error) {
+        console.error('Error loading points:', error);
+        document.getElementById('studentPoints').textContent = '-';
+      }
+    }
+
+    async function loadAnnouncements(schoolName) {
+      if (!schoolName) return;
+
+      const announcementsSection = document.getElementById('announcementsSection');
+
+      try {
+        const { data, error } = await SupabaseClient
+          .from('announcements')
+          .select('*')
+          .eq('school_name', schoolName)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+          announcementsSection.innerHTML = `
+            <div class="empty-state">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 5.882V19.24a1.76 1.76 0 0 1-3.417.592l-2.147-6.15M18 13a3 3 0 1 0 0-6M7.436 13.683A4.001 4.001 0 0 1 7 12a4 4 0 0 1 4-4h5"/>
+              </svg>
+              <p>No announcements from your teacher yet.</p>
+            </div>
+          `;
+        } else {
+          announcementsSection.innerHTML = data.map(ann => `
+            <div style="padding: 16px; background: var(--bg); border-radius: 8px; border: 1px solid var(--line); margin-bottom: 12px;">
+              <div style="font-weight: 600; margin-bottom: 8px;">${ann.title}</div>
+              <div style="color: var(--soft); font-size: 0.9rem; margin-bottom: 8px;">${ann.message}</div>
+              <div style="font-size: 0.8rem; color: var(--soft);">
+                ${new Date(ann.created_at).toLocaleDateString()}
+              </div>
+            </div>
+          `).join('');
+        }
+      } catch (error) {
+        console.error('Error loading announcements:', error);
+      }
+    }
 
     // Load dashboard on page load
     loadDashboard();

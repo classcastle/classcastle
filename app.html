@@ -3037,7 +3037,56 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
                 <label style="font-size: 0.85rem; color: var(--soft);">Added</label>
                 <div id="detailCreated" style="font-size: 1rem;"></div>
               </div>
+              <div style="margin-bottom: 16px;">
+                <label style="font-size: 0.85rem; color: var(--soft);">Points</label>
+                <div id="detailPoints" style="font-size: 1.5rem; font-weight: 600; color: var(--brand);">0</div>
+              </div>
             </div>
+
+            <!-- Award Points -->
+            <div style="margin-top: 16px;">
+              <h4 style="font-size: 0.95rem; margin-bottom: 12px;">Award Points</h4>
+              <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                <input type="number" class="form-input" id="pointsAmount" placeholder="Amount" min="1" style="width: 100px;">
+                <input type="text" class="form-input" id="pointsReason" placeholder="Reason (e.g., Great work on homework)" style="flex: 1;">
+              </div>
+              <button class="btn btn-primary" id="awardPointsBtn" style="width: 100%;">Award Points</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Announcements Section -->
+      <div class="card" id="announcementsCard" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="font-size: 1.1rem; margin: 0;">Announcements</h3>
+          <button class="btn btn-primary" id="createAnnouncementBtn">Create Announcement</button>
+        </div>
+        <div id="announcementsList" style="display: flex; flex-direction: column; gap: 12px;">
+          <p style="color: var(--soft);">No announcements yet.</p>
+        </div>
+      </div>
+
+      <!-- Create Announcement Modal -->
+      <div class="modal-overlay" id="createAnnouncementModal" style="display: none;">
+        <div class="modal" style="max-width: 500px;">
+          <h2 style="font-size: 1.4rem; margin-bottom: 16px;">Create Announcement</h2>
+          <div class="form-group">
+            <label class="form-label">Title</label>
+            <input type="text" class="form-input" id="announcementTitle" placeholder="Announcement title">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Message</label>
+            <textarea class="form-input" id="announcementMessage" placeholder="Your announcement message" rows="4" style="resize: vertical;"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Expires (optional)</label>
+            <input type="datetime-local" class="form-input" id="announcementExpires">
+            <p style="font-size: 0.8rem; color: var(--soft); margin-top: 4px;">Leave empty for no expiration</p>
+          </div>
+          <div class="modal-actions">
+            <button class="modal-btn modal-btn-cancel" id="cancelAnnouncementBtn">Cancel</button>
+            <button class="modal-btn modal-btn-primary" id="saveAnnouncementBtn">Post Announcement</button>
           </div>
         </div>
       </div>
@@ -5975,6 +6024,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     schoolSelection.style.display = 'none';
     studentSchoolResults.style.display = 'none';
     loadStudents();
+    loadAnnouncements();
   }
 
   async function loadStudents() {
@@ -6015,6 +6065,12 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       // Add click handlers to student items
       document.querySelectorAll('.student-item').forEach(item => {
         item.addEventListener('click', () => {
+          // Remove selected class from all items
+          document.querySelectorAll('.student-item').forEach(i => i.classList.remove('selected'));
+          // Add selected class to clicked item
+          item.classList.add('selected');
+          item.style.borderColor = 'var(--brand)';
+
           const studentId = item.dataset.id;
           const student = students.find(s => s.id === studentId);
           if (student) {
@@ -6031,6 +6087,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     const detailEmail = document.getElementById('detailEmail');
     const detailSchool = document.getElementById('detailSchool');
     const detailCreated = document.getElementById('detailCreated');
+    const detailPoints = document.getElementById('detailPoints');
 
     detailName.textContent = student.name;
     detailEmail.textContent = student.email;
@@ -6039,7 +6096,139 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     const createdDate = new Date(student.created_at);
     detailCreated.textContent = createdDate.toLocaleDateString();
 
+    // Load student points
+    loadStudentPoints(student.id);
+
     studentDetails.style.display = 'block';
+  }
+
+  async function loadStudentPoints(studentId) {
+    const detailPoints = document.getElementById('detailPoints');
+    try {
+      const { data, error } = await SupabaseClient.rpc('get_student_points', {
+        p_student_id: studentId
+      });
+
+      if (error) throw error;
+
+      detailPoints.textContent = data || 0;
+    } catch (error) {
+      console.error('Error loading points:', error);
+      detailPoints.textContent = '-';
+    }
+  }
+
+  async function awardPoints() {
+    const selectedStudentId = document.querySelector('.student-item.selected')?.dataset.id;
+    if (!selectedStudentId) {
+      showNotification('Please select a student first');
+      return;
+    }
+
+    const amount = parseInt(document.getElementById('pointsAmount').value);
+    const reason = document.getElementById('pointsReason').value.trim();
+
+    if (!amount || amount < 1) {
+      showNotification('Please enter a valid amount');
+      return;
+    }
+
+    try {
+      const { data, error } = await SupabaseClient.rpc('award_points', {
+        p_student_id: selectedStudentId,
+        p_amount: amount,
+        p_reason: reason
+      });
+
+      if (error) throw error;
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to award points');
+      }
+
+      showNotification('Points awarded successfully!');
+      document.getElementById('pointsAmount').value = '';
+      document.getElementById('pointsReason').value = '';
+      loadStudentPoints(selectedStudentId);
+    } catch (error) {
+      console.error('Error awarding points:', error);
+      showNotification(error.message || 'Error awarding points');
+    }
+  }
+
+  async function loadAnnouncements() {
+    if (!teacherSchool) return;
+
+    const announcementsCard = document.getElementById('announcementsCard');
+    const announcementsList = document.getElementById('announcementsList');
+
+    try {
+      const { data, error } = await SupabaseClient
+        .from('announcements')
+        .select('*')
+        .eq('school_name', teacherSchool.name)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        announcementsList.innerHTML = '<p style="color: var(--soft);">No announcements yet.</p>';
+      } else {
+        announcementsList.innerHTML = data.map(ann => `
+          <div style="padding: 16px; background: var(--bg); border-radius: 8px; border: 1px solid var(--line);">
+            <div style="font-weight: 600; margin-bottom: 8px;">${escapeHtml(ann.title)}</div>
+            <div style="color: var(--soft); font-size: 0.9rem; margin-bottom: 8px;">${escapeHtml(ann.message)}</div>
+            <div style="font-size: 0.8rem; color: var(--soft);">
+              ${new Date(ann.created_at).toLocaleDateString()}
+              ${ann.expires_at ? ` • Expires: ${new Date(ann.expires_at).toLocaleDateString()}` : ''}
+            </div>
+          </div>
+        `).join('');
+      }
+
+      announcementsCard.style.display = 'block';
+    } catch (error) {
+      console.error('Error loading announcements:', error);
+    }
+  }
+
+  async function createAnnouncement() {
+    const title = document.getElementById('announcementTitle').value.trim();
+    const message = document.getElementById('announcementMessage').value.trim();
+    const expires = document.getElementById('announcementExpires').value;
+
+    if (!title || !message) {
+      showNotification('Please fill in title and message');
+      return;
+    }
+
+    if (!teacherSchool) {
+      showNotification('Please select your school first');
+      return;
+    }
+
+    try {
+      const { error } = await SupabaseClient
+        .from('announcements')
+        .insert({
+          title,
+          message,
+          school_name: teacherSchool.name,
+          expires_at: expires ? new Date(expires).toISOString() : null
+        });
+
+      if (error) throw error;
+
+      showNotification('Announcement created successfully!');
+      document.getElementById('announcementTitle').value = '';
+      document.getElementById('announcementMessage').value = '';
+      document.getElementById('announcementExpires').value = '';
+      document.getElementById('createAnnouncementModal').style.display = 'none';
+      loadAnnouncements();
+    } catch (error) {
+      console.error('Error creating announcement:', error);
+      showNotification(error.message || 'Error creating announcement');
+    }
   }
 
   async function addStudent() {
@@ -6137,6 +6326,28 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     document.getElementById('cancelAddStudentBtn').addEventListener('click', () => {
       document.getElementById('addStudentModal').style.display = 'none';
     });
+  }
+
+  // Award points
+  if (document.getElementById('awardPointsBtn')) {
+    document.getElementById('awardPointsBtn').addEventListener('click', awardPoints);
+  }
+
+  // Announcements
+  if (document.getElementById('createAnnouncementBtn')) {
+    document.getElementById('createAnnouncementBtn').addEventListener('click', () => {
+      document.getElementById('createAnnouncementModal').style.display = 'block';
+    });
+  }
+
+  if (document.getElementById('cancelAnnouncementBtn')) {
+    document.getElementById('cancelAnnouncementBtn').addEventListener('click', () => {
+      document.getElementById('createAnnouncementModal').style.display = 'none';
+    });
+  }
+
+  if (document.getElementById('saveAnnouncementBtn')) {
+    document.getElementById('saveAnnouncementBtn').addEventListener('click', createAnnouncement);
   }
 
   // Update custom ID preview
