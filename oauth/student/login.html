@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Classcastle — Student Login</title>
+<link rel="icon" type="image/svg+xml" href="/logo.svg" id="favicon">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --bg: #FCFCFA;
+    --surface: #fff;
+    --ink: #18221C;
+    --soft: #5E675F;
+    --line: #D9DDD3;
+    --brand: #1F5C3A;
+    --tint: #E4F1E6;
+    --board: #17352A;
+    --chalk: #F4D35E;
+    --red: #B23A2E;
+    --amber: #D98E2B;
+    --sky: var(--brand);
+    --sky-soft: var(--tint);
+    color-scheme: light dark;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0F1511;
+      --surface: #18211B;
+      --ink: #EEF2EA;
+      --soft: #9EAA9F;
+      --line: #2A362D;
+      --brand: #4DAA72;
+      --tint: #1A2B20;
+      --board: #1C4030;
+      --chalk: #F4D35E;
+      --red: #D2503F;
+      --amber: #F0B84D;
+      --sky: var(--brand);
+      --sky-soft: var(--tint);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F1511;
+    --surface: #18211B;
+    --ink: #EEF2EA;
+    --soft: #9EAA9F;
+    --line: #2A362D;
+    --brand: #4DAA72;
+    --tint: #1A2B20;
+    --board: #1C4030;
+    --chalk: #F4D35E;
+    --red: #D2503F;
+    --amber: #F0B84D;
+    --sky: var(--brand);
+    --sky-soft: var(--tint);
+  }
+  * { box-sizing: inherit; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  html, body { margin: 0; padding: 0; min-height: 100vh; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Instrument Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  h1, h2, h3 { font-family: 'Instrument Sans', system-ui, sans-serif; margin: 0; font-weight: 400; }
+  p { margin: 0; }
+  a { color: inherit; }
+
+  .image-nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 22px 28px;
+    z-index: 10;
+  }
+  .image-nav .wordmark { font-family: 'Instrument Sans', system-ui, sans-serif; font-size: 1.25rem; font-weight: 400; letter-spacing: -0.01em; display: flex; align-items: center; gap: 9px; color: #fff; }
+  .image-nav .logo-mark { width: 24px; height: 24px; display: block; }
+  .image-nav .wordmark .word-accent { color: #fff; }
+  .image-nav .nav-cta{font-weight:600;font-size:.92rem;text-decoration:none;padding:8px 2px;border-bottom:2px solid #fff;color:#fff}
+
+  .image-credit {
+    position: absolute;
+    bottom: 12px;
+    left: 22px;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    z-index: 10;
+  }
+  .image-credit a {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: underline;
+  }
+  .image-credit a:hover {
+    color: #fff;
+  }
+
+  main {
+    flex: 1;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    padding: 0;
+    position: relative;
+  }
+
+  .auth-container {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    align-items: stretch;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .auth-image {
+    aspect-ratio: auto;
+    background: var(--tint);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .auth-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .image-nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 22px 28px;
+    z-index: 10;
+  }
+
+  .auth-form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 40px 36px 32px;
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .page-title {
+    font-size: clamp(1.5rem, 4vw, 1.8rem);
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+  }
+
+  .page-subtitle {
+    color: var(--soft);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 0.98rem;
+    background: var(--surface);
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+  .form-input:focus {
+    border-color: var(--brand);
+    outline: 3px solid var(--brand);
+    outline-offset: 3px;
+  }
+
+  .btn {
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.98rem;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+    border: none;
+  }
+  .btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  .btn:not(:disabled):active {
+    transform: scale(0.98);
+  }
+
+  .btn-primary {
+    background: var(--brand);
+    color: #fff;
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .btn-primary:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--ink);
+  }
+  .btn-primary:active {
+    transform: translate(0, 0);
+    box-shadow: none;
+  }
+
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+  .btn-secondary:hover {
+    border-color: var(--brand);
+  }
+
+  .btn-full {
+    width: 100%;
+  }
+
+  .auth-footer {
+    margin-top: 16px;
+    text-align: center;
+    color: var(--soft);
+    font-size: 0.9rem;
+  }
+  .auth-footer a {
+    color: var(--brand);
+    text-decoration: underline;
+    text-underline-offset: 5px;
+    text-decoration-thickness: 2px;
+  }
+
+  .notification {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--ink);
+    color: var(--bg);
+    padding: 16px 20px;
+    border-radius: 6px;
+    font-size: 0.92rem;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+    z-index: 1000;
+  }
+  .notification.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-overlay.show {
+    display: flex;
+  }
+
+  .modal {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    animation: modalSlideIn 0.2s ease-out;
+  }
+
+  @keyframes modalSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .modal h2 {
+    font-size: 1.4rem;
+    margin-bottom: 12px;
+    color: var(--ink);
+  }
+
+  .modal p {
+    font-size: 0.95rem;
+    color: var(--soft);
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+  }
+
+  .modal-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .modal-btn-primary {
+    background: var(--ink);
+    color: var(--bg);
+  }
+  .modal-btn-primary:hover {
+    background: #1a1a1a;
+  }
+
+  .modal-btn-secondary {
+    background: var(--bg);
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+  .modal-btn-secondary:hover {
+    background: var(--line);
+  }
+
+  .loading {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #fff;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @media (max-width: 780px) {
+    nav { padding: 22px 24px; }
+    main { padding: 24px; }
+    .auth-container {
+      grid-template-columns: 1fr;
+    }
+    .auth-image {
+      display: none;
+    }
+    .auth-form {
+      padding: 24px;
+    }
+  }
+
+  .info-box {
+    background: var(--tint);
+    border: 1px solid var(--brand);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--brand);
+  }
+  .info-box strong {
+    display: block;
+    margin-bottom: 4px;
+  }
+</style>
+</head>
+<body>
+
+<main>
+  <div class="auth-container">
+    <div class="auth-image">
+      <img src="https://images.unsplash.com/photo-1758270705290-62b6294dd044?auto=format&fit=crop&w=800&h=1000&q=80" alt="Students in classroom" width="800" height="1000">
+      <nav aria-label="Main" class="image-nav">
+        <div class="wordmark"><img src="/logo.svg" alt="" class="logo-mark"><span>Class<span class="word-accent">castle</span></span></div>
+        <div style="display:flex;gap:16px;align-items:center;">
+          <a class="nav-cta" href="/login.html">Teacher login</a>
+        </div>
+      </nav>
+      <div class="image-credit">
+        Photo by <a href="https://unsplash.com/@kellysikkema?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText" target="_blank" rel="noopener noreferrer">Kelly Sikkema</a> on <a href="https://unsplash.com/?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText" target="_blank" rel="noopener noreferrer">Unsplash</a>
+      </div>
+    </div>
+    <div class="auth-form">
+      <div class="card">
+        <div class="page-header">
+          <h1 class="page-title">Student Login</h1>
+          <p class="page-subtitle">Login to track your points and achievements.</p>
+        </div>
+        <div class="info-box">
+          <strong>Need to login?</strong>
+          Only login if your teacher has enabled points for your class. Otherwise, you can join a room using just your room code.
+        </div>
+      <div class="form-group">
+        <label class="form-label" for="loginEmail">Email</label>
+        <input type="email" class="form-input" id="loginEmail" placeholder="you@school.edu">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="loginPassword">Password</label>
+        <input type="password" class="form-input" id="loginPassword" placeholder="••••••••">
+      </div>
+      <button class="btn btn-primary btn-full" id="loginBtn">
+        <span class="btn-text">Sign in</span>
+        <span class="loading" style="display: none;"></span>
+      </button>
+      <div class="auth-footer">
+        Don't have an account? <a href="/signup.html">Create your account</a>
+      </div>
+      <div class="auth-footer" style="margin-top: 8px;">
+        <a href="/login.html">Teacher login</a>
+      </div>
+      <div class="auth-footer" style="margin-top: 12px; font-size: 0.85rem;">
+        By signing in, you agree to our <a href="/terms.html">Terms of Service</a> and <a href="/privacy.html">Privacy Policy</a>
+      </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="notification" id="notification"></div>
+
+<!-- Alert Modal -->
+<div class="modal-overlay" id="alertModalOverlay">
+  <div class="modal" id="alertModal">
+    <h2 id="alertModalTitle">Alert</h2>
+    <p id="alertModalMessage">Message goes here</p>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-primary" id="alertModalConfirm">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Supabase configuration
+  const SUPABASE_URL = 'https://hduyofdbpspjcuwvackd.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK';
+  
+  const SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // Switch favicon based on theme
+  function updateFavicon() {
+    const favicon = document.getElementById('favicon');
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    favicon.href = isDark ? '/logo-dark.svg' : '/logo.svg';
+  }
+
+  // Update favicon on load and when theme changes
+  updateFavicon();
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
+
+  const notification = document.getElementById('notification');
+  const loginEmail = document.getElementById('loginEmail');
+  const loginPassword = document.getElementById('loginPassword');
+  const loginBtn = document.getElementById('loginBtn');
+  const loginBtnText = loginBtn.querySelector('.btn-text');
+  const loginBtnLoading = loginBtn.querySelector('.loading');
+
+  // Alert modal elements
+  const alertModalOverlay = document.getElementById('alertModalOverlay');
+  const alertModal = document.getElementById('alertModal');
+  const alertModalTitle = document.getElementById('alertModalTitle');
+  const alertModalMessage = document.getElementById('alertModalMessage');
+  const alertModalConfirm = document.getElementById('alertModalConfirm');
+
+  function showAlert(title, message, errorCode = null) {
+    alertModalTitle.textContent = title;
+    alertModalMessage.textContent = message;
+    alertModalOverlay.classList.add('show');
+
+    // Show error code if provided
+    if (errorCode) {
+      const errorCodeEl = document.createElement('div');
+      errorCodeEl.style.cssText = 'margin-top: 12px; padding: 8px; background: rgba(0,0,0,0.05); border-radius: 4px; font-family: monospace; font-size: 0.85rem; color: var(--soft);';
+      errorCodeEl.textContent = `Error Code: ${errorCode}`;
+      alertModalMessage.appendChild(errorCodeEl);
+    }
+  }
+
+  alertModalConfirm.addEventListener('click', () => {
+    alertModalOverlay.classList.remove('show');
+  });
+
+  function showNotification(message, duration = 3000) {
+    notification.textContent = message;
+    notification.classList.add('show');
+    setTimeout(() => {
+      notification.classList.remove('show');
+    }, duration);
+  }
+
+  // Check if already logged in
+  async function checkSession() {
+    const { data: { session } } = await SupabaseClient.auth.getSession();
+
+    // Check for error in URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+    const errorCode = urlParams.get('error_code');
+    const errorDescription = urlParams.get('error_description');
+
+    // Only show modal for critical errors that block authentication
+    if (error || errorCode) {
+      let isCriticalError = false;
+      let title = 'Authentication Error';
+      let message = errorDescription || 'An error occurred during authentication.';
+
+      // Handle specific error codes
+      if (errorCode === 'user_banned') {
+        title = 'Account Banned';
+        message = 'Your account has been banned in accordance with our Terms of Service. Please contact support@classcastle.org to find out when your ban expires.';
+        showAlert(title, message, errorCode);
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
+      } else if (error === 'identity_not_found') {
+        title = 'Account Not Found';
+        message = 'This account is not linked to a Classcastle account. Please sign up first.';
+        isCriticalError = true;
+      } else if (error === 'access_denied') {
+        title = 'Access Denied';
+        message = errorDescription || 'You do not have permission to access this resource.';
+        isCriticalError = true;
+      } else if (error === 'user_not_found' || errorCode === 'user_not_found') {
+        title = 'Account Deleted';
+        message = errorDescription || 'Your account has been deleted. Please sign up again if you\'d like to create a new account.';
+        isCriticalError = true;
+      }
+
+      if (isCriticalError) {
+        showAlert(title, message, errorCode);
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
+      } else {
+        showNotification(message, 5000);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+
+    if (session) {
+      showNotification('You are already logged in!');
+      setTimeout(() => {
+        window.location.href = '/app.html';
+      }, 500);
+    }
+  }
+
+  async function handleLogin() {
+    const email = loginEmail.value.trim();
+    const password = loginPassword.value;
+
+    if (!email || !password) {
+      showNotification('Please fill in all fields');
+      return;
+    }
+
+    // Show loading state
+    loginBtn.disabled = true;
+    loginBtnText.style.display = 'none';
+    loginBtnLoading.style.display = 'inline-block';
+
+    try {
+      const { data, error } = await SupabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) throw error;
+
+      showNotification('Welcome back!');
+      setTimeout(() => {
+        window.location.href = '/app.html';
+      }, 1000);
+    } catch (error) {
+      console.error('Login error:', error);
+      showNotification(error.message || 'Login failed. Please try again.');
+      loginBtn.disabled = false;
+      loginBtnText.style.display = 'inline-block';
+      loginBtnLoading.style.display = 'none';
+    }
+  }
+
+  // Event listeners
+  loginBtn.addEventListener('click', handleLogin);
+
+  // Allow Enter key to submit
+  loginPassword.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') handleLogin();
+  });
+
+  // Check session on load
+  checkSession();
+</script>
+
+</body>
+</html>
