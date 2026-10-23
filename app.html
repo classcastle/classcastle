@@ -2983,26 +2983,9 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         <h3 style="font-size: 1.1rem; margin-bottom: 16px;">Your School</h3>
         <div id="schoolDisplay" style="padding: 12px; background: var(--tint); border-radius: 6px; display: none;">
           <strong id="displaySchoolName"></strong>
-          <button class="btn btn-secondary" id="changeSchoolBtn" style="margin-left: 12px; font-size: 0.8rem; padding: 4px 12px;">Change</button>
         </div>
         <div id="schoolSelection" style="display: block;">
-          <div class="form-group">
-            <label class="form-label">Find your school</label>
-            <input type="text" class="form-input" id="studentSchoolSearch" placeholder="Search for your school or postcode (e.g., Manchester Grammar School or M1 7DW)">
-            <button class="btn btn-secondary" id="searchStudentSchoolsBtn" style="margin-top: 8px;">Search Schools</button>
-            <div id="studentSchoolSearchStatus" style="margin-top: 8px; font-size: 0.85rem; color: var(--soft);"></div>
-            <div id="studentSchoolResults" style="margin-top: 12px; max-height: 200px; overflow-y: auto; display: none;">
-              <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
-                <thead>
-                  <tr>
-                    <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--line);">School Name</th>
-                    <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--line);">Location</th>
-                  </tr>
-                </thead>
-                <tbody id="studentSchoolResultsBody"></tbody>
-              </table>
-            </div>
-          </div>
+          <p style="color: var(--soft);">No school assigned to your account. Please contact support@classcastle.org to have a school assigned.</p>
         </div>
       </div>
 
@@ -5900,22 +5883,31 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   let students = [];
   let selectedStudent = null;
 
-  // Load teacher's school from metadata
+  // Load teacher's school from secure table
   async function loadTeacherSchool() {
-    const { data: { user } } = await SupabaseClient.auth.getUser();
-    if (user.user_metadata?.school_name) {
-      teacherSchool = {
-        name: user.user_metadata.school_name,
-        postcode: user.user_metadata.school_postcode,
-        lat: user.user_metadata.school_lat,
-        lon: user.user_metadata.school_lon
-      };
-      displaySchoolName.textContent = teacherSchool.name;
-      schoolDisplay.style.display = 'block';
-      schoolSelection.style.display = 'none';
-      loadStudents();
-      loadAnnouncements();
-    } else {
+    try {
+      const { data, error } = await SupabaseClient.rpc('get_teacher_school');
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        teacherSchool = {
+          name: data[0].school_name,
+          postcode: data[0].school_postcode,
+          lat: data[0].school_lat,
+          lon: data[0].school_lon
+        };
+        displaySchoolName.textContent = teacherSchool.name;
+        schoolDisplay.style.display = 'block';
+        schoolSelection.style.display = 'none';
+        loadStudents();
+        loadAnnouncements();
+      } else {
+        schoolDisplay.style.display = 'none';
+        schoolSelection.style.display = 'block';
+      }
+    } catch (error) {
+      console.error('Error loading teacher school:', error);
       schoolDisplay.style.display = 'none';
       schoolSelection.style.display = 'block';
     }
@@ -6204,22 +6196,18 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       return;
     }
 
-    if (!teacherSchool) {
-      showNotification('Please select your school first');
-      return;
-    }
-
     try {
-      const { error } = await SupabaseClient
-        .from('announcements')
-        .insert({
-          title,
-          message,
-          school_name: teacherSchool.name,
-          expires_at: expires ? new Date(expires).toISOString() : null
-        });
+      const { data, error } = await SupabaseClient.rpc('create_announcement', {
+        p_title: title,
+        p_message: message,
+        p_expires_at: expires ? new Date(expires).toISOString() : null
+      });
 
       if (error) throw error;
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to create announcement');
+      }
 
       showNotification('Announcement created successfully!');
       document.getElementById('announcementTitle').value = '';

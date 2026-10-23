@@ -327,11 +327,7 @@
       const announcementsSection = document.getElementById('announcementsSection');
 
       try {
-        const { data, error } = await SupabaseClient
-          .from('announcements')
-          .select('*')
-          .eq('school_name', schoolName)
-          .order('created_at', { ascending: false });
+        const { data, error } = await SupabaseClient.rpc('get_student_announcements');
 
         if (error) throw error;
 
