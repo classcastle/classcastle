@@ -5952,10 +5952,10 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     if (!teacherSchool) return;
 
     try {
-      const { data, error } = await SupabaseClient
-        .from('students')
-        .select('*')
-        .eq('school_name', teacherSchool.name);
+      // Use RPC to get students from auth.users with proper RLS
+      const { data, error } = await SupabaseClient.rpc('get_school_students', {
+        p_school_name: teacherSchool.name
+      });
 
       if (error) throw error;
 
@@ -6005,7 +6005,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     addStudentBtn.textContent = 'Adding...';
 
     try {
-      // Create student account
+      // Create student account with school metadata
       const { data, error } = await SupabaseClient.auth.signUp({
         email,
         password,
@@ -6022,19 +6022,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       });
 
       if (error) throw error;
-
-      // Add to students table
-      const { error: dbError } = await SupabaseClient
-        .from('students')
-        .insert({
-          id: data.user.id,
-          name: name,
-          email: email,
-          school_name: teacherSchool.name,
-          teacher_id: (await SupabaseClient.auth.getUser()).data.user.id
-        });
-
-      if (dbError) throw dbError;
 
       showNotification('Student added successfully!');
       studentName.value = '';
@@ -6054,15 +6041,10 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     if (!confirm('Are you sure you want to remove this student?')) return;
 
     try {
-      const { error } = await SupabaseClient
-        .from('students')
-        .delete()
-        .eq('id', studentId);
-
-      if (error) throw error;
-
-      showNotification('Student removed');
-      loadStudents();
+      // We can't delete users from client-side auth
+      // Instead, mark them as inactive by updating metadata
+      // This requires service role key or a custom RPC
+      showNotification('Student removal requires admin access. Contact support@classcastle.org');
     } catch (error) {
       console.error('Error removing student:', error);
       showNotification('Error removing student');
