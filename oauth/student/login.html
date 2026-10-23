@@ -430,6 +430,52 @@
     display: block;
     margin-bottom: 4px;
   }
+
+  .school-results {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  #schoolResults {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+  }
+
+  #schoolResults table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  #schoolResults th {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  #schoolResults td {
+    padding: 8px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  #schoolResults tr:last-child td {
+    border-bottom: none;
+  }
+
+  #schoolResults tbody tr {
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  #schoolResults tbody tr:hover {
+    background: var(--tint);
+  }
 </style>
 </head>
 <body>
@@ -437,7 +483,7 @@
 <main>
   <div class="auth-container">
     <div class="auth-image">
-      <img src="https://images.unsplash.com/photo-1758270705290-62b6294dd044?auto=format&fit=crop&w=800&h=1000&q=80" alt="Students in classroom" width="800" height="1000">
+      <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&h=1000&q=80" alt="Students studying" width="800" height="1000">
       <nav aria-label="Main" class="image-nav">
         <div class="wordmark"><img src="/logo.svg" alt="" class="logo-mark"><span>Class<span class="word-accent">castle</span></span></div>
         <div style="display:flex;gap:16px;align-items:center;">
@@ -445,7 +491,7 @@
         </div>
       </nav>
       <div class="image-credit">
-        Photo by <a href="https://unsplash.com/@kellysikkema?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText" target="_blank" rel="noopener noreferrer">Kelly Sikkema</a> on <a href="https://unsplash.com/?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText" target="_blank" rel="noopener noreferrer">Unsplash</a>
+        Photo by <a href="https://unsplash.com/@felipepessoa?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText" target="_blank" rel="noopener noreferrer">Felipe Pessoa</a> on <a href="https://unsplash.com/?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText" target="_blank" rel="noopener noreferrer">Unsplash</a>
       </div>
     </div>
     <div class="auth-form">
@@ -459,6 +505,27 @@
           Only login if your teacher has enabled points for your class. Otherwise, you can join a room using just your room code.
         </div>
       <div class="form-group">
+        <label class="form-label" for="schoolSearch">Find your school</label>
+        <input type="text" class="form-input" id="schoolSearch" placeholder="Search for your school or postcode (e.g., Manchester Grammar School or M1 7DW)">
+        <button class="btn btn-secondary" id="searchSchoolsBtn" style="margin-top: 8px;">Search Schools</button>
+        <div id="schoolSearchStatus" style="margin-top: 8px; font-size: 0.85rem; color: var(--soft);"></div>
+        <div id="schoolResults" style="margin-top: 12px; max-height: 200px; overflow-y: auto; display: none;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+            <thead>
+              <tr>
+                <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--line);">School Name</th>
+                <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--line);">Location</th>
+              </tr>
+            </thead>
+            <tbody id="schoolResultsBody"></tbody>
+          </table>
+        </div>
+        <div id="selectedSchoolInfo" style="margin-top: 8px; padding: 8px; background: var(--tint); border-radius: 4px; display: none;">
+          <strong id="selectedSchoolName"></strong>
+          <button class="btn btn-secondary" id="clearSchoolBtn" style="margin-left: 8px; font-size: 0.75rem; padding: 4px 8px;">Clear</button>
+        </div>
+      </div>
+      <div class="form-group">
         <label class="form-label" for="loginEmail">Email</label>
         <input type="email" class="form-input" id="loginEmail" placeholder="you@school.edu">
       </div>
@@ -470,9 +537,6 @@
         <span class="btn-text">Sign in</span>
         <span class="loading" style="display: none;"></span>
       </button>
-      <div class="auth-footer">
-        Don't have an account? <a href="/signup.html">Create your account</a>
-      </div>
       <div class="auth-footer" style="margin-top: 8px;">
         <a href="/login.html">Teacher login</a>
       </div>
@@ -521,6 +585,16 @@
   const loginBtn = document.getElementById('loginBtn');
   const loginBtnText = loginBtn.querySelector('.btn-text');
   const loginBtnLoading = loginBtn.querySelector('.loading');
+  const schoolSearchInput = document.getElementById('schoolSearch');
+  const schoolSearchStatus = document.getElementById('schoolSearchStatus');
+  const schoolResults = document.getElementById('schoolResults');
+  const schoolResultsBody = document.getElementById('schoolResultsBody');
+  const selectedSchoolInfo = document.getElementById('selectedSchoolInfo');
+  const selectedSchoolName = document.getElementById('selectedSchoolName');
+  const clearSchoolBtn = document.getElementById('clearSchoolBtn');
+  const searchSchoolsBtn = document.getElementById('searchSchoolsBtn');
+
+  let selectedSchool = null;
 
   // Alert modal elements
   const alertModalOverlay = document.getElementById('alertModalOverlay');
@@ -644,6 +718,131 @@
       loginBtnLoading.style.display = 'none';
     }
   }
+
+  // School search functionality (from app.html)
+  async function searchSchools() {
+    const searchTerm = schoolSearchInput.value.trim();
+
+    if (!searchTerm) {
+      schoolSearchStatus.textContent = 'Please enter a school name or postcode';
+      schoolSearchStatus.style.color = 'var(--red)';
+      return;
+    }
+
+    schoolSearchStatus.textContent = 'Searching...';
+    schoolSearchStatus.style.color = 'var(--soft)';
+    schoolResults.style.display = 'none';
+
+    try {
+      // Check if input is a UK postcode
+      const isPostcode = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i.test(searchTerm);
+
+      // Build query - for postcode search, use the postcode directly
+      let query;
+      if (isPostcode) {
+        query = searchTerm;
+      } else {
+        query = `${encodeURIComponent(searchTerm)}+school`;
+      }
+
+      // Use Nominatim API to search
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&addressdetails=1&limit=20&countrycodes=gb`, {
+        headers: {
+          'User-Agent': 'Classcastle'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data || data.length === 0) {
+        schoolSearchStatus.textContent = "No schools found. Your school may not be in our database. Contact us at support@classcastle.org and we'll help you get set up.";
+        schoolSearchStatus.style.color = 'var(--amber)';
+        return;
+      }
+
+      // Filter for UK schools only
+      const schools = data
+        .filter(item => {
+          const isUK = item.address && (item.address.country_code === 'gb' || item.address.country === 'United Kingdom');
+          const isSchool = item.type === 'school' || item.class === 'amenity' || item.display_name.toLowerCase().includes('school');
+          return isUK && isSchool;
+        })
+        .map(item => ({
+          id: item.place_id,
+          name: item.display_name.split(',')[0] || 'Unknown School',
+          location: item.address.city || item.address.town || item.address.village || item.address.county || 'Unknown',
+          postcode: item.address.postcode || 'Not available',
+          lat: parseFloat(item.lat),
+          lon: parseFloat(item.lon)
+        }));
+
+      if (schools.length === 0) {
+        schoolSearchStatus.textContent = "No UK schools found. Your school may not be in our database. Contact us at support@classcastle.org and we'll help you get set up.";
+        schoolSearchStatus.style.color = 'var(--amber)';
+        return;
+      }
+
+      schoolResultsBody.innerHTML = schools.map(school => `
+        <tr style="cursor: pointer; border-bottom: 1px solid var(--line);" data-school-id="${school.id}">
+          <td style="padding: 8px;">${escapeHtml(school.name)}</td>
+          <td style="padding: 8px;">${escapeHtml(school.location)}</td>
+        </tr>
+      `).join('');
+
+      schoolResults.style.display = 'block';
+      schoolSearchStatus.textContent = `Found ${schools.length} UK schools`;
+      schoolSearchStatus.style.color = 'var(--brand)';
+
+      // Add click handlers
+      schoolResultsBody.querySelectorAll('tr[data-school-id]').forEach(row => {
+        row.addEventListener('click', () => {
+          const schoolId = row.dataset.schoolId;
+          const school = schools.find(s => s.id == schoolId);
+          if (school) {
+            selectSchool(school);
+          }
+        });
+      });
+    } catch (error) {
+      console.error('Error searching schools:', error);
+      schoolSearchStatus.textContent = `Error: ${error.message}`;
+      schoolSearchStatus.style.color = 'var(--red)';
+    }
+  }
+
+  function selectSchool(school) {
+    selectedSchool = school;
+    selectedSchoolName.textContent = school.name;
+    selectedSchoolInfo.style.display = 'block';
+    schoolResults.style.display = 'none';
+  }
+
+  function clearSchool() {
+    selectedSchool = null;
+    selectedSchoolInfo.style.display = 'none';
+    schoolSearchInput.value = '';
+    schoolSearchStatus.textContent = '';
+    schoolResults.style.display = 'none';
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // School search event listeners
+  if (searchSchoolsBtn) searchSchoolsBtn.addEventListener('click', searchSchools);
+  if (schoolSearchInput) {
+    schoolSearchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') searchSchools();
+    });
+  }
+  if (clearSchoolBtn) clearSchoolBtn.addEventListener('click', clearSchool);
 
   // Event listeners
   loginBtn.addEventListener('click', handleLogin);
