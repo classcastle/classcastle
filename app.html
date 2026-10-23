@@ -7916,6 +7916,17 @@ usage/fair dealing.`,
         return;
       }
 
+      // Check if user is a student
+      const userType = user.user_metadata?.user_type;
+      if (userType === 'student') {
+        await SupabaseClient.auth.signOut();
+        showNotification('Students should use the student dashboard', 5000);
+        setTimeout(() => {
+          window.location.href = '/oauth/student/login.html';
+        }, 2000);
+        return;
+      }
+
       updateUserInfo();
       // Call showPage to ensure dashboard content renders properly
       showPage('dashboardPage');
