@@ -6082,6 +6082,12 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       if (error) throw error;
 
+      // Verify the student was created with the correct school
+      const { data: { user: createdUser } } = await SupabaseClient.auth.getUser();
+      if (createdUser.user_metadata?.school_name !== teacherSchool.name) {
+        throw new Error('Student school does not match your selected school');
+      }
+
       // Sign back in as teacher if we were logged in
       if (teacherSession) {
         await SupabaseClient.auth.setSession(teacherSession);
