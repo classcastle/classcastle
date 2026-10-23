@@ -743,7 +743,7 @@
       const userSchool = data.user.user_metadata?.school_name;
       if (!userSchool) {
         await SupabaseClient.auth.signOut();
-        showAlert('No School Assigned', 'Your account has no school assigned. Please contact your teacher or support@classcastle.org.');
+        showAlert('No School Assigned', 'Your account has no school assigned. Please contact your teacher.');
         loginBtn.disabled = false;
         loginBtnText.style.display = 'inline-block';
         loginBtnLoading.style.display = 'none';
@@ -752,7 +752,7 @@
 
       if (selectedSchool.name !== userSchool) {
         await SupabaseClient.auth.signOut();
-        showAlert('School Mismatch', `Your account is registered for ${userSchool}, but you selected ${selectedSchool.name}. Please select the correct school.`);
+        showAlert('School Mismatch', 'The school you selected does not match your account. Please select the correct school.');
         loginBtn.disabled = false;
         loginBtnText.style.display = 'inline-block';
         loginBtnLoading.style.display = 'none';
