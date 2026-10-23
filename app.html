@@ -2975,6 +2975,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           <h1 class="page-title">Students</h1>
           <p class="page-subtitle">Manage student accounts for your school</p>
         </div>
+        <button class="btn btn-primary" id="showAddStudentBtn">Add Student</button>
       </div>
 
       <!-- School Selection -->
@@ -3005,33 +3006,63 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         </div>
       </div>
 
-      <!-- Add Student Form -->
-      <div class="card" id="addStudentCard" style="display: none;">
-        <h3 style="font-size: 1.1rem; margin-bottom: 16px;">Add Student</h3>
-        <div class="form-group">
-          <label class="form-label">Student Name</label>
-          <input type="text" class="form-input" id="studentName" placeholder="John Smith">
+      <!-- Students Dashboard -->
+      <div class="card" id="studentsDashboard" style="display: none;">
+        <div style="display: grid; grid-template-columns: 300px 1fr; gap: 24px;">
+          <!-- Students List -->
+          <div>
+            <h3 style="font-size: 1rem; margin-bottom: 16px;">Students (<span id="studentCount">0</span>)</h3>
+            <div id="studentsList" style="display: flex; flex-direction: column; gap: 8px; max-height: 500px; overflow-y: auto;">
+              <p style="color: var(--soft);">No students added yet.</p>
+            </div>
+          </div>
+
+          <!-- Student Details -->
+          <div id="studentDetails" style="display: none;">
+            <h3 style="font-size: 1rem; margin-bottom: 16px;">Student Details</h3>
+            <div style="background: var(--bg); padding: 20px; border-radius: 8px; border: 1px solid var(--line);">
+              <div style="margin-bottom: 16px;">
+                <label style="font-size: 0.85rem; color: var(--soft);">Name</label>
+                <div id="detailName" style="font-size: 1rem; font-weight: 500;"></div>
+              </div>
+              <div style="margin-bottom: 16px;">
+                <label style="font-size: 0.85rem; color: var(--soft);">Email</label>
+                <div id="detailEmail" style="font-size: 1rem;"></div>
+              </div>
+              <div style="margin-bottom: 16px;">
+                <label style="font-size: 0.85rem; color: var(--soft);">School</label>
+                <div id="detailSchool" style="font-size: 1rem;"></div>
+              </div>
+              <div style="margin-bottom: 16px;">
+                <label style="font-size: 0.85rem; color: var(--soft);">Added</label>
+                <div id="detailCreated" style="font-size: 1rem;"></div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Student Email</label>
-          <input type="email" class="form-input" id="studentEmail" placeholder="john.smith@school.edu">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Password</label>
-          <input type="password" class="form-input" id="studentPassword" placeholder="••••••••">
-          <p style="font-size: 0.8rem; color: var(--soft); margin-top: 4px;">Share this password with the student</p>
-        </div>
-        <button class="btn btn-primary" id="addStudentBtn">Add Student</button>
       </div>
 
-      <!-- Students List -->
-      <div class="card" id="studentsListCard" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-          <h3 style="font-size: 1.1rem; margin: 0;">Students</h3>
-          <button class="btn btn-primary" id="showAddStudentBtn">Add Student</button>
-        </div>
-        <div id="studentsList" style="display: flex; flex-direction: column; gap: 8px;">
-          <p style="color: var(--soft);">No students added yet.</p>
+      <!-- Add Student Modal -->
+      <div class="modal-overlay" id="addStudentModal" style="display: none;">
+        <div class="modal" style="max-width: 500px;">
+          <h2 style="font-size: 1.4rem; margin-bottom: 16px;">Add Student</h2>
+          <div class="form-group">
+            <label class="form-label">Student Name</label>
+            <input type="text" class="form-input" id="studentName" placeholder="John Smith">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Student Email</label>
+            <input type="email" class="form-input" id="studentEmail" placeholder="john.smith@school.edu">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-input" id="studentPassword" placeholder="•••••••••">
+            <p style="font-size: 0.8rem; color: var(--soft); margin-top: 4px;">Share this password with the student</p>
+          </div>
+          <div class="modal-actions">
+            <button class="modal-btn modal-btn-cancel" id="cancelAddStudentBtn">Cancel</button>
+            <button class="modal-btn modal-btn-primary" id="addStudentBtn">Add Student</button>
+          </div>
         </div>
       </div>
     </div>
@@ -5809,8 +5840,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   const studentSchoolSearchStatus = document.getElementById('studentSchoolSearchStatus');
   const studentSchoolResults = document.getElementById('studentSchoolResults');
   const studentSchoolResultsBody = document.getElementById('studentSchoolResultsBody');
-  const addStudentCard = document.getElementById('addStudentCard');
-  const studentsListCard = document.getElementById('studentsListCard');
   const showAddStudentBtn = document.getElementById('showAddStudentBtn');
   const addStudentBtn = document.getElementById('addStudentBtn');
   const studentName = document.getElementById('studentName');
@@ -5967,20 +5996,50 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   }
 
   function renderStudents() {
+    const studentsDashboard = document.getElementById('studentsDashboard');
+    const studentCount = document.getElementById('studentCount');
+    const studentDetails = document.getElementById('studentDetails');
+
     if (students.length === 0) {
-      studentsList.innerHTML = '<p style="color: var(--soft);">No students added yet.</p>';
-      studentsListCard.style.display = 'none';
-      addStudentCard.style.display = 'block';
+      studentsDashboard.style.display = 'none';
     } else {
+      studentsDashboard.style.display = 'block';
+      studentCount.textContent = students.length;
       studentsList.innerHTML = students.map(student => `
-        <div style="padding: 12px; background: var(--bg); border-radius: 6px; border: 1px solid var(--line);">
+        <div class="student-item" data-id="${student.id}" style="padding: 12px; background: var(--bg); border-radius: 6px; cursor: pointer; border: 1px solid var(--line);">
           <div style="font-weight: 500;">${escapeHtml(student.name)}</div>
           <div style="font-size: 0.85rem; color: var(--soft);">${escapeHtml(student.email)}</div>
         </div>
       `).join('');
-      studentsListCard.style.display = 'block';
-      addStudentCard.style.display = 'none';
+
+      // Add click handlers to student items
+      document.querySelectorAll('.student-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const studentId = item.dataset.id;
+          const student = students.find(s => s.id === studentId);
+          if (student) {
+            showStudentDetails(student);
+          }
+        });
+      });
     }
+  }
+
+  function showStudentDetails(student) {
+    const studentDetails = document.getElementById('studentDetails');
+    const detailName = document.getElementById('detailName');
+    const detailEmail = document.getElementById('detailEmail');
+    const detailSchool = document.getElementById('detailSchool');
+    const detailCreated = document.getElementById('detailCreated');
+
+    detailName.textContent = student.name;
+    detailEmail.textContent = student.email;
+    detailSchool.textContent = student.school_name;
+
+    const createdDate = new Date(student.created_at);
+    detailCreated.textContent = createdDate.toLocaleDateString();
+
+    studentDetails.style.display = 'block';
   }
 
   async function addStudent() {
@@ -6002,28 +6061,28 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     addStudentBtn.textContent = 'Adding...';
 
     try {
-      // Create student account with school metadata
-      const { data, error } = await SupabaseClient.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            name: name,
-            user_type: 'student',
-            school_name: teacherSchool.name,
-            school_postcode: teacherSchool.postcode,
-            school_lat: teacherSchool.lat,
-            school_lon: teacherSchool.lon
-          }
-        }
+      // Use RPC to create student account without signing in as the student
+      const { data, error } = await SupabaseClient.rpc('create_student_account', {
+        p_email: email,
+        p_password: password,
+        p_name: name,
+        p_school_name: teacherSchool.name,
+        p_school_postcode: teacherSchool.postcode,
+        p_school_lat: teacherSchool.lat,
+        p_school_lon: teacherSchool.lon
       });
 
       if (error) throw error;
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to create student account');
+      }
 
       showNotification('Student added successfully!');
       studentName.value = '';
       studentEmail.value = '';
       studentPassword.value = '';
+      document.getElementById('addStudentModal').style.display = 'none';
       loadStudents();
     } catch (error) {
       console.error('Error adding student:', error);
@@ -6048,11 +6107,16 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   }
 
   if (showAddStudentBtn) showAddStudentBtn.addEventListener('click', () => {
-    studentsListCard.style.display = 'none';
-    addStudentCard.style.display = 'block';
+    document.getElementById('addStudentModal').style.display = 'block';
   });
 
   if (addStudentBtn) addStudentBtn.addEventListener('click', addStudent);
+
+  if (document.getElementById('cancelAddStudentBtn')) {
+    document.getElementById('cancelAddStudentBtn').addEventListener('click', () => {
+      document.getElementById('addStudentModal').style.display = 'none';
+    });
+  }
 
   // Update custom ID preview
   if (pollCustomId) {
