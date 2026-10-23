@@ -36,7 +36,7 @@
     }
 
     .container {
-      max-width: 800px;
+      max-width: 1000px;
       margin: 0 auto;
       padding: 40px 20px;
     }
@@ -45,7 +45,9 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 40px;
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--line);
     }
 
     .logo {
@@ -57,22 +59,23 @@
     }
 
     .logo svg {
-      width: 32px;
-      height: 32px;
+      width: 40px;
+      height: 40px;
     }
 
     .logo-text {
-      font-size: 1.5rem;
+      font-size: 1.75rem;
       font-weight: 600;
     }
 
     .logout-btn {
-      padding: 8px 16px;
+      padding: 10px 20px;
       background: var(--surface);
       border: 1px solid var(--line);
-      border-radius: 6px;
+      border-radius: 8px;
       color: var(--soft);
-      font-size: 0.9rem;
+      font-size: 0.95rem;
+      font-weight: 500;
       cursor: pointer;
       transition: all 0.2s;
     }
@@ -80,23 +83,35 @@
     .logout-btn:hover {
       border-color: var(--brand);
       color: var(--brand);
+      background: var(--tint);
     }
 
-    .welcome-section {
-      background: var(--brand);
-      color: var(--brand-ink);
-      padding: 32px;
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
       border-radius: 12px;
-      margin-bottom: 24px;
+      padding: 24px;
+      text-align: center;
     }
 
-    .welcome-section h1 {
-      font-size: 2rem;
+    .stat-card h3 {
+      font-size: 0.9rem;
+      color: var(--soft);
       margin-bottom: 8px;
+      font-weight: 500;
     }
 
-    .welcome-section p {
-      opacity: 0.9;
+    .stat-card .value {
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: var(--brand);
     }
 
     .card {
@@ -109,56 +124,100 @@
 
     .card h2 {
       font-size: 1.25rem;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
+      font-weight: 600;
     }
 
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--line);
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
     }
 
-    .info-row:last-child {
-      border-bottom: none;
+    .info-item {
+      padding: 16px;
+      background: var(--bg);
+      border-radius: 8px;
+      border: 1px solid var(--line);
     }
 
     .info-label {
+      font-size: 0.85rem;
       color: var(--soft);
-      font-size: 0.9rem;
+      margin-bottom: 8px;
+      font-weight: 500;
     }
 
     .info-value {
-      font-weight: 500;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .info-value.large {
+      font-size: 2rem;
+      color: var(--brand);
+    }
+
+    .announcement-item {
+      padding: 20px;
+      background: var(--bg);
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      margin-bottom: 16px;
+    }
+
+    .announcement-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .announcement-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .announcement-message {
+      color: var(--soft);
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .announcement-date {
+      font-size: 0.85rem;
+      color: var(--soft);
     }
 
     .empty-state {
       text-align: center;
-      padding: 40px;
+      padding: 48px 24px;
       color: var(--soft);
     }
 
     .empty-state svg {
-      width: 64px;
-      height: 64px;
+      width: 72px;
+      height: 72px;
       margin-bottom: 16px;
-      opacity: 0.5;
+      opacity: 0.4;
+    }
+
+    .empty-state p {
+      font-size: 1rem;
     }
 
     .loading {
       text-align: center;
-      padding: 40px;
+      padding: 80px 20px;
       color: var(--soft);
     }
 
     .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid var(--line);
+      width: 48px;
+      height: 48px;
+      border: 4px solid var(--line);
       border-top-color: var(--brand);
       border-radius: 50%;
       animation: spin 1s linear infinite;
-      margin: 0 auto 16px;
+      margin: 0 auto 20px;
     }
 
     @keyframes spin {
@@ -171,17 +230,42 @@
       right: 24px;
       background: var(--ink);
       color: var(--brand-ink);
-      padding: 12px 24px;
-      border-radius: 6px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 14px 28px;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
       transform: translateY(100px);
       opacity: 0;
       transition: all 0.3s;
+      font-weight: 500;
     }
 
     .notification.show {
       transform: translateY(0);
       opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px 16px;
+      }
+
+      .header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+      }
+
+      .logout-btn {
+        width: 100%;
+      }
+
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -204,33 +288,37 @@
     </div>
 
     <div id="content" style="display: none;">
-      <div class="welcome-section">
-        <h1 id="welcomeText">Welcome!</h1>
-        <p>Student Dashboard</p>
+      <div class="dashboard-grid">
+        <div class="stat-card">
+          <h3>Your Points</h3>
+          <div class="value" id="studentPoints">0</div>
+        </div>
+        <div class="stat-card">
+          <h3>School</h3>
+          <div class="value" id="studentSchoolStat" style="font-size: 1.5rem;">-</div>
+        </div>
       </div>
 
       <div class="card">
         <h2>Your Information</h2>
-        <div class="info-row">
-          <span class="info-label">Name</span>
-          <span class="info-value" id="studentName">-</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Email</span>
-          <span class="info-value" id="studentEmail">-</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">School</span>
-          <span class="info-value" id="studentSchool">-</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Points</span>
-          <span class="info-value" id="studentPoints" style="color: var(--brand); font-size: 1.5rem; font-weight: 600;">0</span>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Name</div>
+            <div class="info-value" id="studentName">-</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Email</div>
+            <div class="info-value" id="studentEmail">-</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">School</div>
+            <div class="info-value" id="studentSchool">-</div>
+          </div>
         </div>
       </div>
 
       <div class="card">
-        <h2>Announcements</h2>
+        <h2>Announcements from Your Teacher</h2>
         <div id="announcementsSection">
           <div class="empty-state">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -278,10 +366,10 @@
         }
 
         // Display user info
-        document.getElementById('welcomeText').textContent = `Welcome, ${user.user_metadata?.name || 'Student'}!`;
         document.getElementById('studentName').textContent = user.user_metadata?.name || '-';
         document.getElementById('studentEmail').textContent = user.email || '-';
         document.getElementById('studentSchool').textContent = user.user_metadata?.school_name || '-';
+        document.getElementById('studentSchoolStat').textContent = user.user_metadata?.school_name || '-';
 
         // Load student points
         loadStudentPoints(user.id);
@@ -342,12 +430,10 @@
           `;
         } else {
           announcementsSection.innerHTML = data.map(ann => `
-            <div style="padding: 16px; background: var(--bg); border-radius: 8px; border: 1px solid var(--line); margin-bottom: 12px;">
-              <div style="font-weight: 600; margin-bottom: 8px;">${ann.title}</div>
-              <div style="color: var(--soft); font-size: 0.9rem; margin-bottom: 8px;">${ann.message}</div>
-              <div style="font-size: 0.8rem; color: var(--soft);">
-                ${new Date(ann.created_at).toLocaleDateString()}
-              </div>
+            <div class="announcement-item">
+              <div class="announcement-title">${ann.title}</div>
+              <div class="announcement-message">${ann.message}</div>
+              <div class="announcement-date">${new Date(ann.created_at).toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
             </div>
           `).join('');
         }

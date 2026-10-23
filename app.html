@@ -3135,6 +3135,67 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       </div>
     </div>
 
+    <!-- Admin Guide Modal -->
+    <div class="modal-overlay" id="adminGuideModal" style="display: none;">
+      <div class="modal" style="max-width: 700px; max-height: 80vh; overflow-y: auto;">
+        <h2 style="font-size: 1.4rem; margin-bottom: 16px;">Admin Guide: Approving Teachers</h2>
+        <div style="line-height: 1.7; color: var(--soft);">
+          <h3 style="font-size: 1.1rem; margin: 20px 0 12px; color: var(--ink);">Overview</h3>
+          <p>Teachers need to be assigned to a school before they can use the Students and Points features. This requires manual approval by an admin using the service role key.</p>
+
+          <h3 style="font-size: 1.1rem; margin: 20px 0 12px; color: var(--ink);">Step 1: Get the Teacher's ID</h3>
+          <p>Find the teacher's UUID from the Supabase dashboard:</p>
+          <ol style="margin-left: 20px; margin-top: 8px;">
+            <li>Go to Supabase Dashboard → Authentication → Users</li>
+            <li>Find the teacher by email</li>
+            <li>Copy their User ID (UUID)</li>
+          </ol>
+
+          <h3 style="font-size: 1.1rem; margin: 20px 0 12px; color: var(--ink);">Step 2: Get School Information</h3>
+          <p>You'll need the school's details:</p>
+          <ul style="margin-left: 20px; margin-top: 8px;">
+            <li>School name (e.g., "Manchester Grammar School")</li>
+            <li>Postcode (e.g., "M1 7DW")</li>
+            <li>Latitude and longitude (optional, use Nominatim API if needed)</li>
+          </ul>
+
+          <h3 style="font-size: 1.1rem; margin: 20px 0 12px; color: var(--ink);">Step 3: Insert into teacher_schools Table</h3>
+          <p>Run this SQL in the Supabase SQL Editor (requires service role):</p>
+          <pre style="background: var(--bg); padding: 12px; border-radius: 6px; border: 1px solid var(--line); overflow-x: auto; margin: 12px 0; font-size: 0.85rem;">INSERT INTO teacher_schools (teacher_id, school_name, school_postcode, school_lat, school_lon)
+VALUES (
+  'TEACHER_UUID_HERE',
+  'School Name',
+  'Postcode',
+  LATITUDE,
+  LONGITUDE
+);</pre>
+
+          <h3 style="font-size: 1.1rem; margin: 20px 0 12px; color: var(--ink);">Step 4: Verify</h3>
+          <p>The teacher should now see their school in the Students page and can:</p>
+          <ul style="margin-left: 20px; margin-top: 8px;">
+            <li>Add students to their school</li>
+            <li>Award points to students</li>
+            <li>Create announcements for their school</li>
+          </ul>
+
+          <h3 style="font-size: 1.1rem; margin: 20px 0 12px; color: var(--ink);">Security Notes</h3>
+          <ul style="margin-left: 20px; margin-top: 8px;">
+            <li>Teachers cannot change their own school assignment</li>
+            <li>Teachers can only award points to students in their school</li>
+            <li>Teachers can only create announcements for their school</li>
+            <li>School assignment is stored in a secure table, not user metadata</li>
+          </ul>
+
+          <h3 style="font-size: 1.1rem; margin: 20px 0 12px; color: var(--ink);">Removing School Assignment</h3>
+          <p>To remove a teacher's school assignment:</p>
+          <pre style="background: var(--bg); padding: 12px; border-radius: 6px; border: 1px solid var(--line); overflow-x: auto; margin: 12px 0; font-size: 0.85rem;">DELETE FROM teacher_schools WHERE teacher_id = 'TEACHER_UUID_HERE';</pre>
+        </div>
+        <div class="modal-actions" style="margin-top: 24px;">
+          <button class="modal-btn modal-btn-confirm" id="closeAdminGuideBtn">Close</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Pricing Page -->
     <div class="page" id="pricingPage">
       <div class="page-header page-header-with-back">
@@ -3185,6 +3246,9 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       <div class="card">
         <h2 class="section-title" style="margin-bottom: 16px;">Teacher Account Information</h2>
+        <div style="margin-bottom: 16px;">
+          <a href="#" id="adminGuideBtn" style="color: var(--brand); font-size: 0.9rem; text-decoration: none;">Admin Guide: Approving Teachers →</a>
+        </div>
         <div class="form-group">
           <label class="form-label">Name</label>
           <input type="text" class="form-input" id="settingsName" value="">
@@ -6351,6 +6415,18 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   saveSettingsBtn.addEventListener('click', saveSettings);
   changeEmailBtn.addEventListener('click', changeEmail);
   linkGithubBtn.addEventListener('click', linkGithub);
+
+  // Admin guide modal
+  if (document.getElementById('adminGuideBtn')) {
+    document.getElementById('adminGuideBtn').addEventListener('click', () => {
+      document.getElementById('adminGuideModal').style.display = 'block';
+    });
+  }
+  if (document.getElementById('closeAdminGuideBtn')) {
+    document.getElementById('closeAdminGuideBtn').addEventListener('click', () => {
+      document.getElementById('adminGuideModal').style.display = 'none';
+    });
+  }
 
   // Quick Polls lock menu
   const pollsLockMenuBtn = document.getElementById('pollsLockMenuBtn');
