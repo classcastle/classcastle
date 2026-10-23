@@ -5865,13 +5865,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   // Students Page
   const schoolDisplay = document.getElementById('schoolDisplay');
   const displaySchoolName = document.getElementById('displaySchoolName');
-  const changeSchoolBtn = document.getElementById('changeSchoolBtn');
   const schoolSelection = document.getElementById('schoolSelection');
-  const studentSchoolSearch = document.getElementById('studentSchoolSearch');
-  const searchStudentSchoolsBtn = document.getElementById('searchStudentSchoolsBtn');
-  const studentSchoolSearchStatus = document.getElementById('studentSchoolSearchStatus');
-  const studentSchoolResults = document.getElementById('studentSchoolResults');
-  const studentSchoolResultsBody = document.getElementById('studentSchoolResultsBody');
   const showAddStudentBtn = document.getElementById('showAddStudentBtn');
   const addStudentBtn = document.getElementById('addStudentBtn');
   const studentName = document.getElementById('studentName');
@@ -5911,114 +5905,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       schoolDisplay.style.display = 'none';
       schoolSelection.style.display = 'block';
     }
-  }
-
-  // Search schools for student page
-  async function searchStudentSchools() {
-    const searchTerm = studentSchoolSearch.value.trim();
-    const status = studentSchoolSearchStatus;
-    const resultsDiv = studentSchoolResults;
-    const resultsBody = studentSchoolResultsBody;
-
-    if (!searchTerm) {
-      status.textContent = 'Please enter a school name or postcode';
-      status.style.color = 'var(--red)';
-      return;
-    }
-
-    status.textContent = 'Searching...';
-    status.style.color = 'var(--soft)';
-    resultsDiv.style.display = 'none';
-
-    try {
-      const isPostcode = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i.test(searchTerm);
-      let query = isPostcode ? searchTerm : `${encodeURIComponent(searchTerm)}+school`;
-
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&addressdetails=1&limit=20&countrycodes=gb`, {
-        headers: { 'User-Agent': 'Classcastle' }
-      });
-
-      if (!response.ok) throw new Error(`API request failed: ${response.status}`);
-
-      const data = await response.json();
-
-      if (!data || data.length === 0) {
-        status.textContent = "No schools found";
-        status.style.color = 'var(--amber)';
-        return;
-      }
-
-      const schools = data
-        .filter(item => {
-          const isUK = item.address && (item.address.country_code === 'gb' || item.address.country === 'United Kingdom');
-          const isSchool = item.type === 'school' || item.class === 'amenity' || item.display_name.toLowerCase().includes('school');
-          return isUK && isSchool;
-        })
-        .map(item => ({
-          id: item.place_id,
-          name: item.display_name.split(',')[0] || 'Unknown School',
-          location: item.address.city || item.address.town || item.address.village || item.address.county || 'Unknown',
-          postcode: item.address.postcode || 'Not available',
-          lat: parseFloat(item.lat),
-          lon: parseFloat(item.lon)
-        }));
-
-      if (schools.length === 0) {
-        status.textContent = "No UK schools found";
-        status.style.color = 'var(--amber)';
-        return;
-      }
-
-      resultsBody.innerHTML = schools.map(school => `
-        <tr style="cursor: pointer; border-bottom: 1px solid var(--line);" data-school-id="${school.id}">
-          <td style="padding: 8px;">${escapeHtml(school.name)}</td>
-          <td style="padding: 8px;">${escapeHtml(school.location)}</td>
-        </tr>
-      `).join('');
-
-      resultsDiv.style.display = 'block';
-      status.textContent = `Found ${schools.length} UK schools`;
-      status.style.color = 'var(--brand)';
-
-      resultsBody.querySelectorAll('tr[data-school-id]').forEach(row => {
-        row.addEventListener('click', () => {
-          const schoolId = row.dataset.schoolId;
-          const school = schools.find(s => s.id == schoolId);
-          if (school) {
-            selectTeacherSchool(school);
-          }
-        });
-      });
-    } catch (error) {
-      console.error('Error searching schools:', error);
-      status.textContent = `Error: ${error.message}`;
-      status.style.color = 'var(--red)';
-    }
-  }
-
-  async function selectTeacherSchool(school) {
-    teacherSchool = school;
-    
-    // Update user metadata
-    try {
-      await SupabaseClient.auth.updateUser({
-        data: {
-          school_name: school.name,
-          school_postcode: school.postcode,
-          school_lat: school.lat,
-          school_lon: school.lon
-        }
-      });
-    } catch (error) {
-      console.error('Error updating school metadata:', error);
-    }
-
-    displaySchoolName.textContent = school.name;
-    schoolDisplay.style.display = 'block';
-    schoolSelection.style.display = 'none';
-    studentSchoolResults.style.display = 'none';
-    loadStudents();
-    loadAnnouncements();
   }
 
   async function loadStudents() {
@@ -6294,18 +6180,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   }
 
   // Students page event listeners
-  if (changeSchoolBtn) changeSchoolBtn.addEventListener('click', () => {
-    schoolDisplay.style.display = 'none';
-    schoolSelection.style.display = 'block';
-  });
-
-  if (searchStudentSchoolsBtn) searchStudentSchoolsBtn.addEventListener('click', searchStudentSchools);
-  if (studentSchoolSearch) {
-    studentSchoolSearch.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') searchStudentSchools();
-    });
-  }
-
   if (showAddStudentBtn) showAddStudentBtn.addEventListener('click', () => {
     document.getElementById('addStudentModal').style.display = 'block';
   });
