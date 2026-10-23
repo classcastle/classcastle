@@ -5898,6 +5898,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
   let teacherSchool = null;
   let students = [];
+  let selectedStudent = null;
 
   // Load teacher's school from metadata
   async function loadTeacherSchool() {
@@ -6066,10 +6067,9 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       // Add click handlers to student items
       document.querySelectorAll('.student-item').forEach(item => {
         item.addEventListener('click', () => {
-          // Remove selected class from all items
-          document.querySelectorAll('.student-item').forEach(i => i.classList.remove('selected'));
-          // Add selected class to clicked item
-          item.classList.add('selected');
+          // Remove selected style from all items
+          document.querySelectorAll('.student-item').forEach(i => i.style.borderColor = 'var(--line)');
+          // Add selected style to clicked item
           item.style.borderColor = 'var(--brand)';
 
           const studentId = item.dataset.id;
@@ -6083,6 +6083,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   }
 
   function showStudentDetails(student) {
+    selectedStudent = student;
+
     const studentDetails = document.getElementById('studentDetails');
     const detailName = document.getElementById('detailName');
     const detailEmail = document.getElementById('detailEmail');
@@ -6120,8 +6122,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   }
 
   async function awardPoints() {
-    const selectedStudentId = document.querySelector('.student-item.selected')?.dataset.id;
-    if (!selectedStudentId) {
+    if (!selectedStudent) {
       showNotification('Please select a student first');
       return;
     }
@@ -6136,7 +6137,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
     try {
       const { data, error } = await SupabaseClient.rpc('award_points', {
-        p_student_id: selectedStudentId,
+        p_student_id: selectedStudent.id,
         p_amount: amount,
         p_reason: reason
       });
@@ -6150,7 +6151,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       showNotification('Points awarded successfully!');
       document.getElementById('pointsAmount').value = '';
       document.getElementById('pointsReason').value = '';
-      loadStudentPoints(selectedStudentId);
+      loadStudentPoints(selectedStudent.id);
     } catch (error) {
       console.error('Error awarding points:', error);
       showNotification(error.message || 'Error awarding points');
