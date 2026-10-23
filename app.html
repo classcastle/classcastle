@@ -6034,20 +6034,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     }
   }
 
-  async function deleteStudent(studentId) {
-    if (!confirm('Are you sure you want to remove this student?')) return;
-
-    try {
-      // We can't delete users from client-side auth
-      // Instead, mark them as inactive by updating metadata
-      // This requires service role key or a custom RPC
-      showNotification('Student removal requires admin access. Contact support@classcastle.org');
-    } catch (error) {
-      console.error('Error removing student:', error);
-      showNotification('Error removing student');
-    }
-  }
-
   // Students page event listeners
   if (changeSchoolBtn) changeSchoolBtn.addEventListener('click', () => {
     schoolDisplay.style.display = 'none';
@@ -6067,9 +6053,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   });
 
   if (addStudentBtn) addStudentBtn.addEventListener('click', addStudent);
-
-  // Expose deleteStudent globally
-  window.deleteStudent = deleteStudent;
 
   // Update custom ID preview
   if (pollCustomId) {
