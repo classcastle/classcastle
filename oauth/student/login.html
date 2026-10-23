@@ -431,50 +431,66 @@
     margin-bottom: 4px;
   }
 
-  .school-results {
+  .school-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: 6px;
-    max-height: 200px;
+    max-height: 250px;
     overflow-y: auto;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    margin-top: 4px;
   }
 
-  #schoolResults {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 6px;
-  }
-
-  #schoolResults table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  #schoolResults th {
-    padding: 8px;
-    text-align: left;
+  .school-dropdown-item {
+    padding: 10px 12px;
+    cursor: pointer;
     border-bottom: 1px solid var(--line);
-    font-weight: 600;
-    color: var(--ink);
+    transition: background 0.15s ease;
+    font-size: 0.9rem;
   }
 
-  #schoolResults td {
-    padding: 8px;
-    border-bottom: 1px solid var(--line);
-  }
-
-  #schoolResults tr:last-child td {
+  .school-dropdown-item:last-child {
     border-bottom: none;
   }
 
-  #schoolResults tbody tr {
-    cursor: pointer;
-    transition: background 0.15s ease;
+  .school-dropdown-item:hover {
+    background: var(--tint);
   }
 
-  #schoolResults tbody tr:hover {
-    background: var(--tint);
+  .school-dropdown-item .school-name {
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .school-dropdown-item .school-location {
+    font-size: 0.8rem;
+    color: var(--soft);
+    margin-top: 2px;
+  }
+
+  .school-dropdown-item .school-postcode {
+    font-size: 0.75rem;
+    color: var(--soft);
+    margin-top: 2px;
+  }
+
+  .school-dropdown-loading {
+    padding: 16px;
+    text-align: center;
+    color: var(--soft);
+    font-size: 0.85rem;
+  }
+
+  .school-dropdown-no-results {
+    padding: 16px;
+    text-align: center;
+    color: var(--soft);
+    font-size: 0.85rem;
   }
 </style>
 </head>
@@ -504,24 +520,17 @@
           <strong>Need to login?</strong>
           Only login if your teacher has enabled points for your class. Otherwise, you can join a room using just your room code.
         </div>
-      <div class="form-group">
+      <div class="form-group" style="position: relative;">
         <label class="form-label" for="schoolSearch">Find your school</label>
-        <input type="text" class="form-input" id="schoolSearch" placeholder="Search for your school or postcode (e.g., Manchester Grammar School or M1 7DW)">
-        <button class="btn btn-secondary" id="searchSchoolsBtn" style="margin-top: 8px;">Search Schools</button>
-        <div id="schoolSearchStatus" style="margin-top: 8px; font-size: 0.85rem; color: var(--soft);"></div>
-        <div id="schoolResults" style="margin-top: 12px; max-height: 200px; overflow-y: auto; display: none;">
-          <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
-            <thead>
-              <tr>
-                <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--line);">School Name</th>
-                <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--line);">Location</th>
-              </tr>
-            </thead>
-            <tbody id="schoolResultsBody"></tbody>
-          </table>
+        <div style="position: relative;">
+          <input type="text" class="form-input" id="schoolSearch" placeholder="Search for your school or postcode (e.g., Manchester Grammar School or M1 7DW)" autocomplete="off">
+          <div id="schoolSearchLoading" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display: none;">
+            <div class="loading" style="width: 14px; height: 14px; border-width: 2px;"></div>
+          </div>
         </div>
+        <div id="schoolDropdown" class="school-dropdown" style="display: none;"></div>
         <div id="selectedSchoolInfo" style="margin-top: 8px; padding: 8px; background: var(--tint); border-radius: 4px; display: none;">
-          <strong id="selectedSchoolName"></strong>
+          <span id="selectedSchoolName"></span>
           <button class="btn btn-secondary" id="clearSchoolBtn" style="margin-left: 8px; font-size: 0.75rem; padding: 4px 8px;">Clear</button>
         </div>
       </div>
@@ -586,15 +595,14 @@
   const loginBtnText = loginBtn.querySelector('.btn-text');
   const loginBtnLoading = loginBtn.querySelector('.loading');
   const schoolSearchInput = document.getElementById('schoolSearch');
-  const schoolSearchStatus = document.getElementById('schoolSearchStatus');
-  const schoolResults = document.getElementById('schoolResults');
-  const schoolResultsBody = document.getElementById('schoolResultsBody');
+  const schoolDropdown = document.getElementById('schoolDropdown');
+  const schoolSearchLoading = document.getElementById('schoolSearchLoading');
   const selectedSchoolInfo = document.getElementById('selectedSchoolInfo');
   const selectedSchoolName = document.getElementById('selectedSchoolName');
   const clearSchoolBtn = document.getElementById('clearSchoolBtn');
-  const searchSchoolsBtn = document.getElementById('searchSchoolsBtn');
 
   let selectedSchool = null;
+  let searchTimeout = null;
 
   // Alert modal elements
   const alertModalOverlay = document.getElementById('alertModalOverlay');
@@ -719,25 +727,22 @@
     }
   }
 
-  // School search functionality (from app.html)
-  async function searchSchools() {
-    const searchTerm = schoolSearchInput.value.trim();
-
-    if (!searchTerm) {
-      schoolSearchStatus.textContent = 'Please enter a school name or postcode';
-      schoolSearchStatus.style.color = 'var(--red)';
+  // School search functionality with dropdown
+  async function searchSchools(searchTerm) {
+    if (!searchTerm || searchTerm.length < 2) {
+      schoolDropdown.style.display = 'none';
       return;
     }
 
-    schoolSearchStatus.textContent = 'Searching...';
-    schoolSearchStatus.style.color = 'var(--soft)';
-    schoolResults.style.display = 'none';
+    schoolSearchLoading.style.display = 'block';
+    schoolDropdown.style.display = 'block';
+    schoolDropdown.innerHTML = '<div class="school-dropdown-loading">Searching...</div>';
 
     try {
       // Check if input is a UK postcode
       const isPostcode = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i.test(searchTerm);
 
-      // Build query - for postcode search, use the postcode directly
+      // Build query
       let query;
       if (isPostcode) {
         query = searchTerm;
@@ -746,7 +751,7 @@
       }
 
       // Use Nominatim API to search
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&addressdetails=1&limit=20&countrycodes=gb`, {
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&addressdetails=1&limit=10&countrycodes=gb`, {
         headers: {
           'User-Agent': 'Classcastle'
         }
@@ -759,8 +764,7 @@
       const data = await response.json();
 
       if (!data || data.length === 0) {
-        schoolSearchStatus.textContent = "No schools found. Your school may not be in our database. Contact us at support@classcastle.org and we'll help you get set up.";
-        schoolSearchStatus.style.color = 'var(--amber)';
+        schoolDropdown.innerHTML = '<div class="school-dropdown-no-results">No schools found</div>';
         return;
       }
 
@@ -781,26 +785,22 @@
         }));
 
       if (schools.length === 0) {
-        schoolSearchStatus.textContent = "No UK schools found. Your school may not be in our database. Contact us at support@classcastle.org and we'll help you get set up.";
-        schoolSearchStatus.style.color = 'var(--amber)';
+        schoolDropdown.innerHTML = '<div class="school-dropdown-no-results">No UK schools found</div>';
         return;
       }
 
-      schoolResultsBody.innerHTML = schools.map(school => `
-        <tr style="cursor: pointer; border-bottom: 1px solid var(--line);" data-school-id="${school.id}">
-          <td style="padding: 8px;">${escapeHtml(school.name)}</td>
-          <td style="padding: 8px;">${escapeHtml(school.location)}</td>
-        </tr>
+      schoolDropdown.innerHTML = schools.map(school => `
+        <div class="school-dropdown-item" data-school-id="${school.id}">
+          <div class="school-name">${escapeHtml(school.name)}</div>
+          <div class="school-location">${escapeHtml(school.location)}</div>
+          ${school.postcode !== 'Not available' ? `<div class="school-postcode">${escapeHtml(school.postcode)}</div>` : ''}
+        </div>
       `).join('');
 
-      schoolResults.style.display = 'block';
-      schoolSearchStatus.textContent = `Found ${schools.length} UK schools`;
-      schoolSearchStatus.style.color = 'var(--brand)';
-
       // Add click handlers
-      schoolResultsBody.querySelectorAll('tr[data-school-id]').forEach(row => {
-        row.addEventListener('click', () => {
-          const schoolId = row.dataset.schoolId;
+      schoolDropdown.querySelectorAll('.school-dropdown-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const schoolId = item.dataset.schoolId;
           const school = schools.find(s => s.id == schoolId);
           if (school) {
             selectSchool(school);
@@ -809,24 +809,25 @@
       });
     } catch (error) {
       console.error('Error searching schools:', error);
-      schoolSearchStatus.textContent = `Error: ${error.message}`;
-      schoolSearchStatus.style.color = 'var(--red)';
+      schoolDropdown.innerHTML = '<div class="school-dropdown-no-results">Error searching schools</div>';
+    } finally {
+      schoolSearchLoading.style.display = 'none';
     }
   }
 
   function selectSchool(school) {
     selectedSchool = school;
+    schoolSearchInput.value = school.name;
     selectedSchoolName.textContent = school.name;
     selectedSchoolInfo.style.display = 'block';
-    schoolResults.style.display = 'none';
+    schoolDropdown.style.display = 'none';
   }
 
   function clearSchool() {
     selectedSchool = null;
     selectedSchoolInfo.style.display = 'none';
     schoolSearchInput.value = '';
-    schoolSearchStatus.textContent = '';
-    schoolResults.style.display = 'none';
+    schoolDropdown.style.display = 'none';
   }
 
   function escapeHtml(text) {
@@ -835,13 +836,29 @@
     return div.innerHTML;
   }
 
-  // School search event listeners
-  if (searchSchoolsBtn) searchSchoolsBtn.addEventListener('click', searchSchools);
-  if (schoolSearchInput) {
-    schoolSearchInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') searchSchools();
-    });
-  }
+  // Debounced search on input
+  schoolSearchInput.addEventListener('input', (e) => {
+    const searchTerm = e.target.value.trim();
+    
+    // Clear previous timeout
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+
+    // Set new timeout for debounced search
+    searchTimeout = setTimeout(() => {
+      searchSchools(searchTerm);
+    }, 300);
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!schoolSearchInput.contains(e.target) && !schoolDropdown.contains(e.target)) {
+      schoolDropdown.style.display = 'none';
+    }
+  });
+
+  // Clear school button
   if (clearSchoolBtn) clearSchoolBtn.addEventListener('click', clearSchool);
 
   // Event listeners
