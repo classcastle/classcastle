@@ -1,5 +1,8 @@
+-- Drop existing table if it exists (to recreate with correct schema)
+DROP TABLE IF EXISTS students CASCADE;
+
 -- Create students table for student management
-CREATE TABLE IF NOT EXISTS students (
+CREATE TABLE students (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   email TEXT NOT NULL,
