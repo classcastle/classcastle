@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Classcastle — Pricing</title>
+<link rel="icon" type="image/svg+xml" href="/logo.svg" id="favicon">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FCFCFA;
+    --surface: #fff;
+    --ink: #18221C;
+    --soft: #5E675F;
+    --line: #D9DDD3;
+    --brand: #1F5C3A;
+    --tint: #E4F1E6;
+    --board: #17352A;
+    --chalk: #F4D35E;
+    --red: #B23A2E;
+    --amber: #D98E2B;
+    --sky: var(--brand);
+    --sky-soft: var(--tint);
+    color-scheme: light dark;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0F1511;
+      --surface: #18211B;
+      --ink: #EEF2EA;
+      --soft: #9EAA9F;
+      --line: #2A362D;
+      --brand: #4DAA72;
+      --tint: #1A2B20;
+      --board: #1C4030;
+      --chalk: #F4D35E;
+      --red: #D2503F;
+      --amber: #F0B84D;
+      --sky: var(--brand);
+      --sky-soft: var(--tint);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F1511;
+    --surface: #18211B;
+    --ink: #EEF2EA;
+    --soft: #9EAA9F;
+    --line: #2A362D;
+    --brand: #4DAA72;
+    --tint: #1A2B20;
+    --board: #1C4030;
+    --chalk: #F4D35E;
+    --red: #D2503F;
+    --amber: #F0B84D;
+    --sky: var(--brand);
+    --sky-soft: var(--tint);
+  }
+  * { box-sizing: inherit; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  html, body { margin: 0; padding: 0; min-height: 100vh; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Instrument Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { font-family: 'Instrument Sans', system-ui, sans-serif; margin: 0; font-weight: 400; }
+  p { margin: 0; }
+  a { color: inherit; }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 80px 32px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 64px;
+  }
+
+  .header h1 {
+    font-size: 3rem;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+
+  .header p {
+    font-size: 1.2rem;
+    color: var(--soft);
+    line-height: 1.6;
+  }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 32px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .pricing-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 40px;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+
+  .pricing-card:hover {
+    border-color: var(--brand);
+    transform: translateY(-4px);
+  }
+
+  .pricing-card.featured {
+    border: 2px solid var(--brand);
+    position: relative;
+  }
+
+  .featured-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--brand);
+    color: var(--surface);
+    padding: 4px 16px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .plan-name {
+    font-size: 1.4rem;
+    margin-bottom: 8px;
+  }
+
+  .plan-price {
+    font-size: 3rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .plan-price span {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--soft);
+  }
+
+  .plan-description {
+    color: var(--soft);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 32px;
+  }
+
+  .features-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 32px 0;
+  }
+
+  .features-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.95rem;
+  }
+
+  .features-list li:last-child {
+    border-bottom: none;
+  }
+
+  .features-list li svg {
+    width: 20px;
+    height: 20px;
+    color: var(--brand);
+    flex-shrink: 0;
+  }
+
+  .features-list li.disabled {
+    color: var(--soft);
+  }
+
+  .features-list li.disabled svg {
+    color: var(--line);
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 14px 32px;
+    border-radius: 6px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: opacity 0.15s ease, transform 0.1s ease;
+    border: none;
+    text-decoration: none;
+    text-align: center;
+  }
+
+  .btn:active {
+    transform: scale(0.98);
+  }
+
+  .btn-primary {
+    background: var(--brand);
+    color: var(--surface);
+    width: 100%;
+  }
+
+  .btn-primary:hover {
+    opacity: 0.9;
+  }
+
+  .btn-secondary {
+    background: var(--bg);
+    color: var(--ink);
+    border: 1.5px solid var(--line);
+    width: 100%;
+  }
+
+  .btn-secondary:hover {
+    background: var(--line);
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--soft);
+    text-decoration: none;
+    font-size: 0.95rem;
+    margin-bottom: 32px;
+    transition: color 0.15s ease;
+  }
+
+  .back-link:hover {
+    color: var(--ink);
+  }
+
+  .back-link svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .example-link {
+    color: var(--brand);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .example-link:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 780px) {
+    .container {
+      padding: 40px 20px;
+    }
+
+    .header h1 {
+      font-size: 2rem;
+    }
+
+    .header p {
+      font-size: 1rem;
+    }
+
+    .pricing-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <a href="/app.html" class="back-link">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to app
+  </a>
+
+  <div class="header">
+    <h1>Simple, transparent pricing</h1>
+    <p>Everything you need to manage your classroom, with optional upgrades for custom domains.</p>
+  </div>
+
+  <div class="pricing-grid">
+    <!-- Free Plan -->
+    <div class="pricing-card">
+      <h2 class="plan-name">Free</h2>
+      <div class="plan-price">£0<span>/month</span></div>
+      <p class="plan-description">Perfect for getting started with Classcastle.</p>
+      
+      <ul class="features-list">
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Unlimited rooms
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Unlimited students
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          URL sharing
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Real-time updates
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Analytics dashboard
+        </li>
+        <li class="disabled">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Custom domain
+        </li>
+        <li class="disabled">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Custom room page
+        </li>
+      </ul>
+
+      <a href="/app.html" class="btn btn-secondary">Get started free</a>
+    </div>
+
+    <!-- Pro Plan -->
+    <div class="pricing-card featured">
+      <div class="featured-badge">Most Popular</div>
+      <h2 class="plan-name">Pro</h2>
+      <div class="plan-price">£12.99<span>/month</span></div>
+      <p class="plan-description">For teachers who want a custom classroom presence.</p>
+      
+      <ul class="features-list">
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Everything in Free
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Custom domain (e.g., <a href="https://msclarke.classcastle.org" class="example-link" target="_blank">msclarke.classcastle.org</a>)
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Custom room page with your branding
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Priority support
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Early access to new features
+        </li>
+      </ul>
+
+      <a href="/app.html" class="btn btn-primary">Upgrade to Pro</a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
