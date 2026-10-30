@@ -2287,10 +2287,6 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         Messages
       </a>
-      <a class="nav-item" data-page="students" href="#">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        Students
-      </a>
       <a class="nav-item" href="/resources.html" target="_blank">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
         Resources Hub
@@ -2966,232 +2962,40 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Students Page -->
-    <div class="page" id="studentsPage">
-      <div class="page-header">
-        <div>
-          <h1 class="page-title">Students</h1>
-          <p class="page-subtitle">Manage student accounts for your school</p>
-        </div>
-        <button class="btn btn-primary" id="showAddStudentBtn">Add Student</button>
-      </div>
-
-      <!-- School Selection -->
-      <div class="card" style="margin-bottom: 24px;">
-        <h3 style="font-size: 1.1rem; margin-bottom: 16px;">Your School</h3>
-        <div id="schoolDisplay" style="padding: 12px; background: var(--tint); border-radius: 6px; display: none;">
-          <strong id="displaySchoolName"></strong>
-        </div>
-        <div id="schoolSelection" style="display: block;">
-          <p style="color: var(--soft);">No school assigned to your account. Please contact support@classcastle.org to have a school assigned.</p>
-        </div>
-      </div>
-
-      <!-- Students Dashboard -->
-      <div class="card" id="studentsDashboard" style="display: none;">
-        <div style="display: grid; grid-template-columns: 300px 1fr; gap: 24px;">
-          <!-- Students List -->
-          <div>
-            <h3 style="font-size: 1rem; margin-bottom: 16px;">Students (<span id="studentCount">0</span>)</h3>
-            <div id="studentsList" style="display: flex; flex-direction: column; gap: 8px; max-height: 500px; overflow-y: auto;">
-              <p style="color: var(--soft);">No students added yet.</p>
-            </div>
-          </div>
-
-          <!-- Student Details -->
-          <div id="studentDetails" style="display: none;">
-            <h3 style="font-size: 1rem; margin-bottom: 16px;">Student Details</h3>
-            <div style="background: var(--bg); padding: 20px; border-radius: 8px; border: 1px solid var(--line);">
-              <div style="margin-bottom: 16px;">
-                <label style="font-size: 0.85rem; color: var(--soft);">Name</label>
-                <div id="detailName" style="font-size: 1rem; font-weight: 500;"></div>
-              </div>
-              <div style="margin-bottom: 16px;">
-                <label style="font-size: 0.85rem; color: var(--soft);">Email</label>
-                <div id="detailEmail" style="font-size: 1rem;"></div>
-              </div>
-              <div style="margin-bottom: 16px;">
-                <label style="font-size: 0.85rem; color: var(--soft);">School</label>
-                <div id="detailSchool" style="font-size: 1rem;"></div>
-              </div>
-              <div style="margin-bottom: 16px;">
-                <label style="font-size: 0.85rem; color: var(--soft);">Added</label>
-                <div id="detailCreated" style="font-size: 1rem;"></div>
-              </div>
-              <div style="margin-bottom: 16px;">
-                <label style="font-size: 0.85rem; color: var(--soft);">Points</label>
-                <div id="detailPoints" style="font-size: 1.5rem; font-weight: 600; color: var(--brand);">0</div>
-              </div>
-            </div>
-
-            <!-- Award Points -->
-            <div style="margin-top: 16px;">
-              <h4 style="font-size: 0.95rem; margin-bottom: 12px;">Award Points</h4>
-              <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                <input type="number" class="form-input" id="pointsAmount" placeholder="Amount" min="1" style="width: 100px;">
-                <input type="text" class="form-input" id="pointsReason" placeholder="Reason (e.g., Great work on homework)" style="flex: 1;">
-              </div>
-              <button class="btn btn-primary" id="awardPointsBtn" style="width: 100%;">Award Points</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Announcements Section -->
-      <div class="card" id="announcementsCard" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-          <h3 style="font-size: 1.1rem; margin: 0;">Announcements</h3>
-          <button class="btn btn-primary" id="createAnnouncementBtn">Create Announcement</button>
-        </div>
-        <div id="announcementsList" style="display: flex; flex-direction: column; gap: 12px;">
-          <p style="color: var(--soft);">No announcements yet.</p>
-        </div>
-      </div>
-
-      <!-- Create Announcement Modal -->
-      <div class="modal-overlay" id="createAnnouncementModal" style="display: none;">
+      <!-- Custom Alert Modal -->
+      <div class="modal-overlay" id="alertModal" style="display: none;">
         <div class="modal" style="max-width: 500px;">
-          <h2 style="font-size: 1.4rem; margin-bottom: 16px;">Create Announcement</h2>
-          <div class="form-group">
-            <label class="form-label">Title</label>
-            <input type="text" class="form-input" id="announcementTitle" placeholder="Announcement title">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Message</label>
-            <textarea class="form-input" id="announcementMessage" placeholder="Your announcement message" rows="4" style="resize: vertical;"></textarea>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Expires (optional)</label>
-            <input type="datetime-local" class="form-input" id="announcementExpires">
-            <p style="font-size: 0.8rem; color: var(--soft); margin-top: 4px;">Leave empty for no expiration</p>
-          </div>
+          <h2 id="alertModalTitle" style="font-size: 1.4rem; margin-bottom: 16px;">Notice</h2>
+          <p id="alertModalMessage" style="margin-bottom: 24px; line-height: 1.6; white-space: pre-wrap;"></p>
           <div class="modal-actions">
-            <button class="modal-btn modal-btn-cancel" id="cancelAnnouncementBtn">Cancel</button>
-            <button class="modal-btn modal-btn-primary" id="saveAnnouncementBtn">Post Announcement</button>
+            <button class="modal-btn modal-btn-confirm" id="alertModalOkBtn">OK</button>
           </div>
         </div>
       </div>
 
-      <!-- Add Student Modal -->
-      <div class="modal-overlay" id="addStudentModal" style="display: none;">
+      <!-- Custom Confirm Modal -->
+      <div class="modal-overlay" id="confirmModal" style="display: none;">
         <div class="modal" style="max-width: 500px;">
-          <h2 style="font-size: 1.4rem; margin-bottom: 16px;">Add Student</h2>
-          <div class="form-group">
-            <label class="form-label">Student Name</label>
-            <input type="text" class="form-input" id="studentName" placeholder="John Smith">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Student Email</label>
-            <input type="email" class="form-input" id="studentEmail" placeholder="john.smith@school.edu">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Password</label>
-            <input type="password" class="form-input" id="studentPassword" placeholder="•••••••••">
-            <p style="font-size: 0.8rem; color: var(--soft); margin-top: 4px;">Share this password with the student</p>
-          </div>
+          <h2 id="confirmModalTitle" style="font-size: 1.4rem; margin-bottom: 16px;">Confirm</h2>
+          <p id="confirmModalMessage" style="margin-bottom: 24px; line-height: 1.6; white-space: pre-wrap;"></p>
           <div class="modal-actions">
-            <button class="modal-btn modal-btn-cancel" id="cancelAddStudentBtn">Cancel</button>
-            <button class="modal-btn modal-btn-primary" id="addStudentBtn">Add Student</button>
+            <button class="modal-btn modal-btn-cancel" id="confirmModalCancelBtn">Cancel</button>
+            <button class="modal-btn modal-btn-confirm" id="confirmModalOkBtn">Confirm</button>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Custom Alert Modal -->
-    <div class="modal-overlay" id="alertModal" style="display: none;">
-      <div class="modal" style="max-width: 500px;">
-        <h2 id="alertModalTitle" style="font-size: 1.4rem; margin-bottom: 16px;">Notice</h2>
-        <p id="alertModalMessage" style="margin-bottom: 24px; line-height: 1.6; white-space: pre-wrap;"></p>
-        <div class="modal-actions">
-          <button class="modal-btn modal-btn-confirm" id="alertModalOkBtn">OK</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Custom Confirm Modal -->
-    <div class="modal-overlay" id="confirmModal" style="display: none;">
-      <div class="modal" style="max-width: 500px;">
-        <h2 id="confirmModalTitle" style="font-size: 1.4rem; margin-bottom: 16px;">Confirm</h2>
-        <p id="confirmModalMessage" style="margin-bottom: 24px; line-height: 1.6; white-space: pre-wrap;"></p>
-        <div class="modal-actions">
-          <button class="modal-btn modal-btn-cancel" id="confirmModalCancelBtn">Cancel</button>
-          <button class="modal-btn modal-btn-confirm" id="confirmModalOkBtn">Confirm</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Custom Prompt Modal -->
-    <div class="modal-overlay" id="promptModal" style="display: none;">
-      <div class="modal" style="max-width: 500px;">
-        <h2 id="promptModalTitle" style="font-size: 1.4rem; margin-bottom: 16px;">Input</h2>
-        <p id="promptModalMessage" style="margin-bottom: 16px; line-height: 1.6; white-space: pre-wrap;"></p>
-        <input type="text" class="form-input" id="promptModalInput" style="margin-bottom: 24px;">
-        <div class="modal-actions">
-          <button class="modal-btn modal-btn-cancel" id="promptModalCancelBtn">Cancel</button>
-          <button class="modal-btn modal-btn-confirm" id="promptModalOkBtn">OK</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Admin Guide Modal -->
-    <div class="modal-overlay" id="adminGuideModal" style="display: none;">
-      <div class="modal" style="max-width: 700px; max-height: 80vh; overflow-y: auto;">
-        <h2 style="font-size: 1.4rem; margin-bottom: 16px;">Admin Guide: Approving Teachers</h2>
-        <div style="line-height: 1.7; color: var(--soft);">
-          <h3 style="font-size: 1.1rem; margin: 20px 0 12px; color: var(--ink);">Overview</h3>
-          <p>Teachers need to be assigned to a school before they can use the Students and Points features. This requires manual approval by an admin using the service role key.</p>
-
-          <h3 style="font-size: 1.1rem; margin: 20px 0 12px; color: var(--ink);">Step 1: Get the Teacher's ID</h3>
-          <p>Find the teacher's UUID from the Supabase dashboard:</p>
-          <ol style="margin-left: 20px; margin-top: 8px;">
-            <li>Go to Supabase Dashboard → Authentication → Users</li>
-            <li>Find the teacher by email</li>
-            <li>Copy their User ID (UUID)</li>
-          </ol>
-
-          <h3 style="font-size: 1.1rem; margin: 20px 0 12px; color: var(--ink);">Step 2: Get School Information</h3>
-          <p>You'll need the school's details:</p>
-          <ul style="margin-left: 20px; margin-top: 8px;">
-            <li>School name (e.g., "Manchester Grammar School")</li>
-            <li>Postcode (e.g., "M1 7DW")</li>
-            <li>Latitude and longitude (optional, use Nominatim API if needed)</li>
-          </ul>
-
-          <h3 style="font-size: 1.1rem; margin: 20px 0 12px; color: var(--ink);">Step 3: Insert into teacher_schools Table</h3>
-          <p>Run this SQL in the Supabase SQL Editor (requires service role):</p>
-          <pre style="background: var(--bg); padding: 12px; border-radius: 6px; border: 1px solid var(--line); overflow-x: auto; margin: 12px 0; font-size: 0.85rem;">INSERT INTO teacher_schools (teacher_id, school_name, school_postcode, school_lat, school_lon)
-VALUES (
-  'TEACHER_UUID_HERE',
-  'School Name',
-  'Postcode',
-  LATITUDE,
-  LONGITUDE
-);</pre>
-
-          <h3 style="font-size: 1.1rem; margin: 20px 0 12px; color: var(--ink);">Step 4: Verify</h3>
-          <p>The teacher should now see their school in the Students page and can:</p>
-          <ul style="margin-left: 20px; margin-top: 8px;">
-            <li>Add students to their school</li>
-            <li>Award points to students</li>
-            <li>Create announcements for their school</li>
-          </ul>
-
-          <h3 style="font-size: 1.1rem; margin: 20px 0 12px; color: var(--ink);">Security Notes</h3>
-          <ul style="margin-left: 20px; margin-top: 8px;">
-            <li>Teachers cannot change their own school assignment</li>
-            <li>Teachers can only award points to students in their school</li>
-            <li>Teachers can only create announcements for their school</li>
-            <li>School assignment is stored in a secure table, not user metadata</li>
-          </ul>
-
-          <h3 style="font-size: 1.1rem; margin: 20px 0 12px; color: var(--ink);">Removing School Assignment</h3>
-          <p>To remove a teacher's school assignment:</p>
-          <pre style="background: var(--bg); padding: 12px; border-radius: 6px; border: 1px solid var(--line); overflow-x: auto; margin: 12px 0; font-size: 0.85rem;">DELETE FROM teacher_schools WHERE teacher_id = 'TEACHER_UUID_HERE';</pre>
-        </div>
-        <div class="modal-actions" style="margin-top: 24px;">
-          <button class="modal-btn modal-btn-confirm" id="closeAdminGuideBtn">Close</button>
+      <!-- Custom Prompt Modal -->
+      <div class="modal-overlay" id="promptModal" style="display: none;">
+        <div class="modal" style="max-width: 500px;">
+          <h2 id="promptModalTitle" style="font-size: 1.4rem; margin-bottom: 16px;">Input</h2>
+          <p id="promptModalMessage" style="margin-bottom: 16px; line-height: 1.6; white-space: pre-wrap;"></p>
+          <input type="text" class="form-input" id="promptModalInput" style="margin-bottom: 24px;">
+          <div class="modal-actions">
+            <button class="modal-btn modal-btn-cancel" id="promptModalCancelBtn">Cancel</button>
+            <button class="modal-btn modal-btn-confirm" id="promptModalOkBtn">OK</button>
+          </div>
         </div>
       </div>
     </div>
@@ -3246,9 +3050,6 @@ VALUES (
 
       <div class="card">
         <h2 class="section-title" style="margin-bottom: 16px;">Teacher Account Information</h2>
-        <div style="margin-bottom: 16px;">
-          <a href="#" id="adminGuideBtn" style="color: var(--brand); font-size: 0.9rem; text-decoration: none;">Admin Guide: Approving Teachers →</a>
-        </div>
         <div class="form-group">
           <label class="form-label">Name</label>
           <input type="text" class="form-input" id="settingsName" value="">
@@ -5926,358 +5727,6 @@ VALUES (
   }
   if (clearSchoolBtn) clearSchoolBtn.addEventListener('click', clearSchool);
 
-  // Students Page
-  const schoolDisplay = document.getElementById('schoolDisplay');
-  const displaySchoolName = document.getElementById('displaySchoolName');
-  const schoolSelection = document.getElementById('schoolSelection');
-  const showAddStudentBtn = document.getElementById('showAddStudentBtn');
-  const addStudentBtn = document.getElementById('addStudentBtn');
-  const studentName = document.getElementById('studentName');
-  const studentEmail = document.getElementById('studentEmail');
-  const studentPassword = document.getElementById('studentPassword');
-  const studentsList = document.getElementById('studentsList');
-
-  let teacherSchool = null;
-  let students = [];
-  let selectedStudent = null;
-
-  // Load teacher's school from secure table
-  async function loadTeacherSchool() {
-    try {
-      const { data, error } = await SupabaseClient.rpc('get_teacher_school');
-
-      if (error) throw error;
-
-      if (data && data.length > 0) {
-        teacherSchool = {
-          name: data[0].school_name,
-          postcode: data[0].school_postcode,
-          lat: data[0].school_lat,
-          lon: data[0].school_lon
-        };
-        displaySchoolName.textContent = teacherSchool.name;
-        schoolDisplay.style.display = 'block';
-        schoolSelection.style.display = 'none';
-        loadStudents();
-        loadAnnouncements();
-      } else {
-        schoolDisplay.style.display = 'none';
-        schoolSelection.style.display = 'block';
-      }
-    } catch (error) {
-      console.error('Error loading teacher school:', error);
-      schoolDisplay.style.display = 'none';
-      schoolSelection.style.display = 'block';
-    }
-  }
-
-  async function loadStudents() {
-    if (!teacherSchool) return;
-
-    try {
-      // Use RPC to get students from auth.users with proper RLS
-      const { data, error } = await SupabaseClient.rpc('get_school_students', {
-        p_school_name: teacherSchool.name
-      });
-
-      if (error) throw error;
-
-      students = data || [];
-      renderStudents();
-    } catch (error) {
-      console.error('Error loading students:', error);
-    }
-  }
-
-  function renderStudents() {
-    const studentsDashboard = document.getElementById('studentsDashboard');
-    const studentCount = document.getElementById('studentCount');
-    const studentDetails = document.getElementById('studentDetails');
-
-    if (students.length === 0) {
-      studentsDashboard.style.display = 'none';
-    } else {
-      studentsDashboard.style.display = 'block';
-      studentCount.textContent = students.length;
-      studentsList.innerHTML = students.map(student => `
-        <div class="student-item" data-id="${student.id}" style="padding: 12px; background: var(--bg); border-radius: 6px; cursor: pointer; border: 1px solid var(--line);">
-          <div style="font-weight: 500;">${escapeHtml(student.name)}</div>
-          <div style="font-size: 0.85rem; color: var(--soft);">${escapeHtml(student.email)}</div>
-        </div>
-      `).join('');
-
-      // Add click handlers to student items
-      document.querySelectorAll('.student-item').forEach(item => {
-        item.addEventListener('click', () => {
-          // Remove selected style from all items
-          document.querySelectorAll('.student-item').forEach(i => i.style.borderColor = 'var(--line)');
-          // Add selected style to clicked item
-          item.style.borderColor = 'var(--brand)';
-
-          const studentId = item.dataset.id;
-          const student = students.find(s => s.id === studentId);
-          if (student) {
-            showStudentDetails(student);
-          }
-        });
-      });
-    }
-  }
-
-  function showStudentDetails(student) {
-    selectedStudent = student;
-
-    const studentDetails = document.getElementById('studentDetails');
-    const detailName = document.getElementById('detailName');
-    const detailEmail = document.getElementById('detailEmail');
-    const detailSchool = document.getElementById('detailSchool');
-    const detailCreated = document.getElementById('detailCreated');
-    const detailPoints = document.getElementById('detailPoints');
-
-    detailName.textContent = student.name;
-    detailEmail.textContent = student.email;
-    detailSchool.textContent = student.school_name;
-
-    const createdDate = new Date(student.created_at);
-    detailCreated.textContent = createdDate.toLocaleDateString();
-
-    // Load student points
-    loadStudentPoints(student.id);
-
-    studentDetails.style.display = 'block';
-  }
-
-  async function loadStudentPoints(studentId) {
-    const detailPoints = document.getElementById('detailPoints');
-    try {
-      const { data, error } = await SupabaseClient.rpc('get_student_points', {
-        p_student_id: studentId
-      });
-
-      if (error) throw error;
-
-      detailPoints.textContent = data || 0;
-    } catch (error) {
-      console.error('Error loading points:', error);
-      detailPoints.textContent = '-';
-    }
-  }
-
-  async function awardPoints() {
-    if (!selectedStudent) {
-      showNotification('Please select a student first');
-      return;
-    }
-
-    const amount = parseInt(document.getElementById('pointsAmount').value);
-    const reason = document.getElementById('pointsReason').value.trim();
-
-    if (!amount || amount < 1) {
-      showNotification('Please enter a valid amount');
-      return;
-    }
-
-    try {
-      const { data, error } = await SupabaseClient.rpc('award_points', {
-        p_student_id: selectedStudent.id,
-        p_amount: amount,
-        p_reason: reason
-      });
-
-      if (error) throw error;
-
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to award points');
-      }
-
-      showNotification('Points awarded successfully!');
-      document.getElementById('pointsAmount').value = '';
-      document.getElementById('pointsReason').value = '';
-      loadStudentPoints(selectedStudent.id);
-    } catch (error) {
-      console.error('Error awarding points:', error);
-      showNotification(error.message || 'Error awarding points');
-    }
-  }
-
-  async function loadAnnouncements() {
-    if (!teacherSchool) return;
-
-    const announcementsCard = document.getElementById('announcementsCard');
-    const announcementsList = document.getElementById('announcementsList');
-
-    try {
-      const { data, error } = await SupabaseClient
-        .from('announcements')
-        .select('*')
-        .eq('teacher_id', (await SupabaseClient.auth.getUser()).data.user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      if (!data || data.length === 0) {
-        announcementsList.innerHTML = '<p style="color: var(--soft);">No announcements yet.</p>';
-      } else {
-        announcementsList.innerHTML = data.map(ann => `
-          <div style="padding: 16px; background: var(--bg); border-radius: 8px; border: 1px solid var(--line);">
-            <div style="font-weight: 600; margin-bottom: 8px;">${escapeHtml(ann.title)}</div>
-            <div style="color: var(--soft); font-size: 0.9rem; margin-bottom: 8px;">${escapeHtml(ann.message)}</div>
-            <div style="font-size: 0.8rem; color: var(--soft);">
-              ${new Date(ann.created_at).toLocaleDateString()}
-              ${ann.expires_at ? ` • Expires: ${new Date(ann.expires_at).toLocaleDateString()}` : ''}
-            </div>
-          </div>
-        `).join('');
-      }
-
-      announcementsCard.style.display = 'block';
-    } catch (error) {
-      console.error('Error loading announcements:', error);
-    }
-  }
-
-  async function createAnnouncement() {
-    const title = document.getElementById('announcementTitle').value.trim();
-    const message = document.getElementById('announcementMessage').value.trim();
-    const expires = document.getElementById('announcementExpires').value;
-
-    if (!title || !message) {
-      showNotification('Please fill in title and message');
-      return;
-    }
-
-    try {
-      const { data, error } = await SupabaseClient.rpc('create_announcement', {
-        p_title: title,
-        p_message: message,
-        p_expires_at: expires ? new Date(expires).toISOString() : null
-      });
-
-      if (error) throw error;
-
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to create announcement');
-      }
-
-      showNotification('Announcement created successfully!');
-      document.getElementById('announcementTitle').value = '';
-      document.getElementById('announcementMessage').value = '';
-      document.getElementById('announcementExpires').value = '';
-      document.getElementById('createAnnouncementModal').style.display = 'none';
-      loadAnnouncements();
-    } catch (error) {
-      console.error('Error creating announcement:', error);
-      showNotification(error.message || 'Error creating announcement');
-    }
-  }
-
-  async function addStudent() {
-    const name = studentName.value.trim();
-    const email = studentEmail.value.trim();
-    const password = studentPassword.value;
-
-    if (!name || !email || !password) {
-      showNotification('Please fill in all fields');
-      return;
-    }
-
-    if (!teacherSchool) {
-      showNotification('Please select your school first');
-      return;
-    }
-
-    addStudentBtn.disabled = true;
-    addStudentBtn.textContent = 'Adding...';
-
-    try {
-      // Check if email already exists
-      const { data: { user: existingUser }, error: checkError } = await SupabaseClient.auth.getUser();
-      if (checkError && checkError.message !== 'Auth session missing') {
-        throw checkError;
-      }
-
-      // Get current teacher session to restore later
-      const { data: { session: teacherSession } } = await SupabaseClient.auth.getSession();
-
-      // Create student account
-      const { data, error } = await SupabaseClient.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            name: name,
-            user_type: 'student',
-            school_name: teacherSchool.name,
-            school_postcode: teacherSchool.postcode,
-            school_lat: teacherSchool.lat,
-            school_lon: teacherSchool.lon
-          }
-        }
-      });
-
-      if (error) {
-        // If email already exists, check if it's for a different school
-        if (error.message.includes('already registered') || error.message.includes('duplicate')) {
-          throw new Error('An account with this email already exists');
-        }
-        throw error;
-      }
-
-      // Sign back in as teacher if we were logged in
-      if (teacherSession) {
-        await SupabaseClient.auth.setSession(teacherSession);
-      }
-
-      showNotification('Student added successfully!');
-      studentName.value = '';
-      studentEmail.value = '';
-      studentPassword.value = '';
-      document.getElementById('addStudentModal').style.display = 'none';
-      loadStudents();
-    } catch (error) {
-      console.error('Error adding student:', error);
-      showNotification(error.message || 'Error adding student');
-    } finally {
-      addStudentBtn.disabled = false;
-      addStudentBtn.textContent = 'Add Student';
-    }
-  }
-
-  // Students page event listeners
-  if (showAddStudentBtn) showAddStudentBtn.addEventListener('click', () => {
-    document.getElementById('addStudentModal').style.display = 'block';
-  });
-
-  if (addStudentBtn) addStudentBtn.addEventListener('click', addStudent);
-
-  if (document.getElementById('cancelAddStudentBtn')) {
-    document.getElementById('cancelAddStudentBtn').addEventListener('click', () => {
-      document.getElementById('addStudentModal').style.display = 'none';
-    });
-  }
-
-  // Award points
-  if (document.getElementById('awardPointsBtn')) {
-    document.getElementById('awardPointsBtn').addEventListener('click', awardPoints);
-  }
-
-  // Announcements
-  if (document.getElementById('createAnnouncementBtn')) {
-    document.getElementById('createAnnouncementBtn').addEventListener('click', () => {
-      document.getElementById('createAnnouncementModal').style.display = 'block';
-    });
-  }
-
-  if (document.getElementById('cancelAnnouncementBtn')) {
-    document.getElementById('cancelAnnouncementBtn').addEventListener('click', () => {
-      document.getElementById('createAnnouncementModal').style.display = 'none';
-    });
-  }
-
-  if (document.getElementById('saveAnnouncementBtn')) {
-    document.getElementById('saveAnnouncementBtn').addEventListener('click', createAnnouncement);
-  }
-
   // Update custom ID preview
   if (pollCustomId) {
     pollCustomId.addEventListener('input', () => {
@@ -6354,7 +5803,6 @@ VALUES (
       if (page === 'activity') loadActivityLog();
       if (page === 'polls') loadPolls();
       if (page === 'messages') checkMessagesOptIn();
-      if (page === 'students') loadTeacherSchool();
       if (page === 'settings') loadIdentities();
 
       // Close sidebar on mobile
@@ -6415,18 +5863,6 @@ VALUES (
   saveSettingsBtn.addEventListener('click', saveSettings);
   changeEmailBtn.addEventListener('click', changeEmail);
   linkGithubBtn.addEventListener('click', linkGithub);
-
-  // Admin guide modal
-  if (document.getElementById('adminGuideBtn')) {
-    document.getElementById('adminGuideBtn').addEventListener('click', () => {
-      document.getElementById('adminGuideModal').style.display = 'block';
-    });
-  }
-  if (document.getElementById('closeAdminGuideBtn')) {
-    document.getElementById('closeAdminGuideBtn').addEventListener('click', () => {
-      document.getElementById('adminGuideModal').style.display = 'none';
-    });
-  }
 
   // Quick Polls lock menu
   const pollsLockMenuBtn = document.getElementById('pollsLockMenuBtn');
@@ -7913,17 +7349,6 @@ usage/fair dealing.`,
         setTimeout(() => {
           window.location.href = '/login.html?error=user_not_found&error_description=Your+account+has+been+deleted';
         }, 5000);
-        return;
-      }
-
-      // Check if user is a student
-      const userType = user.user_metadata?.user_type;
-      if (userType === 'student') {
-        await SupabaseClient.auth.signOut();
-        showNotification('Students should use the student dashboard', 5000);
-        setTimeout(() => {
-          window.location.href = '/oauth/student/login.html';
-        }, 2000);
         return;
       }
 
