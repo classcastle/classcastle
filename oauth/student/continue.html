@@ -459,22 +459,30 @@ main {
 
     // Simulate authorization processing
     setTimeout(() => {
-      // Replace card content with success message
-      const card = document.querySelector('.card');
-      card.innerHTML = `
-        <div style="text-align: center; padding: 40px 20px;">
-          <div style="width: 64px; height: 64px; background: var(--tint); border: 2px solid var(--brand); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
+      // Generate random ID
+      const randomId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      
+      // Launch deep link
+      window.location.href = `deeplink.classcastle.org/desktopapp/postoauth?id=${randomId}`;
+      
+      // Show fallback after delay in case deep link doesn't open
+      setTimeout(() => {
+        const card = document.querySelector('.card');
+        card.innerHTML = `
+          <div style="text-align: center; padding: 40px 20px;">
+            <div style="width: 64px; height: 64px; background: var(--tint); border: 2px solid var(--brand); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <h2 style="font-size: 1.3rem; margin-bottom: 8px;">Opened in Classcastle</h2>
+            <p style="color: var(--soft); font-size: 0.9rem; margin-bottom: 24px;">You can now continue using the desktop app.</p>
+            <a href="deeplink.classcastle.org/desktopapp/postoauth?id=${randomId}" class="btn btn-primary" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;">
+              Not opened? Click here
+            </a>
           </div>
-          <h2 style="font-size: 1.3rem; margin-bottom: 8px;">Opened in Classcastle</h2>
-          <p style="color: var(--soft); font-size: 0.9rem; margin-bottom: 24px;">You can now continue using the desktop app.</p>
-          <a href="/desktopapp.html" class="btn btn-primary" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;">
-            Continue to Desktop App
-          </a>
-        </div>
-      `;
+        `;
+      }, 2000);
     }, 1000);
   });
 </script>
