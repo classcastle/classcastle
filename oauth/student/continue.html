@@ -463,7 +463,7 @@ main {
       const randomId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
       
       // Launch deep link
-      window.location.href = `deeplink.classcastle.org/desktopapp/postoauth?id=${randomId}`;
+      window.location.href = `https://deeplink.classcastle.org/desktopapp/postoauth?id=${randomId}`;
       
       // Show fallback after delay in case deep link doesn't open
       setTimeout(() => {
