@@ -314,6 +314,23 @@
     animation: domainRoll 0.5s ease-in-out;
   }
 
+  .preset-btn {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    color: var(--ink);
+  }
+
+  .preset-btn:hover {
+    background: var(--tint);
+    border-color: var(--brand);
+    color: var(--brand);
+  }
+
   .page-header {
     margin-bottom: 32px;
     display: flex;
@@ -3159,7 +3176,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         </div>
 
         <div style="background: var(--surface); padding: 32px; border-radius: 16px; border: 2px solid var(--line);">
-          <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+          <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
             <div style="width: 48px; height: 48px; background: var(--brand); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--brand-ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             </div>
@@ -3168,7 +3185,44 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
               <p style="color: var(--soft); line-height: 1.6; margin: 0; font-size: 0.95rem;">We're working hard to bring you custom domains. Stay tuned for updates!</p>
             </div>
           </div>
+          <button class="btn btn-primary" id="reserveDomainBtn" style="padding: 14px 32px; font-size: 1rem;">Reserve Your Domain</button>
         </div>
+      </div>
+    </div>
+
+    <!-- Reserve Domain Modal -->
+    <div class="modal-overlay" id="reserveDomainModal" style="display: none;">
+      <div class="modal" style="max-width: 500px;">
+        <h2 style="font-size: 1.4rem; margin-bottom: 16px;">Reserve Your Domain</h2>
+        <p style="color: var(--soft); margin-bottom: 24px;">Choose a unique subdomain for your classroom.</p>
+
+        <div class="form-group" style="margin-bottom: 24px;">
+          <label class="form-label">Your Subdomain</label>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="text" class="form-input" id="subdomainInput" placeholder="e.g., mscarter" style="flex: 1;">
+            <span style="color: var(--soft); font-weight: 500;">.classcastle.link</span>
+          </div>
+          <p id="subdomainError" style="color: var(--red); font-size: 0.85rem; margin-top: 8px; display: none;"></p>
+        </div>
+
+        <div style="margin-bottom: 24px;">
+          <p style="font-size: 0.9rem; color: var(--soft); margin-bottom: 12px;">Quick suggestions:</p>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <button class="preset-btn" data-subdomain="mscarter">mscarter</button>
+            <button class="preset-btn" data-subdomain="mrjordon">mrjordon</button>
+            <button class="preset-btn" data-subdomain="mssmith">mssmith</button>
+            <button class="preset-btn" data-subdomain="mrwilliams">mrwilliams</button>
+            <button class="preset-btn" data-subdomain="msdavis">msdavis</button>
+            <button class="preset-btn" data-subdomain="mrmiller">mrmiller</button>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="modal-btn modal-btn-cancel" id="cancelReserveBtn">Cancel</button>
+          <button class="modal-btn modal-btn-confirm" id="confirmReserveBtn">Reserve</button>
+        </div>
+      </div>
+    </div>
       </div>
     </div>
 
@@ -6033,6 +6087,33 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   const domainNames = ['mscarter', 'mrjordon', 'mssmith', 'mrwilliams', 'mrbrown', 'msdavis', 'mrmiller', 'mswilson', 'mrmoore', 'mstaylor'];
   let currentDomainIndex = 0;
 
+  // Restricted subdomains
+  const RESTRICTED_SUBDOMAINS = [
+    // Infrastructure, DNS & Mail
+    "www", "ftp", "pop", "smtp", "mail", "imap", "ns1", "ns2", "ns3", "ns4",
+    "dns", "mx", "host", "cname", "txt", "autoconfig", "autodiscover", "webmail",
+    "postmaster", "hostmaster", "abuse", "security", "ssl", "cert", "certs",
+
+    // App Core, Auth & Admin
+    "app", "api", "auth", "login", "logout", "signin", "signup", "register",
+    "oauth", "sso", "account", "accounts", "user", "users", "profile", "profiles",
+    "dashboard", "settings", "admin", "administrator", "root", "controlpanel",
+    "cpanel", "sysadmin", "manage", "management", "panel", "portal", "system",
+
+    // Marketing, Support, Legal & Utilities
+    "home", "blog", "news", "about", "contact", "help", "support", "docs",
+    "documentation", "status", "terms", "privacy", "security", "legal", "pricing",
+    "features", "billing", "pay", "payment", "checkout", "subscribe", "store",
+    "shop", "faq", "kb", "knowledgebase", "forum", "community",
+
+    // Brand, Product & Classcastle Specific Routing
+    "classcastle", "classcastle-app", "classcastleroom", "official", "staff",
+    "teacher", "teachers", "student", "students", "room", "rooms", "join",
+    "share", "dev", "developer", "devlabs", "labs", "test", "staging", "demo",
+    "beta", "alpha", "v1", "v2", "cdn", "static", "assets", "media", "images",
+    "img", "files", "download", "downloads", "webhooks", "ws", "websocket"
+  ];
+
   function startDomainRotation() {
     // Clear any existing interval
     if (domainRotationInterval) {
@@ -6069,6 +6150,91 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       clearInterval(domainRotationInterval);
       domainRotationInterval = null;
     }
+  }
+
+  // Reserve Domain Modal
+  const reserveDomainBtn = document.getElementById('reserveDomainBtn');
+  const reserveDomainModal = document.getElementById('reserveDomainModal');
+  const cancelReserveBtn = document.getElementById('cancelReserveBtn');
+  const confirmReserveBtn = document.getElementById('confirmReserveBtn');
+  const subdomainInput = document.getElementById('subdomainInput');
+  const subdomainError = document.getElementById('subdomainError');
+  const presetBtns = document.querySelectorAll('.preset-btn');
+
+  function validateSubdomain(subdomain) {
+    // Check if empty
+    if (!subdomain || subdomain.trim() === '') {
+      return { valid: false, error: 'Subdomain cannot be empty' };
+    }
+
+    // Check length (3-63 characters)
+    if (subdomain.length < 3 || subdomain.length > 63) {
+      return { valid: false, error: 'Subdomain must be between 3 and 63 characters' };
+    }
+
+    // Check for valid characters (letters, numbers, hyphens)
+    if (!/^[a-z0-9-]+$/.test(subdomain)) {
+      return { valid: false, error: 'Subdomain can only contain lowercase letters, numbers, and hyphens' };
+    }
+
+    // Check if starts or ends with hyphen
+    if (subdomain.startsWith('-') || subdomain.endsWith('-')) {
+      return { valid: false, error: 'Subdomain cannot start or end with a hyphen' };
+    }
+
+    // Check against restricted subdomains
+    if (RESTRICTED_SUBDOMAINS.includes(subdomain.toLowerCase())) {
+      return { valid: false, error: 'This subdomain is reserved and cannot be used' };
+    }
+
+    return { valid: true };
+  }
+
+  if (reserveDomainBtn) {
+    reserveDomainBtn.addEventListener('click', () => {
+      reserveDomainModal.style.display = 'flex';
+      subdomainInput.value = '';
+      subdomainError.style.display = 'none';
+    });
+  }
+
+  if (cancelReserveBtn) {
+    cancelReserveBtn.addEventListener('click', () => {
+      reserveDomainModal.style.display = 'none';
+    });
+  }
+
+  if (reserveDomainModal) {
+    reserveDomainModal.addEventListener('click', (e) => {
+      if (e.target === reserveDomainModal) {
+        reserveDomainModal.style.display = 'none';
+      }
+    });
+  }
+
+  presetBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const subdomain = btn.dataset.subdomain;
+      subdomainInput.value = subdomain;
+      subdomainError.style.display = 'none';
+    });
+  });
+
+  if (confirmReserveBtn) {
+    confirmReserveBtn.addEventListener('click', () => {
+      const subdomain = subdomainInput.value.trim().toLowerCase();
+      const validation = validateSubdomain(subdomain);
+
+      if (!validation.valid) {
+        subdomainError.textContent = validation.error;
+        subdomainError.style.display = 'block';
+        return;
+      }
+
+      // TODO: Implement actual reservation logic
+      showNotification(`Domain "${subdomain}.classcastle.link" reserved successfully!`);
+      reserveDomainModal.style.display = 'none';
+    });
   }
 
   function showOnboardingStep(step) {
