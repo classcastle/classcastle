@@ -575,7 +575,7 @@
     const loginSubtitle = document.getElementById('loginSubtitle');
 
     // Update subtitle if redirecting to domains
-    if (redirect && redirect.includes('domain')) {
+    if (redirect && redirect.includes('domain') && loginSubtitle) {
       loginSubtitle.textContent = 'Login to continue to Custom Domains';
     }
 
@@ -721,7 +721,7 @@
   });
 
   // Check if already logged in on page load
-  checkSession();
+  document.addEventListener('DOMContentLoaded', checkSession);
 </script>
 
 </body>
