@@ -3217,6 +3217,14 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           </div>
         </div>
 
+        <div style="margin-bottom: 24px;">
+          <button id="viewRestrictedBtn" style="background: none; border: none; color: var(--brand); font-size: 0.85rem; cursor: pointer; text-decoration: underline; padding: 0;">View restricted subdomains</button>
+          <div id="restrictedList" style="display: none; margin-top: 12px; padding: 12px; background: var(--bg); border-radius: 8px; border: 1px solid var(--line); max-height: 200px; overflow-y: auto;">
+            <p style="font-size: 0.85rem; color: var(--soft); margin-bottom: 8px;">The following subdomains are reserved and cannot be used:</p>
+            <div id="restrictedDomainsList" style="font-size: 0.8rem; color: var(--ink); line-height: 1.6; display: flex; flex-wrap: wrap; gap: 4px;"></div>
+          </div>
+        </div>
+
         <div class="modal-actions">
           <button class="modal-btn modal-btn-cancel" id="cancelReserveBtn">Cancel</button>
           <button class="modal-btn modal-btn-confirm" id="confirmReserveBtn">Reserve</button>
@@ -6109,7 +6117,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     // Brand, Product & Classcastle Specific Routing
     "classcastle", "classcastle-app", "classcastleroom", "official", "staff",
     "teacher", "teachers", "student", "students", "room", "rooms", "join",
-    "share", "dev", "developer", "devlabs", "labs", "test", "staging", "demo",
+    "share", "get", "dev", "developer", "devlabs", "labs", "test", "staging", "demo",
     "beta", "alpha", "v1", "v2", "cdn", "static", "assets", "media", "images",
     "img", "files", "download", "downloads", "webhooks", "ws", "websocket"
   ];
@@ -6160,6 +6168,9 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   const subdomainInput = document.getElementById('subdomainInput');
   const subdomainError = document.getElementById('subdomainError');
   const presetBtns = document.querySelectorAll('.preset-btn');
+  const viewRestrictedBtn = document.getElementById('viewRestrictedBtn');
+  const restrictedList = document.getElementById('restrictedList');
+  const restrictedDomainsList = document.getElementById('restrictedDomainsList');
 
   function generatePersonalizedSuggestions() {
     const suggestions = [];
@@ -6282,6 +6293,23 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       // TODO: Implement actual reservation logic
       showNotification(`Domain "${subdomain}.classcastle.link" reserved successfully!`);
       reserveDomainModal.style.display = 'none';
+    });
+  }
+
+  // View restricted domains
+  if (viewRestrictedBtn) {
+    viewRestrictedBtn.addEventListener('click', () => {
+      const isHidden = restrictedList.style.display === 'none';
+      restrictedList.style.display = isHidden ? 'block' : 'none';
+      viewRestrictedBtn.textContent = isHidden ? 'Hide restricted subdomains' : 'View restricted subdomains';
+
+      if (isHidden) {
+        // Populate the list
+        restrictedDomainsList.innerHTML = RESTRICTED_SUBDOMAINS
+          .sort()
+          .map(domain => `<span style="background: var(--tint); padding: 2px 6px; border-radius: 4px;">${domain}</span>`)
+          .join('');
+      }
     });
   }
 
