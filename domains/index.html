@@ -68,7 +68,7 @@ footer a{color:var(--soft)}
   <div class="hero">
     <h2>Your classroom, your domain</h2>
     <p>Reserve a personalized subdomain like mscarter.classcastle.link for your classroom. Make it easy for students to remember and access your room.</p>
-    <a href="/login.html?redirectname=domains&post=/app?force=domain" class="btn" id="goToDomainBtn">Go to domain settings</a>
+    <a href="/login.html?redirectname=domains&post=/app?force=domain" class="btn">Go to domain settings</a>
   </div>
 
   <div class="features">
@@ -94,28 +94,5 @@ footer a{color:var(--soft)}
   </footer>
 </div>
 
-<script>
-  // Check if user is logged in by trying to access the app
-  const goToDomainBtn = document.getElementById('goToDomainBtn');
-
-  async function checkAuthStatus() {
-    try {
-      const response = await fetch('/app?force=domain', {
-        method: 'GET',
-        credentials: 'include'
-      });
-
-      if (!response.redirected) {
-        // If not redirected, user is logged in, go directly to app
-        goToDomainBtn.href = '/app?force=domain';
-        goToDomainBtn.textContent = 'Go to domain settings';
-      }
-    } catch (error) {
-      // If there's an error, keep default login redirect
-    }
-  }
-
-  checkAuthStatus();
-</script>
 </body>
 </html>
