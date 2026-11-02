@@ -109,13 +109,13 @@ footer a{color:var(--soft)}
         // If redirected to login, update the button
         const loginUrl = response.url;
         if (loginUrl.includes('login.html')) {
-          goToDomainBtn.href = '/login.html?redirect=/app?force=domain';
+          goToDomainBtn.href = '/login.html?redirectname=domains&post=/app?force=domain';
           goToDomainBtn.textContent = 'Login to continue to Custom Domains';
         }
       }
     } catch (error) {
       // If there's an error, default to login
-      goToDomainBtn.href = '/login.html?redirect=/app?force=domain';
+      goToDomainBtn.href = '/login.html?redirectname=domains&post=/app?force=domain';
       goToDomainBtn.textContent = 'Login to continue to Custom Domains';
     }
   }

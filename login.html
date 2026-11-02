@@ -567,11 +567,12 @@
 
     // Check for redirect parameter
     const urlParams = new URLSearchParams(window.location.search);
-    const redirect = urlParams.get('redirect');
+    const redirectName = urlParams.get('redirectname');
+    const post = urlParams.get('post');
     const loginSubtitle = document.getElementById('loginSubtitle');
 
     // Update subtitle if redirecting to domains
-    if (redirect && redirect.includes('domain') && loginSubtitle) {
+    if (redirectName === 'domains' && loginSubtitle) {
       loginSubtitle.textContent = 'Login to continue to Custom Domains';
     }
 
@@ -630,7 +631,7 @@
     if (session) {
       showNotification('You are already logged in!');
       setTimeout(() => {
-        window.location.href = redirect || '/app.html';
+        window.location.href = post || '/app.html';
       }, 500);
     }
   }
@@ -644,9 +645,9 @@
       return;
     }
 
-    // Get redirect parameter
+    // Get redirect parameters
     const urlParams = new URLSearchParams(window.location.search);
-    const redirect = urlParams.get('redirect');
+    const post = urlParams.get('post');
 
     // Show loading state
     loginBtn.disabled = true;
@@ -663,7 +664,7 @@
 
       showNotification('Welcome back, teacher!');
       setTimeout(() => {
-        window.location.href = redirect || '/app.html';
+        window.location.href = post || '/app.html';
       }, 1000);
     } catch (error) {
       // Check if user is banned
@@ -680,9 +681,10 @@
   }
 
   async function handleGitHubLogin() {
-    // Get redirect parameter
+    // Get redirect parameters
     const urlParams = new URLSearchParams(window.location.search);
-    const redirect = urlParams.get('redirect');
+    const redirectName = urlParams.get('redirectname');
+    const post = urlParams.get('post');
 
     // Show loading state
     githubLoginBtn.disabled = true;
@@ -693,7 +695,7 @@
       const { data, error } = await SupabaseClient.auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: redirect ? window.location.origin + '/login.html?redirect=' + encodeURIComponent(redirect) : window.location.origin + '/login.html',
+          redirectTo: redirectName && post ? window.location.origin + '/login.html?redirectname=' + encodeURIComponent(redirectName) + '&post=' + encodeURIComponent(post) : window.location.origin + '/login.html',
           skipBrowserRedirect: false
         }
       });
