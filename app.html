@@ -291,6 +291,29 @@
     to { opacity: 1; }
   }
 
+  @keyframes domainRoll {
+    0% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    40% {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    60% {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .domain-name-rolling {
+    animation: domainRoll 0.5s ease-in-out;
+  }
+
   .page-header {
     margin-bottom: 32px;
     display: flex;
@@ -3113,23 +3136,38 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         </div>
       </div>
 
-      <div class="card" style="text-align: center; padding: 48px 32px;">
-        <div style="margin-bottom: 32px;">
-          <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 16px;"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-          <h2 style="font-size: 1.5rem; margin-bottom: 12px; color: var(--ink);">Your Custom Domain</h2>
-          <p style="color: var(--soft); margin-bottom: 24px; line-height: 1.6;">Get a memorable, personalized domain for your classroom. Students can easily remember and access your room with a custom URL.</p>
+      <div class="card" style="text-align: center; padding: 64px 48px; background: linear-gradient(135deg, var(--tint) 0%, var(--bg) 100%);">
+        <div style="margin-bottom: 48px;">
+          <div style="width: 120px; height: 120px; background: var(--brand); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; box-shadow: 0 8px 24px rgba(47, 82, 51, 0.2);">
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="var(--brand-ink)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <h2 style="font-size: 2rem; margin-bottom: 16px; color: var(--ink); font-weight: 600;">Your Custom Domain</h2>
+          <p style="color: var(--soft); margin-bottom: 24px; line-height: 1.7; font-size: 1.1rem; max-width: 500px; margin-left: auto; margin-right: auto;">Get a memorable, personalized domain for your classroom. Students can easily remember and access your room with a custom URL.</p>
         </div>
 
-        <div style="background: var(--tint); padding: 32px; border-radius: 12px; border: 2px solid var(--brand); margin-bottom: 24px;">
-          <p style="font-size: 0.9rem; color: var(--soft); margin-bottom: 16px;">Your domain will look like:</p>
-          <div id="domainPreview" style="font-size: 1.5rem; font-weight: 600; color: var(--ink); font-family: 'Instrument Sans', system-ui, sans-serif; letter-spacing: -0.01em;">
-            <span id="domainName">mscarter</span>.classcastle.link
+        <div style="background: var(--surface); padding: 48px 40px; border-radius: 20px; border: 3px solid var(--brand); margin-bottom: 32px; box-shadow: 0 12px 40px rgba(47, 82, 51, 0.15);">
+          <p style="font-size: 1rem; color: var(--soft); margin-bottom: 24px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase;">Your domain will look like:</p>
+          <div id="domainPreview" style="font-size: 2.5rem; font-weight: 700; color: var(--ink); font-family: 'Instrument Sans', system-ui, sans-serif; letter-spacing: -0.02em; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <span id="domainName" style="color: var(--brand); position: relative; display: inline-block; transition: none;">mscarter</span>
+            <span style="color: var(--soft);">.classcastle.link</span>
+          </div>
+          <div style="margin-top: 24px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+            <span style="background: var(--tint); color: var(--brand); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">Easy to remember</span>
+            <span style="background: var(--tint); color: var(--brand); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">Professional</span>
+            <span style="background: var(--tint); color: var(--brand); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">Shareable</span>
           </div>
         </div>
 
-        <div style="background: var(--bg); padding: 20px; border-radius: 8px; border: 1px solid var(--line);">
-          <h3 style="font-size: 1.1rem; margin-bottom: 12px; color: var(--ink);">Coming Soon</h3>
-          <p style="color: var(--soft); line-height: 1.6; margin-bottom: 0;">We're working hard to bring you custom domains. Stay tuned for updates on this exciting feature!</p>
+        <div style="background: var(--surface); padding: 32px; border-radius: 16px; border: 2px solid var(--line);">
+          <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+            <div style="width: 48px; height: 48px; background: var(--brand); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--brand-ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div style="text-align: left;">
+              <h3 style="font-size: 1.25rem; margin-bottom: 4px; color: var(--ink); font-weight: 600;">Coming Soon</h3>
+              <p style="color: var(--soft); line-height: 1.6; margin: 0; font-size: 0.95rem;">We're working hard to bring you custom domains. Stay tuned for updates!</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -6008,11 +6046,22 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     currentDomainIndex = 0;
     domainNameElement.textContent = domainNames[0];
 
-    // Start rotation
+    // Start rotation with animation
     domainRotationInterval = setInterval(() => {
-      currentDomainIndex = (currentDomainIndex + 1) % domainNames.length;
-      domainNameElement.textContent = domainNames[currentDomainIndex];
-    }, 1500);
+      // Add animation class
+      domainNameElement.classList.add('domain-name-rolling');
+
+      // Change text halfway through animation
+      setTimeout(() => {
+        currentDomainIndex = (currentDomainIndex + 1) % domainNames.length;
+        domainNameElement.textContent = domainNames[currentDomainIndex];
+      }, 250);
+
+      // Remove animation class after it completes
+      setTimeout(() => {
+        domainNameElement.classList.remove('domain-name-rolling');
+      }, 500);
+    }, 2000);
   }
 
   function stopDomainRotation() {
