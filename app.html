@@ -3225,6 +3225,15 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           </div>
         </div>
 
+        <div style="margin-bottom: 24px; padding: 16px; background: var(--tint); border-radius: 8px; border: 1px solid var(--brand);">
+          <label style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer;">
+            <input type="checkbox" id="guidelinesCheckbox" style="margin-top: 4px;">
+            <span style="font-size: 0.9rem; color: var(--ink); line-height: 1.5;">
+              I accept & agree to the <a href="/domains/guidelines.html" target="_blank" style="color: var(--brand); text-decoration: underline;">Custom Domain Guidelines</a>
+            </span>
+          </label>
+        </div>
+
         <div class="modal-actions">
           <button class="modal-btn modal-btn-cancel" id="cancelReserveBtn">Cancel</button>
           <button class="modal-btn modal-btn-confirm" id="confirmReserveBtn">Reserve</button>
@@ -6171,6 +6180,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   const viewRestrictedBtn = document.getElementById('viewRestrictedBtn');
   const restrictedList = document.getElementById('restrictedList');
   const restrictedDomainsList = document.getElementById('restrictedDomainsList');
+  const guidelinesCheckbox = document.getElementById('guidelinesCheckbox');
 
   function generatePersonalizedSuggestions() {
     const suggestions = [];
@@ -6286,6 +6296,13 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       if (!validation.valid) {
         subdomainError.textContent = validation.error;
+        subdomainError.style.display = 'block';
+        return;
+      }
+
+      // Check if guidelines checkbox is checked
+      if (!guidelinesCheckbox.checked) {
+        subdomainError.textContent = 'You must accept the Custom Domain Guidelines to continue';
         subdomainError.style.display = 'block';
         return;
       }

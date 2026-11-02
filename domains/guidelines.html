@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom Domain Guidelines - Classcastle</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --brand: #2f5233;
+      --brand-ink: #ffffff;
+      --brand-tint: #e8f0e9;
+      --ink: #1a1a1a;
+      --soft: #666666;
+      --bg: #f5f5f5;
+      --surface: #ffffff;
+      --line: #e0e0e0;
+      --red: #dc2626;
+      --sky: #0ea5e9;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Instrument Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+      padding-bottom: 32px;
+      border-bottom: 2px solid var(--line);
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+      color: var(--ink);
+    }
+
+    .header p {
+      color: var(--soft);
+      font-size: 1.1rem;
+    }
+
+    .section {
+      background: var(--surface);
+      padding: 32px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      border: 1px solid var(--line);
+    }
+
+    .section h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--ink);
+    }
+
+    .section h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-top: 24px;
+      margin-bottom: 12px;
+      color: var(--ink);
+    }
+
+    .section p {
+      color: var(--soft);
+      margin-bottom: 16px;
+    }
+
+    .section ul {
+      color: var(--soft);
+      margin-left: 24px;
+      margin-bottom: 16px;
+    }
+
+    .section li {
+      margin-bottom: 8px;
+    }
+
+    .section a {
+      color: var(--brand);
+      text-decoration: none;
+    }
+
+    .section a:hover {
+      text-decoration: underline;
+    }
+
+    .notice {
+      background: var(--brand-tint);
+      border: 2px solid var(--brand);
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+
+    .notice h3 {
+      color: var(--brand);
+      margin-bottom: 8px;
+    }
+
+    .notice p {
+      color: var(--ink);
+      margin: 0;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      color: var(--soft);
+    }
+
+    .footer a {
+      color: var(--brand);
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 24px 16px;
+      }
+
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .section {
+        padding: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Custom Domain Guidelines</h1>
+      <p>Last updated: November 2026</p>
+    </div>
+
+    <div class="notice">
+      <h3>⚠️ Important Notice</h3>
+      <p>The custom domain feature is currently in development. The domain format (e.g., .classcastle.link) may change before the official release. We will communicate any changes to users who have reserved domains.</p>
+    </div>
+
+    <div class="section">
+      <h2>1. Overview</h2>
+      <p>Classcastle's Custom Domain feature allows teachers to reserve a personalized subdomain for their classroom. This makes it easier for students to remember and access their room URL.</p>
+      <p>These guidelines outline the rules and expectations for using custom domains on the Classcastle platform.</p>
+    </div>
+
+    <div class="section">
+      <h2>2. Subdomain Requirements</h2>
+      <h3>2.1 Format Rules</h3>
+      <ul>
+        <li>Subdomains must be between 3 and 63 characters in length</li>
+        <li>Only lowercase letters (a-z), numbers (0-9), and hyphens (-) are allowed</li>
+        <li>Subdomains cannot start or end with a hyphen</li>
+        <li>Subdomains must be unique across all Classcastle users</li>
+      </ul>
+
+      <h3>2.2 Reserved Subdomains</h3>
+      <p>Certain subdomains are reserved for system use and cannot be reserved by users. These include infrastructure domains (www, api, mail), brand-related terms (classcastle, official), and functional routes (login, admin, dashboard). A full list is available in the reservation modal.</p>
+    </div>
+
+    <div class="section">
+      <h2>3. Acceptable Use</h2>
+      <h3>3.1 Educational Purpose</h3>
+      <p>Custom domains are intended for educational purposes only. Teachers should use their domain for legitimate classroom activities and student engagement.</p>
+
+      <h3>3.2 Professional Standards</h3>
+      <ul>
+        <li>Domains should not contain offensive, inappropriate, or misleading content</li>
+        <li>Domains should not impersonate other individuals, schools, or organizations</li>
+        <li>Domains should not be used for commercial activities unrelated to education</li>
+        <li>Domains should not violate any applicable laws or regulations</li>
+      </ul>
+
+      <h3>3.3 Content Guidelines</h3>
+      <p>While the domain itself may be neutral, the content hosted on that domain must comply with Classcastle's Terms of Service and Privacy Policy.</p>
+    </div>
+
+    <div class="section">
+      <h2>4. Ownership and Transfer</h2>
+      <h3>4.1 Ownership</h3>
+      <p>Custom domains are owned by the teacher account that reserved them. They cannot be transferred to other accounts without Classcastle's approval.</p>
+
+      <h3>4.2 Account Status</h3>
+      <p>If a teacher account is closed or suspended, any associated custom domains may be released after a reasonable notice period.</p>
+
+      <h3>4.3 First-Come, First-Served</h3>
+      <p>Subdomains are allocated on a first-come, first-served basis, subject to these guidelines and Classcastle's discretion.</p>
+    </div>
+
+    <div class="section">
+      <h2>5. Domain Format Changes</h2>
+      <p>As the Custom Domain feature is in development, the domain suffix (currently .classcastle.link) may change before official release. Users who have reserved domains will be notified of any changes via email and in-app notifications.</p>
+      <p>We aim to maintain consistency, but reserve the right to modify the domain format for technical, branding, or security reasons.</p>
+    </div>
+
+    <div class="section">
+      <h2>6. Enforcement</h2>
+      <p>Classcastle reserves the right to revoke or modify custom domains that violate these guidelines. Violations may result in:</p>
+      <ul>
+        <li>Warning and request to modify the domain</li>
+        <li>Suspension of the custom domain</li>
+        <li>Account suspension or termination in severe cases</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>7. Changes to Guidelines</h2>
+      <p>Classcastle may update these guidelines from time to time. Users will be notified of significant changes. Continued use of the Custom Domain feature after changes constitutes acceptance of the updated guidelines.</p>
+    </div>
+
+    <div class="section">
+      <h2>8. Contact</h2>
+      <p>If you have questions about these guidelines or your custom domain, please contact us at <a href="mailto:support@classcastle.org">support@classcastle.org</a>.</p>
+    </div>
+
+    <div class="footer">
+      <p><a href="/legal.html">View our Terms of Service</a> | <a href="/privacy.html">View our Privacy Policy</a></p>
+      <p style="margin-top: 12px;">© 2026 Classcastle. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>
