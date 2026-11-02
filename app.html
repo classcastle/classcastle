@@ -2326,6 +2326,10 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         Settings
       </a>
+      <a class="nav-item" data-page="customdomain" href="#">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        Custom Domain
+      </a>
     </nav>
     <div class="sidebar-footer">
       <div class="user-info hidden" id="userInfo">
@@ -3100,6 +3104,36 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       </div>
     </div>
 
+    <!-- Custom Domain Page -->
+    <div class="page" id="customdomainPage">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Custom Domain</h1>
+          <p class="page-subtitle">Coming soon - make it even easier for students to join your room</p>
+        </div>
+      </div>
+
+      <div class="card" style="text-align: center; padding: 48px 32px;">
+        <div style="margin-bottom: 32px;">
+          <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 16px;"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <h2 style="font-size: 1.5rem; margin-bottom: 12px; color: var(--ink);">Your Custom Domain</h2>
+          <p style="color: var(--soft); margin-bottom: 24px; line-height: 1.6;">Get a memorable, personalized domain for your classroom. Students can easily remember and access your room with a custom URL.</p>
+        </div>
+
+        <div style="background: var(--tint); padding: 32px; border-radius: 12px; border: 2px solid var(--brand); margin-bottom: 24px;">
+          <p style="font-size: 0.9rem; color: var(--soft); margin-bottom: 16px;">Your domain will look like:</p>
+          <div id="domainPreview" style="font-size: 1.5rem; font-weight: 600; color: var(--ink); font-family: 'Instrument Sans', system-ui, sans-serif; letter-spacing: -0.01em;">
+            <span id="domainName">mscarter</span>.classcastle.link
+          </div>
+        </div>
+
+        <div style="background: var(--bg); padding: 20px; border-radius: 8px; border: 1px solid var(--line);">
+          <h3 style="font-size: 1.1rem; margin-bottom: 12px; color: var(--ink);">Coming Soon</h3>
+          <p style="color: var(--soft); line-height: 1.6; margin-bottom: 0;">We're working hard to bring you custom domains. Stay tuned for updates on this exciting feature!</p>
+        </div>
+      </div>
+    </div>
+
     <!-- Open Source Licenses Modal -->
     <div class="modal-overlay" id="licensesModalOverlay" style="display: none;">
       <div class="modal" id="licensesModal" style="max-width: 700px; max-height: 80vh; overflow: hidden; display: flex; flex-direction: column;">
@@ -3653,6 +3687,9 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   function showPage(pageId) {
     const page = document.getElementById(pageId);
     if (!page) return; // Don't touch existing pages if target doesn't exist
+
+    // Stop domain rotation when leaving custom domain page
+    stopDomainRotation();
 
     // Handle all pages
     document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
@@ -5804,6 +5841,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       if (page === 'polls') loadPolls();
       if (page === 'messages') checkMessagesOptIn();
       if (page === 'settings') loadIdentities();
+      if (page === 'customdomain') startDomainRotation();
 
       // Close sidebar on mobile
       if (window.innerWidth <= 780) {
@@ -5951,6 +5989,38 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   // Onboarding functionality
   let currentOnboardingStep = 1;
   const totalOnboardingSteps = 5;
+
+  // Custom Domain rotation
+  let domainRotationInterval = null;
+  const domainNames = ['mscarter', 'mrjordon', 'mssmith', 'mrwilliams', 'mrbrown', 'msdavis', 'mrmiller', 'mswilson', 'mrmoore', 'mstaylor'];
+  let currentDomainIndex = 0;
+
+  function startDomainRotation() {
+    // Clear any existing interval
+    if (domainRotationInterval) {
+      clearInterval(domainRotationInterval);
+    }
+
+    const domainNameElement = document.getElementById('domainName');
+    if (!domainNameElement) return;
+
+    // Reset to first name
+    currentDomainIndex = 0;
+    domainNameElement.textContent = domainNames[0];
+
+    // Start rotation
+    domainRotationInterval = setInterval(() => {
+      currentDomainIndex = (currentDomainIndex + 1) % domainNames.length;
+      domainNameElement.textContent = domainNames[currentDomainIndex];
+    }, 1500);
+  }
+
+  function stopDomainRotation() {
+    if (domainRotationInterval) {
+      clearInterval(domainRotationInterval);
+      domainRotationInterval = null;
+    }
+  }
 
   function showOnboardingStep(step) {
     document.querySelectorAll('.onboarding-step').forEach(s => s.classList.remove('active'));
