@@ -5932,6 +5932,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       // Handle external links (Legal, Support, API, Resources)
       if (href && href !== '#' && (href.startsWith('http') || href.startsWith('mailto:') || href.startsWith('/'))) {
         if (item.target === '_blank') {
+          e.preventDefault();
           window.open(href, '_blank');
         } else {
           window.location.href = href;
