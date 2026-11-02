@@ -7675,11 +7675,12 @@ usage/fair dealing.`,
   async function checkSession() {
     const { data: { session } } = await SupabaseClient.auth.getSession();
 
-    // Check for error in URL parameters
+    // Check for URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const error = urlParams.get('error');
     const errorCode = urlParams.get('error_code');
     const errorDescription = urlParams.get('error_description');
+    const force = urlParams.get('force');
 
     if (error || errorCode) {
       let message = errorDescription || 'An error occurred during authentication.';
@@ -7732,7 +7733,13 @@ usage/fair dealing.`,
 
       updateUserInfo();
       // Call showPage to ensure dashboard content renders properly
-      showPage('dashboardPage');
+      if (force === 'domain') {
+        showPage('customDomainPage');
+        // Clean URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } else {
+        showPage('dashboardPage');
+      }
 
       try {
         await loadRooms();
