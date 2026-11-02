@@ -1,183 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Custom Domain Guidelines - Classcastle</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --brand: #2f5233;
-      --brand-ink: #ffffff;
-      --brand-tint: #e8f0e9;
-      --ink: #1a1a1a;
-      --soft: #666666;
-      --bg: #f5f5f5;
-      --surface: #ffffff;
-      --line: #e0e0e0;
-      --red: #dc2626;
-      --sky: #0ea5e9;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Instrument Sans', system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--ink);
-      line-height: 1.6;
-    }
-
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 40px 24px;
-    }
-
-    .header {
-      text-align: center;
-      margin-bottom: 48px;
-      padding-bottom: 32px;
-      border-bottom: 2px solid var(--line);
-    }
-
-    .header h1 {
-      font-size: 2.5rem;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      margin-bottom: 12px;
-      color: var(--ink);
-    }
-
-    .header p {
-      color: var(--soft);
-      font-size: 1.1rem;
-    }
-
-    .section {
-      background: var(--surface);
-      padding: 32px;
-      border-radius: 12px;
-      margin-bottom: 24px;
-      border: 1px solid var(--line);
-    }
-
-    .section h2 {
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin-bottom: 16px;
-      color: var(--ink);
-    }
-
-    .section h3 {
-      font-size: 1.2rem;
-      font-weight: 600;
-      margin-top: 24px;
-      margin-bottom: 12px;
-      color: var(--ink);
-    }
-
-    .section p {
-      color: var(--soft);
-      margin-bottom: 16px;
-    }
-
-    .section ul {
-      color: var(--soft);
-      margin-left: 24px;
-      margin-bottom: 16px;
-    }
-
-    .section li {
-      margin-bottom: 8px;
-    }
-
-    .section a {
-      color: var(--brand);
-      text-decoration: none;
-    }
-
-    .section a:hover {
-      text-decoration: underline;
-    }
-
-    .notice {
-      background: var(--brand-tint);
-      border: 2px solid var(--brand);
-      padding: 20px;
-      border-radius: 8px;
-      margin-bottom: 24px;
-    }
-
-    .notice h3 {
-      color: var(--brand);
-      margin-bottom: 8px;
-    }
-
-    .notice p {
-      color: var(--ink);
-      margin: 0;
-    }
-
-    .footer {
-      text-align: center;
-      margin-top: 48px;
-      padding-top: 24px;
-      border-top: 1px solid var(--line);
-      color: var(--soft);
-    }
-
-    .footer a {
-      color: var(--brand);
-      text-decoration: none;
-    }
-
-    .footer a:hover {
-      text-decoration: underline;
-    }
-
-    @media (max-width: 600px) {
-      .container {
-        padding: 24px 16px;
-      }
-
-      .header h1 {
-        font-size: 2rem;
-      }
-
-      .section {
-        padding: 24px;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Custom Domain Guidelines — Classcastle</title>
+<meta name="description" content="Guidelines for using custom domains on Classcastle.">
+<link rel="canonical" href="https://classcastle.org/domains/guidelines.html">
+<link rel="icon" type="image/svg+xml" href="/logo.svg" id="favicon">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FCFCFA; --surface:#fff; --ink:#18221C; --soft:#5E675F; --line:#D9DDD3;
+  --brand:#1F5C3A; --tint:#E4F1E6; --chalk:#F4D35E;
+  color-scheme:light dark; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#0F1511;--surface:#18211B;--ink:#EEF2EA;--soft:#9EAA9F;--line:#2A362D;--brand:#4DAA72;--tint:#1A2B20}
+}
+:root[data-theme="dark"]{--bg:#0F1511;--surface:#18211B;--ink:#EEF2EA;--soft:#9EAA9F;--line:#2A362D;--brand:#4DAA72;--tint:#1A2B20}
+*{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font:400 1.02rem/1.65 'Instrument Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--brand)}
+:focus-visible{outline:3px solid var(--brand);outline-offset:3px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+nav{display:flex;align-items:center;justify-content:space-between;max-width:1080px;margin:0 auto;padding:22px 28px}
+.wordmark{display:flex;align-items:center;gap:10px;font:400 1.3rem 'Instrument Sans',system-ui,sans-serif;text-decoration:none;color:var(--ink)}
+.wordmark img{width:26px;height:26px;display:block}
+.word-accent{color:var(--brand)}
+.nav-cta{font-weight:600;font-size:.92rem;text-decoration:none;color:var(--ink);padding:8px 2px;border-bottom:2px solid var(--ink)}
+header.page{padding:44px 0 36px;border-bottom:1px solid var(--line)}
+header.page h1{font-weight:400;font-size:clamp(2.2rem,4.2vw,3.3rem);line-height:1.1;margin:0}
+header.page p{margin:14px 0 0;color:var(--soft)}
+.layout{display:grid;grid-template-columns:240px 1fr;gap:64px;padding:44px 0 80px;align-items:start}
+.toc{position:sticky;top:24px;font-size:.92rem}
+.toc strong{display:block;margin-bottom:10px}
+.toc ol{margin:0;padding:0;list-style:none;border-left:2px solid var(--line)}
+.toc a{display:block;padding:5px 0 5px 14px;color:var(--soft);text-decoration:none}
+.toc a:hover{color:var(--ink)}
+.summary{background:var(--chalk);color:#18221C;border:2px solid #18221C;border-radius:4px;padding:16px 18px;margin-bottom:40px;font-weight:500}
+.summary p{margin:0}
+article{max-width:68ch}
+article h2{font-weight:600;font-size:1.3rem;line-height:1.25;margin:44px 0 10px;padding-top:28px;border-top:1px solid var(--line)}
+article h2:first-of-type{margin-top:0;padding-top:0;border-top:0}
+article h3{font-weight:600;font-size:1.02rem;margin:22px 0 4px}
+article p{margin:0 0 14px}
+article ul{margin:0 0 14px;padding-left:1.2rem}
+article li{margin-bottom:6px}
+.caps{font-size:.95rem}
+footer{padding:26px 0 44px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--soft);font-size:.85rem;border-top:1px solid var(--line)}
+footer a{color:var(--soft)}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+@media (max-width:820px){
+  .wrap,nav{padding-left:20px;padding-right:20px}
+  .layout{grid-template-columns:1fr;gap:28px;padding-top:32px}
+  .toc{position:static}
+  .toc ol{columns:2;column-gap:20px;border-left:0}
+  .toc a{padding-left:0}
+}
+</style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>Custom Domain Guidelines</h1>
-      <p>Last updated: November 2026</p>
-    </div>
+<nav aria-label="Main">
+  <a class="wordmark" href="/"><img src="/logo.svg" alt=""><span>Class<span class="word-accent">castle</span></span></a>
+  <a class="nav-cta" href="/login.html">Open teacher app</a>
+</nav>
 
-    <div class="notice">
-      <h3>⚠️ Important Notice</h3>
-      <p>The custom domain feature is currently in development. The domain format (e.g., .classcastle.link) may change before the official release. We will communicate any changes to users who have reserved domains.</p>
-    </div>
+<main class="wrap">
+  <header class="page">
+    <h1>Custom Domain Guidelines</h1>
+    <p>Last updated: November 2026</p>
+  </header>
 
-    <div class="section">
-      <h2>1. Overview</h2>
+  <div class="layout">
+    <aside class="toc" aria-label="Contents">
+      <strong>On this page</strong>
+      <ol>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#requirements">Subdomain requirements</a></li>
+        <li><a href="#acceptable">Acceptable use</a></li>
+        <li><a href="#ownership">Ownership and transfer</a></li>
+        <li><a href="#format">Domain format changes</a></li>
+        <li><a href="#enforcement">Enforcement</a></li>
+        <li><a href="#changes">Changes to guidelines</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ol>
+    </aside>
+
+    <article>
+      <div class="summary"><p>In short: Custom domains let teachers reserve a personalized subdomain for their classroom. Follow the format rules, use domains for educational purposes only, and don't choose offensive or misleading names. The domain format may change before release, and we'll notify you of any changes.</p></div>
+
+      <h2 id="overview">1. Overview</h2>
       <p>Classcastle's Custom Domain feature allows teachers to reserve a personalized subdomain for their classroom. This makes it easier for students to remember and access their room URL.</p>
-      <p>These guidelines outline the rules and expectations for using custom domains on the Classcastle platform.</p>
-    </div>
+      <p>These guidelines outline the rules and expectations for using custom domains on the Classcastle platform. By reserving a custom domain, you agree to these guidelines and to our <a href="/terms.html">Terms of Service</a>.</p>
 
-    <div class="section">
-      <h2>2. Subdomain Requirements</h2>
-      <h3>2.1 Format Rules</h3>
+      <h2 id="requirements">2. Subdomain requirements</h2>
+      <h3>2.1 Format rules</h3>
       <ul>
         <li>Subdomains must be between 3 and 63 characters in length</li>
         <li>Only lowercase letters (a-z), numbers (0-9), and hyphens (-) are allowed</li>
@@ -185,16 +107,14 @@
         <li>Subdomains must be unique across all Classcastle users</li>
       </ul>
 
-      <h3>2.2 Reserved Subdomains</h3>
+      <h3>2.2 Reserved subdomains</h3>
       <p>Certain subdomains are reserved for system use and cannot be reserved by users. These include infrastructure domains (www, api, mail), brand-related terms (classcastle, official), and functional routes (login, admin, dashboard). A full list is available in the reservation modal.</p>
-    </div>
 
-    <div class="section">
-      <h2>3. Acceptable Use</h2>
-      <h3>3.1 Educational Purpose</h3>
+      <h2 id="acceptable">3. Acceptable use</h2>
+      <h3>3.1 Educational purpose</h3>
       <p>Custom domains are intended for educational purposes only. Teachers should use their domain for legitimate classroom activities and student engagement.</p>
 
-      <h3>3.2 Professional Standards</h3>
+      <h3>3.2 Professional standards</h3>
       <ul>
         <li>Domains should not contain offensive, inappropriate, or misleading content</li>
         <li>Domains should not impersonate other individuals, schools, or organizations</li>
@@ -202,52 +122,45 @@
         <li>Domains should not violate any applicable laws or regulations</li>
       </ul>
 
-      <h3>3.3 Content Guidelines</h3>
+      <h3>3.3 Content guidelines</h3>
       <p>While the domain itself may be neutral, the content hosted on that domain must comply with Classcastle's Terms of Service and Privacy Policy.</p>
-    </div>
 
-    <div class="section">
-      <h2>4. Ownership and Transfer</h2>
+      <h2 id="ownership">4. Ownership and transfer</h2>
       <h3>4.1 Ownership</h3>
       <p>Custom domains are owned by the teacher account that reserved them. They cannot be transferred to other accounts without Classcastle's approval.</p>
 
-      <h3>4.2 Account Status</h3>
+      <h3>4.2 Account status</h3>
       <p>If a teacher account is closed or suspended, any associated custom domains may be released after a reasonable notice period.</p>
 
-      <h3>4.3 First-Come, First-Served</h3>
+      <h3>4.3 First-come, first-served</h3>
       <p>Subdomains are allocated on a first-come, first-served basis, subject to these guidelines and Classcastle's discretion.</p>
-    </div>
 
-    <div class="section">
-      <h2>5. Domain Format Changes</h2>
+      <h2 id="format">5. Domain format changes</h2>
       <p>As the Custom Domain feature is in development, the domain suffix (currently .classcastle.link) may change before official release. Users who have reserved domains will be notified of any changes via email and in-app notifications.</p>
       <p>We aim to maintain consistency, but reserve the right to modify the domain format for technical, branding, or security reasons.</p>
-    </div>
 
-    <div class="section">
-      <h2>6. Enforcement</h2>
+      <h2 id="enforcement">6. Enforcement</h2>
       <p>Classcastle reserves the right to revoke or modify custom domains that violate these guidelines. Violations may result in:</p>
       <ul>
         <li>Warning and request to modify the domain</li>
         <li>Suspension of the custom domain</li>
         <li>Account suspension or termination in severe cases</li>
       </ul>
-    </div>
 
-    <div class="section">
-      <h2>7. Changes to Guidelines</h2>
+      <h2 id="changes">7. Changes to guidelines</h2>
       <p>Classcastle may update these guidelines from time to time. Users will be notified of significant changes. Continued use of the Custom Domain feature after changes constitutes acceptance of the updated guidelines.</p>
-    </div>
 
-    <div class="section">
-      <h2>8. Contact</h2>
+      <h2 id="contact">8. Contact</h2>
       <p>If you have questions about these guidelines or your custom domain, please contact us at <a href="mailto:support@classcastle.org">support@classcastle.org</a>.</p>
-    </div>
-
-    <div class="footer">
-      <p><a href="/legal.html">View our Terms of Service</a> | <a href="/privacy.html">View our Privacy Policy</a></p>
-      <p style="margin-top: 12px;">© 2026 Classcastle. All rights reserved.</p>
-    </div>
+    </article>
   </div>
+</main>
+
+<div class="wrap">
+  <footer>
+    <span>Classcastle · Made for classrooms</span>
+    <span><a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></span>
+  </footer>
+</div>
 </body>
 </html>
