@@ -452,7 +452,7 @@
       <div class="card">
         <div class="page-header">
           <h1 class="page-title">Welcome back</h1>
-          <p class="page-subtitle">You need to login to Classcastle to continue.</p>
+          <p class="page-subtitle" id="loginSubtitle">You need to login to Classcastle to continue.</p>
         </div>
         <div class="info-box">
           <strong>Data restoration notice</strong>
@@ -569,8 +569,17 @@
   async function checkSession() {
     const { data: { session } } = await SupabaseClient.auth.getSession();
 
-    // Check for error in URL parameters
+    // Check for redirect parameter
     const urlParams = new URLSearchParams(window.location.search);
+    const redirect = urlParams.get('redirect');
+    const loginSubtitle = document.getElementById('loginSubtitle');
+
+    // Update subtitle if redirecting to domains
+    if (redirect && redirect.includes('domain')) {
+      loginSubtitle.textContent = 'Login to continue to Custom Domains';
+    }
+
+    // Check for error in URL parameters
     const error = urlParams.get('error');
     const errorCode = urlParams.get('error_code');
     const errorDescription = urlParams.get('error_description');
@@ -625,7 +634,7 @@
     if (session) {
       showNotification('You are already logged in!');
       setTimeout(() => {
-        window.location.href = '/app.html';
+        window.location.href = redirect || '/app.html';
       }, 500);
     }
   }
@@ -638,6 +647,10 @@
       showNotification('Please fill in all fields');
       return;
     }
+
+    // Get redirect parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const redirect = urlParams.get('redirect');
 
     // Show loading state
     loginBtn.disabled = true;
@@ -654,7 +667,7 @@
 
       showNotification('Welcome back, teacher!');
       setTimeout(() => {
-        window.location.href = '/app.html';
+        window.location.href = redirect || '/app.html';
       }, 1000);
     } catch (error) {
       // Check if user is banned
@@ -671,6 +684,10 @@
   }
 
   async function handleGitHubLogin() {
+    // Get redirect parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const redirect = urlParams.get('redirect');
+
     // Show loading state
     githubLoginBtn.disabled = true;
     githubLoginBtnText.style.display = 'none';
@@ -680,7 +697,7 @@
       const { data, error } = await SupabaseClient.auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: window.location.origin + '/login.html',
+          redirectTo: redirect ? window.location.origin + '/login.html?redirect=' + encodeURIComponent(redirect) : window.location.origin + '/login.html',
           skipBrowserRedirect: false
         }
       });
