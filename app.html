@@ -6161,6 +6161,28 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   const subdomainError = document.getElementById('subdomainError');
   const presetBtns = document.querySelectorAll('.preset-btn');
 
+  function generatePersonalizedSuggestions() {
+    const suggestions = [];
+    const userName = currentUser?.user_metadata?.name || '';
+    
+    if (userName) {
+      // Remove spaces and special characters, convert to lowercase
+      const cleanName = userName.toLowerCase().replace(/[^a-z0-9]/g, '');
+      
+      if (cleanName.length >= 3) {
+        suggestions.push(cleanName);
+        
+        // Add variations with common titles if name doesn't have them
+        if (!cleanName.startsWith('mr') && !cleanName.startsWith('ms') && !cleanName.startsWith('mrs') && !cleanName.startsWith('dr')) {
+          suggestions.push('mr' + cleanName);
+          suggestions.push('ms' + cleanName);
+        }
+      }
+    }
+    
+    return suggestions;
+  }
+
   function validateSubdomain(subdomain) {
     // Check if empty
     if (!subdomain || subdomain.trim() === '') {
@@ -6195,6 +6217,32 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       reserveDomainModal.style.display = 'flex';
       subdomainInput.value = '';
       subdomainError.style.display = 'none';
+
+      // Add personalized suggestions
+      const personalizedSuggestions = generatePersonalizedSuggestions();
+      const presetContainer = document.querySelector('.preset-btn').parentElement;
+      
+      // Remove existing personalized buttons
+      presetContainer.querySelectorAll('.preset-personalized').forEach(btn => btn.remove());
+      
+      // Add new personalized buttons
+      personalizedSuggestions.forEach(subdomain => {
+        const validation = validateSubdomain(subdomain);
+        if (validation.valid) {
+          const btn = document.createElement('button');
+          btn.className = 'preset-btn preset-personalized';
+          btn.dataset.subdomain = subdomain;
+          btn.textContent = subdomain;
+          btn.style.borderColor = 'var(--brand)';
+          btn.style.color = 'var(--brand)';
+          presetContainer.insertBefore(btn, presetContainer.firstChild);
+          
+          btn.addEventListener('click', () => {
+            subdomainInput.value = subdomain;
+            subdomainError.style.display = 'none';
+          });
+        }
+      });
     });
   }
 
