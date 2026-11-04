@@ -2146,7 +2146,24 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           </div>
 
           <div class="deployment-step">
-            <h3>04. Network Configuration</h3>
+            <h3>04. Firefox Deployment</h3>
+            <p>For Firefox, deploy via Group Policy or Enterprise policies using the extension ID.</p>
+            <div class="code-block">
+{
+  "policies": {
+    "ExtensionSettings": {
+      "classcastle@classcastle.org": {
+        "installation_mode": "force_installed",
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/classcastle/latest.xpi"
+      }
+    }
+  }
+}
+            </div>
+          </div>
+
+          <div class="deployment-step">
+            <h3>05. Network Configuration</h3>
             <p>Safelist these domains in your web filter or firewall to ensure room connections work properly.</p>
             <div class="code-block">
 *.supabase.co
@@ -2155,7 +2172,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           </div>
 
           <div class="deployment-step">
-            <h3>05. Testing</h3>
+            <h3>06. Testing</h3>
             <p>Before full deployment, test on a single device to ensure the extension appears and can join a test room.</p>
           </div>
         </div>
