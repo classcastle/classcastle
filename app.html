@@ -2542,7 +2542,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       </div>
 
       <div class="card">
-        <h2 class="section-title" style="margin-bottom: 16px;">Oauth</h2>
+        <h2 class="section-title" style="margin-bottom: 16px;">External Connections</h2>
         <label style="display: flex; align-items: center; gap: 12px; color: var(--ink); font-size: 0.98rem; cursor: pointer;">
           <input type="checkbox" id="legacyOAuthAppsToggle" style="width: 18px; height: 18px; accent-color: var(--brand);">
           <span>Allow legacy OAuth apps to connect to your account</span>
@@ -3768,21 +3768,19 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   async function changeEmail() {
     if (!currentUser) return;
 
-    promptCb(
-      'Enter your new email address:',
-      'Change Email',
-      '',
-      (newEmail) => {
-        if (!newEmail) return;
+    const newEmail = await showPrompt({
+      title: 'Change Email',
+      message: 'Enter your new email address:',
+      placeholder: 'you@school.edu'
+    });
+    if (!newEmail) return;
 
-        if (!newEmail.includes('@') || !newEmail.includes('.')) {
-          showNotification('Please enter a valid email address');
-          return;
-        }
+    if (!newEmail.includes('@') || !newEmail.includes('.')) {
+      showNotification('Please enter a valid email address');
+      return;
+    }
 
-        changeEmailInternal(newEmail);
-      }
-    );
+    await changeEmailInternal(newEmail);
   }
 
   async function changeEmailInternal(newEmail) {
@@ -4925,28 +4923,27 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   }
 
   async function deletePoll(pollId) {
-    confirmCb(
-      'Are you sure you want to delete this poll?',
-      'Delete Poll',
-      async (confirmed) => {
-        if (!confirmed) return;
+    const confirmed = await showConfirm({
+      title: 'Delete Poll',
+      message: 'Are you sure you want to delete this poll?',
+      confirmText: 'Delete'
+    });
+    if (!confirmed) return;
 
-        try {
-          const { error } = await SupabaseClient
-            .from('polls')
-            .delete()
-            .eq('id', pollId);
+    try {
+      const { error } = await SupabaseClient
+        .from('polls')
+        .delete()
+        .eq('id', pollId);
 
-          if (error) throw error;
+      if (error) throw error;
 
-          showNotification('Poll deleted');
-          loadPolls();
-        } catch (error) {
-          console.error('Error deleting poll:', error);
-          showNotification('Error deleting poll');
-        }
-      }
-    );
+      showNotification('Poll deleted');
+      loadPolls();
+    } catch (error) {
+      console.error('Error deleting poll:', error);
+      showNotification('Error deleting poll');
+    }
   }
 
   async function openPollModal() {
@@ -6233,25 +6230,6 @@ usage/fair dealing.`,
   const threadMessages = document.getElementById('threadMessages');
   const threadReplyInput = document.getElementById('threadReplyInput');
   const sendThreadReplyBtn = document.getElementById('sendThreadReplyBtn');
-  const nonUkSchoolBtn = document.getElementById('nonUkSchoolBtn');
-  const nonUkSchoolModal = document.getElementById('nonUkSchoolModal');
-  const closeNonUkModalBtn = document.getElementById('closeNonUkModalBtn');
-  const expressInterestBtn = document.getElementById('expressInterestBtn');
-  const alertModal = document.getElementById('alertModal');
-  const alertModalTitle = document.getElementById('alertModalTitle');
-  const alertModalMessage = document.getElementById('alertModalMessage');
-  const alertModalOkBtn = document.getElementById('alertModalOkBtn');
-  const confirmModal = document.getElementById('confirmModal');
-  const confirmModalTitle = document.getElementById('confirmModalTitle');
-  const confirmModalMessage = document.getElementById('confirmModalMessage');
-  const confirmModalCancelBtn = document.getElementById('confirmModalCancelBtn');
-  const confirmModalOkBtn = document.getElementById('confirmModalOkBtn');
-  const promptModal = document.getElementById('promptModal');
-  const promptModalTitle = document.getElementById('promptModalTitle');
-  const promptModalMessage = document.getElementById('promptModalMessage');
-  const promptModalInput = document.getElementById('promptModalInput');
-  const promptModalCancelBtn = document.getElementById('promptModalCancelBtn');
-  const promptModalOkBtn = document.getElementById('promptModalOkBtn');
   const commandPreview = document.getElementById('commandPreview');
   const commandList = document.getElementById('commandList');
 
@@ -6259,63 +6237,6 @@ usage/fair dealing.`,
   let isPersonalThread = false;
   let currentThread = null;
   let messagesChannel = null;
-
-  // Custom alert function
-  function showAlert(message, title = 'Notice') {
-    alertModalTitle.textContent = title;
-    alertModalMessage.textContent = message;
-    alertModal.style.display = 'flex';
-  }
-
-  function closeAlert() {
-    alertModal.style.display = 'none';
-  }
-
-  // Custom confirm function (callback style for Messages section)
-  let confirmCallback = null;
-  function confirmCb(message, title = 'Confirm', callback) {
-    confirmModalTitle.textContent = title;
-    confirmModalMessage.textContent = message;
-    confirmCallback = callback;
-    confirmModal.style.display = 'flex';
-  }
-
-  function closeConfirm(result = false) {
-    confirmModal.style.display = 'none';
-    if (confirmCallback) {
-      confirmCallback(result);
-      confirmCallback = null;
-    }
-  }
-
-  // Custom prompt function (callback style for Messages section)
-  let promptCallback = null;
-  function promptCb(message, title = 'Input', defaultValue = '', callback) {
-    promptModalTitle.textContent = title;
-    promptModalMessage.textContent = message;
-    promptModalInput.value = defaultValue;
-    promptCallback = callback;
-    promptModal.style.display = 'flex';
-    promptModalInput.focus();
-  }
-
-  function closePrompt(result = null) {
-    promptModal.style.display = 'none';
-    if (promptCallback) {
-      promptCallback(result);
-      promptCallback = null;
-    }
-  }
-
-  alertModalOkBtn.addEventListener('click', closeAlert);
-  confirmModalCancelBtn.addEventListener('click', () => closeConfirm(false));
-  confirmModalOkBtn.addEventListener('click', () => closeConfirm(true));
-  promptModalCancelBtn.addEventListener('click', () => closePrompt(null));
-  promptModalOkBtn.addEventListener('click', () => closePrompt(promptModalInput.value));
-  promptModalInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') closePrompt(promptModalInput.value);
-  });
-
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && licensesModalOverlay.style.display === 'flex') {
