@@ -2618,7 +2618,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       <div class="card">
         <h2 class="section-title" style="margin-bottom: 16px;">Linked Accounts</h2>
-        <p style="color: var(--soft); margin-bottom: 16px;">Link your GitHub account to enable easier sign-in in the future.</p>
+        <p style="color: var(--soft); margin-bottom: 16px;">Link your GitHub, Microsoft, or other supported accounts for easier sign-in.</p>
         <div id="linkedAccounts" style="margin-bottom: 16px;">
           <div class="loading-state" id="identitiesLoading">
             <div class="loading-spinner"></div>
@@ -6135,7 +6135,12 @@ usage/fair dealing.`,
       const linkedProvider = ['github', 'azure'].find(provider => urlParams.get(`${provider}_linked`) === 'true');
       if (linkedProvider) {
         const providerName = linkedProvider === 'azure' ? 'Microsoft' : 'GitHub';
-        showNotification(`${providerName} account linked successfully!`);
+        showConfirm({
+          title: 'Account Linked',
+          message: `Your ${providerName} account was linked successfully.`,
+          confirmText: 'OK',
+          cancelText: ''
+        });
         // Clean URL
         window.history.replaceState({}, document.title, window.location.pathname);
         // Load identities to show the newly linked account
