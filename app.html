@@ -1159,6 +1159,148 @@
     background: var(--line);
   }
 
+  .external-connection {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--bg);
+  }
+
+  .external-connection-logo {
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--line);
+  }
+
+  .external-connection-logo img {
+    width: 28px;
+    height: 28px;
+  }
+
+  .external-connection-info {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .external-connection-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .external-connection-description {
+    margin-top: 4px;
+    color: var(--soft);
+    font-size: 0.88rem;
+    line-height: 1.45;
+  }
+
+  .verified-badge {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+    border-radius: 50%;
+    background: #d6a52f;
+    color: #fff;
+    cursor: help;
+  }
+
+  .verified-badge svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .external-tooltip {
+    position: relative;
+  }
+
+  .external-tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    z-index: 20;
+    right: 0;
+    bottom: calc(100% + 10px);
+    width: max-content;
+    max-width: 240px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--ink);
+    color: var(--bg);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
+    font-size: 0.78rem;
+    font-weight: 400;
+    line-height: 1.4;
+    white-space: normal;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(4px);
+    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+    pointer-events: none;
+  }
+
+  .external-tooltip:hover::after,
+  .external-tooltip:focus-visible::after,
+  .external-tooltip:focus-within::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .external-remove-wrap {
+    flex: 0 0 auto;
+  }
+
+  .external-remove-btn {
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--soft);
+    font: inherit;
+    font-size: 0.85rem;
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+
+  @media (max-width: 520px) {
+    .external-connection {
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+    }
+
+    .external-connection-logo {
+      width: 40px;
+      height: 40px;
+      flex-basis: 40px;
+    }
+
+    .external-connection-logo img {
+      width: 24px;
+      height: 24px;
+    }
+
+    .external-remove-btn {
+      padding: 7px 9px;
+    }
+  }
+
   /* Onboarding Modal */
   .onboarding-overlay {
     position: fixed;
@@ -2495,6 +2637,27 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       <div class="card">
         <h2 class="section-title" style="margin-bottom: 16px;">External Connections</h2>
+        <p style="color: var(--soft); margin-bottom: 20px; line-height: 1.55;">External connections are apps and services authorized to access your Classcastle account. Allowing legacy OAuth apps lets older integrations continue to connect.</p>
+        <div class="external-connection">
+          <div class="external-connection-logo">
+            <img src="/logo.svg" alt="Classcastle logo">
+          </div>
+          <div class="external-connection-info">
+            <div class="external-connection-title">
+              <span>Classcastle Account Services</span>
+              <span class="verified-badge external-tooltip" data-tooltip="Built by Classcastle." tabindex="0" role="img" aria-label="Verified: Built by Classcastle.">
+                <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="m3.5 8.2 2.8 2.7 6.2-6.1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+            </div>
+            <p class="external-connection-description">Provides the sign-in and account services used to access Classcastle.</p>
+          </div>
+          <span class="external-remove-wrap external-tooltip" data-tooltip="This connection is required for your Classcastle account and can't be removed." tabindex="0" aria-label="This connection is required for your Classcastle account and can't be removed.">
+            <button type="button" class="external-remove-btn" disabled aria-disabled="true">Remove</button>
+          </span>
+        </div>
+        <p style="color: var(--soft); margin: 20px 0 12px; font-size: 0.9rem;">Legacy app access</p>
         <label style="display: flex; align-items: center; gap: 12px; color: var(--ink); font-size: 0.98rem; cursor: pointer;">
           <input type="checkbox" id="legacyOAuthAppsToggle" style="width: 18px; height: 18px; accent-color: var(--brand);">
           <span>Allow legacy OAuth apps to connect to your account</span>
