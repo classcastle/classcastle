@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.105.0"></script>
 <style>
   :root {
     --bg: #FCFCFA;
@@ -480,6 +480,14 @@
         <span class="btn-text">Continue with Notion</span>
         <span class="loading" style="display: none;"></span>
       </button>
+      <button class="btn btn-secondary btn-full" id="passkeyLoginBtn" style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 16px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="8" cy="15" r="4"/>
+          <path d="M11 12l8-8 3 3-2 2 2 2-3 3-2-2-3 3"/>
+        </svg>
+        <span class="btn-text">Continue with a passkey</span>
+        <span class="loading" style="display: none;"></span>
+      </button>
       <div style="margin: 16px 0; text-align: center; color: var(--soft); font-size: 0.9rem;">or</div>
       <div class="form-group">
         <label class="form-label" for="loginEmail">Email</label>
@@ -522,7 +530,9 @@
   const SUPABASE_URL = 'https://hduyofdbpspjcuwvackd.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK';
   
-  const SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: { experimental: { passkey: true } }
+  });
 
   // Switch favicon based on theme
   function updateFavicon() {
@@ -550,6 +560,9 @@
   const notionLoginBtn = document.getElementById('notionLoginBtn');
   const notionLoginBtnText = notionLoginBtn.querySelector('.btn-text');
   const notionLoginBtnLoading = notionLoginBtn.querySelector('.loading');
+  const passkeyLoginBtn = document.getElementById('passkeyLoginBtn');
+  const passkeyLoginBtnText = passkeyLoginBtn.querySelector('.btn-text');
+  const passkeyLoginBtnLoading = passkeyLoginBtn.querySelector('.loading');
 
   // Alert modal elements
   const alertModalOverlay = document.getElementById('alertModalOverlay');
@@ -729,6 +742,30 @@
     }
   }
 
+  async function handlePasskeyLogin() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const post = urlParams.get('post');
+
+    passkeyLoginBtn.disabled = true;
+    passkeyLoginBtnText.style.display = 'none';
+    passkeyLoginBtnLoading.style.display = 'inline-block';
+
+    try {
+      const { error } = await SupabaseClient.auth.signInWithPasskey();
+      if (error) throw error;
+
+      showNotification('Welcome back, teacher!');
+      setTimeout(() => {
+        window.location.href = post || '/app.html';
+      }, 1000);
+    } catch (error) {
+      showNotification(error.message || 'Could not sign in with a passkey');
+      passkeyLoginBtn.disabled = false;
+      passkeyLoginBtnText.style.display = 'inline';
+      passkeyLoginBtnLoading.style.display = 'none';
+    }
+  }
+
   function handleGitHubLogin() {
     return handleOAuthLogin('github', githubLoginBtn, githubLoginBtnText, githubLoginBtnLoading);
   }
@@ -745,6 +782,7 @@
   githubLoginBtn.addEventListener('click', handleGitHubLogin);
   microsoftLoginBtn.addEventListener('click', handleMicrosoftLogin);
   notionLoginBtn.addEventListener('click', handleNotionLogin);
+  passkeyLoginBtn.addEventListener('click', handlePasskeyLogin);
   loginPassword.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') handleLogin();
   });

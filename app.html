@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.105.0"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.31/dist/jspdf.plugin.autotable.min.js"></script>
@@ -2646,13 +2646,13 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     <div class="page" id="settingsPage">
       <div class="page-header">
         <div>
-          <h1 class="page-title">Teacher Settings</h1>
-          <p class="page-subtitle">Manage your teacher account and preferences</p>
+          <h1 class="page-title">Settings</h1>
+          <p class="page-subtitle">Manage your profile, sign-in methods, and preferences</p>
         </div>
       </div>
 
       <div class="card">
-        <h2 class="section-title" style="margin-bottom: 16px;">Teacher Account Information</h2>
+        <h2 class="section-title" style="margin-bottom: 16px;">Profile</h2>
         <div class="form-group">
           <label class="form-label">Name</label>
           <input type="text" class="form-input" id="settingsName" value="">
@@ -2667,7 +2667,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       <div class="card">
         <h2 class="section-title" style="margin-bottom: 16px;">Linked Accounts</h2>
-        <p style="color: var(--soft); margin-bottom: 16px;">Link your GitHub, Microsoft, or Notion account for easier sign-in.</p>
+        <p style="color: var(--soft); margin-bottom: 16px;">Connect GitHub, Microsoft, or Notion to sign in to your Classcastle account with those services.</p>
         <div id="linkedAccounts" style="margin-bottom: 16px;">
           <div class="loading-state" id="identitiesLoading">
             <div class="loading-spinner"></div>
@@ -2701,6 +2701,26 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           <span class="btn-text">Link Notion Account</span>
           <span class="loading" style="display: none;"></span>
         </button>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title" style="margin-bottom: 8px;">Security</h2>
+        <h3 style="font-size: 1rem; margin: 16px 0 8px; color: var(--ink);">Passkeys</h3>
+        <p style="color: var(--soft); margin-bottom: 16px;">Use your device or password manager to sign in securely without a password.</p>
+        <div id="passkeysLoading" class="loading-state">
+          <div class="loading-spinner"></div>
+          <p>Loading passkeys...</p>
+        </div>
+        <div id="passkeysList" style="display: none; margin-bottom: 12px;"></div>
+        <button class="btn btn-secondary" id="registerPasskeyBtn">
+          <span class="btn-text">Add a passkey</span>
+          <span class="loading" style="display: none;"></span>
+        </button>
+        <div style="border-top: 1px solid var(--line); margin-top: 20px; padding-top: 16px;">
+          <h3 style="font-size: 1rem; margin: 0 0 8px; color: var(--ink);">Multi-factor authentication</h3>
+          <p style="color: var(--soft); margin-bottom: 12px;">MFA setup is not available yet. We’ll enable it once verification can be securely enforced across Classcastle.</p>
+          <button class="btn btn-secondary" id="mfaUnavailableBtn" disabled aria-disabled="true" title="Multi-factor authentication is not available yet">Set up MFA</button>
+        </div>
       </div>
 
       <div class="card">
@@ -2962,7 +2982,9 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   const SUPABASE_URL = 'https://hduyofdbpspjcuwvackd.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK';
   
-  const SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const SupabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: { experimental: { passkey: true } }
+  });
 
   // Switch favicon based on theme
   function updateFavicon() {
@@ -3080,6 +3102,11 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   const linkNotionBtnLoading = linkNotionBtn.querySelector('.loading');
   const identitiesLoading = document.getElementById('identitiesLoading');
   const identitiesList = document.getElementById('identitiesList');
+  const passkeysLoading = document.getElementById('passkeysLoading');
+  const passkeysList = document.getElementById('passkeysList');
+  const registerPasskeyBtn = document.getElementById('registerPasskeyBtn');
+  const registerPasskeyBtnText = registerPasskeyBtn.querySelector('.btn-text');
+  const registerPasskeyBtnLoading = registerPasskeyBtn.querySelector('.loading');
 
   // Global identities array
   let identities = [];
@@ -3812,6 +3839,102 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       console.error('Error loading identities:', error);
       identitiesLoading.style.display = 'none';
       identitiesList.innerHTML = '<p style="color: var(--red); font-size: 0.9rem;">Error loading linked accounts</p>';
+    }
+  }
+
+  async function loadPasskeys() {
+    if (!currentUser) return;
+
+    passkeysLoading.style.display = 'flex';
+    passkeysList.style.display = 'none';
+    passkeysList.replaceChildren();
+
+    try {
+      const { data: passkeys, error } = await SupabaseClient.auth.passkey.list();
+      if (error) throw error;
+
+      passkeysLoading.style.display = 'none';
+      passkeysList.style.display = 'block';
+
+      if (!passkeys?.length) {
+        passkeysList.innerHTML = '<p style="color: var(--soft); font-size: 0.9rem;">No passkeys added yet.</p>';
+        return;
+      }
+
+      passkeys.forEach(passkey => {
+        const item = document.createElement('div');
+        item.className = 'identity-item';
+
+        const info = document.createElement('div');
+        info.className = 'identity-info';
+        const details = document.createElement('div');
+        const name = document.createElement('div');
+        name.className = 'identity-provider';
+        name.textContent = passkey.friendly_name || 'Passkey';
+        const created = document.createElement('div');
+        created.className = 'identity-email';
+        created.textContent = `Added ${new Date(passkey.created_at).toLocaleDateString()}`;
+        details.append(name, created);
+        info.append(details);
+
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'btn-unlink';
+        removeBtn.textContent = 'Remove';
+        removeBtn.addEventListener('click', () => removePasskey(passkey));
+        item.append(info, removeBtn);
+        passkeysList.append(item);
+      });
+    } catch (error) {
+      console.error('Error loading passkeys:', error);
+      passkeysLoading.style.display = 'none';
+      passkeysList.style.display = 'block';
+      passkeysList.innerHTML = '<p style="color: var(--red); font-size: 0.9rem;">Could not load passkeys. Please try again.</p>';
+    }
+  }
+
+  async function registerPasskey() {
+    if (!currentUser) return;
+
+    registerPasskeyBtn.disabled = true;
+    registerPasskeyBtnText.style.display = 'none';
+    registerPasskeyBtnLoading.style.display = 'inline-block';
+
+    try {
+      const { error } = await SupabaseClient.auth.registerPasskey();
+      if (error) throw error;
+
+      showNotification('Passkey added');
+      await loadPasskeys();
+    } catch (error) {
+      console.error('Error registering passkey:', error);
+      showNotification(error.message || 'Could not add passkey');
+    } finally {
+      registerPasskeyBtn.disabled = false;
+      registerPasskeyBtnText.style.display = 'inline';
+      registerPasskeyBtnLoading.style.display = 'none';
+    }
+  }
+
+  async function removePasskey(passkey) {
+    const confirmed = await showConfirm({
+      title: 'Remove Passkey',
+      message: `Remove ${passkey.friendly_name || 'this passkey'} from your account? You will no longer be able to sign in with it.`,
+      confirmText: 'Remove',
+      cancelText: 'Cancel'
+    });
+
+    if (!confirmed) return;
+
+    try {
+      const { error } = await SupabaseClient.auth.passkey.delete({ passkeyId: passkey.id });
+      if (error) throw error;
+
+      showNotification('Passkey removed');
+      await loadPasskeys();
+    } catch (error) {
+      console.error('Error removing passkey:', error);
+      showNotification(error.message || 'Could not remove passkey');
     }
   }
 
@@ -5499,7 +5622,10 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       if (page === 'activity') loadActivityLog();
       if (page === 'polls') loadPolls();
       if (page === 'messages') checkMessagesOptIn();
-      if (page === 'settings') loadIdentities();
+      if (page === 'settings') {
+        loadIdentities();
+        loadPasskeys();
+      }
 
       // Close sidebar on mobile
       if (window.innerWidth <= 780) {
@@ -5561,6 +5687,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   linkGithubBtn.addEventListener('click', linkGithub);
   linkMicrosoftBtn.addEventListener('click', linkMicrosoft);
   linkNotionBtn.addEventListener('click', linkNotion);
+  registerPasskeyBtn.addEventListener('click', registerPasskey);
 
   // Quick Polls lock menu
   const pollsLockMenuBtn = document.getElementById('pollsLockMenuBtn');
