@@ -2633,6 +2633,16 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           <span class="btn-text">Link GitHub Account</span>
           <span class="loading" style="display: none;"></span>
         </button>
+        <button class="btn btn-secondary" id="linkMicrosoftBtn" style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="#f25022" d="M1 1h10v10H1z"/>
+            <path fill="#7fba00" d="M13 1h10v10H13z"/>
+            <path fill="#00a4ef" d="M1 13h10v10H1z"/>
+            <path fill="#ffb900" d="M13 13h10v10H13z"/>
+          </svg>
+          <span class="btn-text">Link Microsoft Account</span>
+          <span class="loading" style="display: none;"></span>
+        </button>
       </div>
 
       <div class="card">
@@ -2977,6 +2987,9 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   const linkGithubBtn = document.getElementById('linkGithubBtn');
   const linkGithubBtnText = linkGithubBtn.querySelector('.btn-text');
   const linkGithubBtnLoading = linkGithubBtn.querySelector('.loading');
+  const linkMicrosoftBtn = document.getElementById('linkMicrosoftBtn');
+  const linkMicrosoftBtnText = linkMicrosoftBtn.querySelector('.btn-text');
+  const linkMicrosoftBtnLoading = linkMicrosoftBtn.querySelector('.loading');
   const identitiesLoading = document.getElementById('identitiesLoading');
   const identitiesList = document.getElementById('identitiesList');
 
@@ -3624,6 +3637,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       if (!identities || identities.length === 0) {
         identitiesList.innerHTML = '<p style="color: var(--soft); font-size: 0.9rem;">No linked accounts</p>';
         linkGithubBtn.style.display = 'flex';
+        linkMicrosoftBtn.style.display = 'flex';
         return;
       }
 
@@ -3631,10 +3645,13 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         const item = document.createElement('div');
         item.className = 'identity-item';
 
-        const providerName = identity.provider.charAt(0).toUpperCase() + identity.provider.slice(1);
+        const providerNames = { azure: 'Microsoft', github: 'GitHub' };
+        const providerName = providerNames[identity.provider] || identity.provider.charAt(0).toUpperCase() + identity.provider.slice(1);
         const providerIcon = identity.provider === 'github'
           ? '<svg class="identity-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>'
-          : '<svg class="identity-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>';
+          : identity.provider === 'azure'
+            ? '<svg class="identity-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="#f25022" d="M1 1h10v10H1z"/><path fill="#7fba00" d="M13 1h10v10H13z"/><path fill="#00a4ef" d="M1 13h10v10H1z"/><path fill="#ffb900" d="M13 13h10v10H13z"/></svg>'
+            : '<svg class="identity-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>';
 
         const info = document.createElement('div');
         info.className = 'identity-info';
@@ -3662,9 +3679,11 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         identitiesList.appendChild(item);
       });
 
-      // Hide link button if GitHub is already linked
+      // Hide each link button when its provider is already linked
       const hasGithub = identities.some(i => i.provider === 'github');
+      const hasMicrosoft = identities.some(i => i.provider === 'azure' || i.provider === 'microsoft');
       linkGithubBtn.style.display = hasGithub ? 'none' : 'flex';
+      linkMicrosoftBtn.style.display = hasMicrosoft ? 'none' : 'flex';
 
     } catch (error) {
       console.error('Error loading identities:', error);
@@ -3673,34 +3692,39 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     }
   }
 
-  // Link GitHub account
-  async function linkGithub() {
+  // Link an OAuth account
+  async function linkOAuthAccount(provider, button, buttonText, buttonLoading, providerName) {
     if (!currentUser) return;
 
-    // Show loading state
-    linkGithubBtn.disabled = true;
-    linkGithubBtnText.style.display = 'none';
-    linkGithubBtnLoading.style.display = 'inline-block';
+    button.disabled = true;
+    buttonText.style.display = 'none';
+    buttonLoading.style.display = 'inline-block';
 
     try {
       const { data, error } = await SupabaseClient.auth.linkIdentity({
-        provider: 'github',
+        provider,
         options: {
-          redirectTo: window.location.origin + '/app.html'
+          redirectTo: `${window.location.origin}/app.html?${provider}_linked=true`,
+          ...(provider === 'azure' ? { scopes: 'email' } : {})
         }
       });
 
       if (error) throw error;
-
-      // OAuth will redirect, so we don't need to do anything else
     } catch (error) {
-      console.error('Error linking GitHub:', error);
-      showNotification(error.message || 'Error linking GitHub account');
-      // Reset button state
-      linkGithubBtn.disabled = false;
-      linkGithubBtnText.style.display = 'inline';
-      linkGithubBtnLoading.style.display = 'none';
+      console.error(`Error linking ${providerName}:`, error);
+      showNotification(error.message || `Error linking ${providerName} account`);
+      button.disabled = false;
+      buttonText.style.display = 'inline';
+      buttonLoading.style.display = 'none';
     }
+  }
+
+  function linkGithub() {
+    return linkOAuthAccount('github', linkGithubBtn, linkGithubBtnText, linkGithubBtnLoading, 'GitHub');
+  }
+
+  function linkMicrosoft() {
+    return linkOAuthAccount('azure', linkMicrosoftBtn, linkMicrosoftBtnText, linkMicrosoftBtnLoading, 'Microsoft');
   }
 
   // Unlink identity
@@ -5408,6 +5432,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   saveSettingsBtn.addEventListener('click', saveSettings);
   changeEmailBtn.addEventListener('click', changeEmail);
   linkGithubBtn.addEventListener('click', linkGithub);
+  linkMicrosoftBtn.addEventListener('click', linkMicrosoft);
 
   // Quick Polls lock menu
   const pollsLockMenuBtn = document.getElementById('pollsLockMenuBtn');
@@ -6087,13 +6112,7 @@ usage/fair dealing.`,
 
       updateUserInfo();
       // Call showPage to ensure dashboard content renders properly
-      if (force === 'domain') {
-        showPage('customDomainPage');
-        // Clean URL
-        window.history.replaceState({}, document.title, window.location.pathname);
-      } else {
-        showPage('dashboardPage');
-      }
+      showPage('dashboardPage');
 
       try {
         await loadRooms();
@@ -6113,9 +6132,10 @@ usage/fair dealing.`,
         }
       }
 
-      // Check if user just linked GitHub account
-      if (urlParams.get('github_linked') === 'true') {
-        showNotification('GitHub account linked successfully!');
+      const linkedProvider = ['github', 'azure'].find(provider => urlParams.get(`${provider}_linked`) === 'true');
+      if (linkedProvider) {
+        const providerName = linkedProvider === 'azure' ? 'Microsoft' : 'GitHub';
+        showNotification(`${providerName} account linked successfully!`);
         // Clean URL
         window.history.replaceState({}, document.title, window.location.pathname);
         // Load identities to show the newly linked account
