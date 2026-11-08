@@ -471,6 +471,15 @@
         <span class="btn-text">Continue with Microsoft</span>
         <span class="loading" style="display: none;"></span>
       </button>
+      <button class="btn btn-secondary btn-full" id="notionLoginBtn" style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 16px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4.5 3.5h11.8c1.2 0 2.2 1 2.2 2.2v14.8H6.7a2.2 2.2 0 0 1-2.2-2.2z"/>
+          <path d="M18.5 7.5h1a1.8 1.8 0 0 1 0 3.6h-1"/>
+          <path d="M8 16V9l5 7V9"/>
+        </svg>
+        <span class="btn-text">Continue with Notion</span>
+        <span class="loading" style="display: none;"></span>
+      </button>
       <div style="margin: 16px 0; text-align: center; color: var(--soft); font-size: 0.9rem;">or</div>
       <div class="form-group">
         <label class="form-label" for="loginEmail">Email</label>
@@ -538,6 +547,9 @@
   const microsoftLoginBtn = document.getElementById('microsoftLoginBtn');
   const microsoftLoginBtnText = microsoftLoginBtn.querySelector('.btn-text');
   const microsoftLoginBtnLoading = microsoftLoginBtn.querySelector('.loading');
+  const notionLoginBtn = document.getElementById('notionLoginBtn');
+  const notionLoginBtnText = notionLoginBtn.querySelector('.btn-text');
+  const notionLoginBtnLoading = notionLoginBtn.querySelector('.loading');
 
   // Alert modal elements
   const alertModalOverlay = document.getElementById('alertModalOverlay');
@@ -603,8 +615,8 @@
         window.history.replaceState({}, document.title, window.location.pathname);
         return;
       } else if (error === 'identity_not_found') {
-        title = 'GitHub Account Not Linked';
-        message = 'This GitHub account is not linked to a Classcastle account. Please sign up first, then link your GitHub account in Settings.';
+        title = 'Account Not Linked';
+        message = 'This account is not linked to a Classcastle account. Sign in another way, then link this account in Settings.';
         isCriticalError = true;
       } else if (error === 'access_denied') {
         title = 'Access Denied';
@@ -615,9 +627,8 @@
         message = errorDescription || 'Your account has been deleted. Please sign up again if you\'d like to create a new account.';
         isCriticalError = true;
       } else if (errorCode === '403' || errorDescription?.includes('No Classcastle account found')) {
-        // Hook rejected GitHub signup
         title = 'No Classcastle Account Found';
-        message = errorDescription || 'No Classcastle account found for this GitHub account. Please sign up with email first, then link GitHub in Settings.';
+        message = errorDescription || 'No Classcastle account found for this account. Please sign in with email first, then link this account in Settings.';
         isCriticalError = true;
       }
 
@@ -726,9 +737,14 @@
     return handleOAuthLogin('azure', microsoftLoginBtn, microsoftLoginBtnText, microsoftLoginBtnLoading);
   }
 
+  function handleNotionLogin() {
+    return handleOAuthLogin('notion', notionLoginBtn, notionLoginBtnText, notionLoginBtnLoading);
+  }
+
   loginBtn.addEventListener('click', handleLogin);
   githubLoginBtn.addEventListener('click', handleGitHubLogin);
   microsoftLoginBtn.addEventListener('click', handleMicrosoftLogin);
+  notionLoginBtn.addEventListener('click', handleNotionLogin);
   loginPassword.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') handleLogin();
   });
