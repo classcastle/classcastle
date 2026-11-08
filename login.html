@@ -452,7 +452,7 @@
       <div class="card">
         <div class="page-header">
           <h1 class="page-title">Welcome back</h1>
-          <p class="page-subtitle" id="loginSubtitle">You need to login to Classcastle to continue.</p>
+          <p class="page-subtitle">You need to login to Classcastle to continue.</p>
         </div>
       <button class="btn btn-secondary btn-full" id="githubLoginBtn" style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 16px;">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -567,14 +567,7 @@
 
     // Check for redirect parameter
     const urlParams = new URLSearchParams(window.location.search);
-    const redirectName = urlParams.get('redirectname');
     const post = urlParams.get('post');
-    const loginSubtitle = document.getElementById('loginSubtitle');
-
-    // Update subtitle if redirecting to domains
-    if (redirectName === 'domains' && loginSubtitle) {
-      loginSubtitle.textContent = 'Login to continue to Custom Domains';
-    }
 
     // Check for error in URL parameters
     const error = urlParams.get('error');
