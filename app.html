@@ -811,6 +811,55 @@
     line-height: 1.5;
   }
 
+  .account-linked-content {
+    text-align: center;
+  }
+
+  .account-linked-success-icon {
+    width: 56px;
+    height: 56px;
+    margin: 4px auto 16px;
+    color: var(--brand);
+  }
+
+  .account-linked-provider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .account-linked-provider svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .account-linked-next-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 18px 0 22px;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--soft);
+    text-align: left;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .account-linked-next-step svg {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+    margin-top: 1px;
+    color: var(--brand);
+  }
+
   .modal-actions {
     display: flex;
     gap: 12px;
@@ -2731,6 +2780,28 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   </div>
 </div>
 
+<div class="modal-overlay" id="accountLinkedOverlay">
+  <div class="modal account-linked-content" role="dialog" aria-modal="true" aria-labelledby="accountLinkedTitle" aria-describedby="accountLinkedMessage">
+    <svg class="account-linked-success-icon" viewBox="0 0 56 56" fill="none" aria-hidden="true">
+      <circle cx="28" cy="28" r="25" fill="var(--tint)" stroke="var(--brand)" stroke-width="2"/>
+      <path d="m17 28.5 7.2 7.2L39.5 20" stroke="var(--brand)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <h2 id="accountLinkedTitle">Account Linked</h2>
+    <div class="account-linked-provider" id="accountLinkedProvider"></div>
+    <p id="accountLinkedMessage"></p>
+    <div class="account-linked-next-step">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="5" width="18" height="14" rx="2"/>
+        <path d="m3 7 9 6 9-6"/>
+      </svg>
+      <span id="accountLinkedNextStep"></span>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-primary" id="accountLinkedCloseBtn">Got it</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="exportModalOverlay">
   <div class="modal" id="exportModal">
     <h2 id="exportModalTitle">Export Activity Log</h2>
@@ -2922,6 +2993,11 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   const modalMessage = document.getElementById('modalMessage');
   const modalCancel = document.getElementById('modalCancel');
   const modalConfirm = document.getElementById('modalConfirm');
+  const accountLinkedOverlay = document.getElementById('accountLinkedOverlay');
+  const accountLinkedProvider = document.getElementById('accountLinkedProvider');
+  const accountLinkedMessage = document.getElementById('accountLinkedMessage');
+  const accountLinkedNextStep = document.getElementById('accountLinkedNextStep');
+  const accountLinkedCloseBtn = document.getElementById('accountLinkedCloseBtn');
   const exportModalOverlay = document.getElementById('exportModalOverlay');
   const exportModal = document.getElementById('exportModal');
   const exportModalTitle = document.getElementById('exportModalTitle');
@@ -3010,6 +3086,33 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       notification.classList.remove('show');
     }, duration);
   }
+
+  function showAccountLinkedModal(provider) {
+    const isMicrosoft = provider === 'Microsoft';
+    const providerIcon = isMicrosoft
+      ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#f25022" d="M1 1h10v10H1z"/><path fill="#7fba00" d="M13 1h10v10H13z"/><path fill="#00a4ef" d="M1 13h10v10H1z"/><path fill="#ffb900" d="M13 13h10v10H13z"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.79-.26.79-.58v-2.23c-3.34.73-4.03-1.42-4.03-1.42-.55-1.39-1.33-1.76-1.33-1.76-1.09-.75.08-.73.08-.73 1.21.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49 1 .11-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23.96-.27 1.98-.4 3-.4s2.05.13 3.01.4c2.29-1.55 3.3-1.23 3.3-1.23.65 1.65.24 2.87.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.62-5.48 5.92.43.37.82 1.1.82 2.22v3.29c0 .32.19.69.8.58A12 12 0 0 0 12 0Z"/></svg>';
+
+    accountLinkedProvider.innerHTML = `${providerIcon}<span>${provider} account</span>`;
+    accountLinkedMessage.textContent = `Your ${provider} account was linked successfully.`;
+    accountLinkedNextStep.textContent = `You can now sign in to Classcastle with ${provider}. Your existing sign-in options will continue to work too.`;
+    accountLinkedOverlay.classList.add('show');
+    accountLinkedCloseBtn.focus();
+  }
+
+  function closeAccountLinkedModal() {
+    accountLinkedOverlay.classList.remove('show');
+  }
+
+  accountLinkedCloseBtn.addEventListener('click', closeAccountLinkedModal);
+  accountLinkedOverlay.addEventListener('click', (event) => {
+    if (event.target === accountLinkedOverlay) closeAccountLinkedModal();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && accountLinkedOverlay.classList.contains('show')) {
+      closeAccountLinkedModal();
+    }
+  });
 
   // Simple confirm modal
   function showConfirm({ title, message, confirmText = 'Yes', cancelText = 'Cancel' }) {
@@ -6135,12 +6238,7 @@ usage/fair dealing.`,
       const linkedProvider = ['github', 'azure'].find(provider => urlParams.get(`${provider}_linked`) === 'true');
       if (linkedProvider) {
         const providerName = linkedProvider === 'azure' ? 'Microsoft' : 'GitHub';
-        showConfirm({
-          title: 'Account Linked',
-          message: `Your ${providerName} account was linked successfully.`,
-          confirmText: 'OK',
-          cancelText: ''
-        });
+        showAccountLinkedModal(providerName);
         // Clean URL
         window.history.replaceState({}, document.title, window.location.pathname);
         // Load identities to show the newly linked account
