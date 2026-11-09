@@ -2746,8 +2746,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           </span>
         </div>
         <div style="border-top: 1px solid var(--line); margin-top: 20px; padding-top: 16px;">
-          <h3 style="font-size: 1rem; margin: 0 0 8px; color: var(--ink);">OAuth apps you created</h3>
-          <p style="color: var(--soft); margin-bottom: 12px; line-height: 1.5;">Revoke an app to disable its Classcastle OAuth client and remove it from your Dev Labs app list.</p>
+          <h3 style="font-size: 1rem; margin: 0 0 8px; color: var(--ink);">Authorized OAuth apps</h3>
+          <p style="color: var(--soft); margin-bottom: 12px; line-height: 1.5;">These apps have permission to access your Classcastle account. Revoking one removes your authorization without deleting the app for other users.</p>
           <div id="oauthAppsLoading" class="loading-state">
             <div class="loading-spinner"></div>
             <p>Loading OAuth apps...</p>
@@ -3882,19 +3882,20 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         try {
           const { data, error } = await SupabaseClient.functions.invoke(
             'register-oauth-app',
-            { body: { action: 'list' } }
+            { body: { action: 'list_authorized' } }
           );
           if (error || data?.error) throw new Error(error?.message || data.error);
 
           oauthAppsLoading.style.display = 'none';
           oauthAppsList.style.display = 'block';
-          const apps = Array.isArray(data?.apps) ? data.apps : [];
+          const apps = Array.isArray(data?.grants) ? data.grants : [];
           if (!apps.length) {
             oauthAppsList.innerHTML = '<p style="color: var(--soft); font-size: 0.9rem;">No OAuth apps registered.</p>';
             return;
           }
 
-          apps.forEach(app => {
+          apps.forEach(grant => {
+            const app = grant.client || {};
             const item = document.createElement('div');
             item.className = 'identity-item';
 
@@ -3903,15 +3904,15 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
             const icon = document.createElement('img');
             icon.className = 'identity-icon';
             icon.alt = '';
-            icon.src = app.icon_uri || '/logo.svg';
+            icon.src = app.logo_uri || '/logo.svg';
             const details = document.createElement('div');
             const name = document.createElement('div');
             name.className = 'identity-provider';
             name.textContent = app.name || 'OAuth app';
             const created = document.createElement('div');
             created.className = 'identity-email';
-            created.textContent = app.created_at
-              ? `Created ${new Date(app.created_at).toLocaleDateString()}`
+            created.textContent = grant.granted_at
+              ? `Authorized ${new Date(grant.granted_at).toLocaleDateString()}`
               : 'OAuth client';
             details.append(name, created);
             info.append(icon, details);
@@ -3934,8 +3935,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 
       async function revokeOAuthApp(app, button) {
         const confirmed = await showConfirm({
-          title: 'Revoke OAuth app',
-          message: `Revoke ${app.name || 'this OAuth app'}? It will no longer be able to use Classcastle OAuth.`,
+          title: 'Revoke authorization',
+          message: `Revoke ${app.name || 'this OAuth app'}'s access to your Classcastle account?`,
           confirmText: 'Revoke',
           cancelText: 'Cancel'
         });
@@ -3945,7 +3946,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         try {
           const { data, error } = await SupabaseClient.functions.invoke(
             'register-oauth-app',
-            { body: { action: 'revoke', clientId: app.client_id } }
+            { body: { action: 'revoke_authorized', clientId: app.id } }
           );
           if (error || data?.error) throw new Error(error?.message || data.error);
           showNotification('OAuth app revoked');

@@ -171,55 +171,49 @@ Deno.serve(async (request) => {
     return json(request, 200, { apps: data || [] });
   }
 
-  if (body.action === "revoke") {
+  if (body.action === "list_authorized") {
+    const grantsResponse = await fetch(
+      `${supabaseUrl}/auth/v1/user/oauth/grants`,
+      {
+        headers: {
+          apikey: publishableKey,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+    const grants = await grantsResponse.json().catch(() => []);
+
+    if (!grantsResponse.ok) {
+      return json(request, grantsResponse.status, {
+        error: grants?.msg || grants?.message || "Could not load authorized apps.",
+      });
+    }
+    return json(request, 200, { grants: Array.isArray(grants) ? grants : [] });
+  }
+
+  if (body.action === "revoke_authorized") {
     const clientId =
       typeof body.clientId === "string" ? body.clientId.trim() : "";
     if (!clientId) {
       return json(request, 400, { error: "OAuth client ID is required." });
     }
 
-    const { data: ownedApp, error: ownerLookupError } = await adminClient
-      .from("oauth_app_owners")
-      .select("client_id")
-      .eq("client_id", clientId)
-      .eq("owner_id", userData.user.id)
-      .maybeSingle();
-
-    if (ownerLookupError) {
-      return json(request, 500, { error: "Could not verify OAuth app ownership." });
-    }
-    if (!ownedApp) {
-      return json(request, 404, { error: "OAuth app not found." });
-    }
-
     const revokeResponse = await fetch(
-      `${supabaseUrl}/auth/v1/admin/oauth/clients/${encodeURIComponent(clientId)}`,
+      `${supabaseUrl}/auth/v1/user/oauth/grants?client_id=${encodeURIComponent(clientId)}`,
       {
         method: "DELETE",
         headers: {
-          apikey: secretKey,
-          Authorization: `Bearer ${secretKey}`,
+          apikey: publishableKey,
+          Authorization: `Bearer ${accessToken}`,
         },
       },
     );
 
-    if (!revokeResponse.ok && revokeResponse.status !== 404) {
+    if (!revokeResponse.ok) {
       const revokeResult = await revokeResponse.json().catch(() => ({}));
       return json(request, revokeResponse.status, {
         error: revokeResult.msg || revokeResult.message ||
-          "Could not revoke the OAuth app.",
-      });
-    }
-
-    const { error: deleteError } = await adminClient
-      .from("oauth_app_owners")
-      .delete()
-      .eq("client_id", clientId)
-      .eq("owner_id", userData.user.id);
-
-    if (deleteError) {
-      return json(request, 500, {
-        error: "The OAuth app was revoked but its ownership record could not be removed.",
+          "Could not revoke the authorized app.",
       });
     }
 
