@@ -532,23 +532,20 @@
         continueStep.textContent = 'Registering…';
         appFormStatus.textContent = '';
         const scopes = [...document.querySelectorAll('input[name="permissions"]:checked')].map(scope => scope.value);
-        const registrationResponse = await fetch('https://api.classcastle.org/.netlify/functions/registeroauthapp', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${session.access_token}`
-          },
-          body: JSON.stringify({
-            name: document.getElementById('appName').value.trim(),
-            redirectUri: redirectUrl.value.trim(),
-            scopes
-          })
+        const { data: registrationBody, error: registrationError } = await SupabaseClient.functions.invoke(
+          'register-oauth-app',
+          {
+            body: {
+              name: document.getElementById('appName').value.trim(),
+              redirectUri: redirectUrl.value.trim(),
+              scopes
+            }
+          }
         });
-        const registrationBody = await registrationResponse.json().catch(() => ({}));
         continueStep.disabled = false;
         continueStep.textContent = 'Create app';
-        if (!registrationResponse.ok) {
-          appFormStatus.textContent = registrationBody.error || 'Could not register the OAuth app.';
+        if (registrationError || !registrationBody?.client_id || !registrationBody?.client_secret) {
+          appFormStatus.textContent = registrationError?.message || registrationBody?.error || 'Could not register the OAuth app.';
           return;
         }
 
