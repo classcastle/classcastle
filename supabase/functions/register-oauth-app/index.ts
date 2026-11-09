@@ -63,6 +63,8 @@ function configuredKey(
 
 function validateInput(body: Record<string, unknown>) {
   const name = typeof body.name === "string" ? body.name.trim() : "";
+  const iconUri =
+    typeof body.iconUri === "string" ? body.iconUri.trim() : "";
   const redirectUri =
     typeof body.redirectUri === "string" ? body.redirectUri.trim() : "";
   const scopes = Array.isArray(body.scopes)
@@ -75,6 +77,17 @@ function validateInput(body: Record<string, unknown>) {
 
   if (!name || name.length > 100) {
     return { error: "App name is required and must be 100 characters or fewer." };
+  }
+
+  if (iconUri) {
+    try {
+      const icon = new URL(iconUri);
+      if (icon.protocol !== "https:") {
+        return { error: "App icons must use an HTTPS URL." };
+      }
+    } catch {
+      return { error: "Enter a valid app icon URL." };
+    }
   }
 
   let redirect: URL;
@@ -95,7 +108,7 @@ function validateInput(body: Record<string, unknown>) {
     return { error: "Select at least one OAuth scope." };
   }
 
-  return { name, redirectUri, scopes };
+  return { name, iconUri, redirectUri, scopes };
 }
 
 Deno.serve(async (request) => {
@@ -148,7 +161,7 @@ Deno.serve(async (request) => {
   if (body.action === "list") {
     const { data, error } = await adminClient
       .from("oauth_app_owners")
-      .select("client_id, name, redirect_uris, scopes, created_at")
+      .select("client_id, name, icon_uri, redirect_uris, scopes, created_at")
       .eq("owner_id", userData.user.id)
       .order("created_at", { ascending: false });
 
@@ -156,6 +169,61 @@ Deno.serve(async (request) => {
       return json(request, 500, { error: "Could not load your OAuth apps." });
     }
     return json(request, 200, { apps: data || [] });
+  }
+
+  if (body.action === "revoke") {
+    const clientId =
+      typeof body.clientId === "string" ? body.clientId.trim() : "";
+    if (!clientId) {
+      return json(request, 400, { error: "OAuth client ID is required." });
+    }
+
+    const { data: ownedApp, error: ownerLookupError } = await adminClient
+      .from("oauth_app_owners")
+      .select("client_id")
+      .eq("client_id", clientId)
+      .eq("owner_id", userData.user.id)
+      .maybeSingle();
+
+    if (ownerLookupError) {
+      return json(request, 500, { error: "Could not verify OAuth app ownership." });
+    }
+    if (!ownedApp) {
+      return json(request, 404, { error: "OAuth app not found." });
+    }
+
+    const revokeResponse = await fetch(
+      `${supabaseUrl}/auth/v1/admin/oauth/clients/${encodeURIComponent(clientId)}`,
+      {
+        method: "DELETE",
+        headers: {
+          apikey: secretKey,
+          Authorization: `Bearer ${secretKey}`,
+        },
+      },
+    );
+
+    if (!revokeResponse.ok && revokeResponse.status !== 404) {
+      const revokeResult = await revokeResponse.json().catch(() => ({}));
+      return json(request, revokeResponse.status, {
+        error: revokeResult.msg || revokeResult.message ||
+          "Could not revoke the OAuth app.",
+      });
+    }
+
+    const { error: deleteError } = await adminClient
+      .from("oauth_app_owners")
+      .delete()
+      .eq("client_id", clientId)
+      .eq("owner_id", userData.user.id);
+
+    if (deleteError) {
+      return json(request, 500, {
+        error: "The OAuth app was revoked but its ownership record could not be removed.",
+      });
+    }
+
+    return json(request, 200, { revoked: true, client_id: clientId });
   }
 
   const input = validateInput(body);
@@ -171,10 +239,12 @@ Deno.serve(async (request) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        name: input.name,
+        client_name: input.name,
+        ...(input.iconUri ? { logo_uri: input.iconUri } : {}),
         redirect_uris: [input.redirectUri],
         client_type: "confidential",
         token_endpoint_auth_method: "client_secret_basic",
+        scope: "openid profile email",
       }),
     },
   );
@@ -197,7 +267,8 @@ Deno.serve(async (request) => {
     .insert({
       client_id: registration.client_id,
       owner_id: userData.user.id,
-      name: registration.name || input.name,
+      name: registration.client_name || input.name,
+      icon_uri: registration.logo_uri || input.iconUri || null,
       redirect_uris: registration.redirect_uris || [input.redirectUri],
       scopes: input.scopes,
     });
@@ -211,7 +282,8 @@ Deno.serve(async (request) => {
   return json(request, 201, {
     client_id: registration.client_id,
     client_secret: registration.client_secret,
-    name: registration.name || input.name,
+    name: registration.client_name || input.name,
+    icon_uri: registration.logo_uri || input.iconUri || null,
     redirect_uris: registration.redirect_uris || [input.redirectUri],
     scopes: input.scopes,
   });

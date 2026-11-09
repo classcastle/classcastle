@@ -49,7 +49,7 @@
   </main>
 
   <script>
-    const supabase = window.supabase.createClient(
+    const supabaseClient = window.supabase.createClient(
       'https://hduyofdbpspjcuwvackd.supabase.co',
       'sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK'
     );
@@ -61,7 +61,7 @@
       status.className = 'status';
       status.textContent = 'Starting OAuth…';
 
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabaseClient.auth.signInWithOAuth({
         provider: 'custom:classcastle',
         options: {
           redirectTo: window.location.href

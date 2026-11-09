@@ -89,6 +89,7 @@
     .form-group input, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid #dce3dc; border-radius: 5px; background: #fff; color: #18221c; font: inherit; }
     .form-group textarea { min-height: 90px; resize: vertical; }
     .scope-list { display: grid; gap: 10px; }
+    .scope-notice { margin: 0 0 14px; padding: 10px 12px; border: 1px solid #eadca6; border-radius: 5px; background: #fffbea; color: #6b5b16; font-size: .82rem; line-height: 1.45; }
     .scope-option { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; padding: 12px; border: 1px solid #dce3dc; border-radius: 5px; background: #fff; }
     .scope-option input { margin-top: 3px; accent-color: #1f5c3a; }
     .scope-option strong { display: block; margin-bottom: 3px; font-size: .88rem; }
@@ -245,7 +246,8 @@
           </section>
           <section class="form-step" data-panel="permissions" hidden>
             <h3>Permissions</h3>
-            <p class="app-form-intro">Choose the Classcastle data your integration can request. Only selected scopes will be available to your app.</p>
+            <p class="app-form-intro">Choose the Classcastle data your integration may request in the future.</p>
+            <p class="scope-notice">Scopes are currently informational only. They do not grant access to classrooms, students, assignments, polls, or other Classcastle data yet.</p>
             <div class="form-group scope-list">
               <label class="scope-option">
                 <input type="checkbox" name="permissions" value="profile" checked>
@@ -648,6 +650,7 @@
           {
             body: {
               name: document.getElementById('appName').value.trim(),
+              iconUri: appIconCdnUrl.value.trim(),
               redirectUri: redirectUrl.value.trim(),
               scopes
             }

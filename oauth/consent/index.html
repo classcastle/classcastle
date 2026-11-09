@@ -88,7 +88,7 @@
   </main>
 
   <script>
-    const supabase = window.supabase.createClient(
+    const supabaseClient = window.supabase.createClient(
       'https://hduyofdbpspjcuwvackd.supabase.co',
       'sb_publishable_zI1zwUpMhbnU1cMwRJBTug_or6athhK'
     );
@@ -125,8 +125,19 @@
     }
 
     function renderAuthorization(details) {
-      appNameElement.textContent = details.client?.name || 'OAuth application';
+      const client = details.client || {};
+      const clientName = client.client_name || client.name || 'OAuth application';
+      appNameElement.textContent = clientName;
       appOriginElement.textContent = details.redirect_uri ? new URL(details.redirect_uri).origin : '';
+      if (client.logo_uri) {
+        appIconElement.textContent = '';
+        appIconElement.style.backgroundImage = `url("${client.logo_uri}")`;
+        appIconElement.style.backgroundSize = 'cover';
+        appIconElement.style.backgroundPosition = 'center';
+      } else {
+        appIconElement.textContent = clientName.charAt(0).toUpperCase();
+        appIconElement.style.backgroundImage = '';
+      }
       scopeList.replaceChildren();
       (details.scope || 'openid profile email').split(/\s+/).filter(Boolean).forEach(scope => {
         const item = document.createElement('li');
@@ -142,14 +153,14 @@
         return;
       }
 
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabaseClient.auth.getSession();
       if (!session) {
         loginPanel.classList.remove('hidden');
         loginEmail.focus();
         return;
       }
 
-      const { data, error } = await supabase.auth.oauth.getAuthorizationDetails(authorizationId);
+      const { data, error } = await supabaseClient.auth.oauth.getAuthorizationDetails(authorizationId);
       if (error || !data || !data.client || !data.redirect_uri) {
         showError(error?.message || 'This authorization request is invalid or has already been completed.');
         return;
@@ -162,7 +173,7 @@
       loginButton.disabled = true;
       loginButton.textContent = 'Signing in…';
       loginStatus.textContent = '';
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabaseClient.auth.signInWithPassword({
         email: loginEmail.value.trim(),
         password: loginPassword.value
       });
@@ -191,7 +202,7 @@
       denyButton.disabled = true;
       approveButton.textContent = decision === 'approve' ? 'Authorizing…' : 'Processing…';
       const method = decision === 'approve' ? 'approveAuthorization' : 'denyAuthorization';
-      const { data, error } = await supabase.auth.oauth[method](authorizationId);
+      const { data, error } = await supabaseClient.auth.oauth[method](authorizationId);
       if (error || !data?.redirect_url) {
         showError(error?.message || 'Could not complete the authorization request.');
         return;

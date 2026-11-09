@@ -2745,6 +2745,15 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
             <button type="button" class="external-remove-btn" disabled aria-disabled="true">Remove</button>
           </span>
         </div>
+        <div style="border-top: 1px solid var(--line); margin-top: 20px; padding-top: 16px;">
+          <h3 style="font-size: 1rem; margin: 0 0 8px; color: var(--ink);">OAuth apps you created</h3>
+          <p style="color: var(--soft); margin-bottom: 12px; line-height: 1.5;">Revoke an app to disable its Classcastle OAuth client and remove it from your Dev Labs app list.</p>
+          <div id="oauthAppsLoading" class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Loading OAuth apps...</p>
+          </div>
+          <div id="oauthAppsList" style="display: none;"></div>
+        </div>
         <p style="color: var(--soft); margin: 20px 0 12px; font-size: 0.9rem;">Advanced Settings</p>
         <label style="display: flex; align-items: center; gap: 12px; color: var(--ink); font-size: 0.98rem; cursor: pointer;">
           <input type="checkbox" id="legacyOAuthAppsToggle" style="width: 18px; height: 18px; accent-color: var(--brand);">
@@ -3102,6 +3111,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   const linkNotionBtnLoading = linkNotionBtn.querySelector('.loading');
   const identitiesLoading = document.getElementById('identitiesLoading');
   const identitiesList = document.getElementById('identitiesList');
+  const oauthAppsLoading = document.getElementById('oauthAppsLoading');
+  const oauthAppsList = document.getElementById('oauthAppsList');
   const passkeysLoading = document.getElementById('passkeysLoading');
   const passkeysList = document.getElementById('passkeysList');
   const registerPasskeyBtn = document.getElementById('registerPasskeyBtn');
@@ -3859,6 +3870,91 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       if (!passkeys?.length) {
         passkeysList.innerHTML = '<p style="color: var(--soft); font-size: 0.9rem;">No passkeys added yet.</p>';
         return;
+      }
+
+      async function loadOAuthApps() {
+        if (!currentUser) return;
+
+        oauthAppsLoading.style.display = 'flex';
+        oauthAppsList.style.display = 'none';
+        oauthAppsList.replaceChildren();
+
+        try {
+          const { data, error } = await SupabaseClient.functions.invoke(
+            'register-oauth-app',
+            { body: { action: 'list' } }
+          );
+          if (error || data?.error) throw new Error(error?.message || data.error);
+
+          oauthAppsLoading.style.display = 'none';
+          oauthAppsList.style.display = 'block';
+          const apps = Array.isArray(data?.apps) ? data.apps : [];
+          if (!apps.length) {
+            oauthAppsList.innerHTML = '<p style="color: var(--soft); font-size: 0.9rem;">No OAuth apps registered.</p>';
+            return;
+          }
+
+          apps.forEach(app => {
+            const item = document.createElement('div');
+            item.className = 'identity-item';
+
+            const info = document.createElement('div');
+            info.className = 'identity-info';
+            const icon = document.createElement('img');
+            icon.className = 'identity-icon';
+            icon.alt = '';
+            icon.src = app.icon_uri || '/logo.svg';
+            const details = document.createElement('div');
+            const name = document.createElement('div');
+            name.className = 'identity-provider';
+            name.textContent = app.name || 'OAuth app';
+            const created = document.createElement('div');
+            created.className = 'identity-email';
+            created.textContent = app.created_at
+              ? `Created ${new Date(app.created_at).toLocaleDateString()}`
+              : 'OAuth client';
+            details.append(name, created);
+            info.append(icon, details);
+
+            const revokeBtn = document.createElement('button');
+            revokeBtn.type = 'button';
+            revokeBtn.className = 'btn-unlink';
+            revokeBtn.textContent = 'Revoke';
+            revokeBtn.addEventListener('click', () => revokeOAuthApp(app, revokeBtn));
+            item.append(info, revokeBtn);
+            oauthAppsList.appendChild(item);
+          });
+        } catch (error) {
+          console.error('Error loading OAuth apps:', error);
+          oauthAppsLoading.style.display = 'none';
+          oauthAppsList.style.display = 'block';
+          oauthAppsList.innerHTML = '<p style="color: var(--red); font-size: 0.9rem;">Could not load OAuth apps. Please try again.</p>';
+        }
+      }
+
+      async function revokeOAuthApp(app, button) {
+        const confirmed = await showConfirm({
+          title: 'Revoke OAuth app',
+          message: `Revoke ${app.name || 'this OAuth app'}? It will no longer be able to use Classcastle OAuth.`,
+          confirmText: 'Revoke',
+          cancelText: 'Cancel'
+        });
+        if (!confirmed) return;
+
+        button.disabled = true;
+        try {
+          const { data, error } = await SupabaseClient.functions.invoke(
+            'register-oauth-app',
+            { body: { action: 'revoke', clientId: app.client_id } }
+          );
+          if (error || data?.error) throw new Error(error?.message || data.error);
+          showNotification('OAuth app revoked');
+          await loadOAuthApps();
+        } catch (error) {
+          button.disabled = false;
+          console.error('Error revoking OAuth app:', error);
+          showNotification(error.message || 'Could not revoke OAuth app');
+        }
       }
 
       passkeys.forEach(passkey => {
@@ -5625,6 +5721,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       if (page === 'settings') {
         loadIdentities();
         loadPasskeys();
+        loadOAuthApps();
       }
 
       // Close sidebar on mobile
