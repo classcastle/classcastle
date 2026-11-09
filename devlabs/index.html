@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Classcastle Dev Labs — API Documentation</title>
-<meta name="description" content="Build on top of Classcastle with our developer API. Create custom integrations, automate workflows, and extend classroom management.">
+<meta name="description" content="Use the Classcastle legacy API while we build the next-generation OAuth API.">
 <link rel="icon" type="image/svg+xml" href="https://classcastle.org/logo.svg" id="favicon">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -127,7 +127,9 @@ footer a{color:var(--soft)}
   .cta-band{padding:44px 24px}
   .hero-ctas{flex-direction:column;align-items:stretch;text-align:center}
 }
-</style>
+  .api-notice{margin:0 0 42px;padding:18px 20px;background:#fff7d6;border:1px solid #d6b84c;border-left:4px solid #b08a16;border-radius:6px;color:#40350f;line-height:1.55}
+  .api-notice strong{display:block;margin-bottom:4px}
+  </style>
 </head>
 <body>
 
@@ -144,11 +146,18 @@ footer a{color:var(--soft)}
 <div class="wrap">
   <div class="hero">
     <h1>Build on Classcastle</h1>
-    <p class="lede">Our developer API lets you integrate Classcastle into your own tools. Create custom dashboards, automate room management, and extend classroom management however you need.</p>
+    <p class="lede">Our developer API lets you integrate Classcastle into your own tools and automate room management.</p>
     <div class="hero-ctas">
       <a class="btn-primary" href="#getting-started">Get started</a>
       <a class="btn-secondary" href="mailto:dev@classcastle.org">Contact us</a>
     </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="api-notice" role="note">
+    <strong>The legacy API is still available.</strong>
+    You can continue using it, but it is in maintenance mode: no new features will be added, and some endpoints may not keep up with current Classcastle features. We are working on a new OAuth API for the long term.
   </div>
 </div>
 
@@ -174,7 +183,7 @@ footer a{color:var(--soft)}
 
 <section id="getting-started">
   <div class="wrap">
-    <div class="section-head"><h2>Getting started</h2><p>Generate your API key, then make your first request. Or use the <a href="#code-generator" style="color:var(--brand);font-weight:600;">code generator</a> to quickly generate API request code.</p></div>
+    <div class="section-head"><h2>Getting started</h2><p>Generate a legacy API key, then make your first request. This API remains available for existing integrations while the OAuth API is developed.</p></div>
     <div class="feature-card">
       <h3>1. Generate your API key</h3>
       <p style="margin-bottom:16px;">Go to <a href="https://devlabs.classcastle.org/generateapikey" style="color:var(--brand);">devlabs.classcastle.org/generateapikey</a> to generate your API key. This creates an API-only account that can only be accessed via the API, keeping your main teacher account secure.</p>
