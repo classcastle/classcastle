@@ -31,6 +31,8 @@
       cursor: pointer;
     }
     button:hover { background: #e7f2e8; }
+    button.button-disabled { border-color: #dce3dc; background: #eef1ed; color: #89938b; cursor: not-allowed; }
+    button.button-disabled:hover { background: #eef1ed; }
     :focus-visible { outline: 3px solid #f4d35e; outline-offset: 3px; }
     .modal-backdrop { position: fixed; inset: 0; display: none; place-items: center; padding: 20px; background: rgba(15, 25, 18, .64); }
     .modal-backdrop.open { display: grid; }
@@ -47,6 +49,7 @@
     <h1>Classcastle Dev Labs</h1>
     <p>We are building a new OAuth API for Classcastle. The current API is still available, but it is in maintenance mode and may not support newer features.</p>
     <button type="button" id="openDocs">View legacy API documentation</button>
+    <button type="button" class="button-disabled" disabled title="OAuth app creation is coming soon">Create an OAuth App</button>
   </main>
 
   <div class="modal-backdrop" id="docsModal" role="dialog" aria-modal="true" aria-labelledby="docsTitle" aria-hidden="true">
