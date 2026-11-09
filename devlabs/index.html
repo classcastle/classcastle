@@ -40,6 +40,24 @@
     button.button-disabled:hover { background: #eef1ed; }
     .actions { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
     .actions button { margin-top: 24px; }
+    .action-link { display: inline-block; margin-top: 24px; padding: 10px 16px; border: 1px solid #b8c5ba; border-radius: 5px; background: #fff; color: #1f5c3a; font-weight: 600; text-decoration: none; }
+    .action-link:hover { border-color: #1f5c3a; background: #e7f2e8; }
+    .apps-panel { margin-top: 34px; padding: 22px; border: 1px solid #dce3dc; border-radius: 8px; background: #fff; text-align: left; }
+    .apps-panel-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .apps-panel h2 { margin: 0; font-size: 1.05rem; }
+    .apps-panel-header button { margin: 0; padding: 7px 10px; font-size: .82rem; }
+    .apps-status { min-height: 1.3em; margin-top: 14px; color: #627067; font-size: .84rem; }
+    .apps-status.error { color: #a33b3b; }
+    .apps-list { display: grid; gap: 10px; margin: 16px 0 0; padding: 0; list-style: none; }
+    .app-card { padding: 14px; border: 1px solid #dce3dc; border-radius: 6px; background: #f7f9f6; }
+    .app-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .app-card h3 { margin: 0; font-size: .92rem; }
+    .app-card p { margin: 5px 0 0; color: #627067; font-size: .78rem; line-height: 1.45; }
+    .app-card code { color: #18221c; font-size: .76rem; overflow-wrap: anywhere; }
+    .app-card-details { display: grid; gap: 4px; margin-top: 10px; }
+    .app-card-detail { color: #627067; font-size: .78rem; }
+    .app-card-detail strong { color: #18221c; }
+    .empty-apps { margin-top: 16px; color: #627067; font-size: .84rem; }
     :focus-visible { outline: 3px solid #f4d35e; outline-offset: 3px; }
     .modal-backdrop { position: fixed; inset: 0; display: grid; visibility: hidden; opacity: 0; place-items: center; padding: 20px; background: rgba(15, 25, 18, .64); transition: opacity .2s ease, visibility 0s linear .2s; }
     .modal-backdrop.open { visibility: visible; opacity: 1; transition-delay: 0s; }
@@ -141,7 +159,17 @@
     <div class="actions">
       <button class="button-primary" type="button" id="createApp">Create an OAuth App</button>
       <button class="button-secondary" type="button" id="openDocs">View legacy API documentation</button>
+      <a class="button-secondary action-link" href="test.html">Test an OAuth App</a>
     </div>
+    <p class="notice">Already have an OAuth client? Use the test page to try the Authorization Code with PKCE flow.</p>
+    <section class="apps-panel" aria-labelledby="appsTitle">
+      <div class="apps-panel-header">
+        <h2 id="appsTitle">My OAuth apps</h2>
+        <button class="button-secondary" type="button" id="refreshApps">Refresh</button>
+      </div>
+      <div class="apps-status" id="appsStatus" role="status" aria-live="polite">Sign in to view your registered apps.</div>
+      <ul class="apps-list" id="appsList"></ul>
+    </section>
   </main>
 
   <div class="modal-backdrop" id="docsModal" role="dialog" aria-modal="true" aria-labelledby="docsTitle" aria-hidden="true">
@@ -362,6 +390,9 @@
     const closeDocs = document.getElementById('closeDocs');
     const appModal = document.getElementById('appModal');
     const createApp = document.getElementById('createApp');
+    const refreshApps = document.getElementById('refreshApps');
+    const appsStatus = document.getElementById('appsStatus');
+    const appsList = document.getElementById('appsList');
     const closeApp = document.getElementById('closeApp');
     const cancelApp = document.getElementById('cancelApp');
     const authPanel = document.getElementById('authPanel');
@@ -481,6 +512,77 @@
       return [...currentPanel.querySelectorAll('input, textarea')].every(field => field.reportValidity());
     }
 
+    function setAppsStatus(message, isError = false) {
+      appsStatus.textContent = message;
+      appsStatus.classList.toggle('error', isError);
+    }
+
+    function renderApps(apps) {
+      appsList.replaceChildren();
+
+      if (!apps.length) {
+        const empty = document.createElement('li');
+        empty.className = 'empty-apps';
+        empty.textContent = 'You have not registered any OAuth apps yet.';
+        appsList.appendChild(empty);
+        return;
+      }
+
+      apps.forEach(app => {
+        const item = document.createElement('li');
+        item.className = 'app-card';
+
+        const header = document.createElement('div');
+        header.className = 'app-card-header';
+        const title = document.createElement('h3');
+        title.textContent = app.name || 'Unnamed OAuth app';
+        header.appendChild(title);
+        item.appendChild(header);
+
+        const details = document.createElement('div');
+        details.className = 'app-card-details';
+        [
+          ['Client ID', app.client_id],
+          ['Redirect URI', Array.isArray(app.redirect_uris) ? app.redirect_uris.join(', ') : app.redirect_uri],
+          ['Created', app.created_at ? new Date(app.created_at).toLocaleString() : 'Not available']
+        ].forEach(([label, value]) => {
+          const detail = document.createElement('div');
+          detail.className = 'app-card-detail';
+          const strong = document.createElement('strong');
+          strong.textContent = `${label}: `;
+          detail.append(strong, document.createTextNode(value || 'Not available'));
+          details.appendChild(detail);
+        });
+        item.appendChild(details);
+        appsList.appendChild(item);
+      });
+    }
+
+    async function loadApps() {
+      const { data: { session } } = await SupabaseClient.auth.getSession();
+      if (!session) {
+        appsList.replaceChildren();
+        setAppsStatus('Sign in to view your registered apps.');
+        return;
+      }
+
+      refreshApps.disabled = true;
+      setAppsStatus('Loading your apps…');
+      const { data, error } = await SupabaseClient.functions.invoke(
+        'register-oauth-app',
+        { body: { action: 'list' } }
+      );
+      refreshApps.disabled = false;
+
+      if (error || !Array.isArray(data?.apps)) {
+        setAppsStatus(error?.message || data?.error || 'Could not load your OAuth apps.', true);
+        return;
+      }
+
+      renderApps(data.apps);
+      setAppsStatus(`${data.apps.length} registered app${data.apps.length === 1 ? '' : 's'}.`);
+    }
+
     createApp.addEventListener('click', async () => {
       openModal(appModal, closeApp);
       const { data: { session } } = await SupabaseClient.auth.getSession();
@@ -515,6 +617,15 @@
 
       authPassword.value = '';
       showSetup();
+      loadApps();
+    });
+    refreshApps.addEventListener('click', loadApps);
+    SupabaseClient.auth.onAuthStateChange((_event, session) => {
+      if (session) loadApps();
+      else {
+        appsList.replaceChildren();
+        setAppsStatus('Sign in to view your registered apps.');
+      }
     });
     appForm.addEventListener('submit', async event => {
       event.preventDefault();
@@ -541,7 +652,7 @@
               scopes
             }
           }
-        });
+        );
         continueStep.disabled = false;
         continueStep.textContent = 'Create app';
         if (registrationError || !registrationBody?.client_id || !registrationBody?.client_secret) {

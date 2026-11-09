@@ -1,0 +1,218 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.105.0";
+
+const allowedOrigins = new Set([
+  "https://classcastle.org",
+  "https://devlabs.classcastle.org",
+  "https://devlabsclasscastle.pages.dev",
+  "http://localhost:4173",
+  "http://127.0.0.1:4173",
+]);
+
+function corsHeaders(request: Request) {
+  const requestOrigin = request.headers.get("Origin") || "";
+  return {
+    "Access-Control-Allow-Origin": allowedOrigins.has(requestOrigin)
+      ? requestOrigin
+      : "https://classcastle.org",
+    "Access-Control-Allow-Headers":
+      "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Max-Age": "86400",
+    "Vary": "Origin",
+  };
+}
+
+function json(
+  request: Request,
+  status: number,
+  body: Record<string, unknown>,
+) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      ...corsHeaders(request),
+      "Content-Type": "application/json",
+    },
+  });
+}
+
+function configuredKey(
+  jsonName: string,
+  fallbackNames: string[],
+): string | undefined {
+  const jsonValue = Deno.env.get(jsonName);
+  if (jsonValue) {
+    try {
+      const parsed = JSON.parse(jsonValue);
+      if (typeof parsed?.default === "string") return parsed.default;
+      if (parsed && typeof parsed === "object") {
+        const first = Object.values(parsed).find(
+          (value): value is string => typeof value === "string",
+        );
+        if (first) return first;
+      }
+    } catch {
+      // Fall through to the explicit variable names.
+    }
+  }
+
+  return fallbackNames
+    .map((name) => Deno.env.get(name))
+    .find((value): value is string => Boolean(value));
+}
+
+function validateInput(body: Record<string, unknown>) {
+  const name = typeof body.name === "string" ? body.name.trim() : "";
+  const redirectUri =
+    typeof body.redirectUri === "string" ? body.redirectUri.trim() : "";
+  const scopes = Array.isArray(body.scopes)
+    ? [...new Set(body.scopes.filter(
+        (scope): scope is string =>
+          typeof scope === "string" &&
+          /^[a-z][a-z0-9._:-]*$/.test(scope),
+      ))]
+    : [];
+
+  if (!name || name.length > 100) {
+    return { error: "App name is required and must be 100 characters or fewer." };
+  }
+
+  let redirect: URL;
+  try {
+    redirect = new URL(redirectUri);
+  } catch {
+    return { error: "Enter a valid redirect URL." };
+  }
+
+  const localhost = ["localhost", "127.0.0.1", "[::1]"].includes(
+    redirect.hostname,
+  );
+  if (redirect.protocol !== "https:" && !localhost) {
+    return { error: "Production redirect URLs must use HTTPS." };
+  }
+
+  if (!scopes.length) {
+    return { error: "Select at least one OAuth scope." };
+  }
+
+  return { name, redirectUri, scopes };
+}
+
+Deno.serve(async (request) => {
+  if (request.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders(request) });
+  }
+  if (request.method !== "POST") {
+    return json(request, 405, { error: "Method not allowed" });
+  }
+
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const publishableKey = configuredKey("SUPABASE_PUBLISHABLE_KEYS", [
+    "SUPABASE_PUBLISHABLE_KEY",
+    "SUPABASE_ANON_KEY",
+  ]);
+  const secretKey = configuredKey("SUPABASE_SECRET_KEYS", [
+    "SUPABASE_SECRET_KEY",
+    "SUPABASE_SERVICE_ROLE_KEY",
+  ]);
+  const authorization = request.headers.get("Authorization");
+
+  if (!supabaseUrl || !publishableKey || !secretKey) {
+    return json(request, 500, { error: "Function environment is not configured." });
+  }
+  if (!authorization?.startsWith("Bearer ")) {
+    return json(request, 401, { error: "Authentication required." });
+  }
+
+  const accessToken = authorization.replace(/^Bearer\s+/i, "");
+  const userClient = createClient(supabaseUrl, publishableKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+  const adminClient = createClient(supabaseUrl, secretKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+  const { data: userData, error: userError } =
+    await userClient.auth.getUser(accessToken);
+
+  if (userError || !userData.user) {
+    return json(request, 401, { error: "Your session is no longer valid." });
+  }
+
+  let body: Record<string, unknown>;
+  try {
+    body = await request.json();
+  } catch {
+    return json(request, 400, { error: "Invalid JSON request body." });
+  }
+
+  if (body.action === "list") {
+    const { data, error } = await adminClient
+      .from("oauth_app_owners")
+      .select("client_id, name, redirect_uris, scopes, created_at")
+      .eq("owner_id", userData.user.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      return json(request, 500, { error: "Could not load your OAuth apps." });
+    }
+    return json(request, 200, { apps: data || [] });
+  }
+
+  const input = validateInput(body);
+  if ("error" in input) return json(request, 400, { error: input.error });
+
+  const registrationResponse = await fetch(
+    `${supabaseUrl}/auth/v1/admin/oauth/clients`,
+    {
+      method: "POST",
+      headers: {
+        apikey: secretKey,
+        Authorization: `Bearer ${secretKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: input.name,
+        redirect_uris: [input.redirectUri],
+        client_type: "confidential",
+        token_endpoint_auth_method: "client_secret_basic",
+      }),
+    },
+  );
+  const registration = await registrationResponse.json().catch(() => ({}));
+
+  if (!registrationResponse.ok) {
+    return json(request, registrationResponse.status, {
+      error: registration.msg || registration.message || registration.error ||
+        "Could not register the OAuth app.",
+    });
+  }
+  if (!registration.client_id || !registration.client_secret) {
+    return json(request, 502, {
+      error: "Supabase returned incomplete OAuth client credentials.",
+    });
+  }
+
+  const { error: ownerError } = await adminClient
+    .from("oauth_app_owners")
+    .insert({
+      client_id: registration.client_id,
+      owner_id: userData.user.id,
+      name: registration.name || input.name,
+      redirect_uris: registration.redirect_uris || [input.redirectUri],
+      scopes: input.scopes,
+    });
+
+  if (ownerError) {
+    return json(request, 500, {
+      error: "The OAuth client was created but could not be linked to your account.",
+    });
+  }
+
+  return json(request, 201, {
+    client_id: registration.client_id,
+    client_secret: registration.client_secret,
+    name: registration.name || input.name,
+    redirect_uris: registration.redirect_uris || [input.redirectUri],
+    scopes: input.scopes,
+  });
+});
