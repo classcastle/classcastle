@@ -4,180 +4,85 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Classcastle Dev Labs</title>
-  <meta name="description" content="Build Classcastle integrations with the upcoming OAuth API.">
   <link rel="icon" type="image/svg+xml" href="https://classcastle.org/logo.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f7f8f5;
-      --surface: #fff;
-      --ink: #18221c;
-      --soft: #627067;
-      --line: #dce3dc;
-      --brand: #1f5c3a;
-      --tint: #e7f2e8;
-      --yellow: #f4d35e;
-      box-sizing: border-box;
+      color-scheme: light;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #18221c;
+      background: #fafbf8;
     }
-    * { box-sizing: inherit; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--ink);
-      font: 400 1rem/1.6 "Instrument Sans", system-ui, sans-serif;
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+    main { width: min(520px, 100%); text-align: center; }
+    .logo { width: 56px; height: 56px; margin-bottom: 20px; }
+    h1 { margin: 0 0 12px; font-size: clamp(1.7rem, 5vw, 2.2rem); letter-spacing: -.04em; }
+    p { margin: 0 auto; color: #627067; line-height: 1.6; }
+    .notice { margin-top: 20px; }
+    button {
+      margin-top: 24px;
+      padding: 10px 16px;
+      border: 1px solid #1f5c3a;
+      border-radius: 5px;
+      background: transparent;
+      color: #1f5c3a;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
     }
-    a { color: inherit; }
-    :focus-visible { outline: 3px solid var(--brand); outline-offset: 3px; }
-    .wrap { width: min(1080px, calc(100% - 48px)); margin: 0 auto; }
-    nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 22px 0;
-      border-bottom: 1px solid var(--line);
-    }
-    .wordmark { display: flex; align-items: center; gap: 9px; color: var(--ink); text-decoration: none; font-size: 1.25rem; }
-    .logo-mark { width: 27px; height: 27px; }
-    .word-accent { color: var(--brand); }
-    .nav-links { display: flex; align-items: center; gap: 22px; font-size: .9rem; }
-    .nav-links a { color: var(--soft); text-decoration: none; }
-    .nav-links a:hover { color: var(--ink); }
-    .nav-links .nav-button { padding: 9px 15px; border-radius: 5px; background: var(--ink); color: #fff; }
-    .hero { max-width: 760px; padding: 100px 0 96px; }
-    .eyebrow { color: var(--brand); font-size: .78rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
-    h1 { margin: 18px 0 22px; max-width: 700px; font-size: clamp(2.8rem, 6vw, 5.2rem); line-height: 1; letter-spacing: -.07em; font-weight: 500; }
-    .hero p { max-width: 650px; margin: 0; color: var(--soft); font-size: 1.15rem; }
-    .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 30px; }
-    .button { display: inline-block; padding: 12px 18px; border-radius: 5px; font-weight: 600; text-decoration: none; cursor: pointer; font: inherit; }
-    .button-primary { border: 1px solid var(--brand); background: var(--brand); color: #fff; }
-    .button-primary:hover { background: #17482e; }
-    .button-secondary { border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
-    .button-secondary:hover { border-color: var(--brand); color: var(--brand); }
-    .notice { margin-bottom: 96px; padding: 24px 28px; border: 1px solid #d5c26b; border-left: 4px solid #b08a16; border-radius: 6px; background: #fff9dc; }
-    .notice strong { display: block; margin-bottom: 6px; }
-    .notice p { max-width: 780px; margin: 0; color: #514717; }
-    .section { padding: 76px 0; border-top: 1px solid var(--line); }
-    .section h2 { margin: 0 0 12px; font-size: clamp(1.9rem, 3.5vw, 2.8rem); line-height: 1.05; letter-spacing: -.055em; font-weight: 500; }
-    .section-lede { max-width: 590px; margin: 0 0 34px; color: var(--soft); }
-    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-    .card { padding: 22px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
-    .card h3 { margin: 0 0 8px; font-size: 1.05rem; font-weight: 600; }
-    .card p { margin: 0; color: var(--soft); font-size: .94rem; }
-    .contact { display: flex; align-items: center; justify-content: space-between; gap: 30px; padding: 38px; border-radius: 7px; background: var(--tint); }
-    .contact h2 { margin: 0; }
-    footer { display: flex; justify-content: space-between; gap: 20px; padding: 28px 0 42px; color: var(--soft); font-size: .84rem; }
-    footer a { text-decoration: none; }
-    .modal-backdrop { position: fixed; inset: 0; z-index: 20; display: none; align-items: center; justify-content: center; padding: 22px; background: rgba(15, 25, 18, .64); }
-    .modal-backdrop.open { display: flex; }
-    .modal { display: flex; flex-direction: column; width: min(1040px, 100%); height: min(780px, 92vh); overflow: hidden; border-radius: 8px; background: var(--surface); box-shadow: 0 20px 70px rgba(0,0,0,.25); }
-    .modal-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 20px; border-bottom: 1px solid var(--line); }
-    .modal-header h2 { margin: 0; font-size: 1.05rem; font-weight: 600; }
-    .modal-close { padding: 5px 9px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface); color: var(--ink); cursor: pointer; font-size: 1.2rem; line-height: 1; }
-    .modal-close:hover { border-color: var(--brand); color: var(--brand); }
-    .modal iframe { flex: 1; width: 100%; border: 0; background: #fff; }
-    @media (max-width: 720px) {
-      .wrap { width: min(100% - 32px, 1080px); }
-      .hero { padding: 66px 0 70px; }
-      .nav-links a:not(.nav-button) { display: none; }
-      .cards { grid-template-columns: 1fr; }
-      .contact { align-items: flex-start; flex-direction: column; padding: 28px; }
-      .notice { margin-bottom: 70px; padding: 20px; }
-      footer { flex-direction: column; }
-    }
-    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    button:hover { background: #e7f2e8; }
+    :focus-visible { outline: 3px solid #f4d35e; outline-offset: 3px; }
+    .modal-backdrop { position: fixed; inset: 0; display: none; place-items: center; padding: 20px; background: rgba(15, 25, 18, .64); }
+    .modal-backdrop.open { display: grid; }
+    .modal { width: min(1040px, 100%); height: min(780px, 92vh); display: flex; flex-direction: column; overflow: hidden; border-radius: 8px; background: #fff; }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid #dce3dc; }
+    .modal-header strong { font-size: .95rem; }
+    .close { margin: 0; padding: 4px 9px; border-color: #dce3dc; color: #18221c; }
+    iframe { flex: 1; width: 100%; border: 0; }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <nav aria-label="Main">
-      <a class="wordmark" href="https://classcastle.org/"><img src="https://classcastle.org/logo.svg" alt="" class="logo-mark"><span>Class<span class="word-accent">castle</span></span></a>
-      <div class="nav-links">
-        <a href="https://classcastle.org/">Home</a>
-        <a href="https://classcastle.org/login.html">Teacher App</a>
-        <a class="nav-button" href="#contact">Contact</a>
-      </div>
-    </nav>
+  <main>
+    <img class="logo" src="https://classcastle.org/logo.svg" alt="Classcastle">
+    <h1>Classcastle Dev Labs</h1>
+    <p>We are building a new OAuth API for Classcastle. The current API is still available, but it is in maintenance mode and may not support newer features.</p>
+    <button type="button" id="openDocs">View legacy API documentation</button>
+  </main>
 
-    <main>
-      <section class="hero">
-        <div class="eyebrow">Developer platform</div>
-        <h1>Build the next generation of Classcastle tools.</h1>
-        <p>We are preparing an OAuth API for secure, flexible integrations with current and future Classcastle features.</p>
-        <div class="actions">
-          <a class="button button-primary" href="mailto:dev@classcastle.org">Talk to the team</a>
-          <button class="button button-secondary" type="button" id="openDocsBtn">View legacy API docs</button>
-        </div>
-      </section>
-
-      <section class="notice" role="note">
-        <strong>The current API remains available for existing integrations.</strong>
-        <p>You can continue using the legacy API, but it is in maintenance mode. It will not receive new features, and some parts may not work with current Classcastle features. The legacy documentation is available from the button above while the OAuth API is developed.</p>
-      </section>
-
-      <section class="section">
-        <h2>What is changing</h2>
-        <p class="section-lede">The OAuth API will provide a more reliable way to authorize applications and keep integrations aligned with Classcastle as the platform evolves.</p>
-        <div class="cards">
-          <article class="card"><h3>Modern authorization</h3><p>Connect applications with OAuth instead of managing standalone API keys.</p></article>
-          <article class="card"><h3>Better account access</h3><p>Give integrations scoped access to the Classcastle resources they actually need.</p></article>
-          <article class="card"><h3>Built for what is next</h3><p>Use an API designed to support new Classcastle features as they are released.</p></article>
-        </div>
-      </section>
-
-      <section class="section" id="contact">
-        <div class="contact">
-          <div>
-            <h2>Building an integration?</h2>
-            <p class="section-lede">Tell us what you are working on or ask about the OAuth API roadmap.</p>
-          </div>
-          <a class="button button-primary" href="mailto:dev@classcastle.org">Email the Dev Labs team</a>
-        </div>
-      </section>
-    </main>
-
-    <footer>
-      <span>Classcastle Dev Labs</span>
-      <span><a href="https://classcastle.org/privacy.html">Privacy</a> · <a href="https://classcastle.org/terms.html">Terms</a></span>
-    </footer>
-  </div>
-
-  <div class="modal-backdrop" id="docsModal" role="dialog" aria-modal="true" aria-labelledby="docsModalTitle" aria-hidden="true">
+  <div class="modal-backdrop" id="docsModal" role="dialog" aria-modal="true" aria-labelledby="docsTitle" aria-hidden="true">
     <div class="modal">
       <div class="modal-header">
-        <h2 id="docsModalTitle">Legacy API documentation</h2>
-        <button class="modal-close" type="button" id="closeDocsBtn" aria-label="Close legacy API documentation">×</button>
+        <strong id="docsTitle">Legacy API documentation</strong>
+        <button class="close" type="button" id="closeDocs" aria-label="Close legacy API documentation">×</button>
       </div>
-      <iframe src="legacy-api.html" title="Legacy Classcastle API documentation"></iframe>
+      <iframe src="legacy-api.html" title="Legacy API documentation"></iframe>
     </div>
   </div>
 
   <script>
     const docsModal = document.getElementById('docsModal');
-    const openDocsBtn = document.getElementById('openDocsBtn');
-    const closeDocsBtn = document.getElementById('closeDocsBtn');
+    const openDocs = document.getElementById('openDocs');
+    const closeDocs = document.getElementById('closeDocs');
 
-    function closeDocs() {
+    function closeDocumentation() {
       docsModal.classList.remove('open');
       docsModal.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
-      openDocsBtn.focus();
+      openDocs.focus();
     }
 
-    openDocsBtn.addEventListener('click', () => {
+    openDocs.addEventListener('click', () => {
       docsModal.classList.add('open');
       docsModal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
-      closeDocsBtn.focus();
+      closeDocs.focus();
     });
-    closeDocsBtn.addEventListener('click', closeDocs);
+    closeDocs.addEventListener('click', closeDocumentation);
     docsModal.addEventListener('click', event => {
-      if (event.target === docsModal) closeDocs();
+      if (event.target === docsModal) closeDocumentation();
     });
     document.addEventListener('keydown', event => {
-      if (event.key === 'Escape' && docsModal.classList.contains('open')) closeDocs();
+      if (event.key === 'Escape' && docsModal.classList.contains('open')) closeDocumentation();
     });
   </script>
 </body>
