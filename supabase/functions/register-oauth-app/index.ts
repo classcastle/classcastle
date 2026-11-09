@@ -161,14 +161,18 @@ Deno.serve(async (request) => {
   if (body.action === "list") {
     const { data, error } = await adminClient
       .from("oauth_app_owners")
-      .select("client_id, name, icon_uri, redirect_uris, scopes, created_at")
+      .select("client_id, name, redirect_uris, scopes, created_at")
       .eq("owner_id", userData.user.id)
       .order("created_at", { ascending: false });
 
     if (error) {
-      return json(request, 500, { error: "Could not load your OAuth apps." });
+      return json(request, 500, {
+        error: `Could not load your OAuth apps: ${error.message}`,
+      });
     }
-    return json(request, 200, { apps: data || [] });
+    return json(request, 200, {
+      apps: (data || []).map((app) => ({ ...app, icon_uri: null })),
+    });
   }
 
   if (body.action === "list_authorized") {
@@ -256,7 +260,7 @@ Deno.serve(async (request) => {
     });
   }
 
-  const { error: ownerError } = await adminClient
+  let { error: ownerError } = await adminClient
     .from("oauth_app_owners")
     .insert({
       client_id: registration.client_id,
@@ -266,6 +270,19 @@ Deno.serve(async (request) => {
       redirect_uris: registration.redirect_uris || [input.redirectUri],
       scopes: input.scopes,
     });
+
+  if (ownerError?.message?.includes("icon_uri")) {
+    const fallbackInsert = await adminClient
+      .from("oauth_app_owners")
+      .insert({
+        client_id: registration.client_id,
+        owner_id: userData.user.id,
+        name: registration.client_name || input.name,
+        redirect_uris: registration.redirect_uris || [input.redirectUri],
+        scopes: input.scopes,
+      });
+    ownerError = fallbackInsert.error;
+  }
 
   if (ownerError) {
     return json(request, 500, {
