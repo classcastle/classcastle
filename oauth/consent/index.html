@@ -43,6 +43,9 @@
     .login-panel label { display: block; margin: 12px 0 6px; font-size: .84rem; font-weight: 600; }
     .login-panel input { width: 100%; padding: 10px 12px; border: 1px solid #dce3dc; border-radius: 5px; background: #fff; color: #18221c; font: inherit; }
     .login-panel button { width: 100%; margin-top: 16px; }
+    .provider-login-list { display: grid; gap: 8px; margin-top: 18px; }
+    .provider-login-list button { width: 100%; margin: 0; }
+    .login-divider { margin: 18px 0 0; color: #627067; font-size: .8rem; text-align: center; }
     .login-status { min-height: 1.25em; margin-top: 10px; color: #a33b3b; font-size: .82rem; }
     .hidden { display: none; }
     :focus-visible { outline: 3px solid #f4d35e; outline-offset: 3px; }
@@ -65,7 +68,13 @@
 
       <form class="login-panel hidden" id="loginPanel">
         <h2>Sign in to continue</h2>
-        <p class="intro">Use the email address and password you use to sign in to the Classcastle teacher app.</p>
+        <p class="intro">Choose a sign-in method to continue with this authorization request.</p>
+        <div class="provider-login-list" aria-label="External sign-in providers">
+          <button type="button" data-provider="azure">Continue with Microsoft</button>
+          <button type="button" data-provider="notion">Continue with Notion</button>
+          <button type="button" data-provider="github">Continue with GitHub</button>
+        </div>
+        <p class="login-divider">or sign in with your Classcastle account</p>
         <label for="loginEmail">Email</label>
         <input id="loginEmail" type="email" autocomplete="email" required>
         <label for="loginPassword">Password</label>
@@ -97,6 +106,7 @@
       openid: 'Verify your Classcastle identity',
       profile: 'Read your name and account profile',
       email: 'Read your email address',
+      'user:profile': 'Read your name, email address, and account profile',
       classrooms: 'View your classrooms and rooms',
       students: 'View authorized student rosters',
       assignments: 'Read assignments and coursework',
@@ -110,6 +120,7 @@
     const loginPassword = document.getElementById('loginPassword');
     const loginButton = document.getElementById('loginButton');
     const loginStatus = document.getElementById('loginStatus');
+    const providerButtons = document.querySelectorAll('[data-provider]');
     const appNameElement = document.getElementById('appName');
     const appOriginElement = document.getElementById('appOrigin');
     const appIconElement = document.getElementById('appIcon');
@@ -122,6 +133,18 @@
       loginPanel.classList.add('hidden');
       errorMessage.textContent = message;
       errorMessage.classList.remove('hidden');
+    }
+
+    function showLogin(message = '') {
+      requestDetails.classList.add('hidden');
+      errorMessage.classList.add('hidden');
+      loginPanel.classList.remove('hidden');
+      loginStatus.textContent = message;
+    }
+
+    async function clearInvalidSession() {
+      await supabaseClient.auth.signOut({ scope: 'local' });
+      showLogin('Your sign-in session expired. Sign in again to continue.');
     }
 
     function renderAuthorization(details) {
@@ -139,28 +162,54 @@
         appIconElement.style.backgroundImage = '';
       }
       scopeList.replaceChildren();
-      (details.scope || 'openid profile email').split(/\s+/).filter(Boolean).forEach(scope => {
+      const requestedScopes = typeof details.scope === 'string'
+        ? details.scope.split(/\s+/).filter(Boolean)
+        : Array.isArray(details.scopes)
+          ? details.scopes.filter(scope => typeof scope === 'string' && scope.trim())
+          : [];
+      requestedScopes.forEach(scope => {
         const item = document.createElement('li');
         item.textContent = scopeDescriptions[scope] || `Access the ${scope} scope`;
         scopeList.appendChild(item);
       });
+      if (!requestedScopes.length) {
+        const item = document.createElement('li');
+        item.textContent = 'No additional permissions requested';
+        scopeList.appendChild(item);
+      }
       requestDetails.classList.remove('hidden');
     }
 
-    async function loadAuthorization() {
+    async function loadAuthorization(sessionOverride = null) {
       if (!authorizationId) {
         showError('This authorization request is missing authorization_id.');
         return;
       }
 
-      const { data: { session } } = await supabaseClient.auth.getSession();
+      const { data: { session: currentSession } } = await supabaseClient.auth.getSession();
+      const session = sessionOverride || currentSession;
       if (!session) {
+        requestDetails.classList.add('hidden');
         loginPanel.classList.remove('hidden');
         loginEmail.focus();
         return;
       }
 
       const { data, error } = await supabaseClient.auth.oauth.getAuthorizationDetails(authorizationId);
+      const errorCode = String(error?.code || '').toLowerCase();
+      const errorText = String(error?.message || '').toLowerCase();
+      if (errorCode === 'session_not_found' || errorText.includes('session from session_id claim')) {
+        await clearInvalidSession();
+        return;
+      }
+      if (errorText.includes('auth session missing')) {
+        showLogin('Sign in to continue with this authorization request.');
+        return;
+      }
+      if (!error && data?.redirect_url && !('authorization_id' in data)) {
+        window.location.assign(data.redirect_url);
+        return;
+      }
       if (error || !data || !data.client || !data.redirect_uri) {
         showError(error?.message || 'This authorization request is invalid or has already been completed.');
         return;
@@ -187,7 +236,28 @@
       loginPanel.classList.add('hidden');
       loginButton.disabled = false;
       loginButton.textContent = 'Sign in';
-      loadAuthorization();
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      loadAuthorization(session);
+    });
+
+    providerButtons.forEach(button => {
+      button.addEventListener('click', async () => {
+        const provider = button.dataset.provider;
+        providerButtons.forEach(item => { item.disabled = true; });
+        loginButton.disabled = true;
+        loginStatus.textContent = '';
+        button.textContent = 'Redirecting…';
+        const { error } = await supabaseClient.auth.signInWithOAuth({
+          provider,
+          options: { redirectTo: window.location.href }
+        });
+        if (error) {
+          providerButtons.forEach(item => { item.disabled = false; });
+          loginButton.disabled = false;
+          button.textContent = `Continue with ${provider === 'azure' ? 'Microsoft' : provider.charAt(0).toUpperCase() + provider.slice(1)}`;
+          loginStatus.textContent = error.message || 'Could not start sign-in.';
+        }
+      });
     });
 
     if (authorizationId) {
@@ -210,6 +280,9 @@
       window.location.assign(data.redirect_url);
     }
 
+    supabaseClient.auth.onAuthStateChange((_event, session) => {
+      if (session) loadAuthorization(session);
+    });
     loadAuthorization();
   </script>
 </body>
