@@ -135,6 +135,18 @@
       errorMessage.classList.remove('hidden');
     }
 
+    function showLogin(message = '') {
+      requestDetails.classList.add('hidden');
+      errorMessage.classList.add('hidden');
+      loginPanel.classList.remove('hidden');
+      loginStatus.textContent = message;
+    }
+
+    async function clearInvalidSession() {
+      await supabaseClient.auth.signOut({ scope: 'local' });
+      showLogin('Your sign-in session expired. Sign in again to continue.');
+    }
+
     function renderAuthorization(details) {
       const client = details.client || {};
       const clientName = client.client_name || client.name || 'OAuth application';
@@ -184,10 +196,14 @@
       }
 
       const { data, error } = await supabaseClient.auth.oauth.getAuthorizationDetails(authorizationId);
-      if (error?.message?.toLowerCase().includes('auth session missing')) {
-        requestDetails.classList.add('hidden');
-        loginPanel.classList.remove('hidden');
-        loginStatus.textContent = 'Sign in to continue with this authorization request.';
+      const errorCode = String(error?.code || '').toLowerCase();
+      const errorText = String(error?.message || '').toLowerCase();
+      if (errorCode === 'session_not_found' || errorText.includes('session from session_id claim')) {
+        await clearInvalidSession();
+        return;
+      }
+      if (errorText.includes('auth session missing')) {
+        showLogin('Sign in to continue with this authorization request.');
         return;
       }
       if (!error && data?.redirect_url && !('authorization_id' in data)) {
