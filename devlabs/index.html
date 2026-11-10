@@ -57,6 +57,9 @@
     .app-card-details { display: grid; gap: 4px; margin-top: 10px; }
     .app-card-detail { color: #627067; font-size: .78rem; }
     .app-card-detail strong { color: #18221c; }
+    .app-card-actions { display: flex; justify-content: flex-end; margin-top: 12px; }
+    .app-card-delete { margin: 0; padding: 7px 10px; border-color: #d7aaaa; color: #a33b3b; font-size: .78rem; }
+    .app-card-delete:hover { border-color: #a33b3b; background: #fff1f1; }
     .empty-apps { margin-top: 16px; color: #627067; font-size: .84rem; }
     :focus-visible { outline: 3px solid #f4d35e; outline-offset: 3px; }
     .modal-backdrop { position: fixed; inset: 0; display: grid; visibility: hidden; opacity: 0; place-items: center; padding: 20px; background: rgba(15, 25, 18, .64); transition: opacity .2s ease, visibility 0s linear .2s; }
@@ -75,6 +78,7 @@
     .auth-panel input { width: 100%; padding: 10px 12px; border: 1px solid #dce3dc; border-radius: 5px; background: #fff; color: #18221c; font: inherit; }
     .auth-panel button[type="submit"] { width: 100%; margin-top: 8px; }
     .auth-status { min-height: 1.3em; margin-top: 12px; color: #a33b3b; font-size: .82rem; }
+    .auth-divider { margin: 16px 0; color: #627067; font-size: .8rem; text-align: center; }
     .app-modal-content { display: grid; grid-template-columns: 220px 1fr; flex: 1; min-height: 0; }
     .app-modal-content.setup-hidden { display: none; }
     .app-menu { padding: 20px 12px; border-right: 1px solid #dce3dc; background: #f7f9f6; }
@@ -161,6 +165,7 @@
       <button class="button-primary" type="button" id="createApp">Create an OAuth App</button>
       <button class="button-secondary" type="button" id="openDocs">View legacy API documentation</button>
       <a class="button-secondary action-link" href="test.html">Test an OAuth App</a>
+      <button class="button-secondary" type="button" id="logoutButton" hidden>Log out</button>
     </div>
     <p class="notice">Already have an OAuth client? Use the test page to try the Authorization Code with PKCE flow.</p>
     <section class="apps-panel" aria-labelledby="appsTitle">
@@ -192,6 +197,8 @@
       <form class="auth-panel" id="authPanel" hidden>
         <h3>Sign in to continue</h3>
         <p>Please log in with the email address and password you use to sign in to the Classcastle teacher app.</p>
+        <button class="button-secondary" type="button" id="classcastleAuthButton">Continue with Classcastle</button>
+        <div class="auth-divider">or use your email and password</div>
         <div class="form-group">
           <label for="authEmail">Email</label>
           <input id="authEmail" type="email" autocomplete="email" placeholder="you@school.edu" required>
@@ -246,30 +253,15 @@
           </section>
           <section class="form-step" data-panel="permissions" hidden>
             <h3>Permissions</h3>
-            <p class="app-form-intro">Choose the Classcastle data your integration may request in the future.</p>
-            <p class="scope-notice">Scopes are currently informational only. They do not grant access to classrooms, students, assignments, polls, or other Classcastle data yet.</p>
+            <p class="app-form-intro">Choose the Classcastle data your integration may request.</p>
+            <p class="scope-notice">Select at least one scope to continue. Scopes are currently informational only and do not grant access to Classcastle data yet.</p>
             <div class="form-group scope-list">
               <label class="scope-option">
-                <input type="checkbox" name="permissions" value="profile" checked>
-                <span><strong>Profile</strong>Read the signed-in user's name, email address, and account profile.</span>
-              </label>
-              <label class="scope-option">
-                <input type="checkbox" name="permissions" value="classrooms">
-                <span><strong>Classrooms</strong>View the classrooms and rooms the user manages or belongs to.</span>
-              </label>
-              <label class="scope-option">
-                <input type="checkbox" name="permissions" value="students">
-                <span><strong>Students</strong>View student rosters and classroom membership for authorized classrooms.</span>
-              </label>
-              <label class="scope-option">
-                <input type="checkbox" name="permissions" value="assignments">
-                <span><strong>Assignments</strong>Read assignments and coursework connected to authorized classrooms.</span>
-              </label>
-              <label class="scope-option">
-                <input type="checkbox" name="permissions" value="polls">
-                <span><strong>Polls</strong>Read and use classroom polls and poll activity where permitted.</span>
+                <input type="checkbox" name="permissions" value="user:profile">
+                <span><strong>user:profile</strong>Read the signed-in user's name, email address, and account profile.</span>
               </label>
             </div>
+            <div class="auth-status" id="scopeStatus" role="status" aria-live="polite"></div>
           </section>
           <section class="form-step" data-panel="redirects" hidden>
             <h3>Redirect URLs</h3>
@@ -327,15 +319,19 @@
                 <div class="config-methods">
                   <label class="config-method">
                     <input type="radio" name="configurationMethod" checked>
-                    <span><strong>Auto-discovery (Recommended)</strong><span>Automatically fetch OAuth endpoints.</span></span>
+                    <span><strong>Manual configuration</strong><span>Use the exact Classcastle OAuth endpoints below.</span></span>
                   </label>
                   <label class="config-method">
                     <input type="radio" name="configurationMethod" disabled>
-                    <span><strong>Manual configuration</strong><span>Enter endpoints yourself when manual setup is supported.</span></span>
+                    <span><strong>Auto-discovery</strong><span>Not required for this provider.</span></span>
                   </label>
                 </div>
               </div>
-              <p class="provider-help">Share these endpoints with third-party applications that need to integrate with your OAuth 2.1 server.</p>
+              <p class="provider-help">Use these values in Supabase's manual custom-provider form. Only the Client ID and Client Secret are generated for each OAuth app.</p>
+              <div class="provider-field">
+                <label for="issuerUrl">Issuer URL</label>
+                <input id="issuerUrl" value="https://classcastle.org" readonly>
+              </div>
               <div class="provider-field">
                 <label for="authorizationEndpoint">Authorization endpoint</label>
                 <input id="authorizationEndpoint" value="https://hduyofdbpspjcuwvackd.supabase.co/auth/v1/oauth/authorize" readonly>
@@ -353,17 +349,22 @@
                 <input id="oidcDiscovery" value="https://hduyofdbpspjcuwvackd.supabase.co/auth/v1/.well-known/openid-configuration" readonly>
               </div>
               <div class="provider-field">
+                <label for="userinfoEndpoint">Userinfo endpoint</label>
+                <input id="userinfoEndpoint" value="https://hduyofdbpspjcuwvackd.supabase.co/auth/v1/oauth/userinfo" readonly>
+                <p class="provider-help">If Supabase asks for a manual userinfo URL, use this OAuth endpoint.</p>
+              </div>
+              <div class="provider-field">
                 <label for="providerClientId">Client ID</label>
-                <input id="providerClientId" readonly placeholder="Generated when you create the app">
+                <input id="providerClientId" readonly placeholder="Generated after you create the app">
               </div>
               <div class="provider-field">
                 <label for="providerClientSecret">Client Secret</label>
-                <input id="providerClientSecret" readonly placeholder="Generated when you create the app">
+                <input id="providerClientSecret" readonly placeholder="Generated after you create the app">
               </div>
               <div class="provider-field">
                 <label for="providerScopes">Scopes</label>
-                <input id="providerScopes" value="openid, email, profile" readonly>
-                <p class="provider-help">Comma-separated list of scopes requested by this app.</p>
+                <input id="providerScopes" value="user:profile" readonly>
+                <p class="provider-help">This app requests the user:profile scope.</p>
               </div>
               <div class="provider-field">
                 <label class="provider-toggle"><input type="checkbox" id="allowUsersWithoutEmail"> Allow users without email</label>
@@ -392,6 +393,7 @@
     const closeDocs = document.getElementById('closeDocs');
     const appModal = document.getElementById('appModal');
     const createApp = document.getElementById('createApp');
+    const logoutButton = document.getElementById('logoutButton');
     const refreshApps = document.getElementById('refreshApps');
     const appsStatus = document.getElementById('appsStatus');
     const appsList = document.getElementById('appsList');
@@ -402,7 +404,9 @@
     const authEmail = document.getElementById('authEmail');
     const authPassword = document.getElementById('authPassword');
     const authSubmit = document.getElementById('authSubmit');
+    const classcastleAuthButton = document.getElementById('classcastleAuthButton');
     const authStatus = document.getElementById('authStatus');
+    const scopeStatus = document.getElementById('scopeStatus');
     const supabaseGuide = document.getElementById('supabaseGuide');
     const openSupabaseGuide = document.getElementById('openSupabaseGuide');
     const closeSupabaseGuide = document.getElementById('closeSupabaseGuide');
@@ -495,7 +499,7 @@
       activeStep = step;
       if (step === 'redirects') {
         const selectedScopes = [...document.querySelectorAll('input[name="permissions"]:checked')].map(scope => scope.value);
-        providerScopes.value = ['openid', 'email', ...selectedScopes].filter((scope, index, scopes) => scopes.indexOf(scope) === index).join(', ');
+        providerScopes.value = selectedScopes.join(', ');
       }
       formSteps.forEach(panel => {
         const visible = panel.dataset.panel === step;
@@ -511,7 +515,14 @@
 
     function validateStep() {
       const currentPanel = document.querySelector(`[data-panel="${activeStep}"]`);
-      return [...currentPanel.querySelectorAll('input, textarea')].every(field => field.reportValidity());
+      const valid = [...currentPanel.querySelectorAll('input, textarea')].every(field => field.reportValidity());
+      if (!valid) return false;
+      if (activeStep === 'permissions') {
+        const hasScope = currentPanel.querySelector('input[name="permissions"]:checked');
+        scopeStatus.textContent = hasScope ? '' : 'Select at least one scope to continue.';
+        return Boolean(hasScope);
+      }
+      return true;
     }
 
     function setAppsStatus(message, isError = false) {
@@ -556,8 +567,41 @@
           details.appendChild(detail);
         });
         item.appendChild(details);
+        const actions = document.createElement('div');
+        actions.className = 'app-card-actions';
+        const deleteButton = document.createElement('button');
+        deleteButton.type = 'button';
+        deleteButton.className = 'button-secondary app-card-delete';
+        deleteButton.textContent = 'Delete app';
+        deleteButton.addEventListener('click', () => deleteApp(app, deleteButton));
+        actions.appendChild(deleteButton);
+        item.appendChild(actions);
         appsList.appendChild(item);
       });
+    }
+
+    async function deleteApp(app, button) {
+      const confirmed = window.confirm(
+        `Delete ${app.name || 'this OAuth app'}? This permanently removes the app registration and its client credentials.`
+      );
+      if (!confirmed) return;
+
+      button.disabled = true;
+      button.textContent = 'Deleting…';
+      const { data, error } = await SupabaseClient.functions.invoke(
+        'register-oauth-app',
+        { body: { action: 'delete_owned', clientId: app.client_id } }
+      );
+
+      if (error || data?.error) {
+        button.disabled = false;
+        button.textContent = 'Delete app';
+        setAppsStatus(error?.message || data?.error || 'Could not delete the OAuth app.', true);
+        return;
+      }
+
+      setAppsStatus('OAuth app deleted.');
+      await loadApps();
     }
 
     async function loadApps() {
@@ -621,12 +665,40 @@
       showSetup();
       loadApps();
     });
+    classcastleAuthButton.addEventListener('click', async () => {
+      classcastleAuthButton.disabled = true;
+      classcastleAuthButton.textContent = 'Redirecting…';
+      authStatus.textContent = '';
+      const { error } = await SupabaseClient.auth.signInWithOAuth({
+        provider: 'custom:devlabs',
+        options: { redirectTo: window.location.href }
+      });
+      if (error) {
+        classcastleAuthButton.disabled = false;
+        classcastleAuthButton.textContent = 'Continue with Classcastle';
+        authStatus.textContent = error.message || 'We could not start Classcastle sign-in.';
+      }
+    });
     refreshApps.addEventListener('click', loadApps);
+    logoutButton.addEventListener('click', async () => {
+      logoutButton.disabled = true;
+      logoutButton.textContent = 'Logging out…';
+      const { error } = await SupabaseClient.auth.signOut();
+      if (error) {
+        setAppsStatus(error.message || 'Could not log out.', true);
+        logoutButton.disabled = false;
+        logoutButton.textContent = 'Log out';
+      }
+    });
     SupabaseClient.auth.onAuthStateChange((_event, session) => {
-      if (session) loadApps();
-      else {
+      logoutButton.hidden = !session;
+      if (session) {
+        loadApps();
+      } else {
         appsList.replaceChildren();
         setAppsStatus('Sign in to view your registered apps.');
+        logoutButton.disabled = false;
+        logoutButton.textContent = 'Log out';
       }
     });
     appForm.addEventListener('submit', async event => {

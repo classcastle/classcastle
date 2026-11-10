@@ -224,6 +224,61 @@ Deno.serve(async (request) => {
     return json(request, 200, { revoked: true, client_id: clientId });
   }
 
+  if (body.action === "delete_owned") {
+    const clientId =
+      typeof body.clientId === "string" ? body.clientId.trim() : "";
+    if (!clientId) {
+      return json(request, 400, { error: "OAuth client ID is required." });
+    }
+
+    const { data: ownedApp, error: ownerLookupError } = await adminClient
+      .from("oauth_app_owners")
+      .select("client_id")
+      .eq("client_id", clientId)
+      .eq("owner_id", userData.user.id)
+      .maybeSingle();
+
+    if (ownerLookupError) {
+      return json(request, 500, { error: "Could not verify OAuth app ownership." });
+    }
+    if (!ownedApp) {
+      return json(request, 404, { error: "OAuth app not found." });
+    }
+
+    const deleteResponse = await fetch(
+      `${supabaseUrl}/auth/v1/admin/oauth/clients/${encodeURIComponent(clientId)}`,
+      {
+        method: "DELETE",
+        headers: {
+          apikey: secretKey,
+          Authorization: `Bearer ${secretKey}`,
+        },
+      },
+    );
+
+    if (!deleteResponse.ok && deleteResponse.status !== 404) {
+      const deleteResult = await deleteResponse.json().catch(() => ({}));
+      return json(request, deleteResponse.status, {
+        error: deleteResult.msg || deleteResult.message ||
+          "Could not delete the OAuth app.",
+      });
+    }
+
+    const { error: deleteOwnerError } = await adminClient
+      .from("oauth_app_owners")
+      .delete()
+      .eq("client_id", clientId)
+      .eq("owner_id", userData.user.id);
+
+    if (deleteOwnerError) {
+      return json(request, 500, {
+        error: "The OAuth app was deleted but its ownership record could not be removed.",
+      });
+    }
+
+    return json(request, 200, { deleted: true, client_id: clientId });
+  }
+
   const input = validateInput(body);
   if ("error" in input) return json(request, 400, { error: input.error });
 
@@ -242,7 +297,7 @@ Deno.serve(async (request) => {
         redirect_uris: [input.redirectUri],
         client_type: "confidential",
         token_endpoint_auth_method: "client_secret_basic",
-        scope: "openid profile email",
+        scope: input.scopes.join(" "),
       }),
     },
   );

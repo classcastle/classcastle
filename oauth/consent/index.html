@@ -97,6 +97,7 @@
       openid: 'Verify your Classcastle identity',
       profile: 'Read your name and account profile',
       email: 'Read your email address',
+      'user:profile': 'Read your name, email address, and account profile',
       classrooms: 'View your classrooms and rooms',
       students: 'View authorized student rosters',
       assignments: 'Read assignments and coursework',
@@ -139,11 +140,21 @@
         appIconElement.style.backgroundImage = '';
       }
       scopeList.replaceChildren();
-      (details.scope || 'openid profile email').split(/\s+/).filter(Boolean).forEach(scope => {
+      const requestedScopes = typeof details.scope === 'string'
+        ? details.scope.split(/\s+/).filter(Boolean)
+        : Array.isArray(details.scopes)
+          ? details.scopes.filter(scope => typeof scope === 'string' && scope.trim())
+          : [];
+      requestedScopes.forEach(scope => {
         const item = document.createElement('li');
         item.textContent = scopeDescriptions[scope] || `Access the ${scope} scope`;
         scopeList.appendChild(item);
       });
+      if (!requestedScopes.length) {
+        const item = document.createElement('li');
+        item.textContent = 'No additional permissions requested';
+        scopeList.appendChild(item);
+      }
       requestDetails.classList.remove('hidden');
     }
 
@@ -161,6 +172,10 @@
       }
 
       const { data, error } = await supabaseClient.auth.oauth.getAuthorizationDetails(authorizationId);
+      if (!error && data?.redirect_url && !('authorization_id' in data)) {
+        window.location.assign(data.redirect_url);
+        return;
+      }
       if (error || !data || !data.client || !data.redirect_uri) {
         showError(error?.message || 'This authorization request is invalid or has already been completed.');
         return;
