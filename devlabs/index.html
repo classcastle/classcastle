@@ -14,10 +14,27 @@
       background: #fafbf8;
     }
     * { box-sizing: border-box; }
-    body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; }
-    main { width: min(520px, 100%); text-align: center; }
-    .logo { width: 56px; height: 56px; margin-bottom: 20px; }
-    h1 { margin: 0 0 12px; font-size: clamp(1.7rem, 5vw, 2.2rem); letter-spacing: -.04em; }
+    body { margin: 0; min-height: 100vh; padding: 24px; background: #f6f8f6; }
+    main { width: min(1120px, 100%); margin: 0 auto; }
+    .dashboard-surface { transition: filter .2s ease, transform .2s ease; }
+    body.auth-required .dashboard-surface { filter: blur(7px); pointer-events: none; user-select: none; }
+    .dashboard-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 34px; padding: 14px 18px; border: 1px solid #dce3dc; border-radius: 10px; background: rgba(255, 255, 255, .92); box-shadow: 0 8px 24px rgba(24, 34, 28, .05); }
+    .dashboard-brand { display: flex; align-items: center; gap: 10px; color: #18221c; font-weight: 700; }
+    .dashboard-brand img { width: 30px; height: 30px; }
+    .dashboard-header .eyebrow { margin: 0; color: #627067; font-size: .75rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+    .dashboard-header .dashboard-title { margin: 2px 0 0; font-size: 1rem; }
+    .dashboard-header .actions { margin: 0; }
+    .dashboard-header .actions button { margin: 0; }
+    .dashboard-hero { display: grid; grid-template-columns: 1.4fr .9fr; gap: 24px; align-items: stretch; margin-bottom: 24px; }
+    .hero-card, .quick-card { padding: 28px; border: 1px solid #dce3dc; border-radius: 10px; background: #fff; box-shadow: 0 8px 24px rgba(24, 34, 28, .05); }
+    .hero-card { text-align: left; }
+    .hero-card .logo { width: 48px; height: 48px; margin-bottom: 18px; }
+    .hero-card h1 { margin: 0 0 10px; font-size: clamp(1.7rem, 5vw, 2.4rem); letter-spacing: -.04em; }
+    .hero-card p { margin: 0; max-width: 62ch; }
+    .quick-card { display: grid; align-content: center; gap: 12px; text-align: left; }
+    .quick-card h2 { margin: 0; font-size: 1.05rem; }
+    .quick-card p { margin: 0; font-size: .86rem; }
+    .quick-card button { margin: 4px 0 0; width: 100%; }
     p { margin: 0 auto; color: #627067; line-height: 1.6; }
     .notice { margin-top: 20px; }
     button {
@@ -42,7 +59,13 @@
     .actions button { margin-top: 24px; }
     .action-link { display: inline-block; margin-top: 24px; padding: 10px 16px; border: 1px solid #b8c5ba; border-radius: 5px; background: #fff; color: #1f5c3a; font-weight: 600; text-decoration: none; }
     .action-link:hover { border-color: #1f5c3a; background: #e7f2e8; }
-    .apps-panel { margin-top: 34px; padding: 22px; border: 1px solid #dce3dc; border-radius: 8px; background: #fff; text-align: left; }
+    .dashboard-grid { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 24px; align-items: start; }
+    .apps-panel { margin-top: 0; padding: 22px; border: 1px solid #dce3dc; border-radius: 8px; background: #fff; text-align: left; }
+    .dashboard-side { display: grid; gap: 14px; }
+    .side-card { padding: 18px; border: 1px solid #dce3dc; border-radius: 8px; background: #fff; text-align: left; }
+    .side-card h2 { margin: 0 0 8px; font-size: .95rem; }
+    .side-card p { margin: 0; font-size: .82rem; }
+    .side-card a { display: inline-block; margin-top: 12px; color: #1f5c3a; font-size: .82rem; font-weight: 600; }
     .apps-panel-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     .apps-panel h2 { margin: 0; font-size: 1.05rem; }
     .apps-panel-header button { margin: 0; padding: 7px 10px; font-size: .82rem; }
@@ -87,6 +110,18 @@
     .classcastle-auth-button { display: flex; align-items: center; justify-content: center; gap: 9px; width: 100%; margin-top: 20px; }
     .classcastle-auth-button img { width: 20px; height: 20px; }
     .auth-status { min-height: 1.3em; margin-top: 12px; color: #a33b3b; font-size: .82rem; }
+    .auth-gate { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 24px; background: rgba(15, 25, 18, .42); }
+    .auth-gate[hidden] { display: none; }
+    .auth-gate-card { width: min(430px, 100%); padding: 34px; border: 1px solid #d0d7de; border-radius: 12px; background: #fff; box-shadow: 0 24px 70px rgba(15, 25, 18, .22); text-align: center; }
+    .auth-gate-logo { width: 54px; height: 54px; margin-bottom: 16px; }
+    .auth-gate-card h2 { margin: 0 0 8px; color: #18221c; font-size: 1.45rem; letter-spacing: -.03em; }
+    .auth-gate-card > p { margin: 0 0 22px; font-size: .9rem; }
+    .auth-gate-card .auth-divider { margin: 20px 0; }
+    .auth-gate-card .form-group { margin-bottom: 14px; text-align: left; }
+    .auth-gate-card .form-group label { display: block; margin-bottom: 6px; color: #18221c; font-size: .84rem; font-weight: 600; }
+    .auth-gate-card .form-group input { width: 100%; padding: 10px 12px; border: 1px solid #afb8c1; border-radius: 6px; background: #fff; color: #18221c; font: inherit; }
+    .auth-gate-card .form-group input:focus { border-color: #1f5c3a; outline: 3px solid rgba(31, 92, 58, .2); }
+    .auth-gate-card .classcastle-auth-button { margin-top: 0; }
     .auth-divider { margin: 16px 0; color: #627067; font-size: .8rem; text-align: center; }
     .app-modal-content { display: grid; grid-template-columns: 220px 1fr; flex: 1; min-height: 0; }
     .app-modal-content.setup-hidden { display: none; }
@@ -157,6 +192,11 @@
     .form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 26px; padding-top: 20px; border-top: 1px solid #dce3dc; }
     .form-actions button { margin: 0; }
     @media (max-width: 620px) {
+      body { padding: 14px; }
+      .dashboard-header { align-items: flex-start; }
+      .dashboard-header .actions { flex-direction: column; }
+      .dashboard-header .actions button { width: 100%; }
+      .dashboard-hero, .dashboard-grid { grid-template-columns: 1fr; }
       .app-modal-content { grid-template-columns: 1fr; }
       .app-menu { display: flex; gap: 6px; overflow-x: auto; padding: 10px; border-right: 0; border-bottom: 1px solid #dce3dc; }
       .app-menu-label { display: none; }
@@ -167,26 +207,84 @@
 </head>
 <body>
   <main>
-    <img class="logo" src="https://classcastle.org/logo.svg" alt="Classcastle">
-    <h1>Classcastle Dev Labs</h1>
-    <p>The legacy API has been discontinued, but remains accessible for existing integrations. It will not receive updates and may not support current Classcastle features while we build the new OAuth API.</p>
-    <div class="actions">
-      <button class="button-primary" type="button" id="createApp">Create an OAuth App</button>
-      <button class="button-secondary" type="button" id="openDocs">View legacy API documentation</button>
-      <button class="button-secondary" type="button" id="openOAuthDocs">OAuth app docs</button>
-      <a class="button-secondary action-link" href="test.html">Test an OAuth App</a>
-      <button class="button-secondary" type="button" id="logoutButton" hidden>Log out</button>
-    </div>
-    <p class="notice">Already have an OAuth client? Use the test page to try the Authorization Code with PKCE flow.</p>
-    <section class="apps-panel" aria-labelledby="appsTitle">
-      <div class="apps-panel-header">
-        <h2 id="appsTitle">My OAuth apps</h2>
-        <button class="button-secondary" type="button" id="refreshApps">Refresh</button>
+    <div class="dashboard-surface" id="dashboardSurface">
+      <header class="dashboard-header">
+        <div class="dashboard-brand">
+          <img src="https://classcastle.org/logo.svg" alt="">
+          <div>
+            <p class="eyebrow">Developer platform</p>
+            <p class="dashboard-title">Classcastle Dev Labs</p>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="button-secondary" type="button" id="openOAuthDocs">OAuth app docs</button>
+          <button class="button-secondary" type="button" id="logoutButton" hidden>Log out</button>
+        </div>
+      </header>
+
+      <section class="dashboard-hero">
+        <div class="hero-card">
+          <img class="logo" src="https://classcastle.org/logo.svg" alt="Classcastle">
+          <h1>Build with Classcastle</h1>
+          <p>Manage OAuth apps, connect integrations, and test authorization flows from one place. Legacy API documentation remains available for existing integrations.</p>
+        </div>
+        <div class="quick-card">
+          <h2>Get started</h2>
+          <p>Create an OAuth client and configure its redirect URL, scopes, and app identity.</p>
+          <button class="button-primary" type="button" id="createApp">Create an OAuth App</button>
+          <a class="action-link" href="test.html">Test an OAuth App</a>
+        </div>
+      </section>
+
+      <div class="dashboard-grid">
+        <section class="apps-panel" aria-labelledby="appsTitle">
+          <div class="apps-panel-header">
+            <h2 id="appsTitle">My OAuth apps</h2>
+            <button class="button-secondary" type="button" id="refreshApps">Refresh</button>
+          </div>
+          <div class="apps-status" id="appsStatus" role="status" aria-live="polite">Sign in to view your registered apps.</div>
+          <ul class="apps-list" id="appsList"></ul>
+        </section>
+        <aside class="dashboard-side">
+          <section class="side-card">
+            <h2>OAuth resources</h2>
+            <p>Learn how consent, scopes, callback URLs, and Supabase custom providers work.</p>
+            <a href="#" id="openOAuthDocsSide">Read OAuth docs</a>
+          </section>
+          <section class="side-card">
+            <h2>Legacy API</h2>
+            <p>Existing integrations can still access the legacy API, but it will not receive new features.</p>
+            <a href="#" id="openDocsSide">View legacy docs</a>
+          </section>
+        </aside>
       </div>
-      <div class="apps-status" id="appsStatus" role="status" aria-live="polite">Sign in to view your registered apps.</div>
-      <ul class="apps-list" id="appsList"></ul>
-    </section>
+    </div>
   </main>
+
+  <div class="auth-gate" id="authGate" role="dialog" aria-modal="true" aria-labelledby="authGateTitle" hidden>
+    <div class="auth-gate-card">
+      <img class="auth-gate-logo" src="https://classcastle.org/logo.svg" alt="Classcastle Dev Labs">
+      <h2 id="authGateTitle">Welcome to Dev Labs</h2>
+      <p>Sign in with your Classcastle account to manage OAuth apps and developer tools.</p>
+      <button class="button-secondary classcastle-auth-button" type="button" id="gateClasscastleAuthButton">
+        <img src="https://classcastle.org/logo.svg" alt="">
+        <span>Continue with Classcastle</span>
+      </button>
+      <div class="auth-divider">or use your email and password</div>
+      <form id="gateAuthForm">
+        <div class="form-group">
+          <label for="gateAuthEmail">Email</label>
+          <input id="gateAuthEmail" type="email" autocomplete="email" placeholder="you@school.edu" required>
+        </div>
+        <div class="form-group">
+          <label for="gateAuthPassword">Password</label>
+          <input id="gateAuthPassword" type="password" autocomplete="current-password" placeholder="Your teacher app password" required>
+        </div>
+        <button class="button-primary" type="submit" id="gateAuthSubmit">Continue</button>
+      </form>
+      <div class="auth-status" id="gateAuthStatus" role="status" aria-live="polite"></div>
+    </div>
+  </div>
 
   <div class="modal-backdrop" id="docsModal" role="dialog" aria-modal="true" aria-labelledby="docsTitle" aria-hidden="true">
     <div class="modal">
@@ -457,6 +555,16 @@
     const classcastleAuthButton = document.getElementById('classcastleAuthButton');
     const classcastleAuthButtonText = classcastleAuthButton.querySelector('span');
     const authStatus = document.getElementById('authStatus');
+    const authGate = document.getElementById('authGate');
+    const gateAuthForm = document.getElementById('gateAuthForm');
+    const gateAuthEmail = document.getElementById('gateAuthEmail');
+    const gateAuthPassword = document.getElementById('gateAuthPassword');
+    const gateAuthSubmit = document.getElementById('gateAuthSubmit');
+    const gateAuthStatus = document.getElementById('gateAuthStatus');
+    const gateClasscastleAuthButton = document.getElementById('gateClasscastleAuthButton');
+    const gateClasscastleAuthButtonText = gateClasscastleAuthButton.querySelector('span');
+    const openOAuthDocsSide = document.getElementById('openOAuthDocsSide');
+    const openDocsSide = document.getElementById('openDocsSide');
     const scopeStatus = document.getElementById('scopeStatus');
     const supabaseGuide = document.getElementById('supabaseGuide');
     const openSupabaseGuide = document.getElementById('openSupabaseGuide');
@@ -545,6 +653,18 @@
       setupContent.classList.add('setup-hidden');
       authStatus.textContent = '';
       setTimeout(() => authEmail.focus(), 0);
+    }
+
+    function showAuthGate() {
+      document.body.classList.add('auth-required');
+      authGate.hidden = false;
+      setTimeout(() => gateAuthEmail.focus(), 0);
+    }
+
+    function hideAuthGate() {
+      document.body.classList.remove('auth-required');
+      authGate.hidden = true;
+      gateAuthStatus.textContent = '';
     }
 
     function showSetup() {
@@ -737,6 +857,45 @@
         authStatus.textContent = error.message || 'We could not start Classcastle sign-in.';
       }
     });
+    gateAuthForm.addEventListener('submit', async event => {
+      event.preventDefault();
+      gateAuthSubmit.disabled = true;
+      gateAuthSubmit.textContent = 'Signing in…';
+      gateAuthStatus.textContent = '';
+      const { error } = await SupabaseClient.auth.signInWithPassword({
+        email: gateAuthEmail.value.trim(),
+        password: gateAuthPassword.value
+      });
+      gateAuthSubmit.disabled = false;
+      gateAuthSubmit.textContent = 'Continue';
+      if (error) {
+        gateAuthStatus.textContent = error.message || 'We could not sign you in.';
+        return;
+      }
+      gateAuthPassword.value = '';
+    });
+    gateClasscastleAuthButton.addEventListener('click', async () => {
+      gateClasscastleAuthButton.disabled = true;
+      gateClasscastleAuthButtonText.textContent = 'Redirecting…';
+      gateAuthStatus.textContent = '';
+      const { error } = await SupabaseClient.auth.signInWithOAuth({
+        provider: 'custom:devlabs',
+        options: { redirectTo: devlabsRedirectUrl }
+      });
+      if (error) {
+        gateClasscastleAuthButton.disabled = false;
+        gateClasscastleAuthButtonText.textContent = 'Continue with Classcastle';
+        gateAuthStatus.textContent = error.message || 'We could not start Classcastle sign-in.';
+      }
+    });
+    openOAuthDocsSide.addEventListener('click', event => {
+      event.preventDefault();
+      openModal(oauthDocsModal, closeOAuthDocs);
+    });
+    openDocsSide.addEventListener('click', event => {
+      event.preventDefault();
+      openModal(docsModal, closeDocs);
+    });
     refreshApps.addEventListener('click', loadApps);
     logoutButton.addEventListener('click', async () => {
       logoutButton.disabled = true;
@@ -751,13 +910,19 @@
     SupabaseClient.auth.onAuthStateChange((_event, session) => {
       logoutButton.hidden = !session;
       if (session) {
+        hideAuthGate();
         loadApps();
       } else {
+        showAuthGate();
         appsList.replaceChildren();
         setAppsStatus('Sign in to view your registered apps.');
         logoutButton.disabled = false;
         logoutButton.textContent = 'Log out';
       }
+    });
+    SupabaseClient.auth.getSession().then(({ data: { session } }) => {
+      if (session) hideAuthGate();
+      else showAuthGate();
     });
     appForm.addEventListener('submit', async event => {
       event.preventDefault();
