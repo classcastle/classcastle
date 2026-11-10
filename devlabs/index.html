@@ -487,7 +487,9 @@
     const clientId = document.getElementById('clientId');
     const clientSecret = document.getElementById('clientSecret');
     const stepOrder = ['basic', 'permissions', 'redirects', 'complete'];
-    const devlabsRedirectUrl = window.location.origin + window.location.pathname;
+    const devlabsRedirectUrl = window.location.hostname === 'devlabs.classcastle.org'
+      ? 'https://devlabs.classcastle.org/'
+      : window.location.origin + window.location.pathname;
     let activeStep = 'basic';
     let closeTimer;
 
