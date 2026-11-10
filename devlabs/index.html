@@ -77,6 +77,8 @@
     .auth-panel .form-group { margin-bottom: 16px; }
     .auth-panel input { width: 100%; padding: 10px 12px; border: 1px solid #dce3dc; border-radius: 5px; background: #fff; color: #18221c; font: inherit; }
     .auth-panel button[type="submit"] { width: 100%; margin-top: 8px; }
+    .classcastle-auth-button { display: flex; align-items: center; justify-content: center; gap: 9px; width: 100%; margin-top: 20px; }
+    .classcastle-auth-button img { width: 20px; height: 20px; }
     .auth-status { min-height: 1.3em; margin-top: 12px; color: #a33b3b; font-size: .82rem; }
     .auth-divider { margin: 16px 0; color: #627067; font-size: .8rem; text-align: center; }
     .app-modal-content { display: grid; grid-template-columns: 220px 1fr; flex: 1; min-height: 0; }
@@ -197,7 +199,10 @@
       <form class="auth-panel" id="authPanel" hidden>
         <h3>Sign in to continue</h3>
         <p>Please log in with the email address and password you use to sign in to the Classcastle teacher app.</p>
-        <button class="button-secondary" type="button" id="classcastleAuthButton">Continue with Classcastle</button>
+        <button class="button-secondary classcastle-auth-button" type="button" id="classcastleAuthButton">
+          <img src="/logo.svg" alt="">
+          <span>Continue with Classcastle</span>
+        </button>
         <div class="auth-divider">or use your email and password</div>
         <div class="form-group">
           <label for="authEmail">Email</label>
@@ -405,6 +410,7 @@
     const authPassword = document.getElementById('authPassword');
     const authSubmit = document.getElementById('authSubmit');
     const classcastleAuthButton = document.getElementById('classcastleAuthButton');
+    const classcastleAuthButtonText = classcastleAuthButton.querySelector('span');
     const authStatus = document.getElementById('authStatus');
     const scopeStatus = document.getElementById('scopeStatus');
     const supabaseGuide = document.getElementById('supabaseGuide');
@@ -667,7 +673,7 @@
     });
     classcastleAuthButton.addEventListener('click', async () => {
       classcastleAuthButton.disabled = true;
-      classcastleAuthButton.textContent = 'Redirecting…';
+      classcastleAuthButtonText.textContent = 'Redirecting…';
       authStatus.textContent = '';
       const { error } = await SupabaseClient.auth.signInWithOAuth({
         provider: 'custom:devlabs',
@@ -675,7 +681,7 @@
       });
       if (error) {
         classcastleAuthButton.disabled = false;
-        classcastleAuthButton.textContent = 'Continue with Classcastle';
+        classcastleAuthButtonText.textContent = 'Continue with Classcastle';
         authStatus.textContent = error.message || 'We could not start Classcastle sign-in.';
       }
     });
