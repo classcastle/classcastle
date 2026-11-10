@@ -71,6 +71,13 @@
     .modal-header strong { font-size: .95rem; }
     .close { margin: 0; padding: 4px 9px; border-color: #dce3dc; color: #18221c; }
     iframe { flex: 1; width: 100%; border: 0; }
+    .docs-content { overflow-y: auto; padding: 30px; text-align: left; }
+    .docs-content h2 { margin: 0 0 8px; font-size: 1.35rem; }
+    .docs-content h3 { margin: 26px 0 8px; font-size: 1rem; }
+    .docs-content p, .docs-content li { color: #627067; font-size: .88rem; line-height: 1.55; }
+    .docs-content ul, .docs-content ol { margin: 8px 0 0 20px; padding: 0; }
+    .docs-content code { padding: 2px 5px; border-radius: 4px; background: #f0f3f0; color: #18221c; font-size: .82rem; overflow-wrap: anywhere; }
+    .docs-content a { color: #1f5c3a; font-weight: 600; }
     .auth-panel { width: min(420px, 100%); margin: auto; padding: 36px; }
     .auth-panel h3 { margin: 0 0 8px; font-size: 1.35rem; }
     .auth-panel p { margin: 0 0 24px; font-size: .92rem; }
@@ -166,6 +173,7 @@
     <div class="actions">
       <button class="button-primary" type="button" id="createApp">Create an OAuth App</button>
       <button class="button-secondary" type="button" id="openDocs">View legacy API documentation</button>
+      <button class="button-secondary" type="button" id="openOAuthDocs">OAuth app docs</button>
       <a class="button-secondary action-link" href="test.html">Test an OAuth App</a>
       <button class="button-secondary" type="button" id="logoutButton" hidden>Log out</button>
     </div>
@@ -187,6 +195,40 @@
         <button class="close" type="button" id="closeDocs" aria-label="Close legacy API documentation">×</button>
       </div>
       <iframe src="legacy-api.html" title="Legacy API documentation"></iframe>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="oauthDocsModal" role="dialog" aria-modal="true" aria-labelledby="oauthDocsTitle" aria-hidden="true">
+    <div class="modal">
+      <div class="modal-header">
+        <strong id="oauthDocsTitle">OAuth app documentation</strong>
+        <button class="close" type="button" id="closeOAuthDocs" aria-label="Close OAuth app documentation">×</button>
+      </div>
+      <article class="docs-content">
+        <h2>Connect an app with Classcastle OAuth</h2>
+        <p>Create an OAuth app here, then use its client ID, client secret, scope, and redirect URL in your integration. The client secret is shown only once, so store it securely.</p>
+
+        <h3>How the redirect works</h3>
+        <ol>
+          <li>Your app sends the user to the Classcastle authorization endpoint.</li>
+          <li>The user signs in and approves the requested scope on the consent page.</li>
+          <li>Classcastle sends the user back to the exact <strong>Redirect URL</strong> registered for your OAuth app.</li>
+        </ol>
+        <p>Classcastle does not keep the user on the Classcastle website after consent. Register your app's callback route, such as <code>https://your-app.example.com/oauth/callback</code>, and make sure it matches exactly.</p>
+
+        <h3>Using Supabase as your OAuth client</h3>
+        <p>For a Supabase project, register this callback URL as the OAuth app's Redirect URL:</p>
+        <p><code>https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback</code></p>
+        <p>Then configure the Supabase custom provider with the values in <strong>View Supabase setup guide</strong>. After Supabase receives the authorization response, it redirects to the URL in your Supabase Auth client request.</p>
+        <p>Read Supabase's <a href="https://supabase.com/docs/guides/auth/social-login/auth-custom" target="_blank" rel="noopener noreferrer">custom OAuth provider documentation</a> for the provider setup and callback flow.</p>
+
+        <h3>Testing sign-in from Dev Labs</h3>
+        <p>The <strong>Continue with Classcastle</strong> button returns to this Dev Labs page after authentication. In production, the return URL is the current Dev Labs page; in a local preview, it is the current local page. Add the relevant URL to Supabase Auth's allowed redirect URLs.</p>
+        <ul>
+          <li><code>https://devlabs.classcastle.org/</code></li>
+          <li><code>http://127.0.0.1:4173/devlabs/index.html</code> for the local preview</li>
+        </ul>
+      </article>
     </div>
   </div>
 
@@ -396,6 +438,9 @@
     const docsModal = document.getElementById('docsModal');
     const openDocs = document.getElementById('openDocs');
     const closeDocs = document.getElementById('closeDocs');
+    const oauthDocsModal = document.getElementById('oauthDocsModal');
+    const openOAuthDocs = document.getElementById('openOAuthDocs');
+    const closeOAuthDocs = document.getElementById('closeOAuthDocs');
     const appModal = document.getElementById('appModal');
     const createApp = document.getElementById('createApp');
     const logoutButton = document.getElementById('logoutButton');
@@ -442,6 +487,7 @@
     const clientId = document.getElementById('clientId');
     const clientSecret = document.getElementById('clientSecret');
     const stepOrder = ['basic', 'permissions', 'redirects', 'complete'];
+    const devlabsRedirectUrl = window.location.origin + window.location.pathname;
     let activeStep = 'basic';
     let closeTimer;
 
@@ -466,6 +512,10 @@
 
     function closeDocumentation() {
       closeModal(docsModal, openDocs);
+    }
+
+    function closeOAuthDocumentation() {
+      closeModal(oauthDocsModal, openOAuthDocs);
     }
 
     function closeAppForm() {
@@ -677,7 +727,7 @@
       authStatus.textContent = '';
       const { error } = await SupabaseClient.auth.signInWithOAuth({
         provider: 'custom:devlabs',
-        options: { redirectTo: window.location.href }
+        options: { redirectTo: devlabsRedirectUrl }
       });
       if (error) {
         classcastleAuthButton.disabled = false;
@@ -821,8 +871,16 @@
     docsModal.addEventListener('click', event => {
       if (event.target === docsModal) closeDocumentation();
     });
+    openOAuthDocs.addEventListener('click', () => {
+      openModal(oauthDocsModal, closeOAuthDocs);
+    });
+    closeOAuthDocs.addEventListener('click', closeOAuthDocumentation);
+    oauthDocsModal.addEventListener('click', event => {
+      if (event.target === oauthDocsModal) closeOAuthDocumentation();
+    });
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && docsModal.classList.contains('open') && !docsModal.classList.contains('is-closing')) closeDocumentation();
+      if (event.key === 'Escape' && oauthDocsModal.classList.contains('open') && !oauthDocsModal.classList.contains('is-closing')) closeOAuthDocumentation();
       if (event.key === 'Escape' && supabaseGuide.classList.contains('open') && !supabaseGuide.classList.contains('is-closing')) closeSupabaseSetup();
       if (event.key === 'Escape' && appModal.classList.contains('open') && !appModal.classList.contains('is-closing')) closeAppForm();
     });
