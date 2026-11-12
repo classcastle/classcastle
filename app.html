@@ -1284,10 +1284,35 @@
   }
 
   .legacy-oauth-status {
+    display: flex;
+    align-items: center;
+    gap: 7px;
     min-height: 1.25em;
     margin: 10px 0 0 30px;
     color: var(--soft);
     font-size: 0.84rem;
+  }
+
+  .legacy-oauth-status-icon {
+    display: inline-grid;
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    place-items: center;
+    border-radius: 50%;
+    font-size: .75rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .legacy-oauth-status-icon.enabled {
+    background: #dff3e5;
+    color: var(--brand);
+  }
+
+  .legacy-oauth-status-icon.disabled {
+    background: #fde6e6;
+    color: var(--red);
   }
 
   .legacy-oauth-status.enabled {
@@ -1340,6 +1365,44 @@
     line-height: 1.6;
   }
 
+  .legacy-oauth-modal .storage-steps {
+    display: grid;
+    gap: 12px;
+    margin: 0 0 18px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .legacy-oauth-modal .storage-step {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    color: var(--ink);
+    line-height: 1.55;
+  }
+
+  .legacy-oauth-modal .storage-step-icon {
+    display: inline-grid;
+    width: 22px;
+    height: 22px;
+    flex: 0 0 22px;
+    place-items: center;
+    border-radius: 50%;
+    font-size: .82rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .legacy-oauth-modal .storage-step-icon.check {
+    background: #dff3e5;
+    color: var(--brand);
+  }
+
+  .legacy-oauth-modal .storage-step-icon.cross {
+    background: #fde6e6;
+    color: var(--red);
+  }
+
   .legacy-oauth-modal code {
     padding: 2px 5px;
     border-radius: 4px;
@@ -1358,6 +1421,20 @@
     justify-content: flex-end;
     gap: 10px;
     margin-top: 20px;
+  }
+
+  .legacy-oauth-confetti {
+    position: fixed;
+    z-index: 1100;
+    width: 9px;
+    height: 14px;
+    pointer-events: none;
+    animation: legacy-oauth-confetti-fall 900ms ease-out forwards;
+  }
+
+  @keyframes legacy-oauth-confetti-fall {
+    0% { opacity: 1; transform: translate(0, 0) rotate(0deg); }
+    100% { opacity: 0; transform: translate(var(--confetti-x), var(--confetti-y)) rotate(520deg); }
   }
 
   .verified-badge {
@@ -2867,7 +2944,10 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
             <small>Stores the compatibility setting locally in this browser as <code>legacy_oauth</code>.</small>
           </span>
         </label>
-        <div class="legacy-oauth-status" id="legacyOAuthStatus" role="status" aria-live="polite"></div>
+        <div class="legacy-oauth-status" id="legacyOAuthStatus" role="status" aria-live="polite">
+          <span class="legacy-oauth-status-icon disabled" aria-hidden="true">×</span>
+          <span></span>
+        </div>
       </div>
 
       <div class="card">
@@ -2920,12 +3000,24 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   <div class="legacy-oauth-modal">
     <h2 id="legacyOAuthModalTitle">Update legacy OAuth access</h2>
     <p>For safety, this setting is controlled through your browser's local storage. It is not saved in session storage or sent to Classcastle.</p>
-    <ol>
-      <li>Install a local-storage editor, such as <a href="https://addons.mozilla.org/en-GB/firefox/addon/localstorage-editor/" target="_blank" rel="noopener noreferrer">LocalStorage Editor for Firefox</a>.</li>
-      <li>Open the storage for this Classcastle site and use <strong>local storage</strong>, not session storage.</li>
-      <li>Add or update the key <code>legacy_oauth</code> with the value <code>true</code> to enable it.</li>
-      <li>To disable it, remove the key or set its value to <code>false</code>.</li>
-    </ol>
+    <ul class="storage-steps">
+      <li class="storage-step">
+        <span class="storage-step-icon check" aria-hidden="true">✓</span>
+        <span>Install a local-storage editor, such as <a href="https://addons.mozilla.org/en-GB/firefox/addon/localstorage-editor/" target="_blank" rel="noopener noreferrer">LocalStorage Editor for Firefox</a>.</span>
+      </li>
+      <li class="storage-step">
+        <span class="storage-step-icon check" aria-hidden="true">✓</span>
+        <span>Open the storage for this Classcastle site and use <strong>local storage</strong>.</span>
+      </li>
+      <li class="storage-step">
+        <span class="storage-step-icon check" aria-hidden="true">✓</span>
+        <span>Add or update <code>legacy_oauth</code> with the value <code>true</code> to enable legacy OAuth access.</span>
+      </li>
+      <li class="storage-step">
+        <span class="storage-step-icon cross" aria-hidden="true">×</span>
+        <span>Do not use session storage. To disable legacy OAuth access, remove <code>legacy_oauth</code> or set it to <code>false</code>.</span>
+      </li>
+    </ul>
     <p>The setting is watched live. Once the value is detected, this page will update to show whether legacy OAuth access is enabled or disabled.</p>
     <div class="legacy-oauth-modal-actions">
       <button type="button" class="btn btn-secondary" id="closeLegacyOAuthModal">Close</button>
@@ -3268,6 +3360,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   }
 
   const LEGACY_OAUTH_STORAGE_KEY = 'legacy_oauth';
+  const legacyOAuthStatusIcon = legacyOAuthStatus.querySelector('.legacy-oauth-status-icon');
+  const legacyOAuthStatusText = legacyOAuthStatus.querySelector('span:last-child');
   let lastLegacyOAuthEnabled = null;
 
   function isLegacyOAuthEnabled() {
@@ -3285,18 +3379,43 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     const changed = previous !== null && enabled !== previous;
     lastLegacyOAuthEnabled = enabled;
     legacyOAuthAppsToggle.checked = enabled;
-    legacyOAuthStatus.textContent = enabled
+    legacyOAuthStatusText.textContent = enabled
       ? 'Enabled — legacy OAuth apps may connect from this browser.'
       : 'Disabled — legacy OAuth apps are blocked in this browser.';
+    legacyOAuthStatusIcon.textContent = enabled ? '✓' : '×';
+    legacyOAuthStatusIcon.classList.toggle('enabled', enabled);
+    legacyOAuthStatusIcon.classList.toggle('disabled', !enabled);
     legacyOAuthStatus.classList.toggle('enabled', enabled);
     legacyOAuthStatus.classList.remove('pending');
     if (announce && changed) {
+      showLegacyOAuthConfetti(enabled);
       showNotification(enabled ? 'Legacy OAuth access enabled' : 'Legacy OAuth access disabled');
     }
   }
 
+  function showLegacyOAuthConfetti(enabled) {
+    const colors = enabled
+      ? ['#1f5c3a', '#76b892', '#f4d35e', '#fff']
+      : ['#a33b3b', '#e58b8b', '#f4d35e', '#fff'];
+    const originX = window.innerWidth / 2;
+    const originY = window.innerHeight / 2;
+    for (let index = 0; index < 28; index += 1) {
+      const piece = document.createElement('span');
+      piece.className = 'legacy-oauth-confetti';
+      piece.style.left = `${originX + (Math.random() * 80 - 40)}px`;
+      piece.style.top = `${originY + (Math.random() * 30 - 15)}px`;
+      piece.style.background = colors[index % colors.length];
+      piece.style.setProperty('--confetti-x', `${Math.random() * 360 - 180}px`);
+      piece.style.setProperty('--confetti-y', `${Math.random() * 260 + 100}px`);
+      piece.style.transform = `rotate(${Math.random() * 180}deg)`;
+      document.body.appendChild(piece);
+      piece.addEventListener('animationend', () => piece.remove(), { once: true });
+    }
+  }
+
   function openLegacyOAuthInstructions() {
-    legacyOAuthStatus.textContent = 'Waiting for local storage…';
+    legacyOAuthStatusText.textContent = 'Waiting for local storage…';
+    legacyOAuthStatusIcon.textContent = '…';
     legacyOAuthStatus.classList.add('pending');
     legacyOAuthModal.classList.add('open');
     legacyOAuthModal.setAttribute('aria-hidden', 'false');
