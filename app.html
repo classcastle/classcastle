@@ -1255,6 +1255,111 @@
     line-height: 1.45;
   }
 
+  .legacy-oauth-setting {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    color: var(--ink);
+    font-size: 0.98rem;
+    cursor: pointer;
+  }
+
+  .legacy-oauth-setting input {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+    margin-top: 2px;
+    accent-color: var(--brand);
+  }
+
+  .legacy-oauth-setting-copy {
+    display: grid;
+    gap: 4px;
+  }
+
+  .legacy-oauth-setting-copy small {
+    color: var(--soft);
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
+
+  .legacy-oauth-status {
+    min-height: 1.25em;
+    margin: 10px 0 0 30px;
+    color: var(--soft);
+    font-size: 0.84rem;
+  }
+
+  .legacy-oauth-status.enabled {
+    color: var(--brand);
+  }
+
+  .legacy-oauth-status.pending {
+    color: #9a6700;
+  }
+
+  .legacy-oauth-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: none;
+    place-items: center;
+    padding: 20px;
+    background: rgba(15, 23, 18, .58);
+  }
+
+  .legacy-oauth-modal-backdrop.open {
+    display: grid;
+  }
+
+  .legacy-oauth-modal {
+    width: min(520px, 100%);
+    padding: 28px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, .22);
+  }
+
+  .legacy-oauth-modal h2 {
+    margin: 0 0 8px;
+    color: var(--ink);
+    font-size: 1.2rem;
+  }
+
+  .legacy-oauth-modal p {
+    margin: 0 0 16px;
+    color: var(--soft);
+    line-height: 1.55;
+  }
+
+  .legacy-oauth-modal ol {
+    margin: 0 0 18px 20px;
+    padding: 0;
+    color: var(--ink);
+    line-height: 1.6;
+  }
+
+  .legacy-oauth-modal code {
+    padding: 2px 5px;
+    border-radius: 4px;
+    background: var(--tint);
+    color: var(--ink);
+    font-size: .88em;
+  }
+
+  .legacy-oauth-modal a {
+    color: var(--brand);
+    font-weight: 600;
+  }
+
+  .legacy-oauth-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
   .verified-badge {
     position: relative;
     display: inline-flex;
@@ -2755,10 +2860,14 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           <div id="oauthAppsList" style="display: none;"></div>
         </div>
         <p style="color: var(--soft); margin: 20px 0 12px; font-size: 0.9rem;">Advanced Settings</p>
-        <label style="display: flex; align-items: center; gap: 12px; color: var(--ink); font-size: 0.98rem; cursor: pointer;">
-          <input type="checkbox" id="legacyOAuthAppsToggle" style="width: 18px; height: 18px; accent-color: var(--brand);">
-          <span>Allow legacy OAuth apps to connect to your account</span>
+        <label class="legacy-oauth-setting" for="legacyOAuthAppsToggle">
+          <input type="checkbox" id="legacyOAuthAppsToggle">
+          <span class="legacy-oauth-setting-copy">
+            <span>Allow legacy OAuth apps to connect to your account</span>
+            <small>Stores the compatibility setting locally in this browser as <code>legacy_oauth</code>.</small>
+          </span>
         </label>
+        <div class="legacy-oauth-status" id="legacyOAuthStatus" role="status" aria-live="polite"></div>
       </div>
 
       <div class="card">
@@ -2806,6 +2915,23 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 </div>
 
 <div class="notification" id="notification"></div>
+
+<div class="legacy-oauth-modal-backdrop" id="legacyOAuthModal" role="dialog" aria-modal="true" aria-labelledby="legacyOAuthModalTitle" aria-hidden="true">
+  <div class="legacy-oauth-modal">
+    <h2 id="legacyOAuthModalTitle">Update legacy OAuth access</h2>
+    <p>For safety, this setting is controlled through your browser's local storage. It is not saved in session storage or sent to Classcastle.</p>
+    <ol>
+      <li>Install a local-storage editor, such as <a href="https://addons.mozilla.org/en-GB/firefox/addon/localstorage-editor/" target="_blank" rel="noopener noreferrer">LocalStorage Editor for Firefox</a>.</li>
+      <li>Open the storage for this Classcastle site and use <strong>local storage</strong>, not session storage.</li>
+      <li>Add or update the key <code>legacy_oauth</code> with the value <code>true</code> to enable it.</li>
+      <li>To disable it, remove the key or set its value to <code>false</code>.</li>
+    </ol>
+    <p>The setting is watched live. Once the value is detected, this page will update to show whether legacy OAuth access is enabled or disabled.</p>
+    <div class="legacy-oauth-modal-actions">
+      <button type="button" class="btn btn-secondary" id="closeLegacyOAuthModal">Close</button>
+    </div>
+  </div>
+</div>
 
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal" id="modal">
@@ -3113,6 +3239,10 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   const identitiesList = document.getElementById('identitiesList');
   const oauthAppsLoading = document.getElementById('oauthAppsLoading');
   const oauthAppsList = document.getElementById('oauthAppsList');
+  const legacyOAuthAppsToggle = document.getElementById('legacyOAuthAppsToggle');
+  const legacyOAuthStatus = document.getElementById('legacyOAuthStatus');
+  const legacyOAuthModal = document.getElementById('legacyOAuthModal');
+  const closeLegacyOAuthModal = document.getElementById('closeLegacyOAuthModal');
   const passkeysLoading = document.getElementById('passkeysLoading');
   const passkeysList = document.getElementById('passkeysList');
   const registerPasskeyBtn = document.getElementById('registerPasskeyBtn');
@@ -3135,6 +3265,49 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     setTimeout(() => {
       notification.classList.remove('show');
     }, duration);
+  }
+
+  const LEGACY_OAUTH_STORAGE_KEY = 'legacy_oauth';
+  let lastLegacyOAuthEnabled = null;
+
+  function isLegacyOAuthEnabled() {
+    try {
+      return localStorage.getItem(LEGACY_OAUTH_STORAGE_KEY)?.toLowerCase() === 'true';
+    } catch (error) {
+      console.error('Could not read legacy OAuth setting:', error);
+      return false;
+    }
+  }
+
+  function syncLegacyOAuthSetting({ announce = false } = {}) {
+    const enabled = isLegacyOAuthEnabled();
+    const previous = lastLegacyOAuthEnabled;
+    const changed = previous !== null && enabled !== previous;
+    lastLegacyOAuthEnabled = enabled;
+    legacyOAuthAppsToggle.checked = enabled;
+    legacyOAuthStatus.textContent = enabled
+      ? 'Enabled — legacy OAuth apps may connect from this browser.'
+      : 'Disabled — legacy OAuth apps are blocked in this browser.';
+    legacyOAuthStatus.classList.toggle('enabled', enabled);
+    legacyOAuthStatus.classList.remove('pending');
+    if (announce && changed) {
+      showNotification(enabled ? 'Legacy OAuth access enabled' : 'Legacy OAuth access disabled');
+    }
+  }
+
+  function openLegacyOAuthInstructions() {
+    legacyOAuthStatus.textContent = 'Waiting for local storage…';
+    legacyOAuthStatus.classList.add('pending');
+    legacyOAuthModal.classList.add('open');
+    legacyOAuthModal.setAttribute('aria-hidden', 'false');
+    closeLegacyOAuthModal.focus();
+  }
+
+  function closeLegacyOAuthInstructions() {
+    legacyOAuthModal.classList.remove('open');
+    legacyOAuthModal.setAttribute('aria-hidden', 'true');
+    syncLegacyOAuthSetting();
+    legacyOAuthAppsToggle.focus();
   }
 
   function showAccountLinkedModal(provider) {
@@ -5786,6 +5959,28 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   linkMicrosoftBtn.addEventListener('click', linkMicrosoft);
   linkNotionBtn.addEventListener('click', linkNotion);
   registerPasskeyBtn.addEventListener('click', registerPasskey);
+  legacyOAuthAppsToggle.addEventListener('click', (event) => {
+    event.preventDefault();
+    openLegacyOAuthInstructions();
+  });
+  closeLegacyOAuthModal.addEventListener('click', closeLegacyOAuthInstructions);
+  legacyOAuthModal.addEventListener('click', (event) => {
+    if (event.target === legacyOAuthModal) closeLegacyOAuthInstructions();
+  });
+  window.addEventListener('storage', (event) => {
+    if (event.key === LEGACY_OAUTH_STORAGE_KEY || event.key === null) {
+      syncLegacyOAuthSetting({ announce: true });
+    }
+  });
+  window.setInterval(() => {
+    syncLegacyOAuthSetting({ announce: true });
+  }, 500);
+  syncLegacyOAuthSetting();
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && legacyOAuthModal.classList.contains('open')) {
+      closeLegacyOAuthInstructions();
+    }
+  });
 
   // Quick Polls lock menu
   const pollsLockMenuBtn = document.getElementById('pollsLockMenuBtn');
