@@ -1416,6 +1416,55 @@
     font-weight: 600;
   }
 
+  .legacy-oauth-confirmation {
+    text-align: center;
+  }
+
+  .legacy-oauth-confirmation-icon {
+    display: grid;
+    width: 64px;
+    height: 64px;
+    margin: 4px auto 16px;
+    place-items: center;
+    border-radius: 50%;
+    font-size: 2rem;
+    font-weight: 700;
+  }
+
+  .legacy-oauth-confirmation.enabled .legacy-oauth-confirmation-icon {
+    background: #dff3e5;
+    color: var(--brand);
+  }
+
+  .legacy-oauth-confirmation.disabled .legacy-oauth-confirmation-icon {
+    background: #fde6e6;
+    color: var(--red);
+  }
+
+  .legacy-oauth-confirmation h3 {
+    margin: 0 0 8px;
+    color: var(--ink);
+    font-size: 1.15rem;
+  }
+
+  .legacy-oauth-confirmation-info {
+    display: grid;
+    gap: 5px;
+    margin-top: 20px;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--soft);
+    font-size: .84rem;
+    line-height: 1.45;
+    text-align: left;
+  }
+
+  .legacy-oauth-confirmation-info strong {
+    color: var(--ink);
+  }
+
   .legacy-oauth-modal-actions {
     display: flex;
     justify-content: flex-end;
@@ -2999,26 +3048,28 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 <div class="legacy-oauth-modal-backdrop" id="legacyOAuthModal" role="dialog" aria-modal="true" aria-labelledby="legacyOAuthModalTitle" aria-hidden="true">
   <div class="legacy-oauth-modal">
     <h2 id="legacyOAuthModalTitle">Legacy OAuth access</h2>
-    <p>For safety, this setting is controlled through your browser's local storage. It is not saved in session storage or sent to Classcastle.</p>
-    <ul class="storage-steps">
-      <li class="storage-step">
-        <span class="storage-step-icon check" aria-hidden="true">✓</span>
-        <span>Install a local-storage editor, such as <a href="https://addons.mozilla.org/en-GB/firefox/addon/localstorage-editor/" target="_blank" rel="noopener noreferrer">LocalStorage Editor for Firefox</a>.</span>
-      </li>
-      <li class="storage-step">
-        <span class="storage-step-icon check" aria-hidden="true">✓</span>
-        <span>Open the storage for this Classcastle site and use <strong>local storage</strong>, not session storage.</span>
-      </li>
-      <li class="storage-step">
-        <span class="storage-step-icon check" aria-hidden="true">✓</span>
-        <span>Add or update <code>legacy_oauth</code> with the value <code>true</code> to enable legacy OAuth access.</span>
-      </li>
-      <li class="storage-step">
-        <span class="storage-step-icon cross" aria-hidden="true">×</span>
-        <span>Do not use session storage. To disable legacy OAuth access, remove <code>legacy_oauth</code> or set it to <code>false</code>.</span>
-      </li>
-    </ul>
-    <p>The setting is watched live. Once the value is detected, this page will update to show whether legacy OAuth access is enabled or disabled.</p>
+    <div id="legacyOAuthModalContent">
+      <p>For safety, this setting is controlled through your browser's local storage. It is not saved in session storage or sent to Classcastle.</p>
+      <ul class="storage-steps">
+        <li class="storage-step">
+          <span class="storage-step-icon check" aria-hidden="true">✓</span>
+          <span>Install a local-storage editor, such as <a href="https://addons.mozilla.org/en-GB/firefox/addon/localstorage-editor/" target="_blank" rel="noopener noreferrer">LocalStorage Editor for Firefox</a>.</span>
+        </li>
+        <li class="storage-step">
+          <span class="storage-step-icon check" aria-hidden="true">✓</span>
+          <span>Open the storage for this Classcastle site and use <strong>local storage</strong>, not session storage.</span>
+        </li>
+        <li class="storage-step">
+          <span class="storage-step-icon check" aria-hidden="true">✓</span>
+          <span>Add or update <code>legacy_oauth</code> with the value <code>true</code> to enable legacy OAuth access.</span>
+        </li>
+        <li class="storage-step">
+          <span class="storage-step-icon cross" aria-hidden="true">×</span>
+          <span>Do not use session storage. To disable legacy OAuth access, remove <code>legacy_oauth</code> or set it to <code>false</code>.</span>
+        </li>
+      </ul>
+      <p>The setting is watched live. Once the value is detected, this page will update to show whether legacy OAuth access is enabled or disabled.</p>
+    </div>
     <div class="legacy-oauth-modal-actions">
       <button type="button" class="btn btn-secondary" id="closeLegacyOAuthModal">Close</button>
     </div>
@@ -3334,6 +3385,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   const legacyOAuthAppsToggle = document.getElementById('legacyOAuthAppsToggle');
   const legacyOAuthStatus = document.getElementById('legacyOAuthStatus');
   const legacyOAuthModal = document.getElementById('legacyOAuthModal');
+  const legacyOAuthModalContent = document.getElementById('legacyOAuthModalContent');
   const closeLegacyOAuthModal = document.getElementById('closeLegacyOAuthModal');
   const passkeysLoading = document.getElementById('passkeysLoading');
   const passkeysList = document.getElementById('passkeysList');
@@ -3363,6 +3415,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   const legacyOAuthStatusIcon = legacyOAuthStatus.querySelector('.legacy-oauth-status-icon');
   const legacyOAuthStatusText = legacyOAuthStatus.querySelector('span:last-child');
   let lastLegacyOAuthEnabled = null;
+  let legacyOAuthChangeConfirmed = false;
 
   function isLegacyOAuthEnabled() {
     try {
@@ -3388,15 +3441,44 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     legacyOAuthStatus.classList.toggle('enabled', enabled);
     legacyOAuthStatus.classList.remove('pending');
     if (announce && changed) {
-      showLegacyOAuthConfetti(enabled);
+      legacyOAuthChangeConfirmed = true;
+      renderLegacyOAuthConfirmation(enabled);
+      showConfetti(enabled ? ['#1f5c3a', '#76b892', '#f4d35e', '#fff'] : ['#a33b3b', '#e58b8b', '#f4d35e', '#fff']);
       showNotification(enabled ? 'Legacy OAuth access enabled' : 'Legacy OAuth access disabled');
     }
   }
 
-  function showLegacyOAuthConfetti(enabled) {
-    const colors = enabled
-      ? ['#1f5c3a', '#76b892', '#f4d35e', '#fff']
-      : ['#a33b3b', '#e58b8b', '#f4d35e', '#fff'];
+  function renderLegacyOAuthConfirmation(enabled) {
+    legacyOAuthModalContent.innerHTML = `
+      <div class="legacy-oauth-confirmation ${enabled ? 'enabled' : 'disabled'}">
+        <div class="legacy-oauth-confirmation-icon" aria-hidden="true">${enabled ? '✓' : '×'}</div>
+        <h3>${enabled ? 'Legacy OAuth access enabled' : 'Legacy OAuth access disabled'}</h3>
+        <p>${enabled
+          ? 'Legacy OAuth apps can now connect from this browser.'
+          : 'Legacy OAuth apps can no longer connect from this browser.'}</p>
+        <div class="legacy-oauth-confirmation-info">
+          <strong>Storage status</strong>
+          <span><code>localStorage.legacy_oauth</code> is set to <code>${enabled ? 'true' : 'false or removed'}</code>.</span>
+          <span>This setting is local to this browser and is not saved in session storage or sent to Classcastle.</span>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderLegacyOAuthInstructions() {
+    legacyOAuthModalContent.innerHTML = `
+      <p>For safety, this setting is controlled through your browser's local storage. It is not saved in session storage or sent to Classcastle.</p>
+      <ul class="storage-steps">
+        <li class="storage-step"><span class="storage-step-icon check" aria-hidden="true">✓</span><span>Install a local-storage editor, such as <a href="https://addons.mozilla.org/en-GB/firefox/addon/localstorage-editor/" target="_blank" rel="noopener noreferrer">LocalStorage Editor for Firefox</a>.</span></li>
+        <li class="storage-step"><span class="storage-step-icon check" aria-hidden="true">✓</span><span>Open the storage for this Classcastle site and use <strong>local storage</strong>, not session storage.</span></li>
+        <li class="storage-step"><span class="storage-step-icon check" aria-hidden="true">✓</span><span>Add or update <code>legacy_oauth</code> with the value <code>true</code> to enable legacy OAuth access.</span></li>
+        <li class="storage-step"><span class="storage-step-icon cross" aria-hidden="true">×</span><span>Do not use session storage. To disable legacy OAuth access, remove <code>legacy_oauth</code> or set it to <code>false</code>.</span></li>
+      </ul>
+      <p>The setting is watched live. Once the value is detected, this page will update to show whether legacy OAuth access is enabled or disabled.</p>
+    `;
+  }
+
+  function showConfetti(colors = ['#1f5c3a', '#76b892', '#f4d35e', '#fff']) {
     const originX = window.innerWidth / 2;
     const originY = window.innerHeight / 2;
     for (let index = 0; index < 28; index += 1) {
@@ -3414,6 +3496,11 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
   }
 
   function openLegacyOAuthInstructions() {
+    if (legacyOAuthChangeConfirmed) {
+      renderLegacyOAuthConfirmation(isLegacyOAuthEnabled());
+    } else {
+      renderLegacyOAuthInstructions();
+    }
     legacyOAuthStatusText.textContent = 'Waiting for local storage…';
     legacyOAuthStatusIcon.textContent = '…';
     legacyOAuthStatus.classList.add('pending');
@@ -6614,6 +6701,7 @@ usage/fair dealing.`,
   }
 
   function openLicensesModal() {
+    showConfetti(['#1f5c3a', '#76b892', '#f4d35e', '#fff']);
     showLicensesList();
     renderLicensesList();
     licensesModalOverlay.style.display = 'flex';
