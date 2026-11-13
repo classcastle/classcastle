@@ -569,6 +569,21 @@
     margin: 0 auto 16px;
   }
 
+  /* Skeleton loading */
+  .skeleton {
+    background: var(--line);
+    border-radius: 4px;
+    animation: skeleton-pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes skeleton-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .room-card.skeleton-card {
+    cursor: default;
+    pointer-events: none;
+  }
+
   .rooms-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -2414,8 +2429,8 @@
       <div class="user-info hidden" id="userInfo">
         <div class="user-avatar" id="userAvatar">?</div>
         <div class="user-details">
-          <div class="user-name" id="userName">Loading...</div>
-          <div class="user-email" id="userEmail">Loading...</div>
+          <div class="user-name" id="userName"><span class="skeleton" style="display: inline-block; width: 120px; height: 16px; vertical-align: middle;"></span></div>
+          <div class="user-email" id="userEmail"><span class="skeleton" style="display: inline-block; width: 160px; height: 12px; vertical-align: middle;"></span></div>
         </div>
       </div>
       <button class="btn-logout hidden" id="logoutBtn">Sign out</button>
@@ -2900,10 +2915,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         <h2 class="section-title" style="margin-bottom: 16px;">Linked Accounts</h2>
         <p style="color: var(--soft); margin-bottom: 16px;">Connect GitHub, Microsoft, or Notion to sign in to your Classcastle account with those services.</p>
         <div id="linkedAccounts" style="margin-bottom: 16px;">
-          <div class="loading-state" id="identitiesLoading">
-            <div class="loading-spinner"></div>
-            <p>Loading linked accounts...</p>
-          </div>
+          <div id="identitiesLoading"></div>
           <div id="identitiesList" style="display: none;"></div>
         </div>
         <button class="btn btn-secondary" id="linkGithubBtn" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
@@ -2938,10 +2950,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         <h2 class="section-title" style="margin-bottom: 8px;">Security</h2>
         <h3 style="font-size: 1rem; margin: 16px 0 8px; color: var(--ink);">Passkeys</h3>
         <p style="color: var(--soft); margin-bottom: 16px;">Use your device or password manager to sign in securely without a password.</p>
-        <div id="passkeysLoading" class="loading-state">
-          <div class="loading-spinner"></div>
-          <p>Loading passkeys...</p>
-        </div>
+        <div id="passkeysLoading" style="display: none;"></div>
         <div id="passkeysList" style="display: none; margin-bottom: 12px;"></div>
         <button class="btn btn-secondary" id="registerPasskeyBtn">
           <span class="btn-text">Add a passkey</span>
@@ -2979,10 +2988,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         <div style="border-top: 1px solid var(--line); margin-top: 20px; padding-top: 16px;">
           <h3 style="font-size: 1rem; margin: 0 0 8px; color: var(--ink);">Authorized OAuth apps</h3>
           <p style="color: var(--soft); margin-bottom: 12px; line-height: 1.5;">These apps have permission to access your Classcastle account. Revoking one removes your authorization without deleting the app for other users.</p>
-          <div id="oauthAppsLoading" class="loading-state">
-            <div class="loading-spinner"></div>
-            <p>Loading OAuth apps...</p>
-          </div>
+          <div id="oauthAppsLoading" style="display: none;"></div>
           <div id="oauthAppsList" style="display: none;"></div>
         </div>
         <p style="color: var(--soft); margin: 20px 0 12px; font-size: 0.9rem;">Advanced Settings</p>
@@ -3841,7 +3847,7 @@ read sensitive data, or perform actions as you.
         <div class="room-card-info">
           Created ${new Date(room.created_at).toLocaleDateString()}
         </div>
-        <div class="room-card-students" id="studentCount-${room.id}">Loading students...</div>
+        <div class="room-card-students" id="studentCount-${room.id}"><span class="skeleton" style="display: inline-block; width: 90px; height: 12px; vertical-align: middle;"></span></div>
         <div class="room-card-actions">
           <button class="room-card-btn room-card-btn-manage" data-room-id="${room.id}">Manage</button>
           ${room.archived ? `
@@ -3925,13 +3931,106 @@ read sensitive data, or perform actions as you.
     });
   }
 
-  function showLoadingState() {
-    roomsGrid.innerHTML = `
-      <div class="loading-state">
-        <div class="loading-spinner"></div>
-        <p>Loading your rooms...</p>
+  // Skeleton loading helpers
+  function skeletonDiv(style) {
+    return `<div class="skeleton" style="${style}" aria-hidden="true"></div>`;
+  }
+
+  function skeletonGridCards(count = 6, actions = 3) {
+    const buttons = Array.from({ length: actions }, () =>
+      skeletonDiv('flex: 1; height: 34px; border-radius: 6px;')
+    ).join('');
+    return Array.from({ length: count }, () => `
+      <div class="room-card skeleton-card" aria-hidden="true">
+        <div class="room-card-header">
+          ${skeletonDiv('width: 50%; height: 26px;')}
+          ${skeletonDiv('width: 72px; height: 24px; border-radius: 4px;')}
+        </div>
+        <div class="room-card-info" style="margin-top: 12px;">
+          ${skeletonDiv('width: 40%; height: 12px;')}
+        </div>
+        <div class="room-card-students">
+          ${skeletonDiv('width: 30%; height: 12px;')}
+        </div>
+        <div class="room-card-actions">
+          ${buttons}
+        </div>
       </div>
-    `;
+    `).join('');
+  }
+
+  function skeletonRows(count = 5) {
+    return Array.from({ length: count }, () => `
+      <div class="activity-item" aria-hidden="true">
+        ${skeletonDiv('width: 36px; height: 36px; border-radius: 6px; flex-shrink: 0;')}
+        <div class="activity-content">
+          ${skeletonDiv('width: 45%; height: 14px; margin-bottom: 6px;')}
+          ${skeletonDiv('width: 70%; height: 12px; margin-bottom: 6px;')}
+          ${skeletonDiv('width: 30%; height: 11px;')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function skeletonListItems(count = 3) {
+    return Array.from({ length: count }, () => `
+      <div class="identity-item" aria-hidden="true">
+        <div class="identity-info">
+          ${skeletonDiv('width: 24px; height: 24px; border-radius: 4px;')}
+          <div>
+            ${skeletonDiv('width: 110px; height: 14px; margin-bottom: 6px;')}
+            ${skeletonDiv('width: 160px; height: 12px;')}
+          </div>
+        </div>
+        ${skeletonDiv('width: 64px; height: 30px; border-radius: 4px;')}
+      </div>
+    `).join('');
+  }
+
+  function skeletonFeedCards(count = 3) {
+    const buttons = [96, 84, 64, 64].map(w =>
+      skeletonDiv(`width: ${w}px; height: 30px; border-radius: 6px;`)
+    ).join('');
+    return Array.from({ length: count }, () => `
+      <div class="card" style="margin-bottom: 12px; padding: 16px;" aria-hidden="true">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;">
+          <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+              ${skeletonDiv('width: 55%; height: 16px;')}
+              ${skeletonDiv('width: 56px; height: 20px; border-radius: 4px;')}
+            </div>
+            ${skeletonDiv('width: 35%; height: 12px; margin-bottom: 14px;')}
+            <div style="display: flex; gap: 8px;">
+              ${buttons}
+            </div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function initSkeletonPlaceholders() {
+    const gridTargets = {
+      roomsGrid: () => skeletonGridCards(6, 4),
+      templatesGrid: () => skeletonGridCards(4, 2),
+      shortcutsGrid: () => skeletonGridCards(4, 2),
+      topUrlsList: () => skeletonRows(5),
+      activityList: () => skeletonRows(6),
+      pollsList: () => skeletonFeedCards(3),
+      responsesList: () => skeletonFeedCards(3),
+    };
+    Object.entries(gridTargets).forEach(([id, render]) => {
+      const el = document.getElementById(id);
+      if (el && el.querySelector('.loading-state')) el.innerHTML = render();
+    });
+    ['identitiesLoading', 'passkeysLoading', 'oauthAppsLoading'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && !el.innerHTML.trim()) el.innerHTML = skeletonListItems(id === 'identitiesLoading' ? 3 : 2);
+    });
+  }
+
+  function showLoadingState() {
+    roomsGrid.innerHTML = skeletonGridCards(6, 4);
   }
 
   function updateUserInfo() {
@@ -4173,6 +4272,10 @@ read sensitive data, or perform actions as you.
   async function loadIdentities() {
     if (!currentUser) return;
 
+    identitiesLoading.style.display = 'block';
+    identitiesLoading.innerHTML = skeletonListItems(3);
+    identitiesList.style.display = 'none';
+
     try {
       const { data, error } = await SupabaseClient.auth.getUserIdentities();
 
@@ -4243,6 +4346,7 @@ read sensitive data, or perform actions as you.
     } catch (error) {
       console.error('Error loading identities:', error);
       identitiesLoading.style.display = 'none';
+      identitiesList.style.display = 'block';
       identitiesList.innerHTML = '<p style="color: var(--red); font-size: 0.9rem;">Error loading linked accounts</p>';
     }
   }
@@ -4250,7 +4354,8 @@ read sensitive data, or perform actions as you.
   async function loadPasskeys() {
     if (!currentUser) return;
 
-    passkeysLoading.style.display = 'flex';
+    passkeysLoading.style.display = 'block';
+    passkeysLoading.innerHTML = skeletonListItems(2);
     passkeysList.style.display = 'none';
     passkeysList.replaceChildren();
 
@@ -4301,7 +4406,8 @@ read sensitive data, or perform actions as you.
   async function loadOAuthApps() {
     if (!currentUser) return;
 
-    oauthAppsLoading.style.display = 'flex';
+    oauthAppsLoading.style.display = 'block';
+    oauthAppsLoading.innerHTML = skeletonListItems(2);
     oauthAppsList.style.display = 'none';
     oauthAppsList.replaceChildren();
 
@@ -4801,6 +4907,7 @@ read sensitive data, or perform actions as you.
 
   // Templates
   async function loadTemplates() {
+    templatesGrid.innerHTML = skeletonGridCards(4, 2);
     try {
       const { data, error } = await SupabaseClient
         .from('room_templates')
@@ -4936,6 +5043,7 @@ read sensitive data, or perform actions as you.
 
   // Shortcuts
   async function loadShortcuts() {
+    shortcutsGrid.innerHTML = skeletonGridCards(4, 2);
     try {
       const { data, error } = await SupabaseClient
         .from('url_shortcuts')
@@ -5049,6 +5157,11 @@ read sensitive data, or perform actions as you.
 
   // Analytics
   async function loadAnalytics() {
+    topUrlsList.innerHTML = skeletonRows(5);
+    ['totalRooms', 'totalStudents', 'activeRooms', 'archivedRooms'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = '<span class="skeleton" style="display: inline-block; width: 64px; height: 32px; vertical-align: middle;"></span>';
+    });
     try {
       // Total rooms
       const { count: totalRoomsCount } = await SupabaseClient
@@ -5112,11 +5225,17 @@ read sensitive data, or perform actions as you.
       }
     } catch (error) {
       console.error('Error loading analytics:', error);
+      ['totalRooms', 'totalStudents', 'activeRooms', 'archivedRooms'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = '0';
+      });
+      topUrlsList.innerHTML = '<p style="color: var(--soft);">No URL data yet</p>';
     }
   }
 
   // Activity Log
   async function loadActivityLog() {
+    activityList.innerHTML = skeletonRows(6);
     try {
       const { data, error } = await SupabaseClient
         .from('activity_log')
@@ -5198,6 +5317,7 @@ read sensitive data, or perform actions as you.
   }
 
   async function loadPollsContent() {
+    document.getElementById('pollsList').innerHTML = skeletonFeedCards(3);
     try {
       const { data, error } = await SupabaseClient
         .from('polls')
@@ -5215,6 +5335,7 @@ read sensitive data, or perform actions as you.
   }
 
   async function loadResponses() {
+    document.getElementById('responsesList').innerHTML = skeletonFeedCards(3);
     try {
       const { data, error } = await SupabaseClient
         .from('poll_responses')
@@ -5321,7 +5442,14 @@ read sensitive data, or perform actions as you.
 
     status.textContent = 'Searching...';
     status.style.color = 'var(--soft)';
-    resultsDiv.style.display = 'none';
+    resultsBody.innerHTML = Array.from({ length: 5 }, () => `
+      <tr>
+        <td colspan="2" style="padding: 8px;">
+          <div class="skeleton" style="height: 14px; width: ${85 - Math.random() * 30}%;"></div>
+        </td>
+      </tr>
+    `).join('');
+    resultsDiv.style.display = 'block';
 
     try {
       // Check if input is a UK postcode
@@ -5349,6 +5477,7 @@ read sensitive data, or perform actions as you.
       const data = await response.json();
 
       if (!data || data.length === 0) {
+        resultsDiv.style.display = 'none';
         status.textContent = "No schools found. Your school may not be in our database. Contact us at support@classcastle.org and we'll help you get set up.";
         status.style.color = 'var(--amber)';
         return;
@@ -5371,6 +5500,7 @@ read sensitive data, or perform actions as you.
         }));
 
       if (schools.length === 0) {
+        resultsDiv.style.display = 'none';
         status.textContent = "No UK schools found. Your school may not be in our database. Contact us at support@classcastle.org and we'll help you get set up.";
         status.style.color = 'var(--amber)';
         return;
@@ -5399,6 +5529,7 @@ read sensitive data, or perform actions as you.
       });
     } catch (error) {
       console.error('Error searching schools:', error);
+      resultsDiv.style.display = 'none';
       status.textContent = `Error: ${error.message}`;
       status.style.color = 'var(--red)';
     }
@@ -6917,6 +7048,7 @@ usage/fair dealing.`,
   }
 
   // Initialize
+  initSkeletonPlaceholders();
   checkSession();
 
   // Listen for auth changes
