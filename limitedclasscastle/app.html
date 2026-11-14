@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Limited Classcastle — Teacher App</title>
+  <link rel="icon" type="image/svg+xml" href="/logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FAFAF9;
+      --surface: #FFFFFF;
+      --ink: #1A1A1A;
+      --soft: #6B7280;
+      --line: #D9DDD3;
+      --brand: #1F5C3A;
+      --brand-light: #E4F1E6;
+      --tint: #E4F1E6;
+      --chalk: #F59E0B;
+      --red: #DC2626;
+      --sky-soft: #E4F1E6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Instrument Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    .app-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+    .sidebar {
+      width: 260px;
+      background: var(--surface);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      height: 100vh;
+      left: 0;
+      top: 0;
+    }
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--line);
+    }
+    .wordmark {
+      font-family: 'Instrument Sans', system-ui, sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .logo-mark { width: 28px; height: 28px; }
+    .word-text { color: var(--ink); }
+    .word-accent { color: var(--brand); }
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 6px;
+      color: var(--soft);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 400;
+      transition: all 0.15s ease;
+    }
+    .nav-item:hover {
+      background: var(--tint);
+      color: var(--ink);
+    }
+    .nav-item.active {
+      background: var(--brand-light);
+      color: var(--brand);
+      font-weight: 500;
+    }
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid var(--line);
+    }
+    .main-content {
+      flex: 1;
+      margin-left: 260px;
+      padding: 32px;
+    }
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+    }
+    .page-title {
+      font-size: 1.75rem;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    .page-subtitle {
+      color: var(--soft);
+      font-size: 0.95rem;
+    }
+    .btn {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 400;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-primary {
+      background: var(--brand);
+      color: var(--surface);
+    }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-secondary {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      color: var(--ink);
+    }
+    .btn-secondary:hover {
+      background: var(--tint);
+    }
+    .btn-danger {
+      background: var(--red);
+      color: white;
+    }
+    .btn-danger:hover { opacity: 0.9; }
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 0.85rem;
+    }
+    .rooms-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .room-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 24px;
+      transition: all 0.15s ease;
+    }
+    .room-card:hover {
+      border-color: var(--brand);
+      transform: translateY(-2px);
+    }
+    .room-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    .room-name {
+      font-size: 1.25rem;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    .room-code {
+      font-family: 'Monaco', 'Consolas', monospace;
+      background: var(--tint);
+      color: var(--brand);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
+    }
+    .room-info {
+      color: var(--soft);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .room-students {
+      margin-top: 12px;
+      font-size: 0.85rem;
+      color: var(--soft);
+    }
+    .room-actions {
+      margin-top: 16px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .room-actions .btn {
+      flex: 1;
+      min-width: 80px;
+    }
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.show {
+      display: flex;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 32px;
+      max-width: 480px;
+      width: 90%;
+    }
+    .card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 16px;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+    .form-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 0.95rem;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: var(--brand);
+    }
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 24px;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 64px 32px;
+      color: var(--soft);
+    }
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    .beta-badge {
+      background: var(--brand);
+      color: white;
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 8px;
+      font-weight: 600;
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 500;
+    }
+    .url-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .url-item {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .url-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .url-name {
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    .url-link {
+      color: var(--soft);
+      font-size: 0.85rem;
+      word-break: break-all;
+    }
+    .url-actions {
+      display: flex;
+      gap: 8px;
+      margin-left: 16px;
+    }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="wordmark"><img src="/logo.svg" alt="" class="logo-mark"><span class="word-text">Class<span class="word-accent">castle</span></span></div>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item active" href="#" onclick="showPage('rooms')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+        Dashboard
+        <span class="beta-badge">BETA</span>
+      </a>
+      <a class="nav-item" href="#" onclick="showPage('urls')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        URL Shortcuts
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div style="font-size: 0.8rem; color: var(--soft);">
+        Limited Classcastle<br>
+        Local database only
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <!-- Rooms Page -->
+    <div id="roomsPage">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Your Rooms</h1>
+          <p class="page-subtitle">Manage your classrooms</p>
+        </div>
+        <button class="btn btn-primary" onclick="openCreateRoomModal()">
+          <span class="btn-text">Create new room</span>
+        </button>
+      </div>
+      <div class="rooms-grid" id="roomsGrid"></div>
+    </div>
+
+    <!-- URLs Page -->
+    <div id="urlsPage" style="display: none;">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">URL Shortcuts</h1>
+          <p class="page-subtitle">Save frequently used URLs</p>
+        </div>
+        <button class="btn btn-primary" onclick="openCreateUrlModal()">
+          <span class="btn-text">Add URL</span>
+        </button>
+      </div>
+      <div class="url-list" id="urlList"></div>
+    </div>
+  </main>
+</div>
+
+<!-- Create Room Modal -->
+<div class="modal-overlay" id="createRoomModal">
+  <div class="card">
+    <h2>Create New Room</h2>
+    <div class="form-group">
+      <label class="form-label">Room Name</label>
+      <input type="text" class="form-input" id="roomNameInput" placeholder="e.g., Period 1 Science">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeCreateRoomModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="createRoom()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- Create URL Modal -->
+<div class="modal-overlay" id="createUrlModal">
+  <div class="card">
+    <h2>Add URL Shortcut</h2>
+    <div class="form-group">
+      <label class="form-label">Name</label>
+      <input type="text" class="form-input" id="urlNameInput" placeholder="e.g., BBC Bitesize">
+    </div>
+    <div class="form-group">
+      <label class="form-label">URL</label>
+      <input type="url" class="form-input" id="urlInput" placeholder="https://...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeCreateUrlModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="createUrl()">Add</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// IndexedDB setup
+const DB_NAME = 'LimitedClasscastleDB';
+const DB_VERSION = 1;
+let db;
+
+async function initDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => {
+      db = request.result;
+      resolve(db);
+    };
+    
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains('rooms')) {
+        db.createObjectStore('rooms', { keyPath: 'id' });
+      }
+      if (!db.objectStoreNames.contains('urls')) {
+        db.createObjectStore('urls', { keyPath: 'id' });
+      }
+    };
+  });
+}
+
+async function addRoom(room) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(['rooms'], 'readwrite');
+    const store = transaction.objectStore('rooms');
+    const request = store.add(room);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function getAllRooms() {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(['rooms'], 'readonly');
+    const store = transaction.objectStore('rooms');
+    const request = store.getAll();
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function deleteRoom(id) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(['rooms'], 'readwrite');
+    const store = transaction.objectStore('rooms');
+    const request = store.delete(id);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function addUrl(url) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(['urls'], 'readwrite');
+    const store = transaction.objectStore('urls');
+    const request = store.add(url);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function getAllUrls() {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(['urls'], 'readonly');
+    const store = transaction.objectStore('urls');
+    const request = store.getAll();
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function deleteUrl(id) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(['urls'], 'readwrite');
+    const store = transaction.objectStore('urls');
+    const request = store.delete(id);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
+}
+
+function generateRoomCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 6; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+}
+
+function openCreateRoomModal() {
+  document.getElementById('createRoomModal').classList.add('show');
+  document.getElementById('roomNameInput').focus();
+}
+
+function closeCreateRoomModal() {
+  document.getElementById('createRoomModal').classList.remove('show');
+  document.getElementById('roomNameInput').value = '';
+}
+
+async function createRoom() {
+  const name = document.getElementById('roomNameInput').value.trim();
+  if (!name) return;
+  
+  const room = {
+    id: Date.now().toString(),
+    name: name,
+    code: generateRoomCode(),
+    createdAt: new Date().toISOString(),
+    archived: false
+  };
+  
+  await addRoom(room);
+  closeCreateRoomModal();
+  renderRooms();
+}
+
+async function renderRooms() {
+  const rooms = await getAllRooms();
+  const grid = document.getElementById('roomsGrid');
+  
+  if (rooms.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state" style="grid-column: 1 / -1;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect width="7" height="7" x="3" y="3" rx="1"/>
+          <rect width="7" height="7" x="14" y="3" rx="1"/>
+          <rect width="7" height="7" x="14" y="14" rx="1"/>
+          <rect width="7" height="7" x="3" y="14" rx="1"/>
+        </svg>
+        <h3>No rooms yet</h3>
+        <p>Create your first room to get started</p>
+      </div>
+    `;
+    return;
+  }
+  
+  grid.innerHTML = rooms.map(room => `
+    <div class="room-card">
+      <div class="room-card-header">
+        <div>
+          <div class="room-name">${escapeHtml(room.name)}</div>
+          <div class="room-code">${room.code}</div>
+        </div>
+      </div>
+      <div class="room-info">
+        Created ${new Date(room.createdAt).toLocaleDateString()}
+      </div>
+      <div class="room-actions">
+        <button class="btn btn-secondary btn-sm" onclick="copyRoomCode('${room.code}')">Copy Code</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteRoom('${room.id}').then(renderRooms)">Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function copyRoomCode(code) {
+  navigator.clipboard.writeText(code).then(() => {
+    alert('Room code copied: ' + code);
+  });
+}
+
+function openCreateUrlModal() {
+  document.getElementById('createUrlModal').classList.add('show');
+  document.getElementById('urlNameInput').focus();
+}
+
+function closeCreateUrlModal() {
+  document.getElementById('createUrlModal').classList.remove('show');
+  document.getElementById('urlNameInput').value = '';
+  document.getElementById('urlInput').value = '';
+}
+
+async function createUrl() {
+  const name = document.getElementById('urlNameInput').value.trim();
+  const url = document.getElementById('urlInput').value.trim();
+  if (!name || !url) return;
+  
+  const urlObj = {
+    id: Date.now().toString(),
+    name: name,
+    url: url,
+    createdAt: new Date().toISOString()
+  };
+  
+  await addUrl(urlObj);
+  closeCreateUrlModal();
+  renderUrls();
+}
+
+async function renderUrls() {
+  const urls = await getAllUrls();
+  const list = document.getElementById('urlList');
+  
+  if (urls.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+        </svg>
+        <h3>No URLs saved</h3>
+        <p>Add your frequently used URLs for quick access</p>
+      </div>
+    `;
+    return;
+  }
+  
+  list.innerHTML = urls.map(url => `
+    <div class="url-item">
+      <div class="url-info">
+        <div class="url-name">${escapeHtml(url.name)}</div>
+        <div class="url-link">${escapeHtml(url.url)}</div>
+      </div>
+      <div class="url-actions">
+        <button class="btn btn-secondary btn-sm" onclick="openUrl('${escapeHtml(url.url)}')">Open</button>
+        <button class="btn btn-secondary btn-sm" onclick="copyUrl('${escapeHtml(url.url)}')">Copy</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteUrl('${url.id}').then(renderUrls)">Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openUrl(url) {
+  window.open(url, '_blank');
+}
+
+function copyUrl(url) {
+  navigator.clipboard.writeText(url).then(() => {
+    alert('URL copied');
+  });
+}
+
+function showPage(page) {
+  document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  
+  if (page === 'rooms') {
+    document.getElementById('roomsPage').style.display = 'block';
+    document.getElementById('urlsPage').style.display = 'none';
+    renderRooms();
+  } else if (page === 'urls') {
+    document.getElementById('roomsPage').style.display = 'none';
+    document.getElementById('urlsPage').style.display = 'block';
+    renderUrls();
+  }
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Initialize
+initDB().then(() => {
+  renderRooms();
+});
+</script>
+</body>
+</html>
