@@ -6287,6 +6287,13 @@ read sensitive data, or perform actions as you.
 
   createRoomBtn.addEventListener('click', createNewRoom);
 
+  // Check for ?create=room URL parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('create') === 'room') {
+    // Auto-trigger room creation
+    setTimeout(() => createNewRoom(), 500);
+  }
+
   // Handle create first room button (dynamically added)
   const firstRoomBtn = document.getElementById('createFirstRoomBtn');
   if (firstRoomBtn) {

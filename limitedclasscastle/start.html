@@ -56,9 +56,22 @@
       letter-spacing: -0.01em;
       display: flex;
       align-items: center;
-      gap: 9px;
+      gap: 12px;
     }
     .logo-mark { width: 28px; height: 28px; }
+    .wordmark-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+    }
+    .limited-text {
+      font-size: 0.65rem;
+      font-weight: 500;
+      color: var(--soft);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
     .word-text { color: var(--ink); }
     .word-accent { color: var(--brand); }
     .sidebar-nav {
@@ -203,7 +216,13 @@
 <div class="app-layout">
   <aside class="sidebar">
     <div class="sidebar-header">
-      <div class="wordmark"><img src="/logo.svg" alt="" class="logo-mark"><span class="word-text">Class<span class="word-accent">castle</span></span></div>
+      <div class="wordmark">
+        <img src="/logo.svg" alt="" class="logo-mark">
+        <div class="wordmark-text">
+          <span class="limited-text">Limited</span>
+          <span class="word-text">Class<span class="word-accent">castle</span></span>
+        </div>
+      </div>
     </div>
     <nav class="sidebar-nav">
       <a class="nav-item active" href="#">
