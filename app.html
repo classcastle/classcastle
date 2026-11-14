@@ -7050,7 +7050,13 @@ usage/fair dealing.`,
         loadIdentities();
       }
     } else {
-      window.location.href = '/login.html';
+      // Check for ?create=room parameter to preserve redirect after login
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('create') === 'room') {
+        window.location.href = '/login.html?post=/app.html?create=room';
+      } else {
+        window.location.href = '/login.html';
+      }
     }
   }
 
