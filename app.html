@@ -6351,6 +6351,15 @@ usage/fair dealing.`,
 
   // Check for existing session
   async function checkSession() {
+    // Listen for new login from other tabs
+    const authChannel = new BroadcastChannel('classcastle_auth');
+    authChannel.onmessage = (event) => {
+      if (event.data.type === 'new_login') {
+        // Log out current session
+        handleLogout();
+      }
+    };
+
     const { data: { session } } = await SupabaseClient.auth.getSession();
 
     // Check for URL parameters
