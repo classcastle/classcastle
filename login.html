@@ -692,18 +692,6 @@
 
   // Check if already logged in
   async function checkSession() {
-    // Listen for new login from other tabs
-    const authChannel = new BroadcastChannel('classcastle_auth');
-    authChannel.onmessage = (event) => {
-      if (event.data.type === 'new_login') {
-        // Log out current session
-        SupabaseClient.auth.signOut();
-        showNotification('You were logged in from another window');
-        // Reload page to show login form
-        setTimeout(() => window.location.reload(), 1500);
-      }
-    };
-
     const { data: { session } } = await SupabaseClient.auth.getSession();
 
     // Check for redirect parameter
@@ -762,10 +750,6 @@
     }
 
     if (session) {
-      // Broadcast to other tabs that this session is now active
-      const authChannel = new BroadcastChannel('classcastle_auth');
-      authChannel.postMessage({ type: 'new_login' });
-
       showNotification('You are already logged in!');
       setTimeout(() => {
         window.location.href = post || '/app.html';
@@ -799,10 +783,6 @@
       });
 
       if (error) throw error;
-
-      // Broadcast to other tabs to log them out
-      const authChannel = new BroadcastChannel('classcastle_auth');
-      authChannel.postMessage({ type: 'new_login' });
 
       showNotification('Welcome back, teacher!');
       setTimeout(() => {
@@ -846,10 +826,6 @@
 
       if (error) throw error;
 
-      // Broadcast to other tabs to log them out
-      const authChannel = new BroadcastChannel('classcastle_auth');
-      authChannel.postMessage({ type: 'new_login' });
-
       // OAuth will redirect, so we don't need to do anything else
     } catch (error) {
       showNotification(error.message);
@@ -873,10 +849,6 @@
     try {
       const { error } = await SupabaseClient.auth.signInWithPasskey();
       if (error) throw error;
-
-      // Broadcast to other tabs to log them out
-      const authChannel = new BroadcastChannel('classcastle_auth');
-      authChannel.postMessage({ type: 'new_login' });
 
       showNotification('Welcome back, teacher!');
       setTimeout(() => {
