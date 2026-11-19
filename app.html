@@ -2394,6 +2394,60 @@
     flex: 1;
   }
 
+  .settings-layout {
+    display: flex;
+    gap: 24px;
+  }
+
+  .settings-sidebar {
+    width: 250px;
+    flex-shrink: 0;
+  }
+
+  .settings-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .settings-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    color: var(--soft);
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .settings-nav-item:hover {
+    background: var(--surface);
+    color: var(--ink);
+  }
+
+  .settings-nav-item.active {
+    background: var(--surface);
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .settings-nav-item svg {
+    flex-shrink: 0;
+  }
+
+  .settings-nav-danger {
+    color: var(--red);
+  }
+
+  .settings-nav-danger:hover {
+    background: var(--red-light);
+  }
+
+  .settings-content {
+    flex: 1;
+  }
+
   .settings-section {
     display: none;
   }
@@ -2876,7 +2930,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           </div>
 
           <!-- Linked Accounts Section -->
-          <div class="settings-section" id="settings-section-accounts" style="display: none;">
+          <div class="settings-section" id="settings-section-accounts">
             <div class="card">
               <h2 class="section-title">Linked Accounts</h2>
               <p style="color: var(--soft); margin-bottom: 16px;">Connect GitHub, Microsoft, or Notion to sign in to your Classcastle account with those services.</p>
@@ -2914,7 +2968,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           </div>
 
           <!-- Security Section -->
-          <div class="settings-section" id="settings-section-security" style="display: none;">
+          <div class="settings-section" id="settings-section-security">
             <div class="card">
               <h2 class="section-title">Security</h2>
               <h3 style="font-size: 1rem; margin: 16px 0 8px; color: var(--ink);">Passkeys</h3>
@@ -2934,7 +2988,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           </div>
 
           <!-- External Connections Section -->
-          <div class="settings-section" id="settings-section-connections" style="display: none;">
+          <div class="settings-section" id="settings-section-connections">
             <div class="card">
               <h2 class="section-title">External Connections</h2>
               <p style="color: var(--soft); margin-bottom: 20px; line-height: 1.55;">External connections are apps and services authorized to access your Classcastle account. Allowing legacy OAuth apps lets older integrations continue to connect.</p>
@@ -2979,7 +3033,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           </div>
 
           <!-- Help Section -->
-          <div class="settings-section" id="settings-section-help" style="display: none;">
+          <div class="settings-section" id="settings-section-help">
             <div class="card">
               <h2 class="section-title">Help & Onboarding</h2>
               <p style="color: var(--soft); margin-bottom: 16px;">Want to see the onboarding tutorial again or need a refresher on how to use Classcastle?</p>
@@ -2988,7 +3042,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           </div>
 
           <!-- Licenses Section -->
-          <div class="settings-section" id="settings-section-licenses" style="display: none;">
+          <div class="settings-section" id="settings-section-licenses">
             <div class="card">
               <h2 class="section-title">Open Source Licenses</h2>
               <p style="color: var(--soft); margin-bottom: 16px;">Classcastle uses open source libraries. View their licenses here.</p>
@@ -2997,7 +3051,7 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           </div>
 
           <!-- Danger Zone Section -->
-          <div class="settings-section" id="settings-section-danger" style="display: none;">
+          <div class="settings-section" id="settings-section-danger">
             <div class="card">
               <h2 class="section-title" style="color: var(--red);">Danger Zone</h2>
               <p style="color: var(--soft); margin-bottom: 16px;">To delete your teacher account, please contact our support team. We'll help you securely remove your data.</p>
@@ -3005,85 +3059,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
             </div>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Open Source Licenses Modal -->
-    <div class="modal-overlay" id="licensesModalOverlay" style="display: none;">
-        <h2 class="section-title" style="margin-bottom: 8px;">Security</h2>
-        <h3 style="font-size: 1rem; margin: 16px 0 8px; color: var(--ink);">Passkeys</h3>
-        <p style="color: var(--soft); margin-bottom: 16px;">Use your device or password manager to sign in securely without a password.</p>
-        <div id="passkeysLoading" style="display: none;"></div>
-        <div id="passkeysList" style="display: none; margin-bottom: 12px;"></div>
-        <button class="btn btn-secondary" id="registerPasskeyBtn">
-          <span class="btn-text">Add a passkey</span>
-          <span class="loading" style="display: none;"></span>
-        </button>
-        <div style="border-top: 1px solid var(--line); margin-top: 20px; padding-top: 16px;">
-          <h3 style="font-size: 1rem; margin: 0 0 8px; color: var(--ink);">Multi-factor authentication</h3>
-          <p style="color: var(--soft); margin-bottom: 12px;">MFA setup is not available yet. We’ll enable it once verification can be securely enforced across Classcastle.</p>
-          <button class="btn btn-secondary" id="mfaUnavailableBtn" disabled aria-disabled="true" title="Multi-factor authentication is not available yet">Set up MFA</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2 class="section-title" style="margin-bottom: 16px;">External Connections</h2>
-        <p style="color: var(--soft); margin-bottom: 20px; line-height: 1.55;">External connections are apps and services authorized to access your Classcastle account. Allowing legacy OAuth apps lets older integrations continue to connect.</p>
-        <div class="external-connection">
-          <div class="external-connection-logo">
-            <img src="/logo.svg" alt="Classcastle logo">
-          </div>
-          <div class="external-connection-info">
-            <div class="external-connection-title">
-              <span>Classcastle Account Services</span>
-              <span class="verified-badge external-tooltip" data-tooltip="Built by Classcastle." tabindex="0" role="img" aria-label="Verified: Built by Classcastle.">
-                <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <path d="m3.5 8.2 2.8 2.7 6.2-6.1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </span>
-            </div>
-            <p class="external-connection-description">Provides the sign-in and account services used to access Classcastle.</p>
-          </div>
-          <span class="external-remove-wrap external-tooltip" data-tooltip="This connection is required for your Classcastle account and can't be removed." tabindex="0" aria-label="This connection is required for your Classcastle account and can't be removed.">
-            <button type="button" class="external-remove-btn" disabled aria-disabled="true">Remove</button>
-          </span>
-        </div>
-        <div style="border-top: 1px solid var(--line); margin-top: 20px; padding-top: 16px;">
-          <h3 style="font-size: 1rem; margin: 0 0 8px; color: var(--ink);">Authorized OAuth apps</h3>
-          <p style="color: var(--soft); margin-bottom: 12px; line-height: 1.5;">These apps have permission to access your Classcastle account. Revoking one removes your authorization without deleting the app for other users.</p>
-          <div id="oauthAppsLoading" style="display: none;"></div>
-          <div id="oauthAppsList" style="display: none;"></div>
-        </div>
-        <p style="color: var(--soft); margin: 20px 0 12px; font-size: 0.9rem;">Advanced Settings</p>
-        <label class="legacy-oauth-setting" for="legacyOAuthAppsToggle">
-          <input type="checkbox" id="legacyOAuthAppsToggle">
-          <span class="legacy-oauth-setting-copy">
-            <span>Allow legacy OAuth apps to connect to your account</span>
-            <small>Stores the compatibility setting locally in this browser as <code>legacy_oauth</code>.</small>
-          </span>
-        </label>
-        <div class="legacy-oauth-status" id="legacyOAuthStatus" role="status" aria-live="polite">
-          <span class="legacy-oauth-status-icon disabled" aria-hidden="true">×</span>
-          <span></span>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2 class="section-title" style="margin-bottom: 16px;">Help & Onboarding</h2>
-        <p style="color: var(--soft); margin-bottom: 16px;">Want to see the onboarding tutorial again or need a refresher on how to use Classcastle?</p>
-        <button class="btn btn-secondary" id="replayOnboardingBtn">Replay Onboarding</button>
-      </div>
-
-      <div class="card">
-        <h2 class="section-title" style="margin-bottom: 16px;">Open Source Licenses</h2>
-        <p style="color: var(--soft); margin-bottom: 16px;">Classcastle uses open source libraries. View their licenses here.</p>
-        <button class="btn btn-secondary" id="openLicensesBtn">View Open Source Licenses</button>
-      </div>
-
-      <div class="card">
-        <h2 class="section-title" style="margin-bottom: 16px;">Danger Zone</h2>
-        <p style="color: var(--soft); margin-bottom: 16px;">To delete your teacher account, please contact our support team. We'll help you securely remove your data.</p>
-        <a href="mailto:support@classcastle.org?subject=Delete%20My%20Account" class="btn btn-secondary btn-delete">Contact Support to Delete Account</a>
       </div>
     </div>
 
@@ -5955,6 +5930,29 @@ read sensitive data, or perform actions as you.
     openLegacyOAuthInstructions();
   });
   closeLegacyOAuthModal.addEventListener('click', closeLegacyOAuthInstructions);
+
+  // Settings navigation
+  const settingsNavItems = document.querySelectorAll('.settings-nav-item');
+  const settingsSections = document.querySelectorAll('.settings-section');
+
+  settingsNavItems.forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      const sectionId = item.dataset.section;
+
+      // Update active nav item
+      settingsNavItems.forEach(nav => nav.classList.remove('active'));
+      item.classList.add('active');
+
+      // Show corresponding section
+      settingsSections.forEach(section => {
+        section.classList.remove('active');
+        if (section.id === `settings-section-${sectionId}`) {
+          section.classList.add('active');
+        }
+      });
+    });
+  });
   legacyOAuthModal.addEventListener('click', (event) => {
     if (event.target === legacyOAuthModal) closeLegacyOAuthInstructions();
   });
