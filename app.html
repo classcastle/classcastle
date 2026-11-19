@@ -6355,8 +6355,23 @@ usage/fair dealing.`,
     const authChannel = new BroadcastChannel('classcastle_auth');
     authChannel.onmessage = (event) => {
       if (event.data.type === 'new_login') {
-        // Log out current session
-        handleLogout();
+        // Show switch button instead of logging out
+        const switchBtn = document.createElement('button');
+        switchBtn.textContent = 'Switch here';
+        switchBtn.className = 'btn btn-primary';
+        switchBtn.style.marginTop = '12px';
+        switchBtn.style.fontSize = '0.9rem';
+        switchBtn.style.padding = '8px 16px';
+        switchBtn.onclick = () => window.location.reload();
+        
+        const container = document.createElement('div');
+        container.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); text-align: center;';
+        container.innerHTML = '<p style="margin-bottom: 8px; color: var(--ink);">You\'re already logged in on another window.</p>';
+        container.appendChild(switchBtn);
+        document.body.appendChild(container);
+        
+        // Auto-remove after 10 seconds
+        setTimeout(() => container.remove(), 10000);
       }
     };
 
