@@ -3659,6 +3659,21 @@ read sensitive data, or perform actions as you.
     return Math.floor(100000 + Math.random() * 900000).toString();
   }
 
+  function generateTicketCode() {
+    const words = [
+      'apple', 'banana', 'cherry', 'dragon', 'eagle', 'forest', 'garden', 'house',
+      'island', 'jungle', 'kite', 'lemon', 'mountain', 'ocean', 'piano', 'quiet',
+      'river', 'star', 'tiger', 'umbrella', 'valley', 'wave', 'yellow', 'zebra',
+      'brave', 'calm', 'dream', 'energy', 'flame', 'glow', 'happy', 'magic',
+      'nova', 'prism', 'quest', 'spark', 'storm', 'unity', 'vivid', 'wonder',
+      'azure', 'bronze', 'crimson', 'dawn', 'ember', 'frost', 'glint', 'haze',
+      'indigo', 'jade', 'koi', 'lunar', 'mist', 'neon', 'opal', 'pearl',
+      'quartz', 'ruby', 'solar', 'topaz', 'unity', 'violet', 'whimsy', 'xenon'
+    ];
+    const shuffled = words.sort(() => 0.5 - Math.random());
+    return `${shuffled[0]}-${shuffled[1]}`;
+  }
+
   async function loadRoomStudentCount(roomId) {
     try {
       const { count, error } = await SupabaseClient
@@ -5185,14 +5200,14 @@ read sensitive data, or perform actions as you.
     grid.innerHTML = exitTickets.map(ticket => {
       const responseCount = ticket.exit_ticket_responses?.length || 0;
       const time = new Date(ticket.created_at).toLocaleString();
-      const ticketUrl = `https://classcastle.org/ticket?id=${ticket.id}`;
+      const ticketUrl = `https://classcastle.org/ticket?id=${ticket.code}`;
 
       return `
         <div class="card room-card">
           <div class="room-card-header">
             <div class="room-card-title">
               <h3>${ticket.name || 'Untitled Ticket'}</h3>
-              <span class="room-card-code">${ticket.id.substring(0, 6).toUpperCase()}</span>
+              <span class="room-card-code">${ticket.code || ticket.id.substring(0, 6).toUpperCase()}</span>
             </div>
             <div class="room-card-menu">
               <button class="btn-icon" onclick="viewExitTicketResponses('${ticket.id}')" title="View Responses">
@@ -5233,12 +5248,14 @@ read sensitive data, or perform actions as you.
     }
 
     try {
+      const code = generateTicketCode();
       const { data, error } = await SupabaseClient
         .from('exit_tickets')
         .insert({
           teacher_id: currentUser.id,
           name,
-          question: question || null
+          question: question || null,
+          code
         })
         .select()
         .single();

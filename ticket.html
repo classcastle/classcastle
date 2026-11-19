@@ -287,9 +287,9 @@
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const urlParams = new URLSearchParams(window.location.search);
-    const ticketId = urlParams.get('id');
+    const ticketCode = urlParams.get('id');
 
-    if (!ticketId) {
+    if (!ticketCode) {
       showNotFound();
     } else {
       loadTicket();
@@ -300,7 +300,7 @@
         const { data, error } = await supabaseClient
           .from('exit_tickets')
           .select('*')
-          .eq('id', ticketId)
+          .eq('code', ticketCode)
           .single();
 
         if (error || !data) {
