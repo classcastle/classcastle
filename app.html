@@ -1270,236 +1270,6 @@
     line-height: 1.45;
   }
 
-  .legacy-oauth-setting {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    color: var(--ink);
-    font-size: 0.98rem;
-    cursor: pointer;
-  }
-
-  .legacy-oauth-setting input {
-    width: 18px;
-    height: 18px;
-    flex: 0 0 auto;
-    margin-top: 2px;
-    accent-color: var(--brand);
-  }
-
-  .legacy-oauth-setting-copy {
-    display: grid;
-    gap: 4px;
-  }
-
-  .legacy-oauth-setting-copy small {
-    color: var(--soft);
-    font-size: 0.82rem;
-    line-height: 1.45;
-  }
-
-  .legacy-oauth-status {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    min-height: 1.25em;
-    margin: 10px 0 0 30px;
-    color: var(--soft);
-    font-size: 0.84rem;
-  }
-
-  .legacy-oauth-status-icon {
-    display: inline-grid;
-    width: 20px;
-    height: 20px;
-    flex: 0 0 20px;
-    place-items: center;
-    border-radius: 50%;
-    font-size: .75rem;
-    font-weight: 700;
-    line-height: 1;
-  }
-
-  .legacy-oauth-status-icon.enabled {
-    background: #dff3e5;
-    color: var(--brand);
-  }
-
-  .legacy-oauth-status-icon.disabled {
-    background: #fde6e6;
-    color: var(--red);
-  }
-
-  .legacy-oauth-status.enabled {
-    color: var(--brand);
-  }
-
-  .legacy-oauth-status.pending {
-    color: #9a6700;
-  }
-
-  .legacy-oauth-modal-backdrop {
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
-    display: none;
-    place-items: center;
-    padding: 20px;
-    background: rgba(15, 23, 18, .58);
-  }
-
-  .legacy-oauth-modal-backdrop.open {
-    display: grid;
-  }
-
-  .legacy-oauth-modal {
-    width: min(520px, 100%);
-    padding: 28px;
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    background: var(--surface);
-    box-shadow: 0 24px 70px rgba(0, 0, 0, .22);
-  }
-
-  .legacy-oauth-modal h2 {
-    margin: 0 0 8px;
-    color: var(--ink);
-    font-size: 1.2rem;
-  }
-
-  .legacy-oauth-modal p {
-    margin: 0 0 16px;
-    color: var(--soft);
-    line-height: 1.55;
-  }
-
-  .legacy-oauth-modal ol {
-    margin: 0 0 18px 20px;
-    padding: 0;
-    color: var(--ink);
-    line-height: 1.6;
-  }
-
-  .legacy-oauth-modal .storage-steps {
-    display: grid;
-    gap: 12px;
-    margin: 0 0 18px;
-    padding: 0;
-    list-style: none;
-  }
-
-  .legacy-oauth-modal .storage-step {
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-    color: var(--ink);
-    line-height: 1.55;
-  }
-
-  .legacy-oauth-modal .storage-step-icon {
-    display: inline-grid;
-    width: 22px;
-    height: 22px;
-    flex: 0 0 22px;
-    place-items: center;
-    border-radius: 50%;
-    font-size: .82rem;
-    font-weight: 700;
-    line-height: 1;
-  }
-
-  .legacy-oauth-modal .storage-step-icon.check {
-    background: #dff3e5;
-    color: var(--brand);
-  }
-
-  .legacy-oauth-modal .storage-step-icon.cross {
-    background: #fde6e6;
-    color: var(--red);
-  }
-
-  .legacy-oauth-modal code {
-    padding: 2px 5px;
-    border-radius: 4px;
-    background: var(--tint);
-    color: var(--ink);
-    font-size: .88em;
-  }
-
-  .legacy-oauth-modal a {
-    color: var(--brand);
-    font-weight: 600;
-  }
-
-  .legacy-oauth-confirmation {
-    text-align: center;
-  }
-
-  .legacy-oauth-confirmation-icon {
-    display: grid;
-    width: 64px;
-    height: 64px;
-    margin: 4px auto 16px;
-    place-items: center;
-    border-radius: 50%;
-    font-size: 2rem;
-    font-weight: 700;
-  }
-
-  .legacy-oauth-confirmation.enabled .legacy-oauth-confirmation-icon {
-    background: #dff3e5;
-    color: var(--brand);
-  }
-
-  .legacy-oauth-confirmation.disabled .legacy-oauth-confirmation-icon {
-    background: #fde6e6;
-    color: var(--red);
-  }
-
-  .legacy-oauth-confirmation h3 {
-    margin: 0 0 8px;
-    color: var(--ink);
-    font-size: 1.15rem;
-  }
-
-  .legacy-oauth-confirmation-info {
-    display: grid;
-    gap: 5px;
-    margin-top: 20px;
-    padding: 14px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: var(--bg);
-    color: var(--soft);
-    font-size: .84rem;
-    line-height: 1.45;
-    text-align: left;
-  }
-
-  .legacy-oauth-confirmation-info strong {
-    color: var(--ink);
-  }
-
-  .legacy-oauth-modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
-  }
-
-  .legacy-oauth-confetti {
-    position: fixed;
-    z-index: 1100;
-    width: 9px;
-    height: 14px;
-    pointer-events: none;
-    animation: legacy-oauth-confetti-fall 900ms ease-out forwards;
-  }
-
-  @keyframes legacy-oauth-confetti-fall {
-    0% { opacity: 1; transform: translate(0, 0) rotate(0deg); }
-    100% { opacity: 0; transform: translate(var(--confetti-x), var(--confetti-y)) rotate(520deg); }
-  }
 
   .verified-badge {
     position: relative;
@@ -3046,18 +2816,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
                 <div id="oauthAppsLoading" style="display: none;"></div>
                 <div id="oauthAppsList" style="display: none;"></div>
               </div>
-              <p style="color: var(--soft); margin: 20px 0 12px; font-size: 0.9rem;">Advanced Settings</p>
-              <label class="legacy-oauth-setting" for="legacyOAuthAppsToggle">
-                <input type="checkbox" id="legacyOAuthAppsToggle">
-                <span class="legacy-oauth-setting-copy">
-                  <span>Allow legacy OAuth apps to connect to your account</span>
-                  <small>Stores the compatibility setting locally in this browser as <code>legacy_oauth</code>.</small>
-                </span>
-              </label>
-              <div class="legacy-oauth-status" id="legacyOAuthStatus" role="status" aria-live="polite">
-                <span class="legacy-oauth-status-icon disabled" aria-hidden="true">×</span>
-                <span></span>
-              </div>
             </div>
           </div>
 
@@ -3114,37 +2872,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
 </div>
 
 <div class="notification" id="notification"></div>
-
-<div class="legacy-oauth-modal-backdrop" id="legacyOAuthModal" role="dialog" aria-modal="true" aria-labelledby="legacyOAuthModalTitle" aria-hidden="true">
-  <div class="legacy-oauth-modal">
-    <h2 id="legacyOAuthModalTitle">Legacy OAuth access</h2>
-    <div id="legacyOAuthModalContent">
-      <p>For safety, this setting is controlled through your browser's local storage. It is not saved in session storage or sent to Classcastle.</p>
-      <ul class="storage-steps">
-        <li class="storage-step">
-          <span class="storage-step-icon check" aria-hidden="true">✓</span>
-          <span>Install a local-storage editor, such as <a href="https://addons.mozilla.org/en-GB/firefox/addon/localstorage-editor/" target="_blank" rel="noopener noreferrer">LocalStorage Editor for Firefox</a>.</span>
-        </li>
-        <li class="storage-step">
-          <span class="storage-step-icon check" aria-hidden="true">✓</span>
-          <span>Open the storage for this Classcastle site and use <strong>local storage</strong>, not session storage.</span>
-        </li>
-        <li class="storage-step">
-          <span class="storage-step-icon check" aria-hidden="true">✓</span>
-          <span>Add or update <code>legacy_oauth</code> with the value <code>true</code> to enable legacy OAuth access.</span>
-        </li>
-        <li class="storage-step">
-          <span class="storage-step-icon cross" aria-hidden="true">×</span>
-          <span>Do not use session storage. To disable legacy OAuth access, remove <code>legacy_oauth</code> or set it to <code>false</code>.</span>
-        </li>
-      </ul>
-      <p>The setting is watched live. Once the value is detected, this page will update to show whether legacy OAuth access is enabled or disabled.</p>
-    </div>
-    <div class="legacy-oauth-modal-actions">
-      <button type="button" class="btn btn-secondary" id="closeLegacyOAuthModal">Close</button>
-    </div>
-  </div>
-</div>
 
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal" id="modal">
@@ -3467,11 +3194,6 @@ read sensitive data, or perform actions as you.
   const identitiesList = document.getElementById('identitiesList');
   const oauthAppsLoading = document.getElementById('oauthAppsLoading');
   const oauthAppsList = document.getElementById('oauthAppsList');
-  const legacyOAuthAppsToggle = document.getElementById('legacyOAuthAppsToggle');
-  const legacyOAuthStatus = document.getElementById('legacyOAuthStatus');
-  const legacyOAuthModal = document.getElementById('legacyOAuthModal');
-  const legacyOAuthModalContent = document.getElementById('legacyOAuthModalContent');
-  const closeLegacyOAuthModal = document.getElementById('closeLegacyOAuthModal');
   const passkeysLoading = document.getElementById('passkeysLoading');
   const passkeysList = document.getElementById('passkeysList');
   const registerPasskeyBtn = document.getElementById('registerPasskeyBtn');
@@ -3494,111 +3216,6 @@ read sensitive data, or perform actions as you.
     setTimeout(() => {
       notification.classList.remove('show');
     }, duration);
-  }
-
-  const LEGACY_OAUTH_STORAGE_KEY = 'legacy_oauth';
-  const legacyOAuthStatusIcon = legacyOAuthStatus.querySelector('.legacy-oauth-status-icon');
-  const legacyOAuthStatusText = legacyOAuthStatus.querySelector('span:last-child');
-  let lastLegacyOAuthEnabled = null;
-  let legacyOAuthChangeConfirmed = false;
-
-  function isLegacyOAuthEnabled() {
-    try {
-      return localStorage.getItem(LEGACY_OAUTH_STORAGE_KEY)?.toLowerCase() === 'true';
-    } catch (error) {
-      console.error('Could not read legacy OAuth setting:', error);
-      return false;
-    }
-  }
-
-  function syncLegacyOAuthSetting({ announce = false } = {}) {
-    const enabled = isLegacyOAuthEnabled();
-    const previous = lastLegacyOAuthEnabled;
-    const changed = previous !== null && enabled !== previous;
-    lastLegacyOAuthEnabled = enabled;
-    legacyOAuthAppsToggle.checked = enabled;
-    legacyOAuthStatusText.textContent = enabled
-      ? 'Enabled — legacy OAuth apps may connect from this browser.'
-      : 'Disabled — legacy OAuth apps are blocked in this browser.';
-    legacyOAuthStatusIcon.textContent = enabled ? '✓' : '×';
-    legacyOAuthStatusIcon.classList.toggle('enabled', enabled);
-    legacyOAuthStatusIcon.classList.toggle('disabled', !enabled);
-    legacyOAuthStatus.classList.toggle('enabled', enabled);
-    legacyOAuthStatus.classList.remove('pending');
-    if (announce && changed) {
-      legacyOAuthChangeConfirmed = true;
-      renderLegacyOAuthConfirmation(enabled);
-      showConfetti(enabled ? ['#1f5c3a', '#76b892', '#f4d35e', '#fff'] : ['#a33b3b', '#e58b8b', '#f4d35e', '#fff']);
-      showNotification(enabled ? 'Legacy OAuth access enabled' : 'Legacy OAuth access disabled');
-    }
-  }
-
-  function renderLegacyOAuthConfirmation(enabled) {
-    legacyOAuthModalContent.innerHTML = `
-      <div class="legacy-oauth-confirmation ${enabled ? 'enabled' : 'disabled'}">
-        <div class="legacy-oauth-confirmation-icon" aria-hidden="true">${enabled ? '✓' : '×'}</div>
-        <h3>${enabled ? 'Legacy OAuth access enabled' : 'Legacy OAuth access disabled'}</h3>
-        <p>${enabled
-          ? 'Legacy OAuth apps can now connect from this browser.'
-          : 'Legacy OAuth apps can no longer connect from this browser.'}</p>
-        <div class="legacy-oauth-confirmation-info">
-          <strong>Storage status</strong>
-          <span><code>localStorage.legacy_oauth</code> is set to <code>${enabled ? 'true' : 'false or removed'}</code>.</span>
-          <span>This setting is local to this browser and is not saved in session storage or sent to Classcastle.</span>
-        </div>
-      </div>
-    `;
-  }
-
-  function renderLegacyOAuthInstructions() {
-    legacyOAuthModalContent.innerHTML = `
-      <p>For safety, this setting is controlled through your browser's local storage. It is not saved in session storage or sent to Classcastle.</p>
-      <ul class="storage-steps">
-        <li class="storage-step"><span class="storage-step-icon check" aria-hidden="true">✓</span><span>Install a local-storage editor, such as <a href="https://addons.mozilla.org/en-GB/firefox/addon/localstorage-editor/" target="_blank" rel="noopener noreferrer">LocalStorage Editor for Firefox</a>.</span></li>
-        <li class="storage-step"><span class="storage-step-icon check" aria-hidden="true">✓</span><span>Open the storage for this Classcastle site and use <strong>local storage</strong>, not session storage.</span></li>
-        <li class="storage-step"><span class="storage-step-icon check" aria-hidden="true">✓</span><span>Add or update <code>legacy_oauth</code> with the value <code>true</code> to enable legacy OAuth access.</span></li>
-        <li class="storage-step"><span class="storage-step-icon cross" aria-hidden="true">×</span><span>Do not use session storage. To disable legacy OAuth access, remove <code>legacy_oauth</code> or set it to <code>false</code>.</span></li>
-      </ul>
-      <p>The setting is watched live. Once the value is detected, this page will update to show whether legacy OAuth access is enabled or disabled.</p>
-    `;
-  }
-
-  function showConfetti(colors = ['#1f5c3a', '#76b892', '#f4d35e', '#fff']) {
-    const originX = window.innerWidth / 2;
-    const originY = window.innerHeight / 2;
-    for (let index = 0; index < 28; index += 1) {
-      const piece = document.createElement('span');
-      piece.className = 'legacy-oauth-confetti';
-      piece.style.left = `${originX + (Math.random() * 80 - 40)}px`;
-      piece.style.top = `${originY + (Math.random() * 30 - 15)}px`;
-      piece.style.background = colors[index % colors.length];
-      piece.style.setProperty('--confetti-x', `${Math.random() * 360 - 180}px`);
-      piece.style.setProperty('--confetti-y', `${Math.random() * 260 + 100}px`);
-      piece.style.transform = `rotate(${Math.random() * 180}deg)`;
-      document.body.appendChild(piece);
-      piece.addEventListener('animationend', () => piece.remove(), { once: true });
-    }
-  }
-
-  function openLegacyOAuthInstructions() {
-    if (legacyOAuthChangeConfirmed) {
-      renderLegacyOAuthConfirmation(isLegacyOAuthEnabled());
-    } else {
-      renderLegacyOAuthInstructions();
-    }
-    legacyOAuthStatusText.textContent = 'Waiting for local storage…';
-    legacyOAuthStatusIcon.textContent = '…';
-    legacyOAuthStatus.classList.add('pending');
-    legacyOAuthModal.classList.add('open');
-    legacyOAuthModal.setAttribute('aria-hidden', 'false');
-    closeLegacyOAuthModal.focus();
-  }
-
-  function closeLegacyOAuthInstructions() {
-    legacyOAuthModal.classList.remove('open');
-    legacyOAuthModal.setAttribute('aria-hidden', 'true');
-    syncLegacyOAuthSetting();
-    legacyOAuthAppsToggle.focus();
   }
 
   function showAccountLinkedModal(provider) {
@@ -5954,11 +5571,6 @@ read sensitive data, or perform actions as you.
   linkMicrosoftBtn.addEventListener('click', linkMicrosoft);
   linkNotionBtn.addEventListener('click', linkNotion);
   registerPasskeyBtn.addEventListener('click', registerPasskey);
-  legacyOAuthAppsToggle.addEventListener('click', (event) => {
-    event.preventDefault();
-    openLegacyOAuthInstructions();
-  });
-  closeLegacyOAuthModal.addEventListener('click', closeLegacyOAuthInstructions);
 
   // Settings navigation
   const settingsNavItems = document.querySelectorAll('.settings-nav-item');
@@ -5981,23 +5593,6 @@ read sensitive data, or perform actions as you.
         }
       });
     });
-  });
-  legacyOAuthModal.addEventListener('click', (event) => {
-    if (event.target === legacyOAuthModal) closeLegacyOAuthInstructions();
-  });
-  window.addEventListener('storage', (event) => {
-    if (event.key === LEGACY_OAUTH_STORAGE_KEY || event.key === null) {
-      syncLegacyOAuthSetting({ announce: true });
-    }
-  });
-  window.setInterval(() => {
-    syncLegacyOAuthSetting({ announce: true });
-  }, 500);
-  syncLegacyOAuthSetting();
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && legacyOAuthModal.classList.contains('open')) {
-      closeLegacyOAuthInstructions();
-    }
   });
 
   // Exit Ticket functionality
