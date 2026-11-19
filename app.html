@@ -2132,14 +2132,6 @@
     }
   }
 
-  #pollsLockMenuBtn:hover {
-    opacity: 0.7 !important;
-  }
-
-  #pollsLockMenu {
-    animation: fadeIn 0.15s ease-out;
-  }
-
   @keyframes fadeIn {
     from {
       opacity: 0;
@@ -2377,11 +2369,6 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         Activity Log
       </a>
-      <a class="nav-item" data-page="polls" href="#">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        Quick Polls
-        <span style="background: var(--brand); color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px; font-weight: 600;">BETA</span>
-      </a>
       <a class="nav-item" href="/resources.html" target="_blank" rel="noopener noreferrer">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
         Resources Hub
@@ -2391,6 +2378,11 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6"/><path d="M21 12H4"/><path d="M7 6a3 3 0 0 0-3 3v6a3 3 0 0 0 3 3h4"/></svg>
         API
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: auto;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+      </a>
+      <a class="nav-item" data-page="exitTicket" href="#">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect width="6" height="6" x="9" y="3" rx="1"/><path d="M9 14l2 2 4-4"/></svg>
+        Exit Ticket
+        <span style="background: var(--brand); color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px; font-weight: 600;">BETA</span>
       </a>
       <div class="nav-divider"></div>
       <div class="nav-section nav-section-admin">
@@ -2669,186 +2661,6 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
       </div>
     </div>
 
-    <!-- Quick Polls Page -->
-    <div class="page" id="pollsPage">
-      <div class="page-header">
-        <div>
-          <h1 class="page-title">Quick Polls</h1>
-          <p class="page-subtitle">Create polls and share with students</p>
-        </div>
-        <button class="btn btn-primary" id="createPollBtn">Create New Poll</button>
-      </div>
-
-      <!-- Lock Message -->
-      <div class="card" id="pollsLockMessage" style="border: 2px solid var(--chalk); position: relative;">
-        <button id="pollsLockMenuBtn" style="position: absolute; top: 12px; right: 12px; background: none; border: none; cursor: pointer; padding: 8px; border-radius: 4px; display: flex; align-items: center; justify-content: center; opacity: 0.3; transition: opacity 0.2s;">
-          <svg id="pollsLockMenuIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="1"/>
-            <circle cx="12" cy="5" r="1"/>
-            <circle cx="12" cy="19" r="1"/>
-          </svg>
-          <svg id="pollsLockCloseIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
-        <div id="pollsLockMenu" style="position: absolute; top: 40px; right: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 100; display: none; min-width: 150px;">
-          <button id="dismissLockBtn" style="width: 100%; text-align: left; padding: 8px 12px; background: none; border: none; cursor: pointer; font-size: 0.85rem; color: var(--ink); display: flex; align-items: center; gap: 8px;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="18 15 12 9 6 15"/>
-            </svg>
-            Dismiss message
-          </button>
-        </div>
-        <div style="text-align: center; padding: 32px;">
-          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--chalk)" stroke-width="1.5" style="margin-bottom: 16px;">
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-          </svg>
-          <h2 style="font-size: 1.5rem; margin-bottom: 12px;">Quick Polls is temporarily unavailable</h2>
-          <p style="color: var(--soft); margin-bottom: 24px; max-width: 400px; margin-left: auto; margin-right: auto;">
-            We're working on revamping Quick Polls as part of our redesign. Stay tuned for an improved experience coming soon!
-          </p>
-          <p style="font-size: 0.85rem; color: var(--soft);">
-            <a href="/resources.html" style="color: var(--brand);">Explore our Resources Hub</a> in the meantime.
-          </p>
-        </div>
-      </div>
-
-      <!-- Dismiss Confirmation Modal -->
-      <div id="dismissConfirmModal" class="modal-overlay" style="display: none;">
-        <div class="card" style="max-width: 400px; width: 90%; animation: modalFadeIn 0.2s ease-out;">
-          <h3 style="font-size: 1.1rem; margin-bottom: 12px;">Dismiss lock message?</h3>
-          <p style="color: var(--soft); margin-bottom: 24px;">Quick Polls is still being revamped. Are you sure you want to dismiss this message and access the feature?</p>
-          <div style="display: flex; gap: 12px; justify-content: flex-end;">
-            <button id="cancelDismissBtn" class="btn btn-secondary">Cancel</button>
-            <button id="confirmDismissBtn" class="btn btn-primary">Yes, dismiss</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="card" style="margin-bottom: 16px; display: none;" id="pollUsageSection">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <span style="font-size: 0.9rem; font-weight: 500;">Active Polls</span>
-          <span id="pollUsageText" style="font-size: 0.85rem; color: var(--soft);">0 of 15 used</span>
-        </div>
-        <div style="background: var(--line); height: 8px; border-radius: 4px; overflow: hidden;">
-          <div id="pollUsageBar" style="background: var(--brand); height: 100%; width: 0%; transition: width 0.3s;"></div>
-        </div>
-        <p style="font-size: 0.8rem; color: var(--soft); margin-top: 8px;">Free plan: 15 active polls. Close polls to create new ones.</p>
-      </div>
-
-      <!-- Tab Navigation -->
-      <div class="card" style="padding: 0;" id="pollTabsNav">
-        <div style="display: flex; border-bottom: 1px solid var(--line);">
-          <button class="tab-btn active" data-tab="polls" style="flex: 1; padding: 16px; border: none; background: none; cursor: pointer; font-weight: 600; border-bottom: 2px solid var(--brand); color: var(--brand);">
-            My Polls
-          </button>
-          <button class="tab-btn" data-tab="responses" style="flex: 1; padding: 16px; border: none; background: none; cursor: pointer; font-weight: 500; border-bottom: 2px solid transparent; color: var(--soft);">
-            Responses
-          </button>
-        </div>
-
-        <!-- My Polls Tab -->
-        <div id="pollsTab" style="padding: 16px;">
-          <div id="pollsList">
-            <div class="loading-state">
-              <div class="loading-spinner"></div>
-              <p>Loading polls...</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Responses Tab -->
-        <div id="responsesTab" style="padding: 16px; display: none;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <h3 style="font-size: 1rem; margin: 0;">All Responses</h3>
-            <button class="btn btn-secondary" id="exportResponsesBtn" style="font-size: 0.85rem; padding: 6px 12px;">Export XLSX</button>
-          </div>
-          <div id="responsesList">
-            <div class="loading-state">
-              <div class="loading-spinner"></div>
-              <p>Loading responses...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Poll Details Modal -->
-    <div class="modal-overlay" id="pollModalOverlay" style="display: none;">
-      <div class="modal" id="pollModal" style="max-width: 600px;">
-        <h2 id="pollModalTitle">Create Poll</h2>
-        <div id="pollModalContent">
-          <div class="form-group">
-            <label class="form-label">Custom ID (optional)</label>
-            <input type="text" class="form-input" id="pollCustomId" placeholder="e.g., math101-quiz (optional)">
-            <p style="font-size: 0.85rem; color: var(--soft); margin-top: 4px;">Leave blank for auto-generated ID</p>
-            <div id="customIdPreview" style="margin-top: 8px; font-size: 0.85rem; color: var(--brand); font-family: monospace;"></div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Target School (optional)</label>
-            <input type="text" class="form-input" id="schoolSearchInput" placeholder="Search for your school or postcode (e.g., Manchester Grammar School or M1 7DW)">
-            <button class="btn btn-secondary" id="searchSchoolsBtn" style="margin-top: 8px;">Search Schools</button>
-            <div id="schoolSearchStatus" style="margin-top: 8px; font-size: 0.85rem; color: var(--soft);"></div>
-            <div id="schoolResults" style="margin-top: 12px; max-height: 200px; overflow-y: auto; display: none;">
-              <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
-                <thead>
-                  <tr>
-                    <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--line);">School Name</th>
-                    <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--line);">Location</th>
-                  </tr>
-                </thead>
-                <tbody id="schoolResultsBody"></tbody>
-              </table>
-            </div>
-            <div id="selectedSchoolInfo" style="margin-top: 8px; padding: 8px; background: var(--tint); border-radius: 4px; display: none;">
-              <strong id="selectedSchoolName"></strong>
-              <button class="btn btn-secondary" id="clearSchoolBtn" style="margin-left: 8px; font-size: 0.75rem; padding: 4px 8px;">Clear</button>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Question</label>
-            <input type="text" class="form-input" id="pollQuestion" placeholder="e.g., What's your favorite programming language?">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Options</label>
-            <div id="pollOptions">
-              <input type="text" class="form-input poll-option" placeholder="Option 1" style="margin-bottom: 8px;">
-              <input type="text" class="form-input poll-option" placeholder="Option 2" style="margin-bottom: 8px;">
-            </div>
-            <button class="btn btn-secondary" id="addOptionBtn" style="margin-top: 8px;">+ Add Option</button>
-          </div>
-        </div>
-        <div class="modal-actions">
-          <button class="modal-btn modal-btn-cancel" id="cancelPollBtn">Cancel</button>
-          <button class="modal-btn modal-btn-confirm" id="savePollBtn">Create Poll</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Poll Results Modal -->
-    <div class="modal-overlay" id="pollResultsModalOverlay" style="display: none;">
-      <div class="modal" id="pollResultsModal" style="max-width: 700px;">
-        <h2 id="pollResultsTitle">Poll Results</h2>
-        <div id="pollResultsContent">
-          <div id="pollResultsData"></div>
-          <div id="pollShareSection" style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--line);">
-            <h3 style="font-size: 1rem; margin-bottom: 12px;">Share Poll</h3>
-            <div class="form-group">
-              <label class="form-label">Poll URL</label>
-              <div style="display: flex; gap: 8px;">
-                <input type="text" class="form-input" id="pollShareUrl" readonly>
-                <button class="btn btn-secondary" id="copyPollUrlBtn">Copy</button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-actions">
-          <button class="modal-btn modal-btn-cancel" id="closeResultsBtn">Close</button>
-        </div>
-      </div>
-    </div>
-
     <!-- Pricing Page -->
     <div class="page" id="pricingPage">
       <div class="page-header page-header-with-back">
@@ -2885,6 +2697,55 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
         <h2 class="section-title" style="margin-bottom: 16px;">Support Free Education</h2>
         <p style="color: var(--soft); margin-bottom: 16px;">We work hard to keep Classcastle free for individual teachers. If you find it valuable, consider donating to support our work.</p>
         <button class="btn btn-primary" id="donateBtn">Donate</button>
+      </div>
+    </div>
+
+    <!-- Exit Ticket Page -->
+    <div class="page" id="exitTicketPage">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Exit Ticket</h1>
+          <p class="page-subtitle">Create an exit ticket for students to ask questions before leaving class</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title" style="margin-bottom: 16px;">What is an Exit Ticket?</h2>
+        <p style="color: var(--soft); margin-bottom: 16px;">
+          An Exit Ticket is a quick assessment tool used at the end of a lesson. Students can ask questions, share what they learned, or request help before leaving the classroom.
+        </p>
+        <ul style="color: var(--soft); margin-bottom: 24px; padding-left: 20px;">
+          <li style="margin-bottom: 8px;">Students can ask questions about the lesson</li>
+          <li style="margin-bottom: 8px;">Students can share what they understood</li>
+          <li style="margin-bottom: 8px;">Teachers can review responses and address gaps</li>
+          <li>Works with the Classcastle browser extension</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title" style="margin-bottom: 16px;">Generate Exit Ticket Link</h2>
+        <p style="color: var(--soft); margin-bottom: 16px;">
+          Generate a unique link to share with your students. They can access it without signing in.
+        </p>
+        <div class="form-group">
+          <label class="form-label">Ticket Name (optional)</label>
+          <input type="text" class="form-input" id="exitTicketName" placeholder="e.g., Period 1 Science - End of Lesson">
+        </div>
+        <button class="btn btn-primary" id="generateExitTicketBtn">Generate Link</button>
+      </div>
+
+      <div class="card" id="exitTicketResult" style="display: none;">
+        <h2 class="section-title" style="margin-bottom: 16px;">Your Exit Ticket Link</h2>
+        <div class="form-group">
+          <label class="form-label">Share this link with your students</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" class="form-input" id="exitTicketUrl" readonly>
+            <button class="btn btn-secondary" id="copyExitTicketBtn">Copy</button>
+          </div>
+        </div>
+        <p style="color: var(--soft); font-size: 0.85rem; margin-top: 12px;">
+          Students can visit this link to submit their exit ticket responses. No sign-in required.
+        </p>
       </div>
     </div>
 
@@ -3302,7 +3163,6 @@ read sensitive data, or perform actions as you.
   let templates = [];
   let shortcuts = [];
   let activities = [];
-  let polls = [];
   let selectedRooms = new Set();
   let roomSubscription = null;
   let studentSubscription = null;
@@ -3785,7 +3645,7 @@ read sensitive data, or perform actions as you.
 
     // Handle admin submenu - only close when explicitly navigating to dashboard
     // Don't auto-close when just toggling the submenu
-    if (pageId === 'dashboardPage' || pageId === 'analyticsPage' || pageId === 'activityPage' || pageId === 'pollsPage') {
+    if (pageId === 'dashboardPage' || pageId === 'analyticsPage' || pageId === 'activityPage' || pageId === 'exitTicketPage') {
       const adminSection = document.querySelector('.nav-section-admin');
       if (adminSection) adminSection.classList.remove('open');
     }
@@ -4016,8 +3876,6 @@ read sensitive data, or perform actions as you.
       shortcutsGrid: () => skeletonGridCards(4, 2),
       topUrlsList: () => skeletonRows(5),
       activityList: () => skeletonRows(6),
-      pollsList: () => skeletonFeedCards(3),
-      responsesList: () => skeletonFeedCards(3),
     };
     Object.entries(gridTargets).forEach(([id, render]) => {
       const el = document.getElementById(id);
@@ -5288,590 +5146,6 @@ read sensitive data, or perform actions as you.
       .join(' ');
   }
 
-  // Quick Polls
-  let pollsLockDismissed = false;
-
-  async function loadPolls() {
-    try {
-      // Only show lock message if not dismissed
-      if (!pollsLockDismissed) {
-        document.getElementById('pollsLockMessage').style.display = 'block';
-        document.getElementById('pollUsageSection').style.display = 'none';
-        document.getElementById('pollsTab').style.display = 'none';
-        document.getElementById('createPollBtn').style.display = 'none';
-        document.getElementById('pollTabsNav').style.display = 'none';
-        const pollsPageHeader = document.querySelector('#pollsPage .page-header');
-        if (pollsPageHeader) pollsPageHeader.style.display = 'none';
-        return;
-      }
-
-      document.getElementById('pollUsageSection').style.display = 'block';
-      document.getElementById('pollsTab').style.display = 'block';
-      document.getElementById('createPollBtn').style.display = 'inline-block';
-      document.getElementById('pollTabsNav').style.display = 'block';
-      const pollsPageHeader = document.querySelector('#pollsPage .page-header');
-      if (pollsPageHeader) pollsPageHeader.style.display = 'flex';
-    } catch (error) {
-      console.error('Error loading polls:', error);
-    }
-  }
-
-  async function loadPollsContent() {
-    document.getElementById('pollsList').innerHTML = skeletonFeedCards(3);
-    try {
-      const { data, error } = await SupabaseClient
-        .from('polls')
-        .select('*, poll_responses(count)')
-        .eq('teacher_id', currentUser.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      polls = data || [];
-      renderPolls();
-    } catch (error) {
-      console.error('Error loading polls:', error);
-      document.getElementById('pollsList').innerHTML = '<p>Error loading polls</p>';
-    }
-  }
-
-  async function loadResponses() {
-    document.getElementById('responsesList').innerHTML = skeletonFeedCards(3);
-    try {
-      const { data, error } = await SupabaseClient
-        .from('poll_responses')
-        .select(`
-          *,
-          polls (question, options, custom_id)
-        `)
-        .order('submitted_at', { ascending: false })
-        .limit(100);
-
-      if (error) throw error;
-      renderResponses(data || []);
-    } catch (error) {
-      console.error('Error loading responses:', error);
-      document.getElementById('responsesList').innerHTML = '<p>Error loading responses</p>';
-    }
-  }
-
-  function renderResponses(responses) {
-    const responsesList = document.getElementById('responsesList');
-    if (responses.length === 0) {
-      responsesList.innerHTML = `
-        <div class="empty-state">
-          <h3>No responses yet</h3>
-          <p>Student responses will appear here when they submit polls.</p>
-        </div>
-      `;
-      return;
-    }
-
-    responsesList.innerHTML = responses.map(response => {
-      const time = new Date(response.submitted_at).toLocaleString();
-      const poll = response.polls;
-      const pollLabel = poll
-        ? (poll.custom_id ? `/${poll.custom_id}` : poll.question.substring(0, 30) + '...')
-        : 'Unknown poll';
-
-      return `
-        <div class="card" style="margin-bottom: 12px; padding: 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;">
-            <div style="flex: 1;">
-              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                <strong>${response.student_name}</strong>
-                <span style="color: var(--soft); font-size: 0.85rem;">• ${pollLabel}</span>
-              </div>
-              <div style="color: var(--ink); margin-bottom: 4px;">${response.selected_option}</div>
-              <div style="color: var(--soft); font-size: 0.85rem;">${time}</div>
-            </div>
-          </div>
-        </div>
-      `;
-    }).join('');
-  }
-
-  async function exportResponses() {
-    try {
-      const { data: responses, error } = await SupabaseClient
-        .from('poll_responses')
-        .select(`
-          *,
-          polls (question, custom_id)
-        `)
-        .order('submitted_at', { ascending: false });
-
-      if (error) throw error;
-
-      if (!responses || responses.length === 0) {
-        showNotification('No responses to export');
-        return;
-      }
-
-      // Create XLSX workbook
-      const ws = XLSX.utils.json_to_sheet(responses.map(r => ({
-        'Student Name': r.student_name,
-        'Selected Option': r.selected_option,
-        'Poll Question': r.polls?.question || 'N/A',
-        'Poll ID': r.polls?.custom_id || r.poll_id,
-        'Submitted At': new Date(r.submitted_at).toLocaleString()
-      })));
-
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Poll Responses');
-      XLSX.writeFile(wb, `poll-responses-${new Date().toISOString().split('T')[0]}.xlsx`);
-      showNotification('Responses exported as XLSX');
-    } catch (error) {
-      console.error('Error exporting responses:', error);
-      showNotification('Error exporting responses');
-    }
-  }
-
-  let selectedSchool = null;
-
-  async function searchSchools() {
-    const searchTerm = document.getElementById('schoolSearchInput').value.trim();
-    const status = document.getElementById('schoolSearchStatus');
-    const resultsDiv = document.getElementById('schoolResults');
-    const resultsBody = document.getElementById('schoolResultsBody');
-
-    if (!searchTerm) {
-      status.textContent = 'Please enter a school name or postcode';
-      status.style.color = 'var(--red)';
-      return;
-    }
-
-    status.textContent = 'Searching...';
-    status.style.color = 'var(--soft)';
-    resultsBody.innerHTML = Array.from({ length: 5 }, () => `
-      <tr>
-        <td colspan="2" style="padding: 8px;">
-          <div class="skeleton" style="height: 14px; width: ${85 - Math.random() * 30}%;"></div>
-        </td>
-      </tr>
-    `).join('');
-    resultsDiv.style.display = 'block';
-
-    try {
-      // Check if input is a UK postcode
-      const isPostcode = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i.test(searchTerm);
-
-      // Build query - for postcode search, use the postcode directly
-      let query;
-      if (isPostcode) {
-        query = searchTerm;
-      } else {
-        query = `${encodeURIComponent(searchTerm)}+school`;
-      }
-
-      // Use Nominatim API to search
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&addressdetails=1&limit=20&countrycodes=gb`, {
-        headers: {
-          'User-Agent': 'Classcastle'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`API request failed: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (!data || data.length === 0) {
-        resultsDiv.style.display = 'none';
-        status.textContent = "No schools found. Your school may not be in our database. Contact us at support@classcastle.org and we'll help you get set up.";
-        status.style.color = 'var(--amber)';
-        return;
-      }
-
-      // Filter for UK schools only
-      const schools = data
-        .filter(item => {
-          const isUK = item.address && (item.address.country_code === 'gb' || item.address.country === 'United Kingdom');
-          const isSchool = item.type === 'school' || item.class === 'amenity' || item.display_name.toLowerCase().includes('school');
-          return isUK && isSchool;
-        })
-        .map(item => ({
-          id: item.place_id,
-          name: item.display_name.split(',')[0] || 'Unknown School',
-          location: item.address.city || item.address.town || item.address.village || item.address.county || 'Unknown',
-          postcode: item.address.postcode || 'Not available',
-          lat: parseFloat(item.lat),
-          lon: parseFloat(item.lon)
-        }));
-
-      if (schools.length === 0) {
-        resultsDiv.style.display = 'none';
-        status.textContent = "No UK schools found. Your school may not be in our database. Contact us at support@classcastle.org and we'll help you get set up.";
-        status.style.color = 'var(--amber)';
-        return;
-      }
-
-      resultsBody.innerHTML = schools.map(school => `
-        <tr style="cursor: pointer; border-bottom: 1px solid var(--line);" data-school-id="${school.id}">
-          <td style="padding: 8px;">${escapeHtml(school.name)}</td>
-          <td style="padding: 8px;">${escapeHtml(school.location)}</td>
-        </tr>
-      `).join('');
-
-      resultsDiv.style.display = 'block';
-      status.textContent = `Found ${schools.length} UK schools`;
-      status.style.color = 'var(--brand)';
-
-      // Add click handlers
-      resultsBody.querySelectorAll('tr[data-school-id]').forEach(row => {
-        row.addEventListener('click', () => {
-          const schoolId = row.dataset.schoolId;
-          const school = schools.find(s => s.id == schoolId);
-          if (school) {
-            selectSchool(school);
-          }
-        });
-      });
-    } catch (error) {
-      console.error('Error searching schools:', error);
-      resultsDiv.style.display = 'none';
-      status.textContent = `Error: ${error.message}`;
-      status.style.color = 'var(--red)';
-    }
-  }
-
-  function selectSchool(school) {
-    selectedSchool = school;
-    document.getElementById('selectedSchoolName').textContent = school.name;
-    document.getElementById('selectedSchoolInfo').style.display = 'block';
-    document.getElementById('schoolResults').style.display = 'none';
-  }
-
-  function clearSchool() {
-    selectedSchool = null;
-    document.getElementById('selectedSchoolInfo').style.display = 'none';
-    document.getElementById('schoolSearchInput').value = '';
-    document.getElementById('schoolSearchStatus').textContent = '';
-    document.getElementById('schoolResults').style.display = 'none';
-  }
-
-  function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
-
-  function renderPolls() {
-    const pollsList = document.getElementById('pollsList');
-    const activePolls = polls.filter(p => p.active).length;
-    const maxActivePolls = 15;
-    const usagePercentage = Math.min((activePolls / maxActivePolls) * 100, 100);
-
-    // Update usage bar
-    document.getElementById('pollUsageText').textContent = `${activePolls} of ${maxActivePolls} used`;
-    document.getElementById('pollUsageBar').style.width = `${usagePercentage}%`;
-
-    // Update create button state
-    const createBtn = document.getElementById('createPollBtn');
-    if (activePolls >= maxActivePolls) {
-      createBtn.disabled = true;
-      createBtn.textContent = 'Limit Reached (Close a poll to create more)';
-    } else {
-      createBtn.disabled = false;
-      createBtn.textContent = 'Create New Poll';
-    }
-
-    if (polls.length === 0) {
-      pollsList.innerHTML = `
-        <div class="empty-state">
-          <h3>No polls yet</h3>
-          <p>Create your first poll to get started.</p>
-        </div>
-      `;
-      return;
-    }
-
-    pollsList.innerHTML = polls.map(poll => {
-      const responseCount = poll.poll_responses?.[0]?.count || 0;
-      const time = new Date(poll.created_at).toLocaleString();
-      const statusBadge = poll.active
-        ? '<span style="background: var(--tint); color: var(--brand); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">Active</span>'
-        : '<span style="background: var(--line); color: var(--soft); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">Closed</span>';
-      const customIdDisplay = poll.custom_id
-        ? `<span style="color: var(--brand); font-size: 0.85rem; font-family: monospace;">/${poll.custom_id}</span>`
-        : '';
-
-      return `
-        <div class="card" style="margin-bottom: 12px; padding: 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;">
-            <div style="flex: 1;">
-              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                <strong>${poll.question}</strong>
-                ${statusBadge}
-                ${customIdDisplay}
-              </div>
-              <div style="color: var(--soft); font-size: 0.85rem; margin-bottom: 12px;">
-                ${responseCount} response${responseCount !== 1 ? 's' : ''} • ${time}
-              </div>
-              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <button class="btn btn-secondary" onclick="viewPollResults('${poll.id}', '${poll.custom_id || ''}')" style="font-size: 0.85rem; padding: 6px 12px;">View Results</button>
-                <button class="btn btn-secondary" onclick="sharePoll('${poll.id}', '${poll.custom_id || ''}')" style="font-size: 0.85rem; padding: 6px 12px;">Share URL</button>
-                <button class="btn btn-secondary" onclick="togglePollStatus('${poll.id}', ${poll.active})" style="font-size: 0.85rem; padding: 6px 12px;">${poll.active ? 'Close' : 'Open'}</button>
-                <button class="btn btn-secondary" onclick="deletePoll('${poll.id}')" style="font-size: 0.85rem; padding: 6px 12px; color: var(--red);">Delete</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-    }).join('');
-  }
-
-  async function createPoll() {
-    // Check active poll limit
-    const activePolls = polls.filter(p => p.active).length;
-    if (activePolls >= 15) {
-      showNotification('You have reached the limit of 15 active polls. Close a poll to create a new one.');
-      return;
-    }
-
-    const customId = document.getElementById('pollCustomId').value.trim();
-    const question = document.getElementById('pollQuestion').value.trim();
-    const optionInputs = document.querySelectorAll('.poll-option');
-    const options = Array.from(optionInputs)
-      .map(input => input.value.trim())
-      .filter(opt => opt !== '');
-
-    if (!question) {
-      showNotification('Please enter a question');
-      return;
-    }
-
-    if (options.length < 2) {
-      showNotification('Please add at least 2 options');
-      return;
-    }
-
-    // Validate custom_id if provided
-    if (customId) {
-      if (!/^[a-z0-9-]+$/.test(customId)) {
-        showNotification('Custom ID can only contain lowercase letters, numbers, and hyphens');
-        return;
-      }
-    }
-
-    try {
-      const pollData = {
-        teacher_id: currentUser.id,
-        question,
-        options
-      };
-
-      if (customId) {
-        pollData.custom_id = customId;
-      }
-
-      if (selectedSchool) {
-        pollData.school_name = selectedSchool.name;
-        pollData.school_postcode = selectedSchool.postcode;
-        pollData.school_lat = selectedSchool.lat;
-        pollData.school_lon = selectedSchool.lon;
-      }
-
-      const { error } = await SupabaseClient
-        .from('polls')
-        .insert(pollData);
-
-      if (error) {
-        if (error.code === '23505') {
-          showNotification('This custom ID is already taken. Please choose another.');
-        } else {
-          throw error;
-        }
-        return;
-      }
-
-      showNotification('Poll created successfully');
-      closePollModal();
-      await loadPollsContent(); // This will update the usage bar
-    } catch (error) {
-      console.error('Error creating poll:', error);
-      showNotification('Error creating poll');
-    }
-  }
-
-  async function viewPollResults(pollId, customId) {
-    try {
-      const { data: poll, error: pollError } = await SupabaseClient
-        .from('polls')
-        .select('*')
-        .eq('id', pollId)
-        .single();
-
-      if (pollError) throw pollError;
-
-      const { data: responses, error: responsesError } = await SupabaseClient
-        .from('poll_responses')
-        .select('*')
-        .eq('poll_id', pollId);
-
-      if (responsesError) throw responsesError;
-
-      // Calculate results
-      const optionCounts = {};
-      poll.options.forEach(opt => optionCounts[opt] = 0);
-      responses.forEach(r => {
-        if (optionCounts[r.selected_option] !== undefined) {
-          optionCounts[r.selected_option]++;
-        }
-      });
-
-      const total = responses.length;
-      const resultsHtml = poll.options.map(option => {
-        const count = optionCounts[option] || 0;
-        const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
-        return `
-          <div style="margin-bottom: 12px;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-              <span>${option}</span>
-              <span>${count} (${percentage}%)</span>
-            </div>
-            <div style="background: var(--line); height: 8px; border-radius: 4px; overflow: hidden;">
-              <div style="background: var(--brand); height: 100%; width: ${percentage}%;"></div>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      document.getElementById('pollResultsTitle').textContent = poll.question;
-      document.getElementById('pollResultsData').innerHTML = `
-        <div style="margin-bottom: 16px;">
-          <strong>Total responses:</strong> ${total}
-        </div>
-        ${resultsHtml}
-        <div style="margin-top: 16px;">
-          <h4 style="font-size: 0.9rem; margin-bottom: 8px;">Recent responses:</h4>
-          <div style="max-height: 200px; overflow-y: auto;">
-            ${responses.slice(-10).reverse().map(r => `
-              <div style="padding: 8px 0; border-bottom: 1px solid var(--line);">
-                <strong>${r.student_name}</strong> • ${r.selected_option}
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `;
-
-      const shareUrl = customId
-        ? `https://classcastle.org/poll.html?id=${customId}`
-        : `https://classcastle.org/poll.html?id=${pollId}`;
-      document.getElementById('pollShareUrl').value = shareUrl;
-      const pollResultsModal = document.getElementById('pollResultsModal');
-      pollResultsModal.classList.remove('closing');
-      document.getElementById('pollResultsModalOverlay').style.display = 'flex';
-    } catch (error) {
-      console.error('Error loading poll results:', error);
-      showNotification('Error loading poll results');
-    }
-  }
-
-  function sharePoll(pollId, customId) {
-    const url = customId
-      ? `https://classcastle.org/poll.html?id=${customId}`
-      : `https://classcastle.org/poll.html?id=${pollId}`;
-    navigator.clipboard.writeText(url).then(() => {
-      showNotification('Poll URL copied to clipboard');
-    }).catch(() => {
-      showNotification('Failed to copy URL');
-    });
-  }
-
-  async function togglePollStatus(pollId, currentStatus) {
-    try {
-      const { error } = await SupabaseClient
-        .from('polls')
-        .update({ active: !currentStatus })
-        .eq('id', pollId);
-
-      if (error) throw error;
-      showNotification(`Poll ${!currentStatus ? 'opened' : 'closed'}`);
-      await loadPollsContent(); // This will update the usage bar
-    } catch (error) {
-      console.error('Error toggling poll status:', error);
-      showNotification('Error updating poll');
-    }
-  }
-
-  async function deletePoll(pollId) {
-    const confirmed = await showConfirm({
-      title: 'Delete Poll',
-      message: 'Are you sure you want to delete this poll?',
-      confirmText: 'Delete'
-    });
-    if (!confirmed) return;
-
-    try {
-      const { error } = await SupabaseClient
-        .from('polls')
-        .delete()
-        .eq('id', pollId);
-
-      if (error) throw error;
-
-      showNotification('Poll deleted');
-      loadPolls();
-    } catch (error) {
-      console.error('Error deleting poll:', error);
-      showNotification('Error deleting poll');
-    }
-  }
-
-  async function openPollModal() {
-    document.getElementById('pollQuestion').value = '';
-    document.getElementById('pollCustomId').value = '';
-    document.getElementById('customIdPreview').textContent = '';
-    document.getElementById('pollOptions').innerHTML = `
-      <input type="text" class="form-input poll-option" placeholder="Option 1" style="margin-bottom: 8px;">
-      <input type="text" class="form-input poll-option" placeholder="Option 2" style="margin-bottom: 8px;">
-    `;
-    const pollModal = document.getElementById('pollModal');
-    pollModal.classList.remove('closing');
-    document.getElementById('pollModalOverlay').style.display = 'flex';
-
-    // Clear school selection
-    selectedSchool = null;
-    document.getElementById('selectedSchoolInfo').style.display = 'none';
-    document.getElementById('schoolSearchInput').value = '';
-    document.getElementById('schoolSearchStatus').textContent = '';
-    document.getElementById('schoolResults').style.display = 'none';
-
-    // Pre-fill school from user metadata if available
-    const { data: user } = await SupabaseClient.auth.getUser();
-    if (user.user_metadata?.school_name) {
-      selectedSchool = {
-        name: user.user_metadata.school_name,
-        postcode: user.user_metadata.school_postcode,
-        lat: user.user_metadata.school_lat,
-        lon: user.user_metadata.school_lon
-      };
-      document.getElementById('selectedSchoolName').textContent = selectedSchool.name;
-      document.getElementById('selectedSchoolInfo').style.display = 'block';
-    }
-  }
-
-  function closePollModal() {
-    const pollModal = document.getElementById('pollModal');
-    pollModal.classList.add('closing');
-    setTimeout(() => {
-      document.getElementById('pollModalOverlay').style.display = 'none';
-      pollModal.classList.remove('closing');
-    }, 200);
-  }
-
-  function addPollOption() {
-    const optionsContainer = document.getElementById('pollOptions');
-    const optionCount = optionsContainer.querySelectorAll('.poll-option').length + 1;
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.className = 'form-input poll-option';
-    input.placeholder = `Option ${optionCount}`;
-    input.style.marginBottom = '8px';
-    optionsContainer.appendChild(input);
-  }
-
   async function clearActivityLog() {
     const confirmed = await showConfirm({
       title: 'Clear Activity Log',
@@ -6100,85 +5374,6 @@ read sensitive data, or perform actions as you.
   clearActivityBtn.addEventListener('click', clearActivityLog);
   exportActivityBtn.addEventListener('click', exportActivityLog);
 
-  // Quick Polls
-  const createPollBtn = document.getElementById('createPollBtn');
-  const pollModalOverlay = document.getElementById('pollModalOverlay');
-  const cancelPollBtn = document.getElementById('cancelPollBtn');
-  const savePollBtn = document.getElementById('savePollBtn');
-  const addOptionBtn = document.getElementById('addOptionBtn');
-  const pollResultsModalOverlay = document.getElementById('pollResultsModalOverlay');
-  const closeResultsBtn = document.getElementById('closeResultsBtn');
-  const copyPollUrlBtn = document.getElementById('copyPollUrlBtn');
-  const pollCustomId = document.getElementById('pollCustomId');
-  const exportResponsesBtn = document.getElementById('exportResponsesBtn');
-
-  // Tab switching
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const tab = btn.dataset.tab;
-      document.querySelectorAll('.tab-btn').forEach(b => {
-        b.classList.remove('active');
-        b.style.borderBottomColor = 'transparent';
-        b.style.color = 'var(--soft)';
-      });
-      btn.classList.add('active');
-      btn.style.borderBottomColor = 'var(--brand)';
-      btn.style.color = 'var(--brand)';
-
-      document.getElementById('pollsTab').style.display = tab === 'polls' ? 'block' : 'none';
-      document.getElementById('responsesTab').style.display = tab === 'responses' ? 'block' : 'none';
-
-      if (tab === 'responses') {
-        loadResponses();
-      }
-    });
-  });
-
-  if (createPollBtn) createPollBtn.addEventListener('click', openPollModal);
-  if (cancelPollBtn) cancelPollBtn.addEventListener('click', closePollModal);
-  if (savePollBtn) savePollBtn.addEventListener('click', createPoll);
-  if (addOptionBtn) addOptionBtn.addEventListener('click', addPollOption);
-  if (closeResultsBtn) closeResultsBtn.addEventListener('click', () => {
-    const pollResultsModal = document.getElementById('pollResultsModal');
-    pollResultsModal.classList.add('closing');
-    setTimeout(() => {
-      document.getElementById('pollResultsModalOverlay').style.display = 'none';
-      pollResultsModal.classList.remove('closing');
-    }, 200);
-  });
-  if (copyPollUrlBtn) copyPollUrlBtn.addEventListener('click', () => {
-    const url = document.getElementById('pollShareUrl').value;
-    navigator.clipboard.writeText(url).then(() => {
-      showNotification('URL copied to clipboard');
-    });
-  });
-  if (exportResponsesBtn) exportResponsesBtn.addEventListener('click', exportResponses);
-
-  // School search
-  const searchSchoolsBtn = document.getElementById('searchSchoolsBtn');
-  const schoolSearchInput = document.getElementById('schoolSearchInput');
-  const clearSchoolBtn = document.getElementById('clearSchoolBtn');
-
-  if (searchSchoolsBtn) searchSchoolsBtn.addEventListener('click', searchSchools);
-  if (schoolSearchInput) {
-    schoolSearchInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') searchSchools();
-    });
-  }
-  if (clearSchoolBtn) clearSchoolBtn.addEventListener('click', clearSchool);
-
-  // Update custom ID preview
-  if (pollCustomId) {
-    pollCustomId.addEventListener('input', () => {
-      const customId = pollCustomId.value.trim();
-      const preview = document.getElementById('customIdPreview');
-      if (customId) {
-        preview.textContent = `URL: https://classcastle.org/poll.html?id=${customId}`;
-      } else {
-        preview.textContent = '';
-      }
-    });
-  }
 
   // Admin submenu toggle
   const adminParent = document.querySelector('.nav-item-parent[data-parent="admin"]');
@@ -6242,8 +5437,6 @@ read sensitive data, or perform actions as you.
       if (page === 'shortcuts') loadShortcuts();
       if (page === 'analytics') loadAnalytics();
       if (page === 'activity') loadActivityLog();
-      if (page === 'polls') loadPolls();
-      if (page === 'messages') checkMessagesOptIn();
       if (page === 'settings') {
         loadIdentities();
         loadPasskeys();
@@ -6341,89 +5534,33 @@ read sensitive data, or perform actions as you.
     }
   });
 
-  // Quick Polls lock menu
-  const pollsLockMenuBtn = document.getElementById('pollsLockMenuBtn');
-  const pollsLockMenu = document.getElementById('pollsLockMenu');
-  const dismissLockBtn = document.getElementById('dismissLockBtn');
-  const pollsLockMenuIcon = document.getElementById('pollsLockMenuIcon');
-  const pollsLockCloseIcon = document.getElementById('pollsLockCloseIcon');
-  const dismissConfirmModal = document.getElementById('dismissConfirmModal');
-  const cancelDismissBtn = document.getElementById('cancelDismissBtn');
-  const confirmDismissBtn = document.getElementById('confirmDismissBtn');
+  // Exit Ticket functionality
+  const generateExitTicketBtn = document.getElementById('generateExitTicketBtn');
+  const exitTicketName = document.getElementById('exitTicketName');
+  const exitTicketResult = document.getElementById('exitTicketResult');
+  const exitTicketUrl = document.getElementById('exitTicketUrl');
+  const copyExitTicketBtn = document.getElementById('copyExitTicketBtn');
 
-  let menuOpen = false;
-
-  if (pollsLockMenuBtn) {
-    pollsLockMenuBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      menuOpen = !menuOpen;
-      pollsLockMenu.style.display = menuOpen ? 'block' : 'none';
-      pollsLockMenuIcon.style.display = menuOpen ? 'none' : 'block';
-      pollsLockCloseIcon.style.display = menuOpen ? 'block' : 'none';
+  if (generateExitTicketBtn) {
+    generateExitTicketBtn.addEventListener('click', () => {
+      const name = exitTicketName.value.trim();
+      // Generate a simple random ID for the ticket
+      const ticketId = Math.random().toString(36).substring(2, 8).toUpperCase();
+      const url = `https://classcastle.org/ticket?id=${ticketId}`;
+      exitTicketUrl.value = url;
+      exitTicketResult.style.display = 'block';
+      showNotification('Exit ticket link generated');
     });
   }
 
-  if (dismissLockBtn) {
-    dismissLockBtn.addEventListener('click', () => {
-      pollsLockMenu.style.display = 'none';
-      pollsLockMenuIcon.style.display = 'block';
-      pollsLockCloseIcon.style.display = 'none';
-      menuOpen = false;
-      dismissConfirmModal.style.display = 'flex';
+  if (copyExitTicketBtn) {
+    copyExitTicketBtn.addEventListener('click', () => {
+      exitTicketUrl.select();
+      navigator.clipboard.writeText(exitTicketUrl.value).then(() => {
+        showNotification('Link copied to clipboard');
+      });
     });
   }
-
-  if (cancelDismissBtn) {
-    cancelDismissBtn.addEventListener('click', () => {
-      dismissConfirmModal.style.display = 'none';
-    });
-  }
-
-  if (confirmDismissBtn) {
-    confirmDismissBtn.addEventListener('click', () => {
-      dismissConfirmModal.style.display = 'none';
-      document.getElementById('pollsLockMessage').style.display = 'none';
-      pollsLockDismissed = true;
-      // Show polls content
-      document.getElementById('pollUsageSection').style.display = 'block';
-      document.getElementById('pollsTab').style.display = 'block';
-      document.getElementById('createPollBtn').style.display = 'inline-block';
-      document.getElementById('pollTabsNav').style.display = 'block';
-      const pollsPageHeader = document.querySelector('#pollsPage .page-header');
-      if (pollsPageHeader) pollsPageHeader.style.display = 'flex';
-      // Load polls data
-      loadPollsContent();
-    });
-  }
-
-  // Close modal when clicking outside
-  if (dismissConfirmModal) {
-    dismissConfirmModal.addEventListener('click', (e) => {
-      if (e.target === dismissConfirmModal) {
-        dismissConfirmModal.style.display = 'none';
-      }
-    });
-  }
-
-  // Close menu when clicking outside
-  document.addEventListener('click', (e) => {
-    if (pollsLockMenu && pollsLockMenuBtn && !pollsLockMenuBtn.contains(e.target) && !pollsLockMenu.contains(e.target) && !dismissConfirmModal.contains(e.target)) {
-      pollsLockMenu.style.display = 'none';
-      pollsLockMenuIcon.style.display = 'block';
-      pollsLockCloseIcon.style.display = 'none';
-      menuOpen = false;
-    }
-  });
-
-  // Close menu when clicking outside
-  document.addEventListener('click', (e) => {
-    if (pollsLockMenu && pollsLockMenuBtn && !pollsLockMenuBtn.contains(e.target) && !pollsLockMenu.contains(e.target) && !dismissConfirmModal.contains(e.target)) {
-      pollsLockMenu.style.display = 'none';
-      pollsLockMenuIcon.style.display = 'block';
-      pollsLockCloseIcon.style.display = 'none';
-      menuOpen = false;
-    }
-  });
 
   // Onboarding functionality
   let currentOnboardingStep = 1;
