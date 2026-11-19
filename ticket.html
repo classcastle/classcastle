@@ -288,6 +288,7 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const ticketCode = urlParams.get('id');
+    let actualTicketId = null;
 
     if (!ticketCode) {
       showNotFound();
@@ -308,6 +309,7 @@
           return;
         }
 
+        actualTicketId = data.id;
         document.getElementById('ticketName').textContent = data.name || 'Exit Ticket';
         document.getElementById('ticketQuestion').textContent = data.question || 'Share your thoughts on today\'s lesson';
 
@@ -343,7 +345,7 @@
         const { error } = await supabaseClient
           .from('exit_ticket_responses')
           .insert({
-            ticket_id: ticketId,
+            ticket_id: actualTicketId,
             student_name: studentName,
             response: response
           });
