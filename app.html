@@ -2160,6 +2160,60 @@
     background: var(--red-light);
   }
 
+  .toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+  }
+
+  .toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.3s;
+    border-radius: 26px;
+  }
+
+  .toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+  }
+
+  .toggle-switch input:checked + .toggle-slider {
+    background-color: var(--brand);
+  }
+
+  .toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(24px);
+  }
+
+  .theme-color-btn:hover {
+    transform: scale(1.1);
+    transition: transform 0.2s;
+  }
+
+  .theme-color-btn.active {
+    border: 3px solid var(--ink) !important;
+  }
+
   .settings-content {
     flex: 1;
   }
@@ -2212,6 +2266,60 @@
 
   .settings-nav-danger:hover {
     background: var(--red-light);
+  }
+
+  .toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+  }
+
+  .toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.3s;
+    border-radius: 26px;
+  }
+
+  .toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+  }
+
+  .toggle-switch input:checked + .toggle-slider {
+    background-color: var(--brand);
+  }
+
+  .toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(24px);
+  }
+
+  .theme-color-btn:hover {
+    transform: scale(1.1);
+    transition: transform 0.2s;
+  }
+
+  .theme-color-btn.active {
+    border: 3px solid var(--ink) !important;
   }
 
   .settings-content {
@@ -2700,13 +2808,26 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
               </svg>
               Open Source Licenses
             </a>
-            <a class="settings-nav-item settings-nav-danger" data-section="danger" href="#">
+            <a class="settings-nav-item" data-section="danger" href="#">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
                 <line x1="12" y1="9" x2="12" y2="13"></line>
                 <line x1="12" y1="17" x2="12.01" y2="17"></line>
               </svg>
               Danger Zone
+            </a>
+            <a class="settings-nav-item" data-section="accessibility" href="#">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M4.93 4.93l14.14 14.14"></path>
+              </svg>
+              Accessibility
+            </a>
+            <a class="settings-nav-item" data-section="experiments" href="#">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+              Experimental Features
             </a>
           </nav>
         </div>
@@ -2886,6 +3007,69 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
                 <h3 style="font-size: 1rem; margin: 0 0 8px; color: var(--red);">Account Deletion</h3>
                 <p style="color: var(--soft); margin-bottom: 12px; font-size: 0.9rem;">Permanently delete your account and all data.</p>
                 <button class="btn btn-secondary btn-delete" id="deleteAccountBtn">Delete Account</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Accessibility Section -->
+          <div class="settings-section" id="settings-section-accessibility">
+            <div class="card">
+              <h2 class="section-title">Accessibility</h2>
+              <p style="color: var(--soft); margin-bottom: 20px;">Customize your viewing experience.</p>
+              
+              <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--line);">
+                <h3 style="font-size: 1rem; margin: 0 0 8px; color: var(--ink);">Font Size</h3>
+                <p style="color: var(--soft); margin-bottom: 12px; font-size: 0.9rem;">Adjust the text size throughout the app.</p>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <button class="btn btn-secondary" id="decreaseFontSizeBtn" style="padding: 8px 16px;">A-</button>
+                  <span id="currentFontSize" style="min-width: 60px; text-align: center; font-weight: 500;">100%</span>
+                  <button class="btn btn-secondary" id="increaseFontSizeBtn" style="padding: 8px 16px;">A+</button>
+                  <button class="btn btn-secondary" id="resetFontSizeBtn" style="padding: 8px 16px; margin-left: 8px;">Reset</button>
+                </div>
+              </div>
+
+              <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--line);">
+                <h3 style="font-size: 1rem; margin: 0 0 8px; color: var(--ink);">Theme Color</h3>
+                <p style="color: var(--soft); margin-bottom: 12px; font-size: 0.9rem;">Choose your preferred accent color.</p>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                  <button class="theme-color-btn" data-color="#1f5c3a" style="width: 40px; height: 40px; border-radius: 50%; border: 3px solid #1f5c3a; background: #1f5c3a; cursor: pointer;" title="Green"></button>
+                  <button class="theme-color-btn" data-color="#2563eb" style="width: 40px; height: 40px; border-radius: 50%; border: 3px solid transparent; background: #2563eb; cursor: pointer;" title="Blue"></button>
+                  <button class="theme-color-btn" data-color="#7c3aed" style="width: 40px; height: 40px; border-radius: 50%; border: 3px solid transparent; background: #7c3aed; cursor: pointer;" title="Purple"></button>
+                  <button class="theme-color-btn" data-color="#dc2626" style="width: 40px; height: 40px; border-radius: 50%; border: 3px solid transparent; background: #dc2626; cursor: pointer;" title="Red"></button>
+                  <button class="theme-color-btn" data-color="#ea580c" style="width: 40px; height: 40px; border-radius: 50%; border: 3px solid transparent; background: #ea580c; cursor: pointer;" title="Orange"></button>
+                </div>
+              </div>
+
+              <div>
+                <h3 style="font-size: 1rem; margin: 0 0 8px; color: var(--ink);">Reduced Motion</h3>
+                <p style="color: var(--soft); margin-bottom: 12px; font-size: 0.9rem;">Minimize animations throughout the app.</p>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="reducedMotionToggle">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Experimental Features Section -->
+          <div class="settings-section" id="settings-section-experiments">
+            <div class="card">
+              <h2 class="section-title">Experimental Features</h2>
+              <p style="color: var(--soft); margin-bottom: 20px;">Try out new features before they're released. These may be unstable.</p>
+              
+              <div style="margin-bottom: 16px; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <h3 style="font-size: 1rem; margin: 0; color: var(--ink);">Enable Experimental Features</h3>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="experimentalFeaturesToggle">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                <p style="color: var(--soft); font-size: 0.9rem; margin: 0;">When enabled, you'll see early access features that are still in development. These may change or be removed without notice.</p>
+              </div>
+
+              <div style="margin-top: 20px; padding: 12px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; font-size: 0.9rem; color: #856404;">
+                <strong>Note:</strong> Experimental features are not guaranteed to be stable and may contain bugs. Use at your own risk.
               </div>
             </div>
           </div>
@@ -3282,6 +3466,17 @@ read sensitive data, or perform actions as you.
   const clearActivityLogsBtn = document.getElementById('clearActivityLogsBtn');
   const archiveAllRoomsBtn = document.getElementById('archiveAllRoomsBtn');
   const deleteAllRoomsBtn = document.getElementById('deleteAllRoomsBtn');
+
+  // Accessibility elements
+  const decreaseFontSizeBtn = document.getElementById('decreaseFontSizeBtn');
+  const increaseFontSizeBtn = document.getElementById('increaseFontSizeBtn');
+  const resetFontSizeBtn = document.getElementById('resetFontSizeBtn');
+  const currentFontSize = document.getElementById('currentFontSize');
+  const reducedMotionToggle = document.getElementById('reducedMotionToggle');
+  const themeColorBtns = document.querySelectorAll('.theme-color-btn');
+
+  // Experimental features elements
+  const experimentalFeaturesToggle = document.getElementById('experimentalFeaturesToggle');
 
   // Global identities array
   let identities = [];
@@ -5916,6 +6111,98 @@ read sensitive data, or perform actions as you.
       deleteAllRoomsBtn.disabled = false;
     }
   });
+
+  // Accessibility functionality
+  let currentFontSizePercent = 100;
+
+  function updateFontSize() {
+    document.documentElement.style.fontSize = `${currentFontSizePercent}%`;
+    currentFontSize.textContent = `${currentFontSizePercent}%`;
+    localStorage.setItem('classcastle_font_size', currentFontSizePercent);
+  }
+
+  decreaseFontSizeBtn.addEventListener('click', () => {
+    if (currentFontSizePercent > 75) {
+      currentFontSizePercent -= 5;
+      updateFontSize();
+    }
+  });
+
+  increaseFontSizeBtn.addEventListener('click', () => {
+    if (currentFontSizePercent < 150) {
+      currentFontSizePercent += 5;
+      updateFontSize();
+    }
+  });
+
+  resetFontSizeBtn.addEventListener('click', () => {
+    currentFontSizePercent = 100;
+    updateFontSize();
+  });
+
+  // Load saved font size
+  const savedFontSize = localStorage.getItem('classcastle_font_size');
+  if (savedFontSize) {
+    currentFontSizePercent = parseInt(savedFontSize);
+    updateFontSize();
+  }
+
+  // Theme color selection
+  themeColorBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const color = btn.dataset.color;
+      document.documentElement.style.setProperty('--brand', color);
+      localStorage.setItem('classcastle_theme_color', color);
+      
+      themeColorBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // Load saved theme color
+  const savedThemeColor = localStorage.getItem('classcastle_theme_color');
+  if (savedThemeColor) {
+    document.documentElement.style.setProperty('--brand', savedThemeColor);
+    themeColorBtns.forEach(btn => {
+      if (btn.dataset.color === savedThemeColor) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+
+  // Reduced motion toggle
+  reducedMotionToggle.addEventListener('change', (e) => {
+    const enabled = e.target.checked;
+    document.documentElement.style.setProperty('--transition-duration', enabled ? '0s' : '0.2s');
+    localStorage.setItem('classcastle_reduced_motion', enabled);
+  });
+
+  // Load saved reduced motion setting
+  const savedReducedMotion = localStorage.getItem('classcastle_reduced_motion');
+  if (savedReducedMotion === 'true') {
+    reducedMotionToggle.checked = true;
+    document.documentElement.style.setProperty('--transition-duration', '0s');
+  }
+
+  // Experimental features toggle
+  experimentalFeaturesToggle.addEventListener('change', (e) => {
+    const enabled = e.target.checked;
+    localStorage.setItem('classcastle_experimental_features', enabled);
+    // Add logic to enable/disable experimental features based on this toggle
+    if (enabled) {
+      showNotification('Experimental features enabled');
+    } else {
+      showNotification('Experimental features disabled');
+    }
+  });
+
+  // Load saved experimental features setting
+  const savedExperimentalFeatures = localStorage.getItem('classcastle_experimental_features');
+  if (savedExperimentalFeatures === 'true') {
+    experimentalFeaturesToggle.checked = true;
+  }
 
   // Settings navigation
   const settingsNavItems = document.querySelectorAll('.settings-nav-item');
