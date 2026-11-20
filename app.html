@@ -5667,7 +5667,7 @@ read sensitive data, or perform actions as you.
       await SupabaseClient.auth.signOut();
       showNotification('Account data deleted. Contact support to remove your auth account.');
       setTimeout(() => {
-        window.location.href = '/login.html';
+        window.location.href = '/accountdeleted.html';
       }, 2000);
     } catch (error) {
       console.error('Error deleting account:', error);
