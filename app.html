@@ -3237,6 +3237,12 @@ read sensitive data, or perform actions as you.
     }, duration);
   }
 
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
   function showAccountLinkedModal(provider) {
     const isMicrosoft = provider === 'Microsoft';
     const isNotion = provider === 'Notion';
