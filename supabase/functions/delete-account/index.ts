@@ -49,13 +49,19 @@ serve(async (req) => {
       'activity_log',
       'url_shortcuts',
       'url_history',
-      'exit_tickets',
-      'exit_ticket_responses',
       'api_keys'
     ]
 
     for (const table of tables) {
       await supabase.from(table).delete().eq('teacher_id', user.id)
+    }
+
+    // Delete exit tickets and their responses
+    const { data: tickets } = await supabase.from('exit_tickets').select('id').eq('teacher_id', user.id)
+    if (tickets && tickets.length > 0) {
+      const ticketIds = tickets.map(t => t.id)
+      await supabase.from('exit_ticket_responses').delete().in('ticket_id', ticketIds)
+      await supabase.from('exit_tickets').delete().eq('teacher_id', user.id)
     }
 
     // Delete the auth user
