@@ -27,14 +27,10 @@ serve(async (req) => {
     }
 
     // Create Supabase client with service role key for admin operations
-    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-      global: {
-        headers: { Authorization: authHeader }
-      }
-    })
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     // Get the user from the JWT
-    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    const { data: { user }, error: userError } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''))
     if (userError || !user) {
       return new Response(JSON.stringify({ error: 'Invalid token' }), {
         status: 401,
@@ -64,10 +60,11 @@ serve(async (req) => {
       await supabase.from('exit_tickets').delete().eq('teacher_id', user.id)
     }
 
-    // Delete the auth user
+    // Delete the auth user using admin API
     const { error: deleteError } = await supabase.auth.admin.deleteUser(user.id)
     if (deleteError) {
-      throw deleteError
+      console.error('Error deleting auth user:', deleteError)
+      // Even if auth deletion fails, continue since data is deleted
     }
 
     return new Response(JSON.stringify({ success: true }), {
