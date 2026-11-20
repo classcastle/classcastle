@@ -2860,8 +2860,8 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           <div class="settings-section" id="settings-section-danger">
             <div class="card">
               <h2 class="section-title" style="color: var(--red);">Danger Zone</h2>
-              <p style="color: var(--soft); margin-bottom: 16px;">To delete your teacher account, please contact our support team. We'll help you securely remove your data.</p>
-              <a href="mailto:support@classcastle.org?subject=Delete%20My%20Account" class="btn btn-secondary btn-delete">Contact Support to Delete Account</a>
+              <p style="color: var(--soft); margin-bottom: 16px;">Once you delete your account, there is no going back. Please be certain.</p>
+              <button class="btn btn-secondary btn-delete" id="deleteAccountBtn">Delete Account</button>
             </div>
           </div>
         </div>
@@ -2950,6 +2950,29 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
     <div class="modal-actions">
       <button class="modal-btn modal-btn-secondary" id="donateOpenNewTab">Open in new tab</button>
       <button class="modal-btn modal-btn-cancel" id="donateModalCancel">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div class="modal-overlay" id="deleteAccountModalOverlay" style="display: none;">
+  <div class="modal" id="deleteAccountModal" style="max-width: 500px;">
+    <h2 style="color: var(--red);">Delete Account</h2>
+    <p style="color: var(--soft); margin-bottom: 16px;">This action cannot be undone. This will permanently delete your account and all associated data including:</p>
+    <ul style="color: var(--soft); margin-bottom: 20px; padding-left: 20px;">
+      <li>All your rooms</li>
+      <li>Student data and activity logs</li>
+      <li>URL shortcuts</li>
+      <li>Exit tickets</li>
+      <li>Your user account</li>
+    </ul>
+    <div class="form-group">
+      <label class="form-label">Type "DELETE" to confirm</label>
+      <input type="text" class="form-input" id="deleteAccountConfirm" placeholder="DELETE">
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" id="deleteAccountCancel">Cancel</button>
+      <button class="modal-btn modal-btn-confirm btn-delete" id="deleteAccountConfirmBtn" disabled>Delete Account</button>
     </div>
   </div>
 </div>
@@ -3218,6 +3241,14 @@ read sensitive data, or perform actions as you.
   const registerPasskeyBtn = document.getElementById('registerPasskeyBtn');
   const registerPasskeyBtnText = registerPasskeyBtn.querySelector('.btn-text');
   const registerPasskeyBtnLoading = registerPasskeyBtn.querySelector('.loading');
+
+  // Delete account elements
+  const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+  const deleteAccountModalOverlay = document.getElementById('deleteAccountModalOverlay');
+  const deleteAccountModal = document.getElementById('deleteAccountModal');
+  const deleteAccountConfirm = document.getElementById('deleteAccountConfirm');
+  const deleteAccountCancel = document.getElementById('deleteAccountCancel');
+  const deleteAccountConfirmBtn = document.getElementById('deleteAccountConfirmBtn');
 
   // Global identities array
   let identities = [];
@@ -5596,6 +5627,55 @@ read sensitive data, or perform actions as you.
   linkMicrosoftBtn.addEventListener('click', linkMicrosoft);
   linkNotionBtn.addEventListener('click', linkNotion);
   registerPasskeyBtn.addEventListener('click', registerPasskey);
+
+  // Delete account functionality
+  deleteAccountBtn.addEventListener('click', () => {
+    deleteAccountConfirm.value = '';
+    deleteAccountConfirmBtn.disabled = true;
+    deleteAccountModalOverlay.style.display = 'flex';
+  });
+
+  deleteAccountCancel.addEventListener('click', () => {
+    deleteAccountModalOverlay.style.display = 'none';
+  });
+
+  deleteAccountConfirm.addEventListener('input', (e) => {
+    deleteAccountConfirmBtn.disabled = e.target.value !== 'DELETE';
+  });
+
+  deleteAccountConfirmBtn.addEventListener('click', async () => {
+    try {
+      deleteAccountConfirmBtn.textContent = 'Deleting...';
+      deleteAccountConfirmBtn.disabled = true;
+
+      const { data: { user } } = await SupabaseClient.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      // Delete user data from tables
+      await Promise.all([
+        SupabaseClient.from('rooms').delete().eq('teacher_id', user.id),
+        SupabaseClient.from('students').delete().eq('teacher_id', user.id),
+        SupabaseClient.from('activity_log').delete().eq('teacher_id', user.id),
+        SupabaseClient.from('url_shortcuts').delete().eq('teacher_id', user.id),
+        SupabaseClient.from('url_history').delete().eq('teacher_id', user.id),
+        SupabaseClient.from('exit_tickets').delete().eq('teacher_id', user.id),
+        SupabaseClient.from('exit_ticket_responses').eq('ticket_id', SupabaseClient.from('exit_tickets').select('id').eq('teacher_id', user.id)),
+        SupabaseClient.from('api_keys').delete().eq('teacher_id', user.id),
+      ]);
+
+      // Sign out
+      await SupabaseClient.auth.signOut();
+      showNotification('Account data deleted. Contact support to remove your auth account.');
+      setTimeout(() => {
+        window.location.href = '/login.html';
+      }, 2000);
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      showNotification('Error deleting account. Please contact support.');
+      deleteAccountConfirmBtn.textContent = 'Delete Account';
+      deleteAccountConfirmBtn.disabled = false;
+    }
+  });
 
   // Settings navigation
   const settingsNavItems = document.querySelectorAll('.settings-nav-item');
