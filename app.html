@@ -5648,27 +5648,21 @@ read sensitive data, or perform actions as you.
       deleteAccountConfirmBtn.textContent = 'Deleting...';
       deleteAccountConfirmBtn.disabled = true;
 
-      const { data: { user } } = await SupabaseClient.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      const { data: { session } } = await SupabaseClient.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
 
-      // Delete user data from tables
-      await Promise.all([
-        SupabaseClient.from('rooms').delete().eq('teacher_id', user.id),
-        SupabaseClient.from('students').delete().eq('teacher_id', user.id),
-        SupabaseClient.from('activity_log').delete().eq('teacher_id', user.id),
-        SupabaseClient.from('url_shortcuts').delete().eq('teacher_id', user.id),
-        SupabaseClient.from('url_history').delete().eq('teacher_id', user.id),
-        SupabaseClient.from('exit_tickets').delete().eq('teacher_id', user.id),
-        SupabaseClient.from('exit_ticket_responses').eq('ticket_id', SupabaseClient.from('exit_tickets').select('id').eq('teacher_id', user.id)),
-        SupabaseClient.from('api_keys').delete().eq('teacher_id', user.id),
-      ]);
+      // Call the edge function to delete the account
+      const { error } = await SupabaseClient.functions.invoke('delete-account', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
+
+      if (error) throw error;
 
       // Sign out
       await SupabaseClient.auth.signOut();
-      showNotification('Account data deleted. Contact support to remove your auth account.');
-      setTimeout(() => {
-        window.location.href = '/accountdeleted.html';
-      }, 2000);
+      window.location.href = '/accountdeleted.html';
     } catch (error) {
       console.error('Error deleting account:', error);
       showNotification('Error deleting account. Please contact support.');
