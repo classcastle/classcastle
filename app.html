@@ -2860,8 +2860,31 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
           <div class="settings-section" id="settings-section-danger">
             <div class="card">
               <h2 class="section-title" style="color: var(--red);">Danger Zone</h2>
-              <p style="color: var(--soft); margin-bottom: 16px;">Once you delete your account, there is no going back. Please be certain.</p>
-              <button class="btn btn-secondary btn-delete" id="deleteAccountBtn">Delete Account</button>
+              <p style="color: var(--soft); margin-bottom: 20px;">These actions are irreversible. Please be certain before proceeding.</p>
+              
+              <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--line);">
+                <h3 style="font-size: 1rem; margin: 0 0 8px; color: var(--ink);">Data Management</h3>
+                <p style="color: var(--soft); margin-bottom: 12px; font-size: 0.9rem;">Export or clear your data.</p>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                  <button class="btn btn-secondary" id="exportAllDataBtn">Export All Data</button>
+                  <button class="btn btn-secondary" id="clearActivityLogsBtn">Clear Activity Logs</button>
+                </div>
+              </div>
+
+              <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--line);">
+                <h3 style="font-size: 1rem; margin: 0 0 8px; color: var(--ink);">Room Management</h3>
+                <p style="color: var(--soft); margin-bottom: 12px; font-size: 0.9rem;">Bulk actions on all your rooms.</p>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                  <button class="btn btn-secondary" id="archiveAllRoomsBtn">Archive All Rooms</button>
+                  <button class="btn btn-secondary btn-delete" id="deleteAllRoomsBtn">Delete All Rooms</button>
+                </div>
+              </div>
+
+              <div>
+                <h3 style="font-size: 1rem; margin: 0 0 8px; color: var(--red);">Account Deletion</h3>
+                <p style="color: var(--soft); margin-bottom: 12px; font-size: 0.9rem;">Permanently delete your account and all data.</p>
+                <button class="btn btn-secondary btn-delete" id="deleteAccountBtn">Delete Account</button>
+              </div>
             </div>
           </div>
         </div>
@@ -3249,6 +3272,12 @@ read sensitive data, or perform actions as you.
   const deleteAccountConfirm = document.getElementById('deleteAccountConfirm');
   const deleteAccountCancel = document.getElementById('deleteAccountCancel');
   const deleteAccountConfirmBtn = document.getElementById('deleteAccountConfirmBtn');
+
+  // Danger zone elements
+  const exportAllDataBtn = document.getElementById('exportAllDataBtn');
+  const clearActivityLogsBtn = document.getElementById('clearActivityLogsBtn');
+  const archiveAllRoomsBtn = document.getElementById('archiveAllRoomsBtn');
+  const deleteAllRoomsBtn = document.getElementById('deleteAllRoomsBtn');
 
   // Global identities array
   let identities = [];
@@ -5668,6 +5697,138 @@ read sensitive data, or perform actions as you.
       showNotification('Error deleting account. Please contact support.');
       deleteAccountConfirmBtn.textContent = 'Delete Account';
       deleteAccountConfirmBtn.disabled = false;
+    }
+  });
+
+  // Danger zone functionality
+  exportAllDataBtn.addEventListener('click', async () => {
+    try {
+      const { data: { user } } = await SupabaseClient.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      exportAllDataBtn.textContent = 'Exporting...';
+      exportAllDataBtn.disabled = true;
+
+      // Fetch all user data
+      const [rooms, students, activityLog, shortcuts, tickets] = await Promise.all([
+        SupabaseClient.from('rooms').select('*').eq('teacher_id', user.id),
+        SupabaseClient.from('students').select('*').eq('teacher_id', user.id),
+        SupabaseClient.from('activity_log').select('*').eq('teacher_id', user.id),
+        SupabaseClient.from('url_shortcuts').select('*').eq('teacher_id', user.id),
+        SupabaseClient.from('exit_tickets').select('*').eq('teacher_id', user.id)
+      ]);
+
+      const exportData = {
+        exportDate: new Date().toISOString(),
+        userId: user.id,
+        rooms: rooms.data || [],
+        students: students.data || [],
+        activityLog: activityLog.data || [],
+        urlShortcuts: shortcuts.data || [],
+        exitTickets: tickets.data || []
+      };
+
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `classcastle-export-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      showNotification('Data exported successfully');
+    } catch (error) {
+      console.error('Error exporting data:', error);
+      showNotification('Error exporting data');
+    } finally {
+      exportAllDataBtn.textContent = 'Export All Data';
+      exportAllDataBtn.disabled = false;
+    }
+  });
+
+  clearActivityLogsBtn.addEventListener('click', async () => {
+    if (!confirm('Are you sure you want to clear all activity logs? This cannot be undone.')) return;
+
+    try {
+      const { data: { user } } = await SupabaseClient.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      clearActivityLogsBtn.textContent = 'Clearing...';
+      clearActivityLogsBtn.disabled = true;
+
+      const { error } = await SupabaseClient.from('activity_log').delete().eq('teacher_id', user.id);
+      if (error) throw error;
+
+      showNotification('Activity logs cleared');
+      loadActivity(); // Refresh activity list
+    } catch (error) {
+      console.error('Error clearing activity logs:', error);
+      showNotification('Error clearing activity logs');
+    } finally {
+      clearActivityLogsBtn.textContent = 'Clear Activity Logs';
+      clearActivityLogsBtn.disabled = false;
+    }
+  });
+
+  archiveAllRoomsBtn.addEventListener('click', async () => {
+    if (!confirm('Are you sure you want to archive all rooms? This cannot be undone.')) return;
+
+    try {
+      const { data: { user } } = await SupabaseClient.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      archiveAllRoomsBtn.textContent = 'Archiving...';
+      archiveAllRoomsBtn.disabled = true;
+
+      const { error } = await SupabaseClient.from('rooms').update({ archived: true }).eq('teacher_id', user.id).eq('archived', false);
+      if (error) throw error;
+
+      showNotification('All rooms archived');
+      loadRooms(); // Refresh rooms list
+    } catch (error) {
+      console.error('Error archiving rooms:', error);
+      showNotification('Error archiving rooms');
+    } finally {
+      archiveAllRoomsBtn.textContent = 'Archive All Rooms';
+      archiveAllRoomsBtn.disabled = false;
+    }
+  });
+
+  deleteAllRoomsBtn.addEventListener('click', async () => {
+    if (!confirm('Are you sure you want to delete ALL rooms? This will also delete all student data. This cannot be undone.')) return;
+    if (!confirm('This is your last chance. Are you absolutely sure?')) return;
+
+    try {
+      const { data: { user } } = await SupabaseClient.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      deleteAllRoomsBtn.textContent = 'Deleting...';
+      deleteAllRoomsBtn.disabled = true;
+
+      // Get all room IDs
+      const { data: rooms } = await SupabaseClient.from('rooms').select('id').eq('teacher_id', user.id);
+      if (!rooms || rooms.length === 0) {
+        showNotification('No rooms to delete');
+        return;
+      }
+
+      const roomIds = rooms.map(r => r.id);
+
+      // Delete students for all rooms
+      await SupabaseClient.from('students').delete().in('room_id', roomIds);
+
+      // Delete rooms
+      const { error } = await SupabaseClient.from('rooms').delete().in('id', roomIds);
+      if (error) throw error;
+
+      showNotification('All rooms deleted');
+      loadRooms(); // Refresh rooms list
+    } catch (error) {
+      console.error('Error deleting rooms:', error);
+      showNotification('Error deleting rooms');
+    } finally {
+      deleteAllRoomsBtn.textContent = 'Delete All Rooms';
+      deleteAllRoomsBtn.disabled = false;
     }
   });
 
