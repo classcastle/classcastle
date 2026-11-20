@@ -2864,11 +2864,13 @@ Value: 1;https://edge.microsoft.com/extensionstore/acfkgmbemlolnjcnhfokelioeieno
               
               <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--line);">
                 <h3 style="font-size: 1rem; margin: 0 0 8px; color: var(--ink);">Data Management</h3>
-                <p style="color: var(--soft); margin-bottom: 12px; font-size: 0.9rem;">Export or clear your data.</p>
+                <p style="color: var(--soft); margin-bottom: 12px; font-size: 0.9rem;">Export or import your data.</p>
                 <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                   <button class="btn btn-secondary" id="exportAllDataBtn">Export All Data</button>
+                  <button class="btn btn-secondary" id="importDataBtn">Import Data</button>
                   <button class="btn btn-secondary" id="clearActivityLogsBtn">Clear Activity Logs</button>
                 </div>
+                <input type="file" id="importDataInput" accept=".json" style="display: none;">
               </div>
 
               <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--line);">
@@ -3275,6 +3277,8 @@ read sensitive data, or perform actions as you.
 
   // Danger zone elements
   const exportAllDataBtn = document.getElementById('exportAllDataBtn');
+  const importDataBtn = document.getElementById('importDataBtn');
+  const importDataInput = document.getElementById('importDataInput');
   const clearActivityLogsBtn = document.getElementById('clearActivityLogsBtn');
   const archiveAllRoomsBtn = document.getElementById('archiveAllRoomsBtn');
   const deleteAllRoomsBtn = document.getElementById('deleteAllRoomsBtn');
@@ -5743,6 +5747,87 @@ read sensitive data, or perform actions as you.
     } finally {
       exportAllDataBtn.textContent = 'Export All Data';
       exportAllDataBtn.disabled = false;
+    }
+  });
+
+  importDataBtn.addEventListener('click', () => {
+    importDataInput.click();
+  });
+
+  importDataInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      const { data: { user } } = await SupabaseClient.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      importDataBtn.textContent = 'Importing...';
+      importDataBtn.disabled = true;
+
+      const text = await file.text();
+      const importData = JSON.parse(text);
+
+      // Validate import data structure
+      if (!importData.rooms || !Array.isArray(importData.rooms)) {
+        throw new Error('Invalid import file format');
+      }
+
+      // Import rooms
+      for (const room of importData.rooms) {
+        const { id, created_at, teacher_id, ...roomData } = room;
+        await SupabaseClient.from('rooms').insert({
+          ...roomData,
+          teacher_id: user.id,
+          id: undefined // Let Supabase generate new ID
+        });
+      }
+
+      // Import students (if they exist)
+      if (importData.students && Array.isArray(importData.students)) {
+        for (const student of importData.students) {
+          const { id, created_at, ...studentData } = student;
+          await SupabaseClient.from('students').insert({
+            ...studentData,
+            teacher_id: user.id,
+            id: undefined
+          });
+        }
+      }
+
+      // Import URL shortcuts (if they exist)
+      if (importData.urlShortcuts && Array.isArray(importData.urlShortcuts)) {
+        for (const shortcut of importData.urlShortcuts) {
+          const { id, created_at, ...shortcutData } = shortcut;
+          await SupabaseClient.from('url_shortcuts').insert({
+            ...shortcutData,
+            teacher_id: user.id,
+            id: undefined
+          });
+        }
+      }
+
+      // Import exit tickets (if they exist)
+      if (importData.exitTickets && Array.isArray(importData.exitTickets)) {
+        for (const ticket of importData.exitTickets) {
+          const { id, created_at, ...ticketData } = ticket;
+          await SupabaseClient.from('exit_tickets').insert({
+            ...ticketData,
+            teacher_id: user.id,
+            id: undefined
+          });
+        }
+      }
+
+      showNotification('Data imported successfully');
+      loadRooms(); // Refresh rooms list
+    } catch (error) {
+      console.error('Error importing data:', error);
+      showNotification('Error importing data: ' + error.message);
+    } finally {
+      importDataBtn.textContent = 'Import Data';
+      importDataBtn.disabled = false;
+      importDataInput.value = '';
     }
   });
 
